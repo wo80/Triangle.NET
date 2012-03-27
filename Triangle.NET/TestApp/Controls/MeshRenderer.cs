@@ -89,12 +89,27 @@ namespace TestApp
 
         private void IntializeBuffer()
         {
-            if (buffer != null)
+            if (this.Width > 0 && this.Height > 0)
             {
-                buffer.Dispose();
-            }
+                if (buffer != null)
+                {
+                    if (this.ClientRectangle == buffer.Graphics.VisibleClipBounds)
+                    {
+                        // Bounds didn't change. Probably we just restored the window
+                        // from minimized state.
+                        return;
+                    }
 
-            buffer = context.Allocate(Graphics.FromHwnd(this.Handle), this.ClientRectangle);
+                    buffer.Dispose();
+                }
+
+                buffer = context.Allocate(Graphics.FromHwnd(this.Handle), this.ClientRectangle);
+
+                if (initialized)
+                {
+                    this.Render();
+                }
+            }
         }
 
         private void RenderPoints(Graphics g)
@@ -296,7 +311,7 @@ namespace TestApp
 
             IntializeBuffer();
 
-            //_coordinates.SetBounds(this.ClientRectangle);
+            //zoom.Initialize(this.ClientRectangle, data.Bounds);
         }
 
         #endregion
