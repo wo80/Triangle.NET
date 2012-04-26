@@ -14,6 +14,7 @@ namespace TriangleNet
     using TriangleNet.Log;
     using TriangleNet.IO;
     using TriangleNet.Algorithm;
+    using TriangleNet.Smoothing;
 
     /// <summary>
     /// Mesh data structure.
@@ -22,7 +23,7 @@ namespace TriangleNet
     {
         #region Variables
 
-        ILog<string> logger;
+        ILog<SimpleLogItem> logger;
 
         Quality quality;
         Sampler sampler;
@@ -49,11 +50,11 @@ namespace TriangleNet
         internal int inelements;            // Number of input triangles.
         internal int insegments;            // Number of input segments.
         internal int undeads;    // Number of input vertices that don't appear in the mesh.
-        internal long edges;                // Number of output edges.
+        internal int edges;                // Number of output edges.
         internal int mesh_dim;              // Dimension (ought to be 2).
         internal int nextras;               // Number of attributes per vertex.
         internal int eextras;               // Number of attributes per triangle.
-        internal long hullsize;             // Number of edges in convex hull.
+        internal int hullsize;             // Number of edges in convex hull.
         internal int steinerleft;           // Number of Steiner points not yet used.
         internal bool checksegments;        // Are there segments in the triangulation yet?
         internal bool checkquality;         // Has quality triangulation begun yet?
@@ -84,7 +85,7 @@ namespace TriangleNet
 
         public Mesh()
         {
-            logger = SimpleLogger.Instance;
+            logger = SimpleLog.Instance;
 
             Behavior.Init();
 
@@ -266,8 +267,6 @@ namespace TriangleNet
                 quality.EnforceQuality();           // Enforce angle and area constraints.
             }
 
-            quality.CheckMesh();
-
             // Calculate the number of edges.
             edges = (3 * triangles.Count + hullsize) / 2;
         }
@@ -357,8 +356,8 @@ namespace TriangleNet
             }
 
             // TODO
-            holes.Clear();
-            regions.Clear();
+            //holes.Clear();
+            //regions.Clear();
 
             if (triangles.Count > 0)
             {
@@ -368,6 +367,15 @@ namespace TriangleNet
 
             // Calculate the number of edges.
             edges = (3 * triangles.Count + hullsize) / 2;
+        }
+
+        /// <summary>
+        /// Smooth the current mesh.
+        /// </summary>
+        public void Smooth()
+        {
+            //ISmoother smoother = new CvdSmoother(this);
+            //smoother.Smooth();
         }
 
         /// <summary>
@@ -626,12 +634,22 @@ namespace TriangleNet
             triangles.Clear();
             subsegs.Clear();
 
+            holes.Clear();
+            regions.Clear();
+
             Triangle.ResetHashSeed(0);
             Vertex.ResetHashSeed(0);
             Subseg.ResetHashSeed(0);
 
             viri.Clear();
             flipstackers.Clear();
+
+            hullsize = 0;
+            xmin = 0;
+            xmax = 0;
+            ymin = 0;
+            ymax = 0;
+            edges = 0;
 
             Reset();
         }
@@ -2300,7 +2318,7 @@ namespace TriangleNet
 
             // TODO: Improve sampling.
             sampler.Update(this);
-            int[] samples = sampler.GetSamples();
+            int[] samples = sampler.GetSamples(this);
 
             foreach (var key in samples)
             {
@@ -2473,7 +2491,6 @@ namespace TriangleNet
             double tx, ty;
             double etx, ety;
             double split, denom;
-            int i;
 
             // Find the other three segment endpoints.
             endpoint1 = splittri.Apex();
@@ -2990,15 +3007,15 @@ namespace TriangleNet
         void InsertSegment(Vertex endpoint1, Vertex endpoint2, int newmark)
         {
             Otri searchtri1 = default(Otri), searchtri2 = default(Otri);
-            Vertex checkvertex;
+            Vertex checkvertex = null;
 
             // Find a triangle whose origin is the segment's first endpoint.
-            checkvertex = null;
             searchtri1 = endpoint1.tri;
             if (searchtri1.triangle != null)
             {
                 checkvertex = searchtri1.Org();
             }
+
             if (checkvertex != endpoint1)
             {
                 // Find a boundary triangle to search from.

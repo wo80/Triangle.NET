@@ -170,7 +170,7 @@ namespace TriangleNet.Algorithm
                 {
                     if (Behavior.Verbose)
                     {
-                        SimpleLogger.Instance.Warning("A duplicate vertex appeared and was ignored.", 
+                        SimpleLog.Instance.Warning("A duplicate vertex appeared and was ignored.",
                             "Incremental.IncrementalDelaunay()");
                     }
                     v.type = VertexType.UndeadVertex;

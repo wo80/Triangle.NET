@@ -64,7 +64,9 @@
     <Compile Include="IO\DataWriter.cs" />
     <Compile Include="IO\FileReader.cs" />
     <Compile Include="Log\ILog.cs" />
-    <Compile Include="Log\SimpleLogger.cs" />
+    <Compile Include="Log\ILogItem.cs" />
+    <Compile Include="Log\SimpleLog.cs" />
+    <Compile Include="Log\SimpleLogItem.cs" />
     <Compile Include="NewLocation.cs" />
     <Compile Include="Quality.cs" />
     <Compile Include="Enums.cs" />
@@ -73,6 +75,7 @@
     <Compile Include="Primitives.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sampler.cs" />
+    <Compile Include="Smoothing\ISmoother.cs" />
     <Compile Include="Statistic.cs" />
     <Compile Include="Algorithm\SweepLine.cs" />
     <Compile Include="IO\MeshData.cs" />

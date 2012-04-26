@@ -50,28 +50,6 @@ namespace TriangleNet.Data
             }
         }
 
-        public static bool operator ==(Vertex a, Vertex b)
-        {
-            // If vertex is null return false.
-            if ((object)a == null)
-            {
-                return false;
-            }
-
-            return a.Equals(b);
-        }
-
-        public static bool operator !=(Vertex a, Vertex b)
-        {
-            // If vertex is null return false.
-            if ((object)a == null)
-            {
-                return false;
-            }
-
-            return !a.Equals(b);
-        }
-
         /// <summary>
         /// Gets the specified coordinate of the vertex.
         /// </summary>
@@ -110,31 +88,53 @@ namespace TriangleNet.Data
             hashSeed = value;
         }
 
-        public override int GetHashCode()
-        {
-            return this.Hash;
-        }
+        #region Operator overloading / overriding Equals
 
-        public override bool Equals(object obj)
-        {
-            Vertex v = obj as Vertex;
+        // Compare "Guidelines for Overriding Equals() and Operator =="
+        // http://msdn.microsoft.com/en-us/library/ms173147.aspx
 
-            if (v == null)
-            {
-                return false;
-            }
-
-            return this.Equals(v);
-        }
-
-        public bool Equals(Vertex v)
+        public static bool operator ==(Vertex a, Vertex b)
         {
             // If both are null, or both are same instance, return true.
-            if (object.ReferenceEquals(this, v))
+            if (Object.ReferenceEquals(a, b))
             {
                 return true;
             }
 
+            // If one is null, but not both, return false.
+            if (((object)a == null) || ((object)b == null))
+            {
+                return false;
+            }
+
+            return a.Equals(b);
+        }
+
+        public static bool operator !=(Vertex a, Vertex b)
+        {
+            return !(a == b);
+        }
+
+        public override bool Equals(object obj)
+        {
+            // If parameter is null return false.
+            if (obj == null)
+            {
+                return false;
+            }
+
+            Vertex v = obj as Vertex;
+
+            if ((object)v == null)
+            {
+                return false;
+            }
+
+            return this.pt.Equals(v.pt);
+        }
+
+        public bool Equals(Vertex v)
+        {
             // If vertex is null return false.
             if ((object)v == null)
             {
@@ -145,6 +145,12 @@ namespace TriangleNet.Data
             return this.pt.Equals(v.pt);
         }
 
+        public override int GetHashCode()
+        {
+            return this.Hash;
+        }
+
+        #endregion
 
         public override string ToString()
         {

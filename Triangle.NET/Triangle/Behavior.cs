@@ -51,12 +51,12 @@ namespace TriangleNet
             RegionAttrib = false;
             Convex = false;
             Jettison = false;
-            UseBoundaryMarkers = false;
+            UseBoundaryMarkers = true;
             NoHoles = false;
             NoExact = false;
             ConformDel = false;
             Algorithm = TriangulationAlgorithm.Dwyer;
-            Verbose = false;
+            Verbose = true;
             UseSegments = true;
 
             NoBisect = 0;

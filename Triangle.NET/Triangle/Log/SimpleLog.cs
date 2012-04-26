@@ -17,21 +17,23 @@ namespace TriangleNet.Log
     /// <remarks>Using singleton pattern as proposed by Jon Skeet.
     /// http://csharpindepth.com/Articles/General/Singleton.aspx
     /// </remarks>
-    public sealed class SimpleLogger : ILog<string>
+    public sealed class SimpleLog : ILog<SimpleLogItem>
     {
-        private List<string> log = new List<string>();
+        private List<SimpleLogItem> log = new List<SimpleLogItem>();
+
+        private LogLevel level = LogLevel.Info;
 
         #region Singleton pattern
 
-        private static readonly SimpleLogger instance = new SimpleLogger();
+        private static readonly SimpleLog instance = new SimpleLog();
 
         // Explicit static constructor to tell C# compiler
         // not to mark type as beforefieldinit
-        static SimpleLogger() { }
+        static SimpleLog() { }
 
-        private SimpleLogger() { }
+        private SimpleLog() { }
 
-        public static ILog<string> Instance
+        public static ILog<SimpleLogItem> Instance
         {
             get
             {
@@ -41,34 +43,39 @@ namespace TriangleNet.Log
 
         #endregion
 
-        public void Add(string item)
+        public void Add(SimpleLogItem item)
         {
             log.Add(item);
         }
 
-        public void Info(string message)
+        public void Clear()
         {
-            log.Add(message);
+            log.Clear();
         }
 
-        public void Trace(string message, string location)
+        public void Info(string message)
         {
-            log.Add(message);
+            log.Add(new SimpleLogItem(LogLevel.Info, message));
         }
 
         public void Warning(string message, string location)
         {
-            log.Add(message);
+            log.Add(new SimpleLogItem(LogLevel.Warning, message, location));
         }
 
         public void Error(string message, string location)
         {
-            log.Add(message);
+            log.Add(new SimpleLogItem(LogLevel.Error, message, location));
         }
 
-        public IList<string> Data
+        public IList<SimpleLogItem> Data
         {
             get { return log; }
+        }
+
+        public LogLevel Level
+        {
+            get { return level; }
         }
     }
 }

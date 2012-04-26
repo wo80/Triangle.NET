@@ -17,7 +17,7 @@ namespace TriangleNet
     {
         static readonly double SQRT2 = 1.4142135623730950488016887242096980785696718753769480732;
 
-        public List<BadTriangle> badtriangles;
+        public int Count { get { return this.count; } }
 
         // Variables that maintain the bad triangle queues.  The queues are
         //   ordered from 4095 (highest priority) to 0 (lowest priority).
@@ -27,15 +27,19 @@ namespace TriangleNet
         int[] nextnonemptyq;//[4096];
         int firstnonemptyq;
 
+        int count;
+
         public BadTriQueue()
         {
-            badtriangles = new List<BadTriangle>();
+            //badtriangles = new List<BadTriangle>();
 
             queuefront = new BadTriangle[4096];
             queuetail = new BadTriangle[4096];
             nextnonemptyq = new int[4096];
 
             firstnonemptyq = -1;
+
+            count = 0;
         }
 
         #region Queue
@@ -56,6 +60,8 @@ namespace TriangleNet
             int queuenumber;
             int posexponent;
             int i;
+
+            this.count++;
 
             // Determine the appropriate queue to put the bad triangle into.
             // Recall that the key is the square of its shortest edge length.
@@ -166,7 +172,7 @@ namespace TriangleNet
             Vertex dest = enqtri.Dest();
             Vertex apex = enqtri.Apex();
 
-            badtriangles.Add(newbad);
+            //badtriangles.Add(newbad);
 
             Enqueue(newbad);
         }
@@ -184,6 +190,9 @@ namespace TriangleNet
             {
                 return null;
             }
+
+            this.count--;
+
             // Find the first triangle of the highest-priority queue.
             result = queuefront[firstnonemptyq];
             // Remove the triangle from the queue.

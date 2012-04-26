@@ -170,6 +170,20 @@ namespace TriangleNet.IO
 
                 i++;
             }
+
+            n = mesh.holes.Count;
+
+            if (n > 0)
+            {
+                data.Holes = new double[n][];
+
+                i = 0;
+                foreach (var hole in mesh.holes)
+                {
+                    data.Holes[i] = new double[] { hole.X, hole.Y };
+                    i++;
+                }
+            }
         }
 
         /// <summary>
@@ -281,7 +295,7 @@ namespace TriangleNet.IO
         /// <summary>
         /// Gets the Voronoi diagram as raw output data.
         /// </summary>
-        /// <param name="m"></param>
+        /// <param name="mesh"></param>
         /// <returns></returns>
         /// <remarks>
         /// The Voronoi diagram is the geometric dual of the Delaunay triangulation.
@@ -292,7 +306,7 @@ namespace TriangleNet.IO
         /// WARNING:  In order to assign numbers to the Voronoi vertices, this
         /// procedure messes up the subsegments or the extra nodes of every
         /// element.  Hence, you should call this procedure last.</remarks>
-        public static VoronoiData WriteVoronoi(Mesh m)
+        public static VoronoiData WriteVoronoi(Mesh mesh)
         {
             VoronoiData data = new VoronoiData();
 
@@ -302,15 +316,29 @@ namespace TriangleNet.IO
             double xi = 0, eta = 0;
             int p1, p2;
 
+            int i = 0;
+
+            // Copy input points (actually not part of the voronoi diagram)
+            data.InputPoints = new double[mesh.vertices.Count][];
+
+            foreach (var item in mesh.vertices.Values)
+            {
+                if (item.type != VertexType.UndeadVertex)
+                {
+                    data.InputPoints[i] = new double[] { item.pt.X, item.pt.Y };
+                    i++;
+                }
+            }
+
             // Allocate memory for Voronoi vertices.
-            data.PointList = new double[m.triangles.Count][];
+            data.Points = new double[mesh.triangles.Count][];
 
             int index = 0;
 
             tri.orient = 0;
             
-            int i = 0;
-            foreach (var item in m.triangles.Values)
+            i = 0;
+            foreach (var item in mesh.triangles.Values)
             {
                 tri.triangle = item;
                 torg = tri.Org();
@@ -319,17 +347,17 @@ namespace TriangleNet.IO
                 circumcenter = Primitives.FindCircumcenter(torg.pt, tdest.pt, tapex.pt, ref xi, ref eta, false);
 
                 // X and y coordinates.
-                data.PointList[i] = new double[] { circumcenter.X, circumcenter.Y };
+                data.Points[i] = new double[] { circumcenter.X, circumcenter.Y };
 
                 // Update element id
                 tri.triangle.ID = i++;
             }
 
             // Allocate memory for output Voronoi edges.
-            data.EdgeList = new int[m.edges][];
+            data.Edges = new int[mesh.edges][];
 
             // Allocate memory for output Voronoi norms.
-            data.NormList = new double[m.edges][];
+            data.Directions = new double[mesh.edges][];
 
             index = 0;
             // To loop over the set of edges, loop over all triangles, and look at
@@ -338,7 +366,7 @@ namespace TriangleNet.IO
             // adjacent triangle, operate on the edge only if the current triangle
             // has a smaller pointer than its neighbor.  This way, each edge is
             // considered only once.
-            foreach (var item in m.triangles.Values)
+            foreach (var item in mesh.triangles.Values)
             {
                 tri.triangle = item;
 
@@ -356,8 +384,8 @@ namespace TriangleNet.IO
                             tdest = tri.Dest();
 
                             // Copy an infinite ray. Index of one endpoint, and -1.
-                            data.EdgeList[index] = new int[] { p1, -1};
-                            data.NormList[index] = new double[] { tdest[1] - torg[1], torg[0] - tdest[0] };
+                            data.Edges[index] = new int[] { p1, -1};
+                            data.Directions[index] = new double[] { tdest[1] - torg[1], torg[0] - tdest[0] };
                         }
                         else
                         {
@@ -365,8 +393,8 @@ namespace TriangleNet.IO
                             p2 = trisym.triangle.ID;
                             // Finite edge. Write indices of two endpoints.
 
-                            data.EdgeList[index] = new int[] { p1, p2 };
-                            data.NormList[index] = new double[] { 0, 0 };
+                            data.Edges[index] = new int[] { p1, p2 };
+                            data.Directions[index] = new double[] { 0, 0 };
                         }
 
                         index++;

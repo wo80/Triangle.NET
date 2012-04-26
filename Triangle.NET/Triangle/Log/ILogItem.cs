@@ -11,27 +11,14 @@ namespace TriangleNet.Log
     using System.Linq;
     using System.Text;
 
-    public enum LogLevel
-    {
-        Info = 0,
-        Warning = 1,
-        Error = 2
-    }
-
     /// <summary>
-    /// A basic log interface.
+    /// A basic log item interface.
     /// </summary>
-    public interface ILog<T> where T : ILogItem
+    public interface ILogItem
     {
-        void Add(T item);
-        void Clear();
-
-        void Info(string message);
-        void Error(string message, string info);
-        void Warning(string message, string info);
-
-        IList<T> Data { get; }
-
+        DateTime Time { get; }
         LogLevel Level { get; }
+        string Message { get; }
+        string Info { get; }
     }
 }

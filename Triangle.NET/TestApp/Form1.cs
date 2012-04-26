@@ -97,7 +97,7 @@ namespace TestApp
 
             meshRenderer1.SetData(mesh, false);
 
-            statistic.Update(mesh);
+            statistic.Update(mesh, 10);
 
             if (formStats != null && !formStats.IsDisposed)
             {
@@ -121,7 +121,7 @@ namespace TestApp
         {
             if (Directory.Exists(@"..\..\..\Data\"))
             {
-                dlgDirectory = @"..\..\..\Data\";
+                dlgDirectory = Path.GetFullPath(@"..\..\..\Data\");
 
                 //Examples.Example1();
                 //Examples.Example2();
@@ -129,7 +129,7 @@ namespace TestApp
             }
             else if (Directory.Exists(@"Data\"))
             {
-                dlgDirectory = @"Data\";
+                dlgDirectory = Path.GetFullPath(@"Data\");
             }
             
         }
@@ -217,7 +217,7 @@ namespace TestApp
 
                     meshRenderer1.SetData(mesh, false);
 
-                    statistic.Update(mesh);
+                    statistic.Update(mesh, 10);
 
                     if (formStats != null && !formStats.IsDisposed)
                     {

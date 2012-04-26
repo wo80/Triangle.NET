@@ -22,11 +22,11 @@ namespace TriangleNet
         Mesh mesh;
         Func<Vertex, Vertex, Vertex, double, bool> userTest;
 
-        ILog<string> logger;
+        ILog<SimpleLogItem> logger;
 
         public Quality(Mesh m)
         {
-            logger = SimpleLogger.Instance;
+            logger = SimpleLog.Instance;
 
             badsubsegs = new Queue<BadSubseg>();
             queue = new BadTriQueue();
@@ -957,7 +957,7 @@ namespace TriangleNet
                 TallyFaces();
 
                 mesh.checkquality = true;
-                while ((queue.badtriangles.Count > 0) && (mesh.steinerleft != 0))
+                while ((queue.Count > 0) && (mesh.steinerleft != 0))
                 {
                     // Fix one bad triangle by inserting a vertex at its circumcenter.
                     badtri = queue.Dequeue();
@@ -974,7 +974,7 @@ namespace TriangleNet
                     else
                     {
                         // Return the bad triangle to the pool.
-                        queue.badtriangles.Remove(badtri);
+                        //queue.badtriangles.Remove(badtri);
                     }
                 }
             }

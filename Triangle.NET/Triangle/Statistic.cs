@@ -49,7 +49,7 @@ namespace TriangleNet
         public static long CircleTopCount = 0;
 
         /// <summary>
-        /// Number of vertex relocation.
+        /// Number of vertex relocations.
         /// </summary>
         public static long RelocationCount = 0;
 
@@ -59,190 +59,198 @@ namespace TriangleNet
 
         double minEdge = 0;
         /// <summary>
-        /// Shortest edge
+        /// Gets the shortest edge.
         /// </summary>
         public double ShortestEdge { get { return minEdge; } }
 
         double maxEdge = 0;
         /// <summary>
-        /// Longest edge
+        /// Gets the longest edge.
         /// </summary>
         public double LongestEdge { get { return maxEdge; } }
 
         //
         double minAspect = 0;
         /// <summary>
-        /// Shortest altitude  
+        /// Gets the shortest altitude.
         /// </summary>
         public double ShortestAltitude  { get { return minAspect; } }
 
         double maxAspect = 0;
         /// <summary>
-        /// Largest aspect ratio
+        /// Gets the largest aspect ratio.
         /// </summary>
         public double LargestAspectRatio { get { return maxAspect; } }
 
         double minArea = 0;
         /// <summary>
-        /// Smallest area
+        /// Gets the smallest area.
         /// </summary>
         public double SmallestArea { get { return minArea; } }
 
         double maxArea = 0;
         /// <summary>
-        /// Largest area
+        /// Gets the largest area.
         /// </summary>
         public double LargestArea { get { return maxArea; } }
 
         double minAngle = 0;
         /// <summary>
-        /// Smallest angle
+        /// Gets the smallest angle.
         /// </summary>
         public double SmallestAngle { get { return minAngle; } }
 
         double maxAngle = 0;
         /// <summary>
-        /// Largest angle
+        /// Gets the largest angle.
         /// </summary>
         public double LargestAngle { get { return maxAngle; } }
 
         int inVetrices = 0;
         /// <summary>
-        /// Input vertices
+        /// Gets the number of input vertices.
         /// </summary>
         public int InputVertices { get { return inVetrices; } }
 
         int inTriangles = 0;
         /// <summary>
-        /// Input triangles
+        /// Gets the number of input triangles.
         /// </summary>
         public int InputTriangles { get { return inTriangles; } }
 
         int inSegments = 0;
         /// <summary>
-        /// Input segments
+        /// Gets the number of input segments.
         /// </summary>
         public int InputSegments { get { return inSegments; } }
 
         int inHoles = 0;
         /// <summary>
-        /// Input holes
+        /// Gets the number of input holes.
         /// </summary>
         public int InputHoles { get { return inHoles; } }
 
         int outVertices = 0;
         /// <summary>
-        /// Mesh vertices
+        /// Gets the number of mesh vertices.
         /// </summary>
         public int Vertices { get { return outVertices; } }
 
         int outTriangles = 0;
         /// <summary>
-        /// Mesh triangles
+        /// Gets the number of mesh triangles.
         /// </summary>
         public int Triangles { get { return outTriangles; } }
 
         int outEdges = 0;
         /// <summary>
-        /// Mesh edges
+        /// Gets the number of mesh edges.
         /// </summary>
         public int Edges { get { return outEdges; } }
 
         int boundaryEdges = 0;
         /// <summary>
-        /// Exterior boundary edges
+        /// Gets the number of exterior boundary edges.
         /// </summary>
         public int BoundaryEdges { get { return boundaryEdges; } }
 
         int intBoundaryEdges = 0;
         /// <summary>
-        /// Interior boundary edges
+        /// Gets the number of interior boundary edges.
         /// </summary>
         public int InteriorBoundaryEdges { get { return intBoundaryEdges; } }
 
         int constrainedEdges = 0;
         /// <summary>
-        /// Constrained edges
+        /// Gets the number of constrained edges.
         /// </summary>
         public int ConstrainedEdges { get { return constrainedEdges; } }
 
         int[] angleTable;
         /// <summary>
-        /// Angle histogram
+        /// Gets the angle histogram.
         /// </summary>
         public int[] AngleHistogram { get { return angleTable; } }
 
+        int[] minAngles;
+        /// <summary>
+        /// Gets the min angles histogram.
+        /// </summary>
+        public int[] MinAngleHistogram { get { return minAngles; } }
+
+        int[] maxAngles;
+        /// <summary>
+        /// Gets the max angles histogram.
+        /// </summary>
+        public int[] MaxAngleHistogram { get { return maxAngles; } }
+
         #endregion
 
-        /// <summary>
-        /// detailedHistogram()
-        /// </summary>
-        /// <param name="m"></param>
-        void detailedHistogram(Mesh m)
+        #region Private methods
+
+        private void GetAspectHistogram(Mesh mesh)
         {
+            int[] aspecttable;
+            double[] ratiotable;
+
+            aspecttable = new int[16];
+            ratiotable = new double[] { 
+                1.5, 2.0, 2.5, 3.0, 4.0, 6.0, 10.0, 15.0, 25.0, 50.0, 
+                100.0, 300.0, 1000.0, 10000.0, 100000.0, 0.0 };
+
+
+            Otri tri = default(Otri);
             Vertex[] p = new Vertex[3];
-            double[] cosSquareTable = new double[8];
             double[] dx = new double[3], dy = new double[3];
             double[] edgelength = new double[3];
-            double dotproduct;
-            double cosSquare;
+            double triarea;
+            double trilongest2;
+            double triminaltitude2;
+            double triaspect2;
 
-            int i, ii, j, k;
-            double[] cossquaretableHist = new double[89];
-            double radconstHist;
-            int onedegree;
-            int[] angletableHist = new int[180];
+            int aspectindex;
+            int i, j, k;
 
-            radconstHist = Math.PI / 180.0;
-            for (i = 0; i < 89; i++)
+            tri.orient = 0;
+            foreach (var t in mesh.triangles.Values)
             {
-                cossquaretableHist[i] = Math.Cos(radconstHist * (i + 1));
-                cossquaretableHist[i] = cossquaretableHist[i] * cossquaretableHist[i];
-            }
-            for (i = 0; i < 180; i++)
-            {
-                angletableHist[i] = 0;
-            }
-
-            foreach (var tri in m.triangles.Values)
-            {
-                p[0] = tri.vertices[0];
-                p[1] = tri.vertices[1];
-                p[2] = tri.vertices[2];
+                tri.triangle = t;
+                p[0] = tri.Org();
+                p[1] = tri.Dest();
+                p[2] = tri.Apex();
+                trilongest2 = 0.0;
 
                 for (i = 0; i < 3; i++)
                 {
                     j = plus1Mod3[i];
                     k = minus1Mod3[i];
-                    dx[i] = p[j][0] - p[k][0];
-                    dy[i] = p[j][1] - p[k][1];
+                    dx[i] = p[j].pt.X - p[k].pt.X;
+                    dy[i] = p[j].pt.Y - p[k].pt.Y;
                     edgelength[i] = dx[i] * dx[i] + dy[i] * dy[i];
+                    if (edgelength[i] > trilongest2)
+                    {
+                        trilongest2 = edgelength[i];
+                    }
                 }
-                for (i = 0; i < 3; i++)
+
+                //triarea = Primitives.CounterClockwise(p[0], p[1], p[2]);
+                triarea = Math.Abs((p[2].pt.X - p[0].pt.X) * (p[1].pt.Y - p[0].pt.Y) -
+                    (p[1].pt.X - p[0].pt.X) * (p[2].pt.Y - p[0].pt.Y)) / 2.0;
+
+                triminaltitude2 = triarea * triarea / trilongest2;
+
+                triaspect2 = trilongest2 / triminaltitude2;
+
+                aspectindex = 0;
+                while ((triaspect2 > ratiotable[aspectindex] * ratiotable[aspectindex]) && (aspectindex < 15))
                 {
-                    j = plus1Mod3[i];
-                    k = minus1Mod3[i];
-                    dotproduct = dx[j] * dx[k] + dy[j] * dy[k];
-                    cosSquare = dotproduct * dotproduct / (edgelength[j] * edgelength[k]);
-                    onedegree = 89;
-                    for (ii = 88; ii >= 0; ii--)
-                    {
-                        if (cosSquare > cossquaretableHist[ii])
-                        {
-                            onedegree = ii;
-                        }
-                    }
-                    if (dotproduct <= 0.0)
-                    {
-                        angletableHist[onedegree]++;
-                    }
-                    else
-                    {
-                        angletableHist[179 - onedegree]++;
-                    }
+                    aspectindex++;
                 }
+                aspecttable[aspectindex]++;
             }
         }
+
+        #endregion
 
         static readonly int[] plus1Mod3 = { 1, 2, 0 };
         static readonly int[] minus1Mod3 = { 2, 0, 1 };
@@ -251,7 +259,7 @@ namespace TriangleNet
         /// Update statistics about the quality of the mesh.
         /// </summary>
         /// <param name="mesh"></param>
-        public void Update(Mesh mesh)
+        public void Update(Mesh mesh, int sampleDegrees)
         {
             inVetrices = mesh.invertices;
             inTriangles = mesh.inelements;
@@ -267,31 +275,37 @@ namespace TriangleNet
             Point2[] p = new Point2[3];
 
             int k1, k2;
-            int tendegree;
+            int degreeStep;
 
-            double[] cosSquareTable = new double[8];
+            //sampleDegrees = 36; // sample every 5 degrees
+            //sampleDegrees = 45; // sample every 4 degrees
+            sampleDegrees = 60; // sample every 3 degrees
+
+            double[] cosSquareTable = new double[sampleDegrees / 2 - 1];
             double[] dx = new double[3];
             double[] dy = new double[3];
-            double[] edgelength = new double[3];
-            double dotproduct;
-            double cossquare;
-            double triarea;
-            double trilongest2;
-            double triminaltitude2;
-            double triaspect2;
+            double[] edgeLength = new double[3];
+            double dotProduct;
+            double cosSquare;
+            double triArea;
+            double triLongest2;
+            double triMinAltitude2;
+            double triAspect2;
 
-            double radconst = Math.PI / 18.0;
+            double radconst = Math.PI / sampleDegrees;
             double degconst = 180.0 / Math.PI;
 
             // New angle table
-            angleTable = new int[18];
+            angleTable = new int[sampleDegrees];
+            minAngles = new int[sampleDegrees];
+            maxAngles = new int[sampleDegrees];
 
-            for (int i = 0; i < 8; i++)
+            for (int i = 0; i < sampleDegrees / 2 - 1; i++)
             {
                 cosSquareTable[i] = Math.Cos(radconst * (i + 1));
                 cosSquareTable[i] = cosSquareTable[i] * cosSquareTable[i];
             }
-            for (int i = 0; i < 18; i++)
+            for (int i = 0; i < sampleDegrees; i++)
             {
                 angleTable[i] = 0;
             }
@@ -307,14 +321,20 @@ namespace TriangleNet
             maxAngle = 2.0;
 
             bool acuteBiggest = true;
+            bool acuteBiggestTri = true;
+
+            double triMinAngle, triMaxAngle = 1;
 
             foreach (var tri in mesh.triangles.Values)
             {
+                triMinAngle = 0; // Min angle:  0 < a <  60 degress
+                triMaxAngle = 1; // Max angle: 60 < a < 180 degress
+
                 p[0] = tri.vertices[0].pt;
                 p[1] = tri.vertices[1].pt;
                 p[2] = tri.vertices[2].pt;
 
-                trilongest2 = 0.0;
+                triLongest2 = 0.0;
 
                 for (int i = 0; i < 3; i++)
                 {
@@ -324,44 +344,48 @@ namespace TriangleNet
                     dx[i] = p[k1].X - p[k2].X;
                     dy[i] = p[k1].Y - p[k2].Y;
 
-                    edgelength[i] = dx[i] * dx[i] + dy[i] * dy[i];
+                    edgeLength[i] = dx[i] * dx[i] + dy[i] * dy[i];
 
-                    if (edgelength[i] > trilongest2)
+                    if (edgeLength[i] > triLongest2)
                     {
-                        trilongest2 = edgelength[i];
+                        triLongest2 = edgeLength[i];
                     }
 
-                    if (edgelength[i] > maxEdge)
+                    if (edgeLength[i] > maxEdge)
                     {
-                        maxEdge = edgelength[i];
+                        maxEdge = edgeLength[i];
                     }
 
-                    if (edgelength[i] < minEdge)
+                    if (edgeLength[i] < minEdge)
                     {
-                        minEdge = edgelength[i];
+                        minEdge = edgeLength[i];
                     }
                 }
 
                 //triarea = Primitives.CounterClockwise(p[0], p[1], p[2]);
-                triarea = Math.Abs((p[2].X - p[0].X) * (p[1].Y - p[0].Y) -
+                triArea = Math.Abs((p[2].X - p[0].X) * (p[1].Y - p[0].Y) -
                     (p[1].X - p[0].X) * (p[2].Y - p[0].Y));
-                if (triarea < minArea)
+
+                if (triArea < minArea)
                 {
-                    minArea = triarea;
+                    minArea = triArea;
                 }
-                if (triarea > maxArea)
+
+                if (triArea > maxArea)
                 {
-                    maxArea = triarea;
+                    maxArea = triArea;
                 }
-                triminaltitude2 = triarea * triarea / trilongest2;
-                if (triminaltitude2 < minAspect)
+
+                triMinAltitude2 = triArea * triArea / triLongest2;
+                if (triMinAltitude2 < minAspect)
                 {
-                    minAspect = triminaltitude2;
+                    minAspect = triMinAltitude2;
                 }
-                triaspect2 = trilongest2 / triminaltitude2;
-                if (triaspect2 > maxAspect)
+
+                triAspect2 = triLongest2 / triMinAltitude2;
+                if (triAspect2 > maxAspect)
                 {
-                    maxAspect = triaspect2;
+                    maxAspect = triAspect2;
                 }
 
                 for (int i = 0; i < 3; i++)
@@ -369,39 +393,91 @@ namespace TriangleNet
                     k1 = plus1Mod3[i];
                     k2 = minus1Mod3[i];
 
-                    dotproduct = dx[k1] * dx[k2] + dy[k1] * dy[k2];
-                    cossquare = dotproduct * dotproduct / (edgelength[k1] * edgelength[k2]);
-                    tendegree = 8;
+                    dotProduct = dx[k1] * dx[k2] + dy[k1] * dy[k2];
+                    cosSquare = dotProduct * dotProduct / (edgeLength[k1] * edgeLength[k2]);
+                    degreeStep = sampleDegrees / 2 - 1;
 
-                    for (int j = 7; j >= 0; j--)
+                    for (int j = degreeStep - 1; j >= 0; j--)
                     {
-                        if (cossquare > cosSquareTable[j])
+                        if (cosSquare > cosSquareTable[j])
                         {
-                            tendegree = j;
+                            degreeStep = j;
                         }
                     }
-                    if (dotproduct <= 0.0)
+
+                    if (dotProduct <= 0.0)
                     {
-                        angleTable[tendegree]++;
-                        if (cossquare > minAngle)
+                        angleTable[degreeStep]++;
+                        if (cosSquare > minAngle)
                         {
-                            minAngle = cossquare;
+                            minAngle = cosSquare;
                         }
-                        if (acuteBiggest && (cossquare < maxAngle))
+                        if (acuteBiggest && (cosSquare < maxAngle))
                         {
-                            maxAngle = cossquare;
+                            maxAngle = cosSquare;
+                        }
+
+                        // Update min/max angle per triangle
+                        if (cosSquare > triMinAngle)
+                        {
+                            triMinAngle = cosSquare;
+                        }
+                        if (acuteBiggestTri && (cosSquare < triMaxAngle))
+                        {
+                            triMaxAngle = cosSquare;
                         }
                     }
                     else
                     {
-                        angleTable[17 - tendegree]++;
-                        if (acuteBiggest || (cossquare > maxAngle))
+                        angleTable[sampleDegrees - degreeStep - 1]++;
+                        if (acuteBiggest || (cosSquare > maxAngle))
                         {
-                            maxAngle = cossquare;
+                            maxAngle = cosSquare;
                             acuteBiggest = false;
+                        }
+
+                        // Update max angle for (possibly non-acute) triangle
+                        if (acuteBiggestTri || (cosSquare > triMaxAngle))
+                        {
+                            triMaxAngle = cosSquare;
+                            acuteBiggestTri = false;
                         }
                     }
                 }
+
+                // Update min angle histogram
+                degreeStep = sampleDegrees / 2 - 1;
+
+                for (int j = degreeStep - 1; j >= 0; j--)
+                {
+                    if (triMinAngle > cosSquareTable[j])
+                    {
+                        degreeStep = j;
+                    }
+                }
+                minAngles[degreeStep]++;
+
+                // Update max angle histogram
+                degreeStep = sampleDegrees / 2 - 1;
+
+                for (int j = degreeStep - 1; j >= 0; j--)
+                {
+                    if (triMaxAngle > cosSquareTable[j])
+                    {
+                        degreeStep = j;
+                    }
+                }
+
+                if (acuteBiggestTri)
+                {
+                    maxAngles[degreeStep]++;
+                }
+                else
+                {
+                    maxAngles[sampleDegrees - degreeStep - 1]++;
+                }
+                
+                acuteBiggestTri = true;
             }
 
             minEdge = Math.Sqrt(minEdge);
@@ -418,6 +494,7 @@ namespace TriangleNet
             {
                 minAngle = degconst * Math.Acos(Math.Sqrt(minAngle));
             }
+
             if (maxAngle >= 1.0)
             {
                 maxAngle = 180.0;
@@ -434,208 +511,5 @@ namespace TriangleNet
                 }
             }
         }
-
-        /* Original code with aspect ratio
-
-        int[] aspecttable;
-        double[] ratiotable;
-
-        public Statistic()
-        {
-            angletable = new int[18];
-            aspecttable = new int[16];
-            ratiotable = new double[] { 
-                1.5, 2.0, 2.5, 3.0, 4.0, 6.0, 10.0, 15.0, 25.0, 50.0, 
-                100.0, 300.0, 1000.0, 10000.0, 100000.0, 0.0 };
-        }
-
-        public void Update(Mesh mesh)
-        {
-            inVetrices = mesh.invertices;
-            inTriangles = mesh.inelements;
-            inSegments = mesh.insegments;
-            inHoles = mesh.holes;
-            outVertices = mesh.vertices.Count - mesh.undeads;
-            outTriangles = mesh.triangles.Count;
-            outEdges = (int)mesh.edges;
-            boundaryEdges = (int)mesh.hullsize;
-            intBoundaryEdges = mesh.subsegs.Count - (int)mesh.hullsize;
-            constrainedEdges = mesh.subsegs.Count;
-
-            Otri triangleloop = default(Otri);
-            Vertex[] p = new Vertex[3];
-            double[] cossquaretable = new double[8];
-            double[] dx = new double[3], dy = new double[3];
-            double[] edgelength = new double[3];
-            double dotproduct;
-            double cossquare;
-            double triarea;
-            double trilongest2;
-            double triminaltitude2;
-            double triaspect2;
-            double radconst, degconst;
-
-            int aspectindex;
-            int tendegree;
-            bool acutebiggest;
-            int i, ii, j, k;
-
-            radconst = Math.PI / 18.0;
-            degconst = 180.0 / Math.PI;
-            for (i = 0; i < 8; i++)
-            {
-                cossquaretable[i] = Math.Cos(radconst * (double)(i + 1));
-                cossquaretable[i] = cossquaretable[i] * cossquaretable[i];
-            }
-            for (i = 0; i < 18; i++)
-            {
-                angletable[i] = 0;
-            }
-
-            for (i = 0; i < 16; i++)
-            {
-                aspecttable[i] = 0;
-            }
-
-            worstaspect = 0.0;
-            minaltitude = mesh.xmax - mesh.xmin + mesh.ymax - mesh.ymin;
-            minaltitude = minaltitude * minaltitude;
-            shortest = minaltitude;
-            longest = 0.0;
-            smallestarea = minaltitude;
-            biggestarea = 0.0;
-            worstaspect = 0.0;
-            smallestangle = 0.0;
-            biggestangle = 2.0;
-            acutebiggest = true;
-
-            triangleloop.orient = 0;
-            foreach (var t in mesh.triangles)
-            {
-                triangleloop.triangle = t;
-                p[0] = triangleloop.Org();
-                p[1] = triangleloop.Dest();
-                p[2] = triangleloop.Apex();
-                trilongest2 = 0.0;
-
-                for (i = 0; i < 3; i++)
-                {
-                    j = plus1Mod3[i];
-                    k = minus1Mod3[i];
-                    dx[i] = p[j].pt.X - p[k].pt.X;
-                    dy[i] = p[j].pt.Y - p[k].pt.Y;
-                    edgelength[i] = dx[i] * dx[i] + dy[i] * dy[i];
-                    if (edgelength[i] > trilongest2)
-                    {
-                        trilongest2 = edgelength[i];
-                    }
-                    if (edgelength[i] > longest)
-                    {
-                        longest = edgelength[i];
-                    }
-                    if (edgelength[i] < shortest)
-                    {
-                        shortest = edgelength[i];
-                    }
-                }
-
-                //triarea = Primitives.CounterClockwise(p[0], p[1], p[2]);
-                triarea = Math.Abs((p[2].pt.X - p[0].pt.X) * (p[1].pt.Y - p[0].pt.Y) -
-                    (p[1].pt.X - p[0].pt.X) * (p[2].pt.Y - p[0].pt.Y)) / 2.0;
-                if (triarea < smallestarea)
-                {
-                    smallestarea = triarea;
-                }
-                if (triarea > biggestarea)
-                {
-                    biggestarea = triarea;
-                }
-                triminaltitude2 = triarea * triarea / trilongest2;
-                if (triminaltitude2 < minaltitude)
-                {
-                    minaltitude = triminaltitude2;
-                }
-                triaspect2 = trilongest2 / triminaltitude2;
-                if (triaspect2 > worstaspect)
-                {
-                    worstaspect = triaspect2;
-                }
-                aspectindex = 0;
-                while ((triaspect2 > ratiotable[aspectindex] * ratiotable[aspectindex]) && (aspectindex < 15))
-                {
-                    aspectindex++;
-                }
-                aspecttable[aspectindex]++;
-
-                for (i = 0; i < 3; i++)
-                {
-                    j = plus1Mod3[i];
-                    k = minus1Mod3[i];
-                    dotproduct = dx[j] * dx[k] + dy[j] * dy[k];
-                    cossquare = dotproduct * dotproduct / (edgelength[j] * edgelength[k]);
-                    tendegree = 8;
-                    for (ii = 7; ii >= 0; ii--)
-                    {
-                        if (cossquare > cossquaretable[ii])
-                        {
-                            tendegree = ii;
-                        }
-                    }
-                    if (dotproduct <= 0.0)
-                    {
-                        angletable[tendegree]++;
-                        if (cossquare > smallestangle)
-                        {
-                            smallestangle = cossquare;
-                        }
-                        if (acutebiggest && (cossquare < biggestangle))
-                        {
-                            biggestangle = cossquare;
-                        }
-                    }
-                    else
-                    {
-                        angletable[17 - tendegree]++;
-                        if (acutebiggest || (cossquare > biggestangle))
-                        {
-                            biggestangle = cossquare;
-                            acutebiggest = false;
-                        }
-                    }
-                }
-            }
-
-            shortest = Math.Sqrt(shortest);
-            longest = Math.Sqrt(longest);
-            minaltitude = Math.Sqrt(minaltitude);
-            worstaspect = Math.Sqrt(worstaspect);
-            smallestarea *= 0.5;
-            biggestarea *= 0.5;
-            if (smallestangle >= 1.0)
-            {
-                smallestangle = 0.0;
-            }
-            else
-            {
-                smallestangle = degconst * Math.Acos(Math.Sqrt(smallestangle));
-            }
-            if (biggestangle >= 1.0)
-            {
-                biggestangle = 180.0;
-            }
-            else
-            {
-                if (acutebiggest)
-                {
-                    biggestangle = degconst * Math.Acos(Math.Sqrt(biggestangle));
-                }
-                else
-                {
-                    biggestangle = 180.0 - degconst * Math.Acos(Math.Sqrt(biggestangle));
-                }
-            }
-        }
-
-         */
     }
 }

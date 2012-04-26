@@ -583,7 +583,7 @@ namespace TriangleNet.Algorithm
             {
                 if (heapsize == 0)
                 {
-                    SimpleLogger.Instance.Error("Input vertices are all identical.", "SweepLine.SweepLineDelaunay()");
+                    SimpleLog.Instance.Error("Input vertices are all identical.", "SweepLine.SweepLineDelaunay()");
                     throw new Exception("Input vertices are all identical.");
                 }
                 secondvertex = eventheap[0].vertexEvent;
@@ -594,7 +594,7 @@ namespace TriangleNet.Algorithm
                 {
                     if (Behavior.Verbose)
                     {
-                        SimpleLogger.Instance.Warning("A duplicate vertex appeared and was ignored.", 
+                        SimpleLog.Instance.Warning("A duplicate vertex appeared and was ignored.", 
                             "SweepLine.SweepLineDelaunay().1");
                     }
                     secondvertex.type = VertexType.UndeadVertex;
@@ -650,7 +650,7 @@ namespace TriangleNet.Algorithm
                     {
                         if (Behavior.Verbose)
                         {
-                            SimpleLogger.Instance.Warning("A duplicate vertex appeared and was ignored.", 
+                            SimpleLog.Instance.Warning("A duplicate vertex appeared and was ignored.", 
                                 "SweepLine.SweepLineDelaunay().2");
                         }
                         nextvertex.type = VertexType.UndeadVertex;

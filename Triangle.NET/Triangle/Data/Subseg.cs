@@ -27,13 +27,13 @@ namespace TriangleNet.Data
         internal int Hash;
 
         // The ID is only used for mesh output.
-        public int ID;
+        //public int ID;
 
         public Osub[] subsegs;
         public Vertex[] vertices;
         public Otri[] triangles;
         public int boundary;
-        public int segment;
+        //public int segment;
 
         public Subseg()
         {

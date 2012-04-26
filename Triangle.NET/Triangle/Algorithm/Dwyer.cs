@@ -849,7 +849,9 @@ namespace TriangleNet.Algorithm
                 {
                     if (Behavior.Verbose)
                     {
-                        SimpleLogger.Instance.Warning("A duplicate vertex appeared and was ignored.", "DivConquer.DivconqDelaunay()");
+                        SimpleLog.Instance.Warning(
+                            String.Format("A duplicate vertex appeared and was ignored (ID {0}).", sortarray[j].Hash),
+                            "DivConquer.DivconqDelaunay()");
                     }
                     sortarray[j].type = VertexType.UndeadVertex;
                     m.undeads++;

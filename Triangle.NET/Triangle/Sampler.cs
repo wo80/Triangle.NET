@@ -36,10 +36,19 @@ namespace TriangleNet
         /// <param name="mesh">Current mesh.</param>
         public void Update(Mesh mesh)
         {
+            this.Update(mesh, false);
+        }
+
+        /// <summary>
+        /// Update sampling parameters if mesh changed.
+        /// </summary>
+        /// <param name="mesh">Current mesh.</param>
+        public void Update(Mesh mesh, bool forceUpdate)
+        {
             int count = mesh.triangles.Count;
 
             // TODO: Is checking the triangle count a good way to monitor mesh changes?
-            if (triangleCount != count)
+            if (triangleCount != count || forceUpdate)
             {
                 triangleCount = count;
 
@@ -61,20 +70,33 @@ namespace TriangleNet
         /// Get a random sample set of triangle keys.
         /// </summary>
         /// <returns>Array of triangle keys.</returns>
-        public int[] GetSamples()
+        public int[] GetSamples(Mesh mesh)
         {
-            int[] randSamples = new int[samples];
+            // TODO: Using currKeys to check key availability?
+            List<int> randSamples = new List<int>(samples);
 
             int range = triangleCount / samples;
+            int key;
 
             for (int i = 0; i < samples; i++)
             {
                 // Yeah, rand should be equally distributed, but just to make
                 // sure, use a range variable...
-                randSamples[i] = keys[rand.Next(i * range, (i + 1) * range - 1)];
+                key = rand.Next(i * range, (i + 1) * range - 1);
+
+                if (!mesh.triangles.Keys.Contains(keys[key]))
+                {
+                    // Keys collection isn't up to date anymore!
+                    this.Update(mesh, true);
+                    i--;
+                }
+                else
+                {
+                    randSamples.Add(keys[key]);
+                }
             }
 
-            return randSamples;
+            return randSamples.ToArray();
         }
     }
 }

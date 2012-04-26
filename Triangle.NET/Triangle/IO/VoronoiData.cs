@@ -8,17 +8,15 @@
 namespace TriangleNet.IO
 {
     /// <summary>
-    /// Stores the mesh data in- and output.
+    /// Stores the voronoi data (output only).
     /// </summary>
     public class VoronoiData
     {
-        public double[][] PointList;               // In / out
-        //public int NumberOfPoints;               // In / out
-
-        public int[][] EdgeList;         // Out only
-        //public int NumberOfEdges;      // Out only
+        public double[][] InputPoints;
+        public double[][] Points;
+        public int[][] Edges;
 
         // Stores the direction for infinite voronoi edges
-        public double[][] NormList;
+        public double[][] Directions;
     }
 }

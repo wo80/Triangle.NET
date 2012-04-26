@@ -20,12 +20,6 @@ namespace TriangleNet.IO
     /// </summary>
     public static class DataReader
     {
-        class StackTri
-        {
-            public Otri tri = default(Otri);
-            public StackTri next;
-        }
-
         #region Library
 
         /// <summary>
@@ -134,7 +128,7 @@ namespace TriangleNet.IO
                     corner[j] = input.Triangles[i][j];
                     if ((corner[j] < 0) || (corner[j] >= mesh.invertices))
                     {
-                        SimpleLogger.Instance.Error("Triangle has an invalid vertex index.", "MeshReader.Reconstruct()");
+                        SimpleLog.Instance.Error("Triangle has an invalid vertex index.", "MeshReader.Reconstruct()");
                         throw new Exception("Triangle has an invalid vertex index.");
                     }
                 }
@@ -242,7 +236,7 @@ namespace TriangleNet.IO
                     {
                         if ((end[j] < 0) || (end[j] >= mesh.invertices))
                         {
-                            SimpleLogger.Instance.Error("Segment has an invalid vertex index.", "MeshReader.Reconstruct()");
+                            SimpleLog.Instance.Error("Segment has an invalid vertex index.", "MeshReader.Reconstruct()");
                             throw new Exception("Segment has an invalid vertex index.");
                         }
                     }

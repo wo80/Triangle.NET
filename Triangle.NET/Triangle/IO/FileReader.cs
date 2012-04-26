@@ -393,7 +393,7 @@ namespace TriangleNet.IO
                     {
                         if (Behavior.Verbose)
                         {
-                            SimpleLogger.Instance.Warning("Invalid first endpoint of segment.", 
+                            SimpleLog.Instance.Warning("Invalid first endpoint of segment.", 
                                 "MeshReader.ReadPolyfile()");
                         }
                     }
@@ -401,7 +401,7 @@ namespace TriangleNet.IO
                     {
                         if (Behavior.Verbose)
                         {
-                            SimpleLogger.Instance.Warning("Invalid second endpoint of segment.", 
+                            SimpleLog.Instance.Warning("Invalid second endpoint of segment.", 
                                 "MeshReader.ReadPolyfile()");
                         }
                     }
@@ -485,6 +485,15 @@ namespace TriangleNet.IO
                     ReadEleFile(elefile, data, readArea);
                 }
             }
+
+            return data;
+        }
+
+        public static MeshData ReadEleFile(string elefilename)
+        {
+            MeshData data = new MeshData();
+
+            ReadEleFile(elefilename, data, false);
 
             return data;
         }
@@ -590,7 +599,7 @@ namespace TriangleNet.IO
 
                 if (int.Parse(line[0]) != intriangles)
                 {
-                    SimpleLogger.Instance.Warning("Number of area constraints doesn't match number of triangles.", 
+                    SimpleLog.Instance.Warning("Number of area constraints doesn't match number of triangles.", 
                         "ReadAreaFile()");
                     return;
                 }
@@ -613,6 +622,101 @@ namespace TriangleNet.IO
                     data.TriangleAreas[i] = double.Parse(line[1], nfi);
                 }
             }
+        }
+
+        public static MeshData ReadEdgeFile(string edgeFile)
+        {
+            // Read poly file
+            MeshData data = new MeshData();
+
+            startIndex = 0;
+
+            string[] line;
+
+            using (StreamReader reader = new StreamReader(edgeFile))
+            {
+                // Read the edges from a .edge file.
+
+                // Read number of segments and number of boundary markers.
+                if (!TryReadLine(reader, out line))
+                {
+                    throw new Exception("Can't read input file (segments).");
+                }
+
+                int inedges = int.Parse(line[0]);
+
+                int edgemarkers = 0;
+                if (line.Length > 1)
+                {
+                    edgemarkers = int.Parse(line[1]);
+                }
+
+                if (inedges > 0)
+                {
+                    data.Edges = new int[inedges][];
+                }
+
+                if (edgemarkers > 0)
+                {
+                    data.EdgeMarkers = new int[inedges];
+                }
+
+                int end1, end2;
+                // Read and insert the segments.
+                for (int i = 0; i < inedges; i++)
+                {
+                    if (!TryReadLine(reader, out line))
+                    {
+                        throw new Exception("Can't read input file (segments).");
+                    }
+
+                    if (line.Length < 3)
+                    {
+                        throw new Exception("Segment has no endpoints.");
+                    }
+
+                    // TODO: startIndex ok?
+                    end1 = int.Parse(line[1]) - startIndex;
+                    end2 = int.Parse(line[2]) - startIndex;
+
+                    if (edgemarkers > 0)
+                    {
+                        if (line.Length > 3)
+                        {
+                            data.SegmentMarkers[i] = int.Parse(line[3]);
+                        }
+                        else
+                        {
+                            data.SegmentMarkers[i] = 0;
+                        }
+                    }
+
+                    data.Segments[i] = new int[] { end1, end2 };
+
+                    //if ((end1 < 0) || (end1 >= invertices))
+                    //{
+                    //    if (Behavior.Verbose)
+                    //    {
+                    //        SimpleLogger.Instance.Warning("Invalid first endpoint of segment.",
+                    //            "MeshReader.ReadPolyfile()");
+                    //    }
+                    //}
+                    //else if ((end2 < 0) || (end2 >= invertices))
+                    //{
+                    //    if (Behavior.Verbose)
+                    //    {
+                    //        SimpleLogger.Instance.Warning("Invalid second endpoint of segment.",
+                    //            "MeshReader.ReadPolyfile()");
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    data.Segments[i] = new int[] { end1, end2 };
+                    //}
+                }
+            }
+
+            return data;
         }
     }
 }
