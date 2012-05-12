@@ -36,8 +36,7 @@ namespace TriangleNet
             Osub hullsubseg = default(Osub);
             Vertex horg, hdest;
 
-            int workaround, ntri = mesh.triangles.Count;
-            Queue<Triangle> infectedTris = new Queue<Triangle>();
+            int workaround, nseg= mesh.subsegs.Count;
 
             // Find a triangle handle on the hull.
             hulltri.triangle = Mesh.dummytri;
@@ -62,8 +61,6 @@ namespace TriangleNet
                         {
                             hulltri.Infect();
                             mesh.viri.Add(hulltri.triangle);
-
-                            infectedTris.Enqueue(hulltri.triangle);
                         }
                     }
                     else
@@ -93,16 +90,15 @@ namespace TriangleNet
                     nexttri.Copy(ref hulltri);
                     hulltri.Oprev(ref nexttri);
 
-                    workaround++;
-
-                    if (workaround > ntri)
+                    if (++workaround > nseg)
                     {
                         // Reverse infection
-                        mesh.viri.Clear();
-                        while (infectedTris.Count > 0)
+                        foreach (var item in mesh.viri)
                         {
-                            infectedTris.Dequeue().infected = false;
+                            item.infected = false;
                         }
+                        mesh.viri.Clear();
+
                         return false;
                     }
                 }
