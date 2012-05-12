@@ -31,6 +31,15 @@ namespace TriangleNet
         int[] keys;
 
         /// <summary>
+        /// Reset the sampler.
+        /// </summary>
+        public void Reset()
+        {
+            this.samples = 1;
+            this.triangleCount = 0;
+        }
+
+        /// <summary>
         /// Update sampling parameters if mesh changed.
         /// </summary>
         /// <param name="mesh">Current mesh.</param>

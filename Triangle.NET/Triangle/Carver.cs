@@ -9,6 +9,7 @@ namespace TriangleNet
 {
     using TriangleNet.Data;
     using System;
+    using System.Collections.Generic;
 
     /// <summary>
     /// Carves holes into the triangulation.
@@ -27,13 +28,16 @@ namespace TriangleNet
         /// protected by subsegments. Where there are subsegments, set boundary 
         /// markers as appropriate.
         /// </summary>
-        void InfectHull()
+        bool InfectHull()
         {
             Otri hulltri = default(Otri);
             Otri nexttri = default(Otri);
             Otri starttri = default(Otri);
             Osub hullsubseg = default(Osub);
             Vertex horg, hdest;
+
+            int workaround, ntri = mesh.triangles.Count;
+            Queue<Triangle> infectedTris = new Queue<Triangle>();
 
             // Find a triangle handle on the hull.
             hulltri.triangle = Mesh.dummytri;
@@ -44,6 +48,8 @@ namespace TriangleNet
             // Go once counterclockwise around the convex hull.
             do
             {
+                workaround = 0;
+
                 // Ignore triangles that are already infected.
                 if (!hulltri.IsInfected())
                 {
@@ -56,6 +62,8 @@ namespace TriangleNet
                         {
                             hulltri.Infect();
                             mesh.viri.Add(hulltri.triangle);
+
+                            infectedTris.Enqueue(hulltri.triangle);
                         }
                     }
                     else
@@ -84,8 +92,23 @@ namespace TriangleNet
                 {
                     nexttri.Copy(ref hulltri);
                     hulltri.Oprev(ref nexttri);
+
+                    workaround++;
+
+                    if (workaround > ntri)
+                    {
+                        // Reverse infection
+                        mesh.viri.Clear();
+                        while (infectedTris.Count > 0)
+                        {
+                            infectedTris.Dequeue().infected = false;
+                        }
+                        return false;
+                    }
                 }
             } while (!hulltri.Equal(starttri));
+
+            return true;
         }
 
         /// <summary>
@@ -385,7 +408,29 @@ namespace TriangleNet
             {
                 // Mark as infected any unprotected triangles on the boundary.
                 // This is one way by which concavities are created.
-                InfectHull();
+                if (!InfectHull())
+                {
+                    // THIS IS A WORKAROUND FOR
+                    // http://triangle.codeplex.com/workitem/9390
+
+                    // Problem seems to be Otri being a value type. Assigning and getting
+                    // dummytri.neighbors[0] (the triangulation algorithms use this to
+                    // store a pointer to a boundary triangle) always produces an otri copy,
+                    // so changes made to the orientation aren't persisted. The problem occurs
+                    // when InsertSegment -> ConstrainedEdge -> Flip is called and InsertSegment 
+                    // has Mesh.dummytri.neighbors[0] as searchtri1.
+                    Mesh.dummytri.neighbors[0].LprevSelf();
+
+                    if (!InfectHull())
+                    {
+                        Mesh.dummytri.neighbors[0].LprevSelf();
+
+                        if (!InfectHull())
+                        {
+                            throw new Exception("Inconsistent topology.");
+                        }
+                    }
+                }
             }
 
             if (!Behavior.NoHoles)

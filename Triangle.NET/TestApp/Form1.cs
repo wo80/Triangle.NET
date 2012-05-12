@@ -131,7 +131,6 @@ namespace TestApp
             {
                 dlgDirectory = Path.GetFullPath(@"Data\");
             }
-            
         }
 
         private void btnRandPts_Click(object sender, EventArgs e)

@@ -651,6 +651,8 @@ namespace TriangleNet
             ymax = 0;
             edges = 0;
 
+            sampler.Reset();
+
             Reset();
         }
 
