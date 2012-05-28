@@ -485,7 +485,7 @@ namespace TriangleNet.Algorithm
         /// </summary>
         /// <param name="startghost"></param>
         /// <returns>Number of vertices on the hull.</returns>
-        int RemoveGhosts(Mesh m, ref Otri startghost)
+        int RemoveGhosts(ref Otri startghost)
         {
             Otri searchedge = default(Otri);
             Otri dissolveedge = default(Otri);
@@ -525,7 +525,7 @@ namespace TriangleNet.Algorithm
                 // Find the next bounding triangle.
                 deadtriangle.Sym(ref dissolveedge);
                 // Delete the bounding triangle.
-                m.TriangleDealloc(deadtriangle.triangle);
+                mesh.TriangleDealloc(deadtriangle.triangle);
             } while (!dissolveedge.Equal(startghost));
 
             return hullsize;
@@ -746,7 +746,7 @@ namespace TriangleNet.Algorithm
 
             splaynodes.Clear();
             bottommost.LprevSelf();
-            return RemoveGhosts(mesh, ref bottommost);
+            return RemoveGhosts(ref bottommost);
         }
     }
 }

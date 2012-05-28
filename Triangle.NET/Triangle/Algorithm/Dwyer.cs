@@ -47,6 +47,9 @@ namespace TriangleNet.Algorithm
         static Random rand = new Random(DateTime.Now.Millisecond);
         bool useDwyer = true;
 
+        Vertex[] sortarray;
+        Mesh mesh;
+
         /// <summary>
         /// Sort an array of vertices by x-coordinate, using the y-coordinate as a secondary key.
         /// </summary>
@@ -57,7 +60,7 @@ namespace TriangleNet.Algorithm
         /// Uses quicksort. Randomized O(n log n) time. No, I did not make any of
         /// the usual quicksort mistakes.
         /// </remarks>
-        static void VertexSort(Vertex[] sortarray, int left, int right)
+        void VertexSort(int left, int right)
         {
             int oleft = left;
             int oright = right;
@@ -121,12 +124,12 @@ namespace TriangleNet.Algorithm
             if (left > oleft)
             {
                 // Recursively sort the left subset.
-                VertexSort(sortarray, oleft, left);
+                VertexSort(oleft, left);
             }
             if (oright > right + 1)
             {
                 // Recursively sort the right subset.
-                VertexSort(sortarray, right + 1, oright);
+                VertexSort(right + 1, oright);
             }
         }
 
@@ -144,7 +147,7 @@ namespace TriangleNet.Algorithm
         /// if axis == 1.  Very similar to the vertexsort() procedure, but runs in
         /// randomized linear time.
         /// </remarks>
-        void VertexMedian(Vertex[] sortarray, int left, int right, int median, int axis)
+        void VertexMedian(int left, int right, int median, int axis)
         {
             int arraysize = right - left + 1;
             int oleft = left, oright = right;
@@ -203,12 +206,12 @@ namespace TriangleNet.Algorithm
             if (left > median)
             {
                 // Recursively shuffle the left subset.
-                VertexMedian(sortarray, oleft, left - 1, median, axis);
+                VertexMedian(oleft, left - 1, median, axis);
             }
             if (right < median - 1)
             {
                 // Recursively shuffle the right subset.
-                VertexMedian(sortarray, right + 1, oright, median, axis);
+                VertexMedian(right + 1, oright, median, axis);
             }
         }
 
@@ -225,7 +228,7 @@ namespace TriangleNet.Algorithm
         /// For the base case, subsets containing only two or three vertices are
         /// always sorted by x-coordinate.
         /// </remarks>
-        void AlternateAxes(Vertex[] sortarray, int left, int right, int axis)
+        void AlternateAxes(int left, int right, int axis)
         {
             int arraysize = right - left + 1;
             int divider;
@@ -239,15 +242,15 @@ namespace TriangleNet.Algorithm
                 axis = 0;
             }
             // Partition with a horizontal or vertical cut.
-            VertexMedian(sortarray, left, right, left + divider, axis);
+            VertexMedian(left, right, left + divider, axis);
             // Recursively partition the subsets with a cross cut.
             if (arraysize - divider >= 2)
             {
                 if (divider >= 2)
                 {
-                    AlternateAxes(sortarray, left, left + divider - 1, 1 - axis);
+                    AlternateAxes(left, left + divider - 1, 1 - axis);
                 }
-                AlternateAxes(sortarray, left + divider, right, 1 - axis);
+                AlternateAxes(left + divider, right, 1 - axis);
             }
         }
 
@@ -288,8 +291,7 @@ namespace TriangleNet.Algorithm
         /// merged triangulation, and the destination of 'farright' is the rightmost
         /// vertex.
         /// </remarks>
-        void MergeHulls(Mesh m, ref Otri farleft,
-                        ref Otri innerleft, ref Otri innerright,
+        void MergeHulls(ref Otri farleft, ref Otri innerleft, ref Otri innerright,
                         ref Otri farright, int axis)
         {
             Otri leftcand = default(Otri), rightcand = default(Otri);
@@ -386,7 +388,7 @@ namespace TriangleNet.Algorithm
             innerleft.Sym(ref leftcand);
             innerright.Sym(ref rightcand);
             // Create the bottom new bounding triangle.
-            m.MakeTriangle(ref baseedge);
+            mesh.MakeTriangle(ref baseedge);
             // Connect it to the bounding boxes of the left and right triangulations.
             baseedge.Bond(ref innerleft);
             baseedge.LnextSelf();
@@ -425,7 +427,7 @@ namespace TriangleNet.Algorithm
                 if (leftfinished && rightfinished)
                 {
                     // Create the top new bounding triangle.
-                    m.MakeTriangle(ref nextedge);
+                    mesh.MakeTriangle(ref nextedge);
                     nextedge.SetOrg(lowerleft);
                     nextedge.SetDest(lowerright);
                     // Apex is intentionally left NULL.
@@ -616,7 +618,7 @@ namespace TriangleNet.Algorithm
         /// 'farright' is the rightmost vertex (breaking ties by choosing the
         /// lowest rightmost vertex).
         /// </remarks>
-        void DivconqRecurse(Mesh m, Vertex[] sortarray, int left, int right, int axis,
+        void DivconqRecurse(int left, int right, int axis,
                             ref Otri farleft, ref Otri farright)
         {
             Otri midtri = default(Otri);
@@ -632,11 +634,11 @@ namespace TriangleNet.Algorithm
             {
                 // The triangulation of two vertices is an edge.  An edge is
                 // represented by two bounding triangles.
-                m.MakeTriangle(ref farleft);
+                mesh.MakeTriangle(ref farleft);
                 farleft.SetOrg(sortarray[left]);
                 farleft.SetDest(sortarray[left + 1]);
                 // The apex is intentionally left NULL.
-                m.MakeTriangle(ref farright);
+                mesh.MakeTriangle(ref farright);
                 farright.SetOrg(sortarray[left + 1]);
                 farright.SetDest(sortarray[left]);
                 // The apex is intentionally left NULL.
@@ -657,10 +659,10 @@ namespace TriangleNet.Algorithm
                 // The triangulation of three vertices is either a triangle (with
                 // three bounding triangles) or two edges (with four bounding
                 // triangles).  In either case, four triangles are created.
-                m.MakeTriangle(ref midtri);
-                m.MakeTriangle(ref tri1);
-                m.MakeTriangle(ref tri2);
-                m.MakeTriangle(ref tri3);
+                mesh.MakeTriangle(ref midtri);
+                mesh.MakeTriangle(ref tri1);
+                mesh.MakeTriangle(ref tri2);
+                mesh.MakeTriangle(ref tri3);
                 area = Primitives.CounterClockwise(sortarray[left].pt, sortarray[left + 1].pt, sortarray[left + 2].pt);
                 if (area == 0.0)
                 {
@@ -756,11 +758,11 @@ namespace TriangleNet.Algorithm
                 // Split the vertices in half.
                 divider = vertices >> 1;
                 // Recursively triangulate each half.
-                DivconqRecurse(m, sortarray, left, left + divider - 1, 1 - axis, ref farleft, ref innerleft);
-                DivconqRecurse(m, sortarray, left + divider, right, 1 - axis, ref innerright, ref farright);
+                DivconqRecurse(left, left + divider - 1, 1 - axis, ref farleft, ref innerleft);
+                DivconqRecurse(left + divider, right, 1 - axis, ref innerright, ref farright);
 
                 // Merge the two triangulations into one.
-                MergeHulls(m, ref farleft, ref innerleft, ref innerright, ref farright, axis);
+                MergeHulls(ref farleft, ref innerleft, ref innerright, ref farright, axis);
             }
         }
 
@@ -769,7 +771,7 @@ namespace TriangleNet.Algorithm
         /// </summary>
         /// <param name="startghost"></param>
         /// <returns>Number of vertices on the hull.</returns>
-        int RemoveGhosts(Mesh m, ref Otri startghost)
+        int RemoveGhosts(ref Otri startghost)
         {
             Otri searchedge = default(Otri);
             Otri dissolveedge = default(Otri);
@@ -809,7 +811,7 @@ namespace TriangleNet.Algorithm
                 // Find the next bounding triangle.
                 deadtriangle.Sym(ref dissolveedge);
                 // Delete the bounding triangle.
-                m.TriangleDealloc(deadtriangle.triangle);
+                mesh.TriangleDealloc(deadtriangle.triangle);
             } while (!dissolveedge.Equal(startghost));
 
             return hullsize;
@@ -825,13 +827,14 @@ namespace TriangleNet.Algorithm
         /// </remarks>
         public int Triangulate(Mesh m)
         {
-            Vertex[] sortarray;
             Otri hullleft = default(Otri), hullright = default(Otri);
             int divider;
             int i, j;
 
+            this.mesh = m;
+
             // Allocate an array of pointers to vertices for sorting.
-            sortarray = new Vertex[m.invertices];
+            this.sortarray = new Vertex[m.invertices];
             i = 0;
             foreach (var v in m.vertices.Values)
             {
@@ -839,7 +842,7 @@ namespace TriangleNet.Algorithm
             }
             // Sort the vertices.
             //Array.Sort(sortarray);
-            VertexSort(sortarray, 0, m.invertices - 1);
+            VertexSort(0, m.invertices - 1);
             // Discard duplicate vertices, which can really mess up the algorithm.
             i = 0;
             for (j = 1; j < m.invertices; j++)
@@ -871,17 +874,17 @@ namespace TriangleNet.Algorithm
                 {
                     if (divider >= 2)
                     {
-                        AlternateAxes(sortarray, 0, divider - 1, 1);
+                        AlternateAxes(0, divider - 1, 1);
                     }
-                    AlternateAxes(sortarray, divider, i - 1, 1);
+                    AlternateAxes(divider, i - 1, 1);
                 }
             }
 
             // Form the Delaunay triangulation.
-            DivconqRecurse(m, sortarray, 0, i-1, 0, ref hullleft, ref hullright);
+            DivconqRecurse(0, i-1, 0, ref hullleft, ref hullright);
             //trifree((VOID*)sortarray);
 
-            return RemoveGhosts(m, ref hullleft);
+            return RemoveGhosts(ref hullleft);
         }
     }
 }

@@ -386,6 +386,7 @@ namespace TriangleNet.Data
         public void Dissolve()
         {
             triangle.neighbors[orient].triangle = Mesh.dummytri;
+            triangle.neighbors[orient].orient = 0;
         }
 
         /// <summary>

@@ -93,6 +93,7 @@ namespace TestApp
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
+                return;
             }
 
             meshRenderer1.SetData(mesh, false);
@@ -180,7 +181,16 @@ namespace TestApp
                 else
                 {
                     dlgFilterIndex = 1;
-                    input = FileReader.ReadFile(file);
+                    try
+                    {
+                        input = FileReader.ReadFile(file);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message);
+                        input = null;
+                        return;
+                    }
                 }
 
                 meshRenderer1.SetData(input, true);
@@ -212,6 +222,7 @@ namespace TestApp
                     catch (Exception ex)
                     {
                         MessageBox.Show(ex.Message);
+                        return;
                     }
 
                     meshRenderer1.SetData(mesh, false);
