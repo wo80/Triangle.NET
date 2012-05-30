@@ -58,6 +58,12 @@
     <Compile Include="Data\Triangle.cs" />
     <Compile Include="Data\Vertex.cs" />
     <Compile Include="Algorithm\Dwyer.cs" />
+    <Compile Include="Geometry\BoundingBox.cs" />
+    <Compile Include="Geometry\Edge.cs" />
+    <Compile Include="Geometry\InputGeometry.cs" />
+    <Compile Include="Geometry\ITriangle.cs" />
+    <Compile Include="Geometry\Point.cs" />
+    <Compile Include="Geometry\RegionPointer.cs" />
     <Compile Include="IO\DataReader.cs" />
     <Compile Include="IO\FileWriter.cs" />
     <Compile Include="IO\VoronoiData.cs" />

@@ -30,7 +30,7 @@ namespace TestApp
         Pen lines = new Pen(Color.FromArgb(30, 30, 30));
 
         Zoom zoom;
-        MeshDataInternal data;
+        RenderData data;
         bool initialized = false;
 
         public long RenderTime { get; private set; }
@@ -43,7 +43,7 @@ namespace TestApp
 
             zoom = new Zoom();
             context = new BufferedGraphicsContext();
-            data = new MeshDataInternal();
+            data = new RenderData();
         }
 
         public void SetData(MeshData meshdata, bool input)

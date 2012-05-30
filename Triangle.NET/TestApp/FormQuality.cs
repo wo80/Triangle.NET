@@ -11,11 +11,11 @@ using System.Globalization;
 
 namespace TestApp
 {
-    public partial class Form2 : Form
+    public partial class FormQuality : Form
     {
         static NumberFormatInfo nfi = CultureInfo.InvariantCulture.NumberFormat;
 
-        public Form2()
+        public FormQuality()
         {
             InitializeComponent();
 

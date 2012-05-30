@@ -10,7 +10,7 @@ namespace TestApp.Controls
 	using System.Text;
 	using System.Windows.Forms;
 
-    public class ButtonDark : Button
+    public class DarkButton : Button
     {
         #region Designer
 
@@ -58,7 +58,7 @@ namespace TestApp.Controls
         }
 
         //--------------------------------------------------------------------------------
-        public ButtonDark()
+        public DarkButton()
         {
             InitializeComponent();
         }

@@ -14,7 +14,7 @@ namespace TestApp.Rendering
     using System.Drawing;
     using TriangleNet;
 
-    public class MeshDataInternal
+    public class RenderData
     {
         public PointF[] Points;
         public int[][] Triangles;

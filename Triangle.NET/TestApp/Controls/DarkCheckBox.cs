@@ -16,7 +16,7 @@ namespace TestApp.Controls
     /// <summary>
     /// TODO: Update summary.
     /// </summary>
-    public class CheckBoxDark : ButtonBase
+    public class DarkCheckBox : ButtonBase
     {
         #region Designer
 
@@ -73,7 +73,7 @@ namespace TestApp.Controls
         }
 
         //--------------------------------------------------------------------------------
-        public CheckBoxDark()
+        public DarkCheckBox()
         {
             this.BackColor = Color.FromArgb(76, 76, 76);
             InitializeComponent();

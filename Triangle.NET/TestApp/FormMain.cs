@@ -11,7 +11,7 @@ using TestApp.Rendering;
 
 namespace TestApp
 {
-    public partial class Form1 : Form
+    public partial class FormMain : Form
     {
         Random rand = new Random(DateTime.Now.Millisecond);
 
@@ -26,9 +26,9 @@ namespace TestApp
         string dlgDirectory = Application.StartupPath;
 
         Statistic statistic = new Statistic();
-        Form2 formStats;
+        FormQuality formStats;
 
-        public Form1()
+        public FormMain()
         {
             InitializeComponent();
         }
@@ -246,7 +246,7 @@ namespace TestApp
         {
             if (formStats == null)
             {
-                formStats = new Form2();
+                formStats = new FormQuality();
             }
 
             if (!formStats.Visible)

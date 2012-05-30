@@ -8,8 +8,8 @@
     <ProjectGuid>{336AAF8A-5316-4303-9E73-5E38BD0B28AF}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TestApp</RootNamespace>
-    <AssemblyName>TestApp</AssemblyName>
+    <RootNamespace>MeshExplorer</RootNamespace>
+    <AssemblyName>Mesh Explorer</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -46,64 +46,50 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controls\ButtonDark.cs">
+    <Compile Include="Controls\DarkButton.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\CheckBoxDark.cs">
+    <Compile Include="Controls\DarkCheckBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Histogram.cs">
+    <Compile Include="Controls\AngleHistogram.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\TextBoxDark.cs">
+    <Compile Include="Controls\DarkTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Examples.cs" />
-    <Compile Include="Form1.cs">
+    <Compile Include="FormMain.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="FormMain.Designer.cs">
+      <DependentUpon>FormMain.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\MeshRenderer.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Form2.cs">
+    <Compile Include="FormQuality.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form2.Designer.cs">
-      <DependentUpon>Form2.cs</DependentUpon>
+    <Compile Include="FormQuality.Designer.cs">
+      <DependentUpon>FormQuality.cs</DependentUpon>
     </Compile>
     <Compile Include="ImageWriter.cs" />
+    <Compile Include="IO\FileProcessor.cs" />
+    <Compile Include="IO\Formats\DatFile.cs" />
+    <Compile Include="IO\IMeshFormat.cs" />
+    <Compile Include="IO\JsonParser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Rendering\MeshDataInternal.cs" />
+    <Compile Include="Rendering\RenderData.cs" />
     <Compile Include="Rendering\Zoom.cs" />
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="Util.cs" />
+    <EmbeddedResource Include="FormMain.resx">
+      <DependentUpon>FormMain.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Form2.resx">
-      <DependentUpon>Form2.cs</DependentUpon>
+    <EmbeddedResource Include="FormQuality.resx">
+      <DependentUpon>FormQuality.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Triangle\Triangle.csproj">
@@ -111,6 +97,7 @@
       <Name>Triangle</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

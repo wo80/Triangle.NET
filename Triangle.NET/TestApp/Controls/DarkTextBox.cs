@@ -13,7 +13,7 @@ namespace TestApp.Controls
     using System.Drawing.Drawing2D;
     using System.Windows.Forms;
 
-    public class TextBoxDark : Control
+    public class DarkTextBox : Control
     {
 
         #region Designer
@@ -73,7 +73,7 @@ namespace TestApp.Controls
 
         TextBox textBox;
 
-        public TextBoxDark()
+        public DarkTextBox()
         {
             InitializeComponent();
 

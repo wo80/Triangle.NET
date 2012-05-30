@@ -1,6 +1,6 @@
 ﻿namespace TestApp
 {
-    partial class Form1
+    partial class FormMain
     {
         /// <summary>
         /// Required designer variable.
@@ -28,13 +28,13 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.btnStatistic = new TestApp.Controls.ButtonDark();
-            this.tbNumPoints = new TestApp.Controls.TextBoxDark();
-            this.cbConvex = new TestApp.Controls.CheckBoxDark();
-            this.cbQuality = new TestApp.Controls.CheckBoxDark();
-            this.btnRun = new TestApp.Controls.ButtonDark();
-            this.btnOpen = new TestApp.Controls.ButtonDark();
-            this.btnRandPts = new TestApp.Controls.ButtonDark();
+            this.btnStatistic = new TestApp.Controls.DarkButton();
+            this.tbNumPoints = new TestApp.Controls.DarkTextBox();
+            this.cbConvex = new TestApp.Controls.DarkCheckBox();
+            this.cbQuality = new TestApp.Controls.DarkCheckBox();
+            this.btnRun = new TestApp.Controls.DarkButton();
+            this.btnOpen = new TestApp.Controls.DarkButton();
+            this.btnRandPts = new TestApp.Controls.DarkButton();
             this.meshRenderer1 = new TestApp.MeshRenderer();
             this.lbTime = new System.Windows.Forms.Label();
             this.SuspendLayout();
@@ -162,13 +162,13 @@
         #endregion
 
         private MeshRenderer meshRenderer1;
-        private Controls.ButtonDark btnRandPts;
-        private Controls.ButtonDark btnOpen;
-        private Controls.ButtonDark btnRun;
-        private Controls.CheckBoxDark cbQuality;
-        private Controls.TextBoxDark tbNumPoints;
-        private Controls.ButtonDark btnStatistic;
-        private Controls.CheckBoxDark cbConvex;
+        private Controls.DarkButton btnRandPts;
+        private Controls.DarkButton btnOpen;
+        private Controls.DarkButton btnRun;
+        private Controls.DarkCheckBox cbQuality;
+        private Controls.DarkTextBox tbNumPoints;
+        private Controls.DarkButton btnStatistic;
+        private Controls.DarkCheckBox cbConvex;
         private System.Windows.Forms.Label lbTime;
 
     }

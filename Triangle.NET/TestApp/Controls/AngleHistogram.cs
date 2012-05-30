@@ -16,7 +16,7 @@ namespace TestApp.Controls
     /// <summary>
     /// TODO: Update summary.
     /// </summary>
-    public class Histogram : Control
+    public class AngleHistogram : Control
     {
         #region Designer
 
@@ -56,7 +56,7 @@ namespace TestApp.Controls
         int[] data;
         int max = 0;
 
-        public Histogram()
+        public AngleHistogram()
         {
             this.BackColor = Color.FromArgb(76, 76, 76);
             InitializeComponent();

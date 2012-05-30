@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Triangle", "Triangle\Triangle.csproj", "{F7907A0A-B75F-400B-9E78-BFAD00DB4D6B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApp", "TestApp\TestApp.csproj", "{336AAF8A-5316-4303-9E73-5E38BD0B28AF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mesh Explorer", "TestApp\Mesh Explorer.csproj", "{336AAF8A-5316-4303-9E73-5E38BD0B28AF}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
@@ -11,12 +11,12 @@ Global
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs06
 		SccLocalPath0 = .
-		SccProjectUniqueName1 = TestApp\\TestApp.csproj
-		SccProjectName1 = TestApp
-		SccLocalPath1 = TestApp
-		SccProjectUniqueName2 = Triangle\\Triangle.csproj
-		SccProjectName2 = Triangle
-		SccLocalPath2 = Triangle
+		SccProjectUniqueName1 = Triangle\\Triangle.csproj
+		SccProjectName1 = Triangle
+		SccLocalPath1 = Triangle
+		SccProjectUniqueName2 = TestApp\\Mesh\u0020Explorer.csproj
+		SccProjectName2 = TestApp
+		SccLocalPath2 = TestApp
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

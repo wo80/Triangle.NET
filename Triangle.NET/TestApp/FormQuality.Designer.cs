@@ -1,6 +1,6 @@
 ﻿namespace TestApp
 {
-    partial class Form2
+    partial class FormQuality
     {
         /// <summary>
         /// Required designer variable.
@@ -60,7 +60,7 @@
             this.lbRatioMax = new System.Windows.Forms.Label();
             this.lbAngleMin = new System.Windows.Forms.Label();
             this.lbAngleMax = new System.Windows.Forms.Label();
-            this.histogram1 = new TestApp.Controls.Histogram();
+            this.histogram1 = new TestApp.Controls.AngleHistogram();
             this.SuspendLayout();
             // 
             // label1
@@ -484,6 +484,6 @@
         private System.Windows.Forms.Label lbRatioMax;
         private System.Windows.Forms.Label lbAngleMin;
         private System.Windows.Forms.Label lbAngleMax;
-        private Controls.Histogram histogram1;
+        private Controls.AngleHistogram histogram1;
     }
 }
