@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace TestApp.Rendering
+namespace MeshExplorer.Rendering
 {
     using System;
     using System.Collections.Generic;
@@ -13,42 +13,82 @@ namespace TestApp.Rendering
     using TriangleNet.IO;
     using System.Drawing;
     using TriangleNet;
+    using TriangleNet.Data;
+    using TriangleNet.Geometry;
 
     public class RenderData
     {
         public PointF[] Points;
-        public int[][] Triangles;
-        public int[][] Edges;
-        public int[][] Segments;
+
+        public Edge[] Edges;
+        public Edge[] Segments;
+        public IEnumerable<ITriangle> Triangles;
+
         public int NumberOfInputPoints;
         public RectangleF Bounds;
 
+        public void SetData(InputGeometry data)
+        {
+            int n = data.Count;
+            int i = 0;
+
+            this.NumberOfInputPoints = n;
+
+            this.Triangles = null;
+            this.Edges = null;
+
+            // Convert points to float
+            this.Points = new PointF[n];
+            foreach (var pt in data.Points)
+            {
+                this.Points[i++] = new PointF((float)pt.X, (float)pt.Y);
+            }
+
+            this.Bounds = new RectangleF(
+                (float)data.Bounds.Xmin,
+                (float)data.Bounds.Ymin,
+                (float)data.Bounds.Width,
+                (float)data.Bounds.Height);
+
+            // Copy segments
+            this.Segments = data.Segments.ToArray();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mesh"></param>
+        /// <remarks>This methods assumes that the mesh.Renumber() has been called.</remarks>
         public void SetData(Mesh mesh)
         {
-            NumberOfInputPoints = mesh.NumberOfInputPoints;
+            mesh.Renumber();
 
-            SetData(mesh.GetMeshData(true, true, false), mesh.NumberOfInputPoints);
-        }
+            this.NumberOfInputPoints = mesh.NumberOfInputPoints;
 
-        public void SetData(MeshData data)
-        {
-            SetData(data, data.Points.Length);
-        }
+            this.Triangles = mesh.Triangles;
 
-        public void SetData(MeshData data, int inputCount)
-        {
-            NumberOfInputPoints = inputCount;
+            int n = mesh.NumberOfVertices;
 
-            int n = data.Points.Length;
-
-            // Reset
-            Triangles = null;
-            Edges = null;
-            Segments = null;
-
-            // Copy points
+            // Convert points to float
             this.Points = new PointF[n];
 
+            SetPoints(mesh.Vertices);
+
+            // Get edges (more efficient than rendering triangles)
+            EdgeEnumerator e = new EdgeEnumerator(mesh);
+
+            List<Edge> edgeList = new List<Edge>(mesh.NumberOfEdges);
+
+            while (e.MoveNext())
+            {
+                edgeList.Add(e.Current);
+            }
+
+            this.Edges = edgeList.ToArray();
+        }
+
+        private void SetPoints(IEnumerable<Vertex> points)
+        {
             // Bounds
             float minx = float.MaxValue;
             float maxx = float.MinValue;
@@ -56,11 +96,12 @@ namespace TestApp.Rendering
             float maxy = float.MinValue;
 
             float x, y;
+            int i = 0;
 
-            for (int i = 0; i < n; i += 1)
+            foreach (var pt in points)
             {
-                x = (float)data.Points[i][0];
-                y = (float)data.Points[i][1];
+                x = (float)pt.X;
+                y = (float)pt.Y;
                 // Update bounding box
                 if (minx > x) minx = x;
                 if (maxx < x) maxx = x;
@@ -68,55 +109,11 @@ namespace TestApp.Rendering
                 if (maxy < y) maxy = y;
 
                 this.Points[i] = new PointF(x, y);
+
+                i++;
             }
 
             this.Bounds = new RectangleF(minx, miny, maxx - minx, maxy - miny);
-
-            n = data.Edges == null ? 0 : data.Edges.Length;
-
-            // Copy edges
-            if (data.Edges != null && n > 0)
-            {
-                Edges = new int[n][];
-
-                for (int i = 0; i < n; i++)
-                {
-                    Edges[i] = new int[2];
-                    Edges[i][0] = data.Edges[i][0];
-                    Edges[i][1] = data.Edges[i][1];
-                }
-            }
-
-            n = data.Segments == null ? 0 : data.Segments.Length;
-
-            // Copy segments
-            if (data.Segments != null && n > 0)
-            {
-                Segments = new int[n][];
-
-                for (int i = 0; i < n; i++)
-                {
-                    Segments[i] = new int[2];
-                    Segments[i][0] = data.Segments[i][0];
-                    Segments[i][1] = data.Segments[i][1];
-                }
-            }
-
-            n = data.Triangles == null ? 0 : data.Triangles.Length;
-
-            // Copy triangles
-            if (data.Triangles != null && n > 0)
-            {
-                Triangles = new int[n][];
-
-                for (int i = 0; i < n; i++)
-                {
-                    Triangles[i] = new int[3];
-                    Triangles[i][0] = data.Triangles[i][0];
-                    Triangles[i][1] = data.Triangles[i][1];
-                    Triangles[i][2] = data.Triangles[i][2];
-                }
-            }
         }
     }
 }

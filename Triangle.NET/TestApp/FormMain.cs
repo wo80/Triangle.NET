@@ -1,115 +1,126 @@
 ﻿using System;
-using System.Drawing;
 using System.Diagnostics;
-using System.Windows.Forms;
+using System.Drawing;
 using System.IO;
-using System.Globalization;
+using System.Linq;
+using System.Windows.Forms;
 using System.Collections.Generic;
+using MeshExplorer.Controls;
+using MeshExplorer.IO;
 using TriangleNet;
+using TriangleNet.Geometry;
 using TriangleNet.IO;
-using TestApp.Rendering;
+using TriangleNet.Tools;
 
-namespace TestApp
+namespace MeshExplorer
 {
     public partial class FormMain : Form
     {
-        Random rand = new Random(DateTime.Now.Millisecond);
-
-        // Triangulation IO
-        MeshData input;
+        Settings settings;
+        InputGeometry input;
         Mesh mesh;
+        Statistic stats;
 
-        // Filter index of the "Open file" dialog
-        int dlgFilterIndex = 1;
-
-        // Startup directory of the "Open file" dialog
-        string dlgDirectory = Application.StartupPath;
-
-        Statistic statistic = new Statistic();
-        FormQuality formStats;
+        FormLog frmLog;
+        FormQuality frmQuality;
 
         public FormMain()
         {
             InitializeComponent();
+
+            ToolStripManager.Renderer = new DarkToolStripRenderer();
         }
 
-        private double[][] CreateRandomPoints(int numPoints)
+        private void Form1_Load(object sender, EventArgs e)
         {
-            bool save = false;
+            oldClientSize = this.ClientSize;
 
-            double[][] points = new double[numPoints][];
+            settings = new Settings();
 
-            int width = meshRenderer1.Width;
-            int height = meshRenderer1.Height;
-            if (save)
+            meshRenderer1.Initialize();
+
+            stats = new Statistic();
+
+            //BatchTest();
+        }
+
+        void BatchTest()
+        {
+            try
             {
-                using (TextWriter fs = new StreamWriter(numPoints + ".txt"))
+                Mesh m = new Mesh();
+                m.SetOption(Options.MinAngle, 20);
+
+
+                for (int j = 0; j < 10; j++)
                 {
-                    fs.WriteLine("{0} 2 0 0", numPoints);
-
-                    for (int i = 0; i < numPoints; i++)
+                    for (int i = 20; i > 0; i--)
                     {
-                        points[i] = new double[] {
-                        rand.NextDouble() * width,
-                        rand.NextDouble() * height };
+                        var geom = PolygonGenerator.CreateRandomPoints(10 * i, 100, 100);
 
-                        fs.WriteLine(String.Format(CultureInfo.InvariantCulture.NumberFormat,
-                            "{0} {1:0.0} {2:0.0}", (i + 1), points[i][0], points[i][1]));
+                        m.Triangulate(geom);
                     }
                 }
             }
-            else
+            catch (Exception e)
             {
-                for (int i = 0; i < numPoints; i++)
-                {
-                    points[i] = new double[] {
-                        rand.NextDouble() * width,
-                        rand.NextDouble() * height };
-                }
+                MessageBox.Show("BLUB\n" + e.Message);
             }
-
-            return points;
         }
 
-        private void Run()
+        private void Form1_KeyUp(object sender, KeyEventArgs e)
         {
-            if (input == null)
+            switch (e.KeyCode)
             {
-                return;
+                case Keys.F3:
+                    Open();
+                    break;
+                case Keys.F4:
+                    Save();
+                    break;
+                case Keys.F5:
+                    Reload();
+                    break;
+                case Keys.F8:
+                    TriangulateOrRefine();
+                    break;
+                case Keys.F9:
+                    Smooth();
+                    break;
+                case Keys.F12:
+                    ShowLog();
+                    break;
             }
+        }
 
-            Stopwatch sw = new Stopwatch();
+        private void btnMesh_Click(object sender, EventArgs e)
+        {
+            TriangulateOrRefine();
+        }
 
-            mesh = new Mesh();
-            mesh.SetOption(Options.Quality, cbQuality.Checked);
-            mesh.SetOption(Options.Convex, cbConvex.Checked);
+        private void btnSmooth_Click(object sender, EventArgs e)
+        {
+            //Smooth();
+        }
 
-            try
-            {
-                sw.Start();
-                mesh.Triangulate(input);
-                sw.Stop();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-                return;
-            }
+        private void slMinAngle_ValueChanging(object sender, EventArgs e)
+        {
+            // Between 0 and 40 (step 1)
+            int angle = (slMinAngle.Value * 40) / 100;
+            lbMinAngle.Text = angle.ToString();
+        }
 
-            meshRenderer1.SetData(mesh, false);
-
-            statistic.Update(mesh, 10);
-
-            if (formStats != null && !formStats.IsDisposed)
-            {
-                formStats.UpdateSatistic(statistic, sw.ElapsedMilliseconds, meshRenderer1.RenderTime);
-            }
+        private void slMaxArea_ValueChanging(object sender, EventArgs e)
+        {
+            // Between 0 and 1 (step 0.01)
+            double area = slMaxArea.Value * 0.01;
+            lbMaxArea.Text = area.ToString(Util.Nfi);
         }
 
         protected override void OnMouseWheel(MouseEventArgs e)
         {
-            Point pt = e.Location;
-            pt.Offset(0, -meshRenderer1.Top);
+            System.Drawing.Point pt = e.Location;
+            pt.Offset(-splitContainer1.SplitterDistance, 0);
 
             if (meshRenderer1.ClientRectangle.Contains(pt))
             {
@@ -118,174 +129,397 @@ namespace TestApp
             base.OnMouseWheel(e);
         }
 
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            if (Directory.Exists(@"..\..\..\Data\"))
-            {
-                dlgDirectory = Path.GetFullPath(@"..\..\..\Data\");
+        #region Resize event handler
 
-                //Examples.Example1();
-                //Examples.Example2();
-                //Examples.Example3();
-            }
-            else if (Directory.Exists(@"Data\"))
+        bool isResizing = false;
+        Size oldClientSize;
+
+        private void ResizeHandler(object sender, EventArgs e)
+        {
+            // Handle window minimize and maximize
+            if (!isResizing)
             {
-                dlgDirectory = Path.GetFullPath(@"Data\");
+                meshRenderer1.HandleResize();
             }
         }
 
-        private void btnRandPts_Click(object sender, EventArgs e)
+        private void ResizeEndHandler(object sender, EventArgs e)
         {
-            btnRun.Text = "Triangulate";
+            isResizing = false;
 
-            int n = 10;
-            int.TryParse(tbNumPoints.Text, out n);
-
-            input = new MeshData();
-
-            input.Points = CreateRandomPoints(n);
-
-            meshRenderer1.SetData(input, true);
+            if (this.ClientSize != this.oldClientSize)
+            {
+                this.oldClientSize = this.ClientSize;
+                meshRenderer1.HandleResize();
+            }
         }
 
-        private void btnOpen_Click(object sender, EventArgs e)
+        private void ResizeBeginHandler(object sender, EventArgs e)
         {
-            OpenFileDialog dlg = new OpenFileDialog();
-            dlg.InitialDirectory = dlgDirectory;
-            dlg.Filter = "Triangle polygon (*.node;*.poly)|*.node;*.poly|Polygon data (*.dat)|*.dat";
-            dlg.FilterIndex = dlgFilterIndex;
+            isResizing = true;
+        }
 
-            if (dlg.ShowDialog() == DialogResult.OK)
+        #endregion
+
+        #region State changes
+
+        private void HandleNewInput()
+        {
+            // Reset mesh
+            mesh = null;
+
+            // Reset state
+            settings.RefineMode = false;
+            settings.ExceptionThrown = false;
+
+            // Reset labels
+            lbNumVert2.Text = "-";
+            lbNumTri2.Text = "-";
+            lbNumSeg2.Text = "-";
+
+            lbNumVert.Text = input.Count.ToString();
+            lbNumSeg.Text = input.Segments.Count().ToString();
+            lbNumTri.Text = "0"; //input.Triangles == null ? "0" : input.Triangles.Length.ToString();
+
+            // Reset buttons
+            btnMesh.Enabled = true;
+            btnMesh.Text = "Triangulate";
+            btnSmooth.Enabled = false;
+
+            // Render input
+            meshRenderer1.SetData(input);
+
+            // Update window caption
+            this.Text = "Triangle.NET - Mesh Explorer - " + settings.CurrentFile;
+
+            // Disable menu items
+            viewMenuMQuality.Enabled = false;
+        }
+
+        private void HandleMeshChange()
+        {
+            // Render mesh
+            meshRenderer1.SetData(mesh);
+
+            // Previous mesh stats
+            lbNumVert2.Text = lbNumVert.Text;
+            lbNumTri2.Text = lbNumTri.Text;
+            lbNumSeg2.Text = lbNumSeg.Text;
+
+            // New mesh stats
+            lbNumVert.Text = stats.Vertices.ToString();
+            lbNumSeg.Text = stats.ConstrainedEdges.ToString();
+            lbNumTri.Text = stats.Triangles.ToString();
+
+            // Update statistics tab
+            angleHistogram1.SetData(stats.MinAngleHistogram, stats.MaxAngleHistogram);
+
+            lbAreaMin.Text = Util.DoubleToString(stats.SmallestArea);
+            lbAreaMax.Text = Util.DoubleToString(stats.LargestArea);
+            lbEdgeMin.Text = Util.DoubleToString(stats.ShortestEdge);
+            lbEdgeMax.Text = Util.DoubleToString(stats.LongestEdge);
+            lbRatioMin.Text = Util.DoubleToString(stats.ShortestAltitude);
+            lbRatioMax.Text = Util.DoubleToString(stats.LargestAspectRatio);
+            lbAngleMin.Text = Util.AngleToString(stats.SmallestAngle);
+            lbAngleMax.Text = Util.AngleToString(stats.LargestAngle);
+
+            // Enable menu items
+            viewMenuMQuality.Enabled = true;
+        }
+
+        #endregion
+
+        #region Commands
+
+        private void Open()
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+
+            ofd.Filter = settings.OfdFilter;
+            ofd.FilterIndex = settings.OfdFilterIndex;
+            ofd.InitialDirectory = settings.OfdDirectory;
+            ofd.FileName = "";
+
+            if (ofd.ShowDialog() == DialogResult.OK)
             {
-                dlgDirectory = Path.GetDirectoryName(dlg.FileName);
+                input = FileProcessor.Open(ofd.FileName);
 
-                string file = dlg.FileName;
-                string ext = Path.GetExtension(file);
-
-                if (ext == ".dat")
+                if (input != null)
                 {
-                    dlgFilterIndex = 2;
-                    input = new MeshData();
-                    input.Points = ParseDatFile(file);
+                    // Update settings
+                    settings.CurrentFile = Path.GetFileName(ofd.FileName);
 
-                    int n = input.Points.Length;
-                    int[][] segments = new int[n][];
-
-                    for (int i = 0; i < n; i++)
-                    {
-                        segments[i] = new int[] { i, (i + 1) % n };
-
-                    }
-                    input.Segments = segments;
+                    HandleNewInput();
                 }
-                else
-                {
-                    dlgFilterIndex = 1;
-                    try
-                    {
-                        input = FileReader.ReadFile(file);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.Message);
-                        input = null;
-                        return;
-                    }
-                }
+                // else Message
 
-                meshRenderer1.SetData(input, true);
-
-                btnRun.Text = "Triangulate";
+                // Update folder settings
+                settings.OfdFilterIndex = ofd.FilterIndex;
+                settings.OfdDirectory = Path.GetFullPath(ofd.FileName);
             }
         }
 
-        private void btnRun_Click(object sender, EventArgs e)
+        private void Save()
         {
+            SaveFileDialog sfd = new SaveFileDialog();
+
+            sfd.Filter = settings.SfdFilter;
+            sfd.FilterIndex = settings.SfdFilterIndex;
+            sfd.InitialDirectory = settings.SfdDirectory;
+            sfd.FileName = "";
+
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+                FileProcessor.Save(sfd.FileName, mesh);
+            }
+        }
+
+        private void Reload()
+        {
+            if (input != null)
+            {
+                mesh = null;
+                settings.RefineMode = false;
+                settings.ExceptionThrown = false;
+
+                HandleNewInput();
+            }
+        }
+
+        private void TriangulateOrRefine()
+        {
+            if (input == null || settings.ExceptionThrown) return;
+
+            if (settings.RefineMode == false)
+            {
+                Triangulate();
+
+                if (cbQuality.Checked)
+                {
+                    btnMesh.Text = "Refine";
+                    //btnSmooth.Enabled = true;
+                }
+            }
+            else
+            {
+                Refine();
+            }
+        }
+
+        private void Triangulate()
+        {
+            if (input == null) return;
+
+            //Stopwatch sw = new Stopwatch();
+
+            mesh = new Mesh();
+
             if (cbQuality.Checked)
             {
-                if (btnRun.Text == "Triangulate")
+                mesh.SetOption(Options.Quality, true);
+
+                int angle = (slMinAngle.Value * 40) / 100;
+                mesh.SetOption(Options.MinAngle, angle);
+
+                double area = slMaxArea.Value * 0.01;
+
+                if (area > 0 && area < 1)
                 {
-                    btnRun.Text = "Refine";
+                    var size = input.Bounds;
 
-                    Run();
-                }
-                else
-                {
-                    Stopwatch sw = new Stopwatch();
+                    double min = Math.Min(size.Width, size.Height);
 
-                    try
-                    {
-                        sw.Start();
-                        mesh.Refine(statistic.LargestArea / 2);
-                        sw.Stop();
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.Message);
-                        return;
-                    }
-
-                    meshRenderer1.SetData(mesh, false);
-
-                    statistic.Update(mesh, 10);
-
-                    if (formStats != null && !formStats.IsDisposed)
-                    {
-                        formStats.UpdateSatistic(statistic, sw.ElapsedMilliseconds, meshRenderer1.RenderTime);
-                    }
+                    mesh.SetOption(Options.MaxArea, area * min);
                 }
             }
-            else
+
+            if (cbConvex.Checked)
             {
-                btnRun.Text = "Triangulate";
-                Run();
+                mesh.SetOption(Options.Convex, true);
             }
+
+            try
+            {
+                //sw.Start();
+                mesh.Triangulate(input);
+                //sw.Stop();
+
+                stats.Update(mesh, 10);
+
+                HandleMeshChange();
+
+                if (cbQuality.Checked)
+                {
+                    settings.RefineMode = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                settings.ExceptionThrown = true;
+                DarkMessageBox.Show("Exception - Triangulate", ex.Message);
+            }
+
+            UpdateLog();
         }
 
-        private void btnStatistic_Click(object sender, EventArgs e)
+        private void Refine()
         {
-            if (formStats == null)
+            if (mesh == null) return;
+
+            Stopwatch sw = new Stopwatch();
+
+            double area = slMaxArea.Value * 0.01;
+
+            if (area > 0 && area < 1)
             {
-                formStats = new FormQuality();
+                mesh.SetOption(Options.MaxArea, area * stats.LargestArea);
             }
 
-            if (!formStats.Visible)
+            int angle = (slMinAngle.Value * 40) / 100;
+            mesh.SetOption(Options.MinAngle, angle);
+
+            try
             {
-                formStats.UpdateSatistic(this.statistic, -1, -1);
-                formStats.Show(this);
+                sw.Start();
+                mesh.Refine();
+                sw.Stop();
+
+                stats.Update(mesh, 10);
+
+                HandleMeshChange();
             }
-            else
+            catch (Exception ex)
             {
-                formStats.Hide();
+                settings.ExceptionThrown = true;
+                DarkMessageBox.Show("Exception - Refine", ex.Message);
             }
+
+            UpdateLog();
         }
 
-        public static double[][] ParseDatFile(string filename)
+        private void Smooth()
         {
-            NumberFormatInfo nfi = CultureInfo.InvariantCulture.NumberFormat;
+            if (mesh == null || settings.ExceptionThrown) return;
 
-            List<double[]> points = new List<double[]>();
+            Stopwatch sw = new Stopwatch();
 
-            string line;
-            string[] split;
-
-            using (TextReader reader = new StreamReader(filename))
+            try
             {
-                while ((line = reader.ReadLine()) != null)
-                {
-                    split = line.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                sw.Start();
+                mesh.Smooth();
+                sw.Stop();
 
-                    if (split.Length == 2)
-                    {
-                        points.Add(new double[] { 
-                            double.Parse(split[0], nfi), 
-                            double.Parse(split[1], nfi)
-                        });
-                    }
-                }
+                stats.Update(mesh, 10);
+
+                HandleMeshChange();
+            }
+            catch (Exception ex)
+            {
+                settings.ExceptionThrown = true;
+                DarkMessageBox.Show("Exception - Smooth", ex.Message);
             }
 
-            return points.ToArray();
+            UpdateLog();
         }
+
+        private void ShowLog()
+        {
+            if (frmLog == null)
+            {
+                frmLog = new FormLog();
+            }
+
+            UpdateLog();
+
+            if (!frmLog.Visible)
+            {
+                frmLog.Show(this);
+            }
+        }
+
+        private void UpdateLog()
+        {
+            if (frmLog != null)
+            {
+                frmLog.UpdateItems();
+            }
+        }
+
+        private void ShowQuality()
+        {
+            if (frmQuality == null)
+            {
+                frmQuality = new FormQuality();
+            }
+
+            //UpdateLog();
+
+            if (!frmQuality.Visible)
+            {
+                frmQuality.Show(this);
+            }
+        }
+
+        #endregion
+
+        #region Menu Handler
+
+        private void fileMenuOpen_Click(object sender, EventArgs e)
+        {
+            Open();
+        }
+
+        private void fileMenuSave_Click(object sender, EventArgs ev)
+        {
+            if (mesh != null)
+            {
+                Save();
+            }
+        }
+
+        private void viewMenuLog_Click(object sender, EventArgs e)
+        {
+            ShowLog();
+        }
+
+        private void toolsMenuPoly1_Click(object sender, EventArgs e)
+        {
+            input = PolygonGenerator.StarInBox(20);
+            settings.CurrentFile = "star *";
+            HandleNewInput();
+        }
+
+        private void toolsMenuRandPts_Click(object sender, EventArgs e)
+        {
+            input = PolygonGenerator.CreateRandomPoints(10, 120, 100);
+            settings.CurrentFile = "points *";
+            HandleNewInput();
+        }
+
+        private void toolsMenuCheck_Click(object sender, EventArgs e)
+        {
+            if (mesh != null)
+            {
+                mesh.Check();
+                ShowLog();
+            }
+        }
+
+        private void viewMenuMQuality_Click(object sender, EventArgs e)
+        {
+            if (mesh != null)
+            {
+                ShowQuality();
+            }
+
+            frmQuality.UpdateQuality(meshRenderer1.Data);
+        }
+
+        private void fileMenuQuit_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        #endregion
     }
 }

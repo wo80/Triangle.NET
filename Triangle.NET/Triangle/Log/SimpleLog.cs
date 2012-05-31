@@ -12,7 +12,7 @@ namespace TriangleNet.Log
     using System.Text;
 
     /// <summary>
-    /// A simple logger, which logs messages to a List<string>.
+    /// A simple logger, which logs messages to a List.
     /// </summary>
     /// <remarks>Using singleton pattern as proposed by Jon Skeet.
     /// http://csharpindepth.com/Articles/General/Singleton.aspx

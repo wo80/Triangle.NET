@@ -18,32 +18,25 @@ namespace TriangleNet.Data
     /// <remarks>
     /// Each subsegment contains two pointers to adjoining subsegments, plus
     /// four pointers to vertices, plus two pointers to adjoining triangles,
-    /// plus one boundary marker, plus one segment number.
+    /// plus one boundary marker.
     /// </remarks>
-    class Subseg
+    public class Segment
     {
-        // Start at -1, so dummysub has that ID
-        private static int hashSeed = -1;
-        internal int Hash;
+        // Hash for dictionary. Will be set by mesh instance.
+        internal int hash;
 
-        // The ID is only used for mesh output.
-        //public int ID;
+        internal Osub[] subsegs;
+        internal Vertex[] vertices;
+        internal Otri[] triangles;
+        internal int boundary;
 
-        public Osub[] subsegs;
-        public Vertex[] vertices;
-        public Otri[] triangles;
-        public int boundary;
-        //public int segment;
-
-        public Subseg()
+        public Segment()
         {
-            Hash = hashSeed++;
-
             // Initialize the two adjoining subsegments to be the omnipresent
-            //   subsegment.
+            // subsegment.
             subsegs = new Osub[2];
-            subsegs[0].ss = Mesh.dummysub;
-            subsegs[1].ss = Mesh.dummysub;
+            subsegs[0].seg = Mesh.dummysub;
+            subsegs[1].seg = Mesh.dummysub;
 
             // Four NULL vertices.
             vertices = new Vertex[4];
@@ -57,29 +50,42 @@ namespace TriangleNet.Data
             boundary = 0;
         }
 
+        #region Public properties
+
         /// <summary>
-        /// Reset the hash seed.
+        /// Gets the first endpoints vertex id.
         /// </summary>
-        /// <param name="value">The new has seed value.</param>
-        /// <remarks>Reset value will usally 0, if a new triangulation starts, 
-        /// or the number of subsegments, if refinement is done.</remarks>
-        internal static void ResetHashSeed(int value)
+        public int P0
         {
-            if (value < 0)
-            {
-                throw new ArgumentException("A hash seed must be non negative.");
-            }
-            hashSeed = value;
+            get { return this.vertices[0].id; }
         }
+
+        /// <summary>
+        /// Gets the seconds endpoints vertex id.
+        /// </summary>
+        public int P1
+        {
+            get { return this.vertices[1].id; }
+        }
+
+        /// <summary>
+        /// Gets the segment boundary mark.
+        /// </summary>
+        public int Boundary
+        {
+            get { return this.boundary; }
+        }
+
+        #endregion
 
         public override int GetHashCode()
         {
-            return this.Hash;
+            return this.hash;
         }
 
         public override string ToString()
         {
-            return String.Format("SID {0}", Hash);
+            return String.Format("SID {0}", hash);
         }
     }
 }

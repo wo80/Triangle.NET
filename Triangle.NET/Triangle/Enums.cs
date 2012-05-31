@@ -90,5 +90,5 @@ namespace TriangleNet
     /// <summary>
     /// The type of the mesh vertex.
     /// </summary>
-    enum VertexType { InputVertex, SegmentVertex, FreeVertex, DeadVertex, UndeadVertex };
+    public enum VertexType { InputVertex, SegmentVertex, FreeVertex, DeadVertex, UndeadVertex };
 }

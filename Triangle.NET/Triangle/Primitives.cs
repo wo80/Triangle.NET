@@ -9,6 +9,8 @@ namespace TriangleNet
 {
     using System;
     using TriangleNet.Data;
+    using TriangleNet.Geometry;
+    using TriangleNet.Tools;
 
     /// <summary>
     /// Provides some primitives regularly used in computational geometry.
@@ -84,14 +86,14 @@ namespace TriangleNet
         /// also a rough approximation of twice the signed area of the triangle defined 
         /// by the three points.
         /// </summary>
-        /// <param name="pa"></param>
-        /// <param name="pb"></param>
-        /// <param name="pc"></param>
+        /// <param name="pa">Point a.</param>
+        /// <param name="pb">Point b.</param>
+        /// <param name="pc">Point c.</param>
         /// <returns>Return a positive value if the points pa, pb, and pc occur in 
         /// counterclockwise order; a negative value if they occur in clockwise order; 
         /// and zero if they are collinear.</returns>
         /// <remarks>
-        /// Uses exact arithmetic if necessary to ensure a correct answer.  The
+        /// Uses exact arithmetic if necessary to ensure a correct answer. The
         /// result returned is the determinant of a matrix. This determinant is
         /// computed adaptively, in the sense that exact arithmetic is used only to
         /// the degree it is needed to ensure that the returned value has the
@@ -100,15 +102,15 @@ namespace TriangleNet
         ///
         /// See Robust Predicates paper for details.
         /// </remarks>
-        public static double CounterClockwise(Point2 pa, Point2 pb, Point2 pc)
+        public static double CounterClockwise(Point pa, Point pb, Point pc)
         {
             double detleft, detright, det;
             double detsum, errbound;
 
             Statistic.CounterClockwiseCount++;
 
-            detleft = (pa.X - pc.X) * (pb.Y - pc.Y);
-            detright = (pa.Y - pc.Y) * (pb.X - pc.X);
+            detleft = (pa.x - pc.x) * (pb.y - pc.y);
+            detright = (pa.y - pc.y) * (pb.x - pc.x);
             det = detleft - detright;
 
             if (Behavior.NoExact)
@@ -161,10 +163,10 @@ namespace TriangleNet
         /// points pa, pb, and pc must be in counterclockwise order, or the sign of the result 
         /// will be reversed.
         /// </summary>
-        /// <param name="pa"></param>
-        /// <param name="pb"></param>
-        /// <param name="pc"></param>
-        /// <param name="pd"></param>
+        /// <param name="pa">Point a.</param>
+        /// <param name="pb">Point b.</param>
+        /// <param name="pc">Point c.</param>
+        /// <param name="pd">Point d.</param>
         /// <returns>Return a positive value if the point pd lies inside the circle passing through 
         /// pa, pb, and pc; a negative value if it lies outside; and zero if the four points 
         /// are cocircular.</returns>
@@ -178,7 +180,7 @@ namespace TriangleNet
         ///
         /// See Robust Predicates paper for details.
         /// </remarks>
-        public static double InCircle(Point2 pa, Point2 pb, Point2 pc, Point2 pd)
+        public static double InCircle(Point pa, Point pb, Point pc, Point pd)
         {
             double adx, bdx, cdx, ady, bdy, cdy;
             double bdxcdy, cdxbdy, cdxady, adxcdy, adxbdy, bdxady;
@@ -188,12 +190,12 @@ namespace TriangleNet
 
             Statistic.InCircleCount++;
 
-            adx = pa.X - pd.X;
-            bdx = pb.X - pd.X;
-            cdx = pc.X - pd.X;
-            ady = pa.Y - pd.Y;
-            bdy = pb.Y - pd.Y;
-            cdy = pc.Y - pd.Y;
+            adx = pa.x - pd.x;
+            bdx = pb.x - pd.x;
+            cdx = pc.x - pd.x;
+            ady = pa.y - pd.y;
+            bdy = pb.y - pd.y;
+            cdy = pc.y - pd.y;
 
             bdxcdy = bdx * cdy;
             cdxbdy = cdx * bdy;
@@ -239,19 +241,14 @@ namespace TriangleNet
         /// pc must be in counterclockwise order, or the sign of the result will be 
         /// reversed.
         /// </summary>
-        /// <param name="pa"></param>
-        /// <param name="pb"></param>
-        /// <param name="pc"></param>
-        /// <param name="pd"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// If the -w switch is used, the points are lifted onto the parabolic
-        /// lifting map, then they are dropped according to their weights, then the
-        /// 3D orientation test is applied. If the -W switch is used, the points'
-        /// heights are already provided, so the 3D orientation test is applied
-        /// directly. If neither switch is used, the incircle test is applied.
-        /// </remarks>
-        public static double NonRegular(Point2 pa, Point2 pb, Point2 pc, Point2 pd)
+        /// <param name="pa">Point a.</param>
+        /// <param name="pb">Point b.</param>
+        /// <param name="pc">Point c.</param>
+        /// <param name="pd">Point d.</param>
+        /// <returns>Return a positive value if the point pd lies inside the circle passing through 
+        /// pa, pb, and pc; a negative value if it lies outside; and zero if the four points 
+        /// are cocircular.</returns>
+        public static double NonRegular(Point pa, Point pb, Point pc, Point pd)
         {
             return InCircle(pa, pb, pc, pd);
         }
@@ -259,13 +256,13 @@ namespace TriangleNet
         /// <summary>
         /// Find the circumcenter of a triangle.
         /// </summary>
-        /// <param name="torg"></param>
-        /// <param name="tdest"></param>
-        /// <param name="tapex"></param>
-        /// <param name="circumcenter"></param>
-        /// <param name="xi"></param>
-        /// <param name="eta"></param>
-        /// <param name="offcenter"></param>
+        /// <param name="torg">Triangle point.</param>
+        /// <param name="tdest">Triangle point.</param>
+        /// <param name="tapex">Triangle point.</param>
+        /// <param name="xi">Relative coordinate of new location.</param>
+        /// <param name="eta">Relative coordinate of new location.</param>
+        /// <param name="offcenter">Use off-center for new location.</param>
+        /// <returns>Coordinates of the circumcenter (or off-center)</returns>
         /// <remarks>
         /// The result is returned both in terms of x-y coordinates and xi-eta
         /// (barycentric) coordinates. The xi-eta coordinate system is defined in
@@ -275,7 +272,7 @@ namespace TriangleNet
         /// This procedure also returns the square of the length of the triangle's
         /// shortest edge.
         /// </remarks>
-        public static Point2 FindCircumcenter(Point2 torg, Point2 tdest, Point2 tapex,
+        public static Point FindCircumcenter(Point torg, Point tdest, Point tapex,
                               ref double xi, ref double eta, bool offcenter)
         {
             double xdo, ydo, xao, yao;
@@ -286,14 +283,14 @@ namespace TriangleNet
             Statistic.CircumcenterCount++;
 
             // Compute the circumcenter of the triangle.
-            xdo = tdest.X - torg.X;
-            ydo = tdest.Y - torg.Y;
-            xao = tapex.X - torg.X;
-            yao = tapex.Y - torg.Y;
+            xdo = tdest.x - torg.x;
+            ydo = tdest.y - torg.y;
+            xao = tapex.x - torg.x;
+            yao = tapex.y - torg.y;
             dodist = xdo * xdo + ydo * ydo;
             aodist = xao * xao + yao * yao;
-            dadist = (tdest.X - tapex.X) * (tdest.X - tapex.X) +
-                     (tdest.Y - tapex.Y) * (tdest.Y - tapex.Y);
+            dadist = (tdest.x - tapex.x) * (tdest.x - tapex.x) +
+                     (tdest.y - tapex.y) * (tdest.y - tapex.y);
             if (Behavior.NoExact)
             {
                 denominator = 0.5 / (xdo * yao - xao * ydo);
@@ -350,10 +347,10 @@ namespace TriangleNet
             {
                 if (offcenter && (Behavior.Offconstant > 0.0))
                 {
-                    dxoff = 0.5 * (tapex.X - tdest.X) -
-                          Behavior.Offconstant * (tapex.Y - tdest.Y);
-                    dyoff = 0.5 * (tapex.Y - tdest.Y) +
-                          Behavior.Offconstant * (tapex.X - tdest.X);
+                    dxoff = 0.5 * (tapex.x - tdest.x) -
+                          Behavior.Offconstant * (tapex.y - tdest.y);
+                    dyoff = 0.5 * (tapex.y - tdest.y) +
+                          Behavior.Offconstant * (tapex.x - tdest.x);
                     // If the off-center is closer to the destination than the
                     // circumcenter, use the off-center instead.
                     if (dxoff * dxoff + dyoff * dyoff <
@@ -365,7 +362,7 @@ namespace TriangleNet
                 }
             }
 
-            Point2 circumcenter = new Point2(torg.X + dx, torg.Y + dy);
+            Point circumcenter = new Point(torg.x + dx, torg.y + dy);
 
             // To interpolate vertex attributes for the new vertex inserted at
             // the circumcenter, define a coordinate system with a xi-axis,
@@ -377,87 +374,5 @@ namespace TriangleNet
 
             return circumcenter;
         }
-
-
-        /*
-        /// <summary>
-        /// Return a positive value if the point pd lies below the plane passing 
-        /// through pa, pb, and pc; "below" is defined so that pa, pb, and pc appear 
-        /// in counterclockwise order when viewed from above the plane. The result is 
-        /// also a rough approximation of six times the signed volume of the 
-        /// tetrahedron defined by the four points.
-        /// </summary>
-        /// <param name="pa"></param>
-        /// <param name="pb"></param>
-        /// <param name="pc"></param>
-        /// <param name="pd"></param>
-        /// <param name="aheight"></param>
-        /// <param name="bheight"></param>
-        /// <param name="cheight"></param>
-        /// <param name="dheight"></param>
-        /// <returns>Return a positive value if the point pd lies below the plane 
-        /// passing through pa, pb, and pc. Returns a negative value if pd lies above 
-        /// the plane. Returns zero if the points are coplanar.</returns>
-        /// <remarks>
-        /// Uses exact arithmetic if necessary to ensure a correct answer.  The
-        /// result returned is the determinant of a matrix.  This determinant is
-        /// computed adaptively, in the sense that exact arithmetic is used only to
-        /// the degree it is needed to ensure that the returned value has the
-        /// correct sign.  Hence, this function is usually quite fast, but will run
-        /// more slowly when the input points are coplanar or nearly so.
-        ///
-        /// See my Robust Predicates paper for details.
-        /// </remarks>
-        public static double Orient3d2(Point2 pa, Point2 pb, Point2 pc, Point2 pd,
-                      double aheight, double bheight, double cheight, double dheight)
-        {
-            double adx, bdx, cdx, ady, bdy, cdy, adheight, bdheight, cdheight;
-            double bdxcdy, cdxbdy, cdxady, adxcdy, adxbdy, bdxady;
-            double det;
-            double permanent, errbound;
-
-            Statistic.Orient3dCount++;
-
-            adx = pa.X - pd.X;
-            bdx = pb.X - pd.X;
-            cdx = pc.X - pd.X;
-            ady = pa.Y - pd.Y;
-            bdy = pb.Y - pd.Y;
-            cdy = pc.Y - pd.Y;
-            adheight = aheight - dheight;
-            bdheight = bheight - dheight;
-            cdheight = cheight - dheight;
-
-            bdxcdy = bdx * cdy;
-            cdxbdy = cdx * bdy;
-
-            cdxady = cdx * ady;
-            adxcdy = adx * cdy;
-
-            adxbdy = adx * bdy;
-            bdxady = bdx * ady;
-
-            det = adheight * (bdxcdy - cdxbdy)
-                + bdheight * (cdxady - adxcdy)
-                + cdheight * (adxbdy - bdxady);
-
-            if (Behavior.NoExact)
-            {
-                return det;
-            }
-
-            permanent = (Math.Abs(bdxcdy) + Math.Abs(cdxbdy)) * Math.Abs(adheight)
-                      + (Math.Abs(cdxady) + Math.Abs(adxcdy)) * Math.Abs(bdheight)
-                      + (Math.Abs(adxbdy) + Math.Abs(bdxady)) * Math.Abs(cdheight);
-            errbound = o3derrboundA * permanent;
-            if ((det > errbound) || (-det > errbound))
-            {
-                return det;
-            }
-
-            throw new Exception();
-            //return orient3dadapt(pa, pb, pc, pd, aheight, bheight, cheight, dheight, permanent);
-        }
-        */
     }
 }

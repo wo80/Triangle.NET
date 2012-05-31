@@ -11,43 +11,52 @@ namespace TriangleNet.Data
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
-
+    using TriangleNet.Geometry;
 
     /// <summary>
     /// The vertex data structure.
     /// </summary>
-    /// <remarks>
-    /// Each vertex is actually an array of doubles. An integer boundary marker,
-    /// and sometimes a to a triangle, is appended after the doubles.
-    /// </remarks>
-    class Vertex : IComparable<Vertex>, IEquatable<Vertex>
+    public class Vertex : Point
     {
-        private static int hashSeed = 0;
-        internal int Hash;
+        // Hash for dictionary. Will be set by mesh instance.
+        internal int hash;
 
         // The ID is only used for mesh output.
-        internal int ID;
+        internal int id;
 
-        internal Point2 pt;
-        internal int mark;
         internal VertexType type;
         internal Otri tri;
-        internal double[] attributes;
 
         public Vertex()
-            : this(0)
+            : this(0, 0, 0)
         { }
 
-        public Vertex(int numAttributes)
-        {
-            this.Hash = hashSeed++;
-            
-            pt = default(Point2);
+        public Vertex(double x, double y)
+            : this(x, y, 0)
+        { }
 
-            if (numAttributes > 0)
-            {
-                attributes = new double[numAttributes];
-            }
+        public Vertex(double x, double y, int mark)
+            : base(x, y, mark)
+        {
+            this.type = VertexType.InputVertex;
+        }
+
+        #region Public properties
+
+        /// <summary>
+        /// Gets the vertex id.
+        /// </summary>
+        public int ID
+        {
+            get { return this.id; }
+        }
+
+        /// <summary>
+        /// Gets the vertex type.
+        /// </summary>
+        public VertexType Type
+        {
+            get { return this.type; }
         }
 
         /// <summary>
@@ -61,110 +70,23 @@ namespace TriangleNet.Data
             {
                 if (i == 0)
                 {
-                    return pt.X;
+                    return x;
                 }
 
                 if (i == 1)
                 {
-                    return pt.Y;
+                    return y;
                 }
 
                 throw new ArgumentOutOfRangeException("Index must be 0 or 1.");
             }
         }
 
-        /// <summary>
-        /// Reset the hash seed.
-        /// </summary>
-        /// <param name="value">The new has seed value.</param>
-        /// <remarks>Reset value will usally 0, if a new triangulation starts, 
-        /// or the number of points, if refinement is done.</remarks>
-        internal static void ResetHashSeed(int value)
-        {
-            if (value < 0)
-            {
-                throw new ArgumentException("A hash seed must be non negative.");
-            }
-            hashSeed = value;
-        }
-
-        #region Operator overloading / overriding Equals
-
-        // Compare "Guidelines for Overriding Equals() and Operator =="
-        // http://msdn.microsoft.com/en-us/library/ms173147.aspx
-
-        public static bool operator ==(Vertex a, Vertex b)
-        {
-            // If both are null, or both are same instance, return true.
-            if (Object.ReferenceEquals(a, b))
-            {
-                return true;
-            }
-
-            // If one is null, but not both, return false.
-            if (((object)a == null) || ((object)b == null))
-            {
-                return false;
-            }
-
-            return a.Equals(b);
-        }
-
-        public static bool operator !=(Vertex a, Vertex b)
-        {
-            return !(a == b);
-        }
-
-        public override bool Equals(object obj)
-        {
-            // If parameter is null return false.
-            if (obj == null)
-            {
-                return false;
-            }
-
-            Vertex v = obj as Vertex;
-
-            if ((object)v == null)
-            {
-                return false;
-            }
-
-            return this.pt.Equals(v.pt);
-        }
-
-        public bool Equals(Vertex v)
-        {
-            // If vertex is null return false.
-            if ((object)v == null)
-            {
-                return false;
-            }
-
-            // Return true if the fields match:
-            return this.pt.Equals(v.pt);
-        }
+        #endregion
 
         public override int GetHashCode()
         {
-            return this.Hash;
-        }
-
-        #endregion
-
-        public override string ToString()
-        {
-            return String.Format("[{0},{1}]", pt.X, pt.Y);
-        }
-
-        public int CompareTo(Vertex other)
-        {
-            if (pt.X == other.pt.X && pt.Y == other.pt.Y)
-            {
-                return 0;
-            }
-
-            return (pt.X < other.pt.X || (pt.X == other.pt.X && pt.Y < other.pt.Y)) ? -1 : 1;
+            return this.hash;
         }
     }
 }

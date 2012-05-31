@@ -4,24 +4,24 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace TestApp
+namespace MeshExplorer.Controls
 {
     using System;
-    using System.Collections.Generic;
-    using System.Text;
-    using System.Windows.Forms;
-    using System.Drawing;
-    using System.Drawing.Imaging;
-    using System.Drawing.Drawing2D;
-    using TriangleNet;
     using System.Diagnostics;
+    using System.Drawing;
+    using System.Drawing.Drawing2D;
+    using System.Drawing.Text;
+    using System.Windows.Forms;
+    using MeshExplorer.Rendering;
+    using TriangleNet;
     using TriangleNet.IO;
-    using TestApp.Rendering;
+    using TriangleNet.Data;
+    using TriangleNet.Geometry;
 
     /// <summary>
     /// Renders a mesh using GDI.
     /// </summary>
-    public class MeshRenderer : System.Windows.Forms.Control
+    public class MeshRenderer : Control
     {
         // Rendering stuff
         private BufferedGraphics buffer;
@@ -33,7 +33,12 @@ namespace TestApp
         RenderData data;
         bool initialized = false;
 
+        string coordinate = String.Empty;
+
+        Timer timer;
+
         public long RenderTime { get; private set; }
+        public RenderData Data { get { return data; } }
 
         public MeshRenderer()
         {
@@ -44,39 +49,48 @@ namespace TestApp
             zoom = new Zoom();
             context = new BufferedGraphicsContext();
             data = new RenderData();
+
+            timer = new Timer();
+            timer.Interval = 3000;
+            timer.Tick += (sender, e) => {
+                timer.Stop();
+                coordinate = String.Empty;
+                this.Invalidate();
+            };
         }
 
-        public void SetData(MeshData meshdata, bool input)
+        public void Initialize()
         {
-            data.SetData(meshdata);
-
-            if (input)
-            {
-                // Reset the zoom on new data
-                zoom.Initialize(this.ClientRectangle, data.Bounds);
-            }
+            zoom.Initialize(this.ClientRectangle, this.ClientRectangle);
+            InitializeBuffer();
 
             initialized = true;
 
-            this.Render();
+            this.Invalidate();
         }
 
-        public void SetData(Mesh mesh, bool input)
+        public void SetData(InputGeometry mesh)
         {
             data.SetData(mesh);
 
-            if (input)
-            {
-                // Reset the zoom on new data
-                zoom.Initialize(this.ClientRectangle, data.Bounds);
-            }
-            
+            // Reset the zoom on new data
+            zoom.Initialize(this.ClientRectangle, data.Bounds);
+
             initialized = true;
 
             this.Render();
         }
 
-        public void Zoom(Point location, int delta)
+        public void SetData(Mesh mesh)
+        {
+            data.SetData(mesh);
+
+            initialized = true;
+
+            this.Render();
+        }
+
+        public void Zoom(PointF location, int delta)
         {
             if (!initialized) return;
 
@@ -87,7 +101,13 @@ namespace TestApp
             }
         }
 
-        private void IntializeBuffer()
+        public void HandleResize()
+        {
+            zoom.Resize(this.ClientRectangle, data.Bounds);
+            InitializeBuffer();
+        }
+
+        private void InitializeBuffer()
         {
             if (this.Width > 0 && this.Height > 0)
             {
@@ -95,6 +115,8 @@ namespace TestApp
                 {
                     if (this.ClientRectangle == buffer.Graphics.VisibleClipBounds)
                     {
+                        this.Invalidate();
+
                         // Bounds didn't change. Probably we just restored the window
                         // from minimized state.
                         return;
@@ -150,21 +172,18 @@ namespace TestApp
             PointF p0, p1, p2;
             PointF[] pts = data.Points;
 
-            int[] tri;
+            var triangles = data.Triangles;
 
             // Draw triangles
-            int n = data.Triangles.Length;
-            for (int i = 0; i < n; i++)
+            foreach (var tri in triangles)
             {
-                tri = data.Triangles[i];
-
-                if (zoom.ViewportContains(pts[tri[0]]) ||
-                    zoom.ViewportContains(pts[tri[1]]) ||
-                    zoom.ViewportContains(pts[tri[2]]))
+                if (zoom.ViewportContains(pts[tri.P0]) ||
+                    zoom.ViewportContains(pts[tri.P1]) ||
+                    zoom.ViewportContains(pts[tri.P2]))
                 {
-                    p0 = zoom.WorldToScreen(pts[tri[0]]);
-                    p1 = zoom.WorldToScreen(pts[tri[1]]);
-                    p2 = zoom.WorldToScreen(pts[tri[2]]);
+                    p0 = zoom.WorldToScreen(pts[tri.P0]);
+                    p1 = zoom.WorldToScreen(pts[tri.P1]);
+                    p2 = zoom.WorldToScreen(pts[tri.P2]);
 
                     g.DrawLine(lines, p0, p1);
                     g.DrawLine(lines, p1, p2);
@@ -178,19 +197,16 @@ namespace TestApp
             PointF p0, p1;
             PointF[] pts = data.Points;
 
-            int[] tri;
+            var edges = data.Edges;
 
-            // Draw triangles
-            int n = data.Edges.Length;
-            for (int i = 0; i < n; i++)
+            // Draw edges
+            foreach (var edge in edges)
             {
-                tri = data.Edges[i];
-
-                if (zoom.ViewportContains(pts[tri[0]]) ||
-                    zoom.ViewportContains(pts[tri[1]]))
+                if (zoom.ViewportContains(pts[edge.P0]) ||
+                    zoom.ViewportContains(pts[edge.P1]))
                 {
-                    p0 = zoom.WorldToScreen(pts[tri[0]]);
-                    p1 = zoom.WorldToScreen(pts[tri[1]]);
+                    p0 = zoom.WorldToScreen(pts[edge.P0]);
+                    p1 = zoom.WorldToScreen(pts[edge.P1]);
 
                     g.DrawLine(lines, p0, p1);
                 }
@@ -202,19 +218,15 @@ namespace TestApp
             PointF p0, p1;
             PointF[] pts = data.Points;
 
-            int[] tri;
+            var segments = data.Segments;
 
-            // Draw triangles
-            int n = data.Segments.Length;
-            for (int i = 0; i < n; i++)
+            foreach (var seg in segments)
             {
-                tri = data.Segments[i];
-
-                if (zoom.ViewportContains(pts[tri[0]]) ||
-                    zoom.ViewportContains(pts[tri[1]]))
+                if (zoom.ViewportContains(pts[seg.P0]) ||
+                    zoom.ViewportContains(pts[seg.P1]))
                 {
-                    p0 = zoom.WorldToScreen(pts[tri[0]]);
-                    p1 = zoom.WorldToScreen(pts[tri[1]]);
+                    p0 = zoom.WorldToScreen(pts[seg.P0]);
+                    p1 = zoom.WorldToScreen(pts[seg.P1]);
 
                     g.DrawLine(Pens.DarkBlue, p0, p1);
                 }
@@ -223,10 +235,12 @@ namespace TestApp
 
         private void Render()
         {
+            coordinate = String.Empty;
+
             Graphics g = buffer.Graphics;
             g.Clear(this.BackColor);
 
-            if (!initialized)
+            if (!initialized || data == null)
             {
                 return;
             }
@@ -250,7 +264,10 @@ namespace TestApp
                 this.RenderSegments(g);
             }
 
-            this.RenderPoints(g);
+            if (data.Points != null)
+            {
+                this.RenderPoints(g);
+            }
 
             stopwatch.Stop();
 
@@ -263,28 +280,20 @@ namespace TestApp
 
         protected override void OnPaint(PaintEventArgs pe)
         {
-            Graphics g = buffer.Graphics;
-            g.SmoothingMode = SmoothingMode.Default;
-
-            Pen pen1 = new Pen(Color.FromArgb(82, 82, 82));
-            Pen pen2 = new Pen(Color.FromArgb(40, 40, 40));
-
-            g.DrawLine(pen1, 0, 0, this.Width, 0);
-            g.DrawLine(pen2, 0, 1, this.Width, 1);
-
-            pen1.Dispose();
-            pen2.Dispose();
+            if (!initialized)
+            {
+                base.OnPaint(pe);
+                return;
+            }
 
             buffer.Render();
-        }
 
-        protected override void OnClientSizeChanged(EventArgs e)
-        {
-            if (buffer == null) return;
-
-            // Redraw
-
-            base.OnClientSizeChanged(e);
+            if (!String.IsNullOrEmpty(coordinate) && data.Points != null)
+            {
+                Graphics g = pe.Graphics;
+                g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
+                g.DrawString(coordinate, this.Font, Brushes.White, 10, 10);
+            }
         }
 
         protected override void OnMouseClick(MouseEventArgs e)
@@ -296,6 +305,20 @@ namespace TestApp
                 zoom.Reset();
                 this.Render();
             }
+            else if (e.Button == MouseButtons.Left)
+            {
+                // Just in case ...
+                timer.Stop();
+
+                PointF c = zoom.ScreenToWorld((float)e.X / this.Width, (float)e.Y / this.Height);
+                coordinate = String.Format("X:{0} Y:{1}", 
+                    c.X.ToString(Util.Nfi), 
+                    c.Y.ToString(Util.Nfi));
+
+                this.Invalidate();
+
+                timer.Start();
+            }
 
             base.OnMouseClick(e);
         }
@@ -303,15 +326,10 @@ namespace TestApp
         protected override void OnPaintBackground(PaintEventArgs pevent)
         {
             // Do nothing
-        }
-
-        protected override void OnResize(EventArgs e)
-        {
-            base.OnResize(e);
-
-            IntializeBuffer();
-
-            //zoom.Initialize(this.ClientRectangle, data.Bounds);
+            if (!initialized)
+            {
+                base.OnPaintBackground(pevent);
+            }
         }
 
         #endregion

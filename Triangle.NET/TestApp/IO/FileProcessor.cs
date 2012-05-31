@@ -65,11 +65,11 @@ namespace MeshExplorer.IO
 
             if (ext == ".node" || ext == ".poly")
             {
-                //provider = new TriangleFile();
+                provider = new TriangleFile();
             }
             else if (ext == ".json")
             {
-                //provider = new JsonFile();
+                provider = new JsonFile();
             }
             else if (ext == ".dat")
             {

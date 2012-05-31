@@ -75,7 +75,7 @@ namespace TriangleNet.Geometry
         /// </summary>
         public IEnumerable<Point> Points
         {
-            get { return null; }
+            get { return points; }
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace TriangleNet.Geometry
         /// <param name="boundary">Boundary marker.</param>
         public void AddPoint(double x, double y, int boundary)
         {
-            //points.Add(new Vertex(x, y, boundary));
+            points.Add(new Vertex(x, y, boundary));
 
             bounds.Update(x, y);
         }
@@ -176,7 +176,7 @@ namespace TriangleNet.Geometry
         /// <param name="boundary">Segment marker.</param>
         public void AddSegment(int p0, int p1, int boundary)
         {
-            if (p0 == p1)
+            if (p0 == p1 || p0 < 0 || p1 < 0)
             {
                 throw new NotSupportedException("Invalid endpoints.");
             }

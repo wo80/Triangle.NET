@@ -5,11 +5,12 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace TriangleNet
+namespace TriangleNet.Tools
 {
     using System;
     using System.Text;
     using TriangleNet.Data;
+    using TriangleNet.Geometry;
 
     /// <summary>
     /// Gather mesh statistics.
@@ -74,7 +75,7 @@ namespace TriangleNet
         /// <summary>
         /// Gets the shortest altitude.
         /// </summary>
-        public double ShortestAltitude  { get { return minAspect; } }
+        public double ShortestAltitude { get { return minAspect; } }
 
         double maxAspect = 0;
         /// <summary>
@@ -224,8 +225,8 @@ namespace TriangleNet
                 {
                     j = plus1Mod3[i];
                     k = minus1Mod3[i];
-                    dx[i] = p[j].pt.X - p[k].pt.X;
-                    dy[i] = p[j].pt.Y - p[k].pt.Y;
+                    dx[i] = p[j].x - p[k].x;
+                    dy[i] = p[j].y - p[k].y;
                     edgelength[i] = dx[i] * dx[i] + dy[i] * dy[i];
                     if (edgelength[i] > trilongest2)
                     {
@@ -234,8 +235,8 @@ namespace TriangleNet
                 }
 
                 //triarea = Primitives.CounterClockwise(p[0], p[1], p[2]);
-                triarea = Math.Abs((p[2].pt.X - p[0].pt.X) * (p[1].pt.Y - p[0].pt.Y) -
-                    (p[1].pt.X - p[0].pt.X) * (p[2].pt.Y - p[0].pt.Y)) / 2.0;
+                triarea = Math.Abs((p[2].x - p[0].x) * (p[1].y - p[0].y) -
+                    (p[1].x - p[0].x) * (p[2].y - p[0].y)) / 2.0;
 
                 triminaltitude2 = triarea * triarea / trilongest2;
 
@@ -272,7 +273,7 @@ namespace TriangleNet
             intBoundaryEdges = mesh.subsegs.Count - (int)mesh.hullsize;
             constrainedEdges = mesh.subsegs.Count;
 
-            Point2[] p = new Point2[3];
+            Point[] p = new Point[3];
 
             int k1, k2;
             int degreeStep;
@@ -310,7 +311,7 @@ namespace TriangleNet
                 angleTable[i] = 0;
             }
 
-            minAspect = mesh.xmax - mesh.xmin + mesh.ymax - mesh.ymin;
+            minAspect = mesh.bounds.Width + mesh.bounds.Height;
             minAspect = minAspect * minAspect;
             maxAspect = 0.0;
             minEdge = minAspect;
@@ -330,9 +331,9 @@ namespace TriangleNet
                 triMinAngle = 0; // Min angle:  0 < a <  60 degress
                 triMaxAngle = 1; // Max angle: 60 < a < 180 degress
 
-                p[0] = tri.vertices[0].pt;
-                p[1] = tri.vertices[1].pt;
-                p[2] = tri.vertices[2].pt;
+                p[0] = tri.vertices[0];
+                p[1] = tri.vertices[1];
+                p[2] = tri.vertices[2];
 
                 triLongest2 = 0.0;
 
@@ -476,7 +477,7 @@ namespace TriangleNet
                 {
                     maxAngles[sampleDegrees - degreeStep - 1]++;
                 }
-                
+
                 acuteBiggestTri = true;
             }
 

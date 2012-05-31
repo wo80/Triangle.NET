@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace TestApp
+namespace MeshExplorer
 {
     using System;
     using System.Collections.Generic;
@@ -12,10 +12,10 @@ namespace TestApp
     using System.Text;
     using TriangleNet;
     using TriangleNet.IO;
+    using TriangleNet.Geometry;
 
     /// <summary>
     /// Code of the online examples.
-    /// 
     /// </summary>
     public static class Examples
     {
@@ -39,7 +39,7 @@ namespace TestApp
 
             // Read face polygon file and gernerate the delaunay triangulation 
             // of the PSLG. We reuse the mesh instance here.
-            MeshData data = FileReader.ReadFile(pathToData + "face.poly");
+            InputGeometry data = FileReader.ReadFile(pathToData + "face.poly");
             mesh.Triangulate(data);
             ImageWriter.WritePng(mesh, "face.png", 200);
 
@@ -62,7 +62,7 @@ namespace TestApp
             // Read spiral node file and gernerate the delaunay triangulation. 
             // Set the mesh quality option to true, which will set a default
             // minimum angle of 20 degrees.
-            MeshData data = FileReader.ReadNodeFile(pathToData + "spiral.node");
+            InputGeometry data = FileReader.ReadNodeFile(pathToData + "spiral.node");
             mesh.SetOption(Options.Quality, true);
             mesh.Triangulate(data);
             ImageWriter.WritePng(mesh, "spiral-Angle-20.png", 200);
@@ -115,6 +115,75 @@ namespace TestApp
             mesh.SetOption(Options.MinAngle, 0);
             mesh.Refine();
             ImageWriter.WritePng(mesh, "box-Refine-3.png", 200);
+        }
+
+        /// <summary>
+        /// Drawing the Voronoi diagram.
+        /// </summary>
+        public static void Example4()
+        {
+            ImageWriter.SetColorSchemeLight();
+
+            // Create mesh data (random point set)
+            //data.Points = Util.CreateCirclePoints(0, 0, 5, 50); // Ooops, TODO !!!
+            InputGeometry data = PolygonGenerator.CreateStarPoints(0, 0, 5, 10);
+
+            // Create a mesh instance.
+            Mesh mesh = new Mesh();
+
+            // Gernerate a delaunay triangulation
+            mesh.Triangulate(data);
+            ImageWriter.WritePng(mesh, "circle-mesh.png", 400);
+            ImageWriter.WriteVoronoiPng(mesh, "circle-voronoi.png", 400);
+        }
+
+        /// <summary>
+        /// Smoothing a mesh.
+        /// </summary>
+        public static void Example5()
+        {
+            ImageWriter.SetColorSchemeLight();
+
+            // Create a mesh instance.
+            Mesh mesh = new Mesh();
+
+            mesh.SetOption(Options.Quality, true);
+            mesh.SetOption(Options.MinAngle, 25);
+            mesh.SetOption(Options.MaxArea, 0.0075);
+            mesh.Triangulate(pathToData + "Smooth-Slit.poly");
+            mesh.Smooth();
+
+            ImageWriter.WritePng(mesh, "slit-smooth.png", 300);
+        }
+
+        /// <summary>
+        /// Smoothing a mesh.
+        /// </summary>
+        public static void ExampleXYZ()
+        {
+            ImageWriter.SetColorSchemeLight();
+
+            Mesh mesh = new Mesh();
+
+            mesh.SetOption(Options.Quality, true);
+            mesh.SetOption(Options.MinAngle, 25);
+            mesh.SetOption(Options.MaxArea, 0.05);
+
+            mesh.Triangulate(pathToData + "Smooth-Square.poly");
+
+            ImageWriter.WritePng(mesh, "test1.png", 300);
+
+            mesh.SetOption(Options.MaxArea, 0.01);
+
+            // Refine with new max area
+            mesh.Refine();
+
+            ImageWriter.WritePng(mesh, "test2.png", 300);
+
+            mesh.SetOption(Options.SteinerPoints, 50);
+            mesh.Triangulate(pathToData + "Smooth-Square.poly");
+
+            ImageWriter.WritePng(mesh, "test3.png", 300);
         }
     }
 }

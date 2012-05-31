@@ -36,7 +36,7 @@ namespace TriangleNet.Data
         }
         public override string ToString()
         {
-            return String.Format("B-TID {0}", poortri.triangle.Hash);
+            return String.Format("B-TID {0}", poortri.triangle.hash);
         }
     }
 }

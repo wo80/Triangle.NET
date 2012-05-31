@@ -9,6 +9,7 @@ namespace TriangleNet.Algorithm
 {
     using TriangleNet.Data;
     using TriangleNet.Log;
+    using TriangleNet.Geometry;
 
     /// <summary>
     /// Builds a delaunay triangulation using the incremental algorithm.
@@ -25,31 +26,25 @@ namespace TriangleNet.Algorithm
         /// used by the point location routines, but (mostly) ignored by the
         /// Delaunay edge flip routines.
         /// </remarks>
-        void BoundingBox()
+        void GetBoundingBox()
         {
             Otri inftri = default(Otri); // Handle for the triangular bounding box.
-            double width;
+            BoundingBox box = mesh.bounds;
 
             // Find the width (or height, whichever is larger) of the triangulation.
-            width = mesh.xmax - mesh.xmin;
-            if (mesh.ymax - mesh.ymin > width)
+            double width = box.Width;
+            if (box.Height > width)
             {
-                width = mesh.ymax - mesh.ymin;
+                width = box.Height;
             }
             if (width == 0.0)
             {
                 width = 1.0;
             }
             // Create the vertices of the bounding box.
-            mesh.infvertex1 = new Vertex();
-            mesh.infvertex2 = new Vertex();
-            mesh.infvertex3 = new Vertex();
-            mesh.infvertex1.pt.X = mesh.xmin - 50.0 * width;
-            mesh.infvertex1.pt.Y = mesh.ymin - 40.0 * width;
-            mesh.infvertex2.pt.X = mesh.xmax + 50.0 * width;
-            mesh.infvertex2.pt.Y = mesh.ymin - 40.0 * width;
-            mesh.infvertex3.pt.X = 0.5 * (mesh.xmin + mesh.xmax);
-            mesh.infvertex3.pt.Y = mesh.ymax + 60.0 * width;
+            mesh.infvertex1 = new Vertex(box.Xmin - 50.0 * width, box.Ymin - 40.0 * width);
+            mesh.infvertex2 = new Vertex(box.Xmax + 50.0 * width, box.Ymin - 40.0 * width);
+            mesh.infvertex3 = new Vertex(0.5 * (box.Xmin + box.Xmax), box.Ymax + 60.0 * width);
 
             // Create the bounding box.
             mesh.MakeTriangle(ref inftri);
@@ -160,7 +155,7 @@ namespace TriangleNet.Algorithm
             Otri starttri = new Otri();
 
             // Create a triangular bounding box.
-            BoundingBox();
+            GetBoundingBox();
 
             foreach (var v in mesh.vertices.Values)
             {
@@ -170,7 +165,7 @@ namespace TriangleNet.Algorithm
                 {
                     if (Behavior.Verbose)
                     {
-                        SimpleLog.Instance.Warning("A duplicate vertex appeared and was ignored.",
+                        SimpleLog.Instance.Warning("A duplicate vertex appeared and was ignored.", 
                             "Incremental.IncrementalDelaunay()");
                     }
                     v.type = VertexType.UndeadVertex;

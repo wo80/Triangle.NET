@@ -32,7 +32,7 @@ namespace TriangleNet.Data
             {
                 return "O-TID [null]";
             }
-            return String.Format("O-TID {0}", triangle.Hash);
+            return String.Format("O-TID {0}", triangle.hash);
         }
 
         #region Otri primitives
@@ -372,8 +372,14 @@ namespace TriangleNet.Data
         /// </summary>
         public void Bond(ref Otri o2)
         {
-            triangle.neighbors[orient] = o2;
-            o2.triangle.neighbors[o2.orient] = this;
+            //triangle.neighbors[orient]= o2;
+            //o2.triangle.neighbors[o2.orient] = this;
+
+            triangle.neighbors[orient].triangle = o2.triangle;
+            triangle.neighbors[orient].orient = o2.orient;
+
+            o2.triangle.neighbors[o2.orient].triangle = this.triangle;
+            o2.triangle.neighbors[o2.orient].orient = this.orient;
         }
 
         /// <summary>
@@ -462,7 +468,7 @@ namespace TriangleNet.Data
         public void SegBond(ref Osub os)
         {
             triangle.subsegs[orient] = os;
-            os.ss.triangles[os.ssorient] = this;
+            os.seg.triangles[os.orient] = this;
         }
 
         /// <summary>
@@ -470,7 +476,7 @@ namespace TriangleNet.Data
         /// </summary>
         public void SegDissolve()
         {
-            triangle.subsegs[orient].ss = Mesh.dummysub;
+            triangle.subsegs[orient].seg = Mesh.dummysub;
         }
 
         #endregion

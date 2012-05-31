@@ -11,6 +11,7 @@ namespace TriangleNet
     using System.Collections.Generic;
     using TriangleNet.Data;
     using TriangleNet.Log;
+    using TriangleNet.Geometry;
 
     /// <summary>
     /// Provides methods for mesh quality enforcement and testing.
@@ -20,7 +21,9 @@ namespace TriangleNet
         Queue<BadSubseg> badsubsegs;
         BadTriQueue queue;
         Mesh mesh;
-        Func<Vertex, Vertex, Vertex, double, bool> userTest;
+
+        // Not used at the moment
+        Func<Point, Point, Point, double, bool> userTest;
 
         ILog<SimpleLogItem> logger;
 
@@ -34,9 +37,9 @@ namespace TriangleNet
         }
 
         /// <summary>
-        /// Deallocate space for a bad subsegment, marking it dead.
+        /// Add a bad subsegment to the queue.
         /// </summary>
-        /// <param name="dyingseg"></param>
+        /// <param name="badseg">Bad subsegment.</param>
         public void AddBadSubseg(BadSubseg badseg)
         {
             badsubsegs.Enqueue(badseg);
@@ -75,8 +78,10 @@ namespace TriangleNet
                     {   // Only test for inversion once.
                         // Test if the triangle is flat or inverted.
                         triapex = tri.Apex();
-                        if (Primitives.CounterClockwise(triorg.pt, tridest.pt, triapex.pt) <= 0.0)
+                        if (Primitives.CounterClockwise(triorg, tridest, triapex) <= 0.0)
                         {
+                            logger.Warning("Triangle is flat or inverted.",
+                                "Quality.CheckMesh()");
                             horrors++;
                         }
                     }
@@ -183,16 +188,17 @@ namespace TriangleNet
                         // If a subsegment separates the triangles, then the edge is
                         // constrained, so no local Delaunay test should be done.
                         triangleloop.SegPivot(ref opposubseg);
-                        if (opposubseg.ss != Mesh.dummysub)
+                        if (opposubseg.seg != Mesh.dummysub)
                         {
                             shouldbedelaunay = false;
                         }
                     }
                     if (shouldbedelaunay)
                     {
-                        if (Primitives.NonRegular(triorg.pt, tridest.pt, triapex.pt, oppoapex.pt) > 0.0)
+                        if (Primitives.NonRegular(triorg, tridest, triapex, oppoapex) > 0.0)
                         {
-                            logger.Warning("Non-regular pair of triangles found.", "Quality.CheckDelaunay()");
+                            string coords = triorg.ToString() + " " + tridest.ToString();
+                            logger.Warning("Non-regular pair of triangles found. " + coords, "Quality.CheckDelaunay()");
                             horrors++;
                         }
                     }
@@ -223,7 +229,7 @@ namespace TriangleNet
         /// <summary>
         /// Check a subsegment to see if it is encroached; add it to the list if it is.
         /// </summary>
-        /// <param name="testsubseg"></param>
+        /// <param name="testsubseg">The subsegment to check.</param>
         /// <returns>Returns a nonzero value if the subsegment is encroached.</returns>
         /// <remarks>
         /// A subsegment is encroached if there is a vertex in its diametral lens.
@@ -268,17 +274,17 @@ namespace TriangleNet
                 // of two sides of the triangle is used to check whether the angle
                 // at the apex is greater than (180 - 2 'minangle') degrees (for
                 // lenses; 90 degrees for diametral circles).
-                dotproduct = (eorg.pt.X - eapex.pt.X) * (edest.pt.X - eapex.pt.X) +
-                             (eorg.pt.Y - eapex.pt.Y) * (edest.pt.Y - eapex.pt.Y);
+                dotproduct = (eorg.x - eapex.x) * (edest.x - eapex.x) +
+                             (eorg.y - eapex.y) * (edest.y - eapex.y);
                 if (dotproduct < 0.0)
                 {
                     if (Behavior.ConformDel ||
                         (dotproduct * dotproduct >=
                          (2.0 * Behavior.GoodAngle - 1.0) * (2.0 * Behavior.GoodAngle - 1.0) *
-                         ((eorg.pt.X - eapex.pt.X) * (eorg.pt.X - eapex.pt.X) +
-                          (eorg.pt.Y - eapex.pt.Y) * (eorg.pt.Y - eapex.pt.Y)) *
-                         ((edest.pt.X - eapex.pt.X) * (edest.pt.X - eapex.pt.X) +
-                          (edest.pt.Y - eapex.pt.Y) * (edest.pt.Y - eapex.pt.Y))))
+                         ((eorg.x - eapex.x) * (eorg.x - eapex.x) +
+                          (eorg.y - eapex.y) * (eorg.y - eapex.y)) *
+                         ((edest.x - eapex.x) * (edest.x - eapex.x) +
+                          (edest.y - eapex.y) * (edest.y - eapex.y))))
                     {
                         encroached = 1;
                     }
@@ -295,17 +301,17 @@ namespace TriangleNet
                 eapex = neighbortri.Apex();
                 // Check whether the apex is in the diametral lens of the subsegment
                 // (or the diametral circle, if 'conformdel' is set).
-                dotproduct = (eorg.pt.X - eapex.pt.X) * (edest.pt.X - eapex.pt.X) +
-                             (eorg.pt.Y - eapex.pt.Y) * (edest.pt.Y - eapex.pt.Y);
+                dotproduct = (eorg.x - eapex.x) * (edest.x - eapex.x) +
+                             (eorg.y - eapex.y) * (edest.y - eapex.y);
                 if (dotproduct < 0.0)
                 {
                     if (Behavior.ConformDel ||
                         (dotproduct * dotproduct >=
                          (2.0 * Behavior.GoodAngle - 1.0) * (2.0 * Behavior.GoodAngle - 1.0) *
-                         ((eorg.pt.X - eapex.pt.X) * (eorg.pt.X - eapex.pt.X) +
-                          (eorg.pt.Y - eapex.pt.Y) * (eorg.pt.Y - eapex.pt.Y)) *
-                         ((edest.pt.X - eapex.pt.X) * (edest.pt.X - eapex.pt.X) +
-                          (edest.pt.Y - eapex.pt.Y) * (edest.pt.Y - eapex.pt.Y))))
+                         ((eorg.x - eapex.x) * (eorg.x - eapex.x) +
+                          (eorg.y - eapex.y) * (eorg.y - eapex.y)) *
+                         ((edest.x - eapex.x) * (edest.x - eapex.x) +
+                          (edest.y - eapex.y) * (edest.y - eapex.y))))
                     {
                         encroached += 2;
                     }
@@ -329,7 +335,7 @@ namespace TriangleNet
                     encroachedseg.subsegorg = edest;
                     encroachedseg.subsegdest = eorg;
                 }
-                
+
                 badsubsegs.Enqueue(encroachedseg);
             }
 
@@ -365,12 +371,12 @@ namespace TriangleNet
             torg = testtri.Org();
             tdest = testtri.Dest();
             tapex = testtri.Apex();
-            dxod = torg.pt.X - tdest.pt.X;
-            dyod = torg.pt.Y - tdest.pt.Y;
-            dxda = tdest.pt.X - tapex.pt.X;
-            dyda = tdest.pt.Y - tapex.pt.Y;
-            dxao = tapex.pt.X - torg.pt.X;
-            dyao = tapex.pt.Y - torg.pt.Y;
+            dxod = torg.x - tdest.x;
+            dyod = torg.y - tdest.y;
+            dxda = tdest.x - tapex.x;
+            dyda = tdest.y - tapex.y;
+            dxao = tapex.x - torg.x;
+            dyao = tapex.y - torg.y;
             dxod2 = dxod * dxod;
             dyod2 = dyod * dyod;
             dxda2 = dxda * dxda;
@@ -487,7 +493,7 @@ namespace TriangleNet
                     // Check if both points lie in a common segment. If they do, the
                     // skinny triangle is enqueued to be split as usual.
                     tri1.SegPivot(ref testsub);
-                    if (testsub.ss == Mesh.dummysub)
+                    if (testsub.seg == Mesh.dummysub)
                     {
                         // No common segment.  Find a subsegment that contains 'torg'.
                         tri1.Copy(ref tri2);
@@ -495,7 +501,7 @@ namespace TriangleNet
                         {
                             tri1.OprevSelf();
                             tri1.SegPivot(ref testsub);
-                        } while (testsub.ss == Mesh.dummysub);
+                        } while (testsub.seg == Mesh.dummysub);
                         // Find the endpoints of the containing segment.
                         org1 = testsub.SegOrg();
                         dest1 = testsub.SegDest();
@@ -504,17 +510,17 @@ namespace TriangleNet
                         {
                             tri2.DnextSelf();
                             tri2.SegPivot(ref testsub);
-                        } while (testsub.ss == Mesh.dummysub);
+                        } while (testsub.seg == Mesh.dummysub);
                         // Find the endpoints of the containing segment.
                         org2 = testsub.SegOrg();
                         dest2 = testsub.SegDest();
                         // Check if the two containing segments have an endpoint in common.
                         joinvertex = null;
-                        if ((dest1.pt.X == org2.pt.X) && (dest1.pt.Y == org2.pt.Y))
+                        if ((dest1.x == org2.x) && (dest1.y == org2.y))
                         {
                             joinvertex = dest1;
                         }
-                        else if ((org1.pt.X == dest2.pt.X) && (org1.pt.Y == dest2.pt.Y))
+                        else if ((org1.x == dest2.x) && (org1.y == dest2.y))
                         {
                             joinvertex = org1;
                         }
@@ -522,10 +528,10 @@ namespace TriangleNet
                         {
                             // Compute the distance from the common endpoint (of the two
                             // segments) to each of the endpoints of the shortest edge.
-                            dist1 = ((base1.pt.X - joinvertex.pt.X) * (base1.pt.X - joinvertex.pt.X) +
-                                     (base1.pt.Y - joinvertex.pt.Y) * (base1.pt.Y - joinvertex.pt.Y));
-                            dist2 = ((base2.pt.X - joinvertex.pt.X) * (base2.pt.X - joinvertex.pt.X) +
-                                     (base2.pt.Y - joinvertex.pt.Y) * (base2.pt.Y - joinvertex.pt.Y));
+                            dist1 = ((base1.x - joinvertex.x) * (base1.x - joinvertex.x) +
+                                     (base1.y - joinvertex.y) * (base1.y - joinvertex.y));
+                            dist2 = ((base2.x - joinvertex.x) * (base2.x - joinvertex.x) +
+                                     (base2.y - joinvertex.y) * (base2.y - joinvertex.y));
                             // If the two distances are equal, don't split the triangle.
                             if ((dist1 < 1.001 * dist2) && (dist1 > 0.999 * dist2))
                             {
@@ -549,19 +555,16 @@ namespace TriangleNet
         /// Traverse the entire list of subsegments, and check each to see if it 
         /// is encroached. If so, add it to the list.
         /// </summary>
-        void TallyEncs()
+        private void TallyEncs()
         {
             Osub subsegloop = default(Osub);
-            int dummy;
+            subsegloop.orient = 0;
 
-            subsegloop.ssorient = 0;
-
-            foreach (var s in mesh.subsegs.Values)
+            foreach (var seg in mesh.subsegs.Values)
             {
-                subsegloop.ss = s;
+                subsegloop.seg = seg;
                 // If the segment is encroached, add it to the list.
-                dummy = CheckSeg4Encroach(ref subsegloop);
-                //subsegloop.ss = subsegtraverse(m);
+                CheckSeg4Encroach(ref subsegloop);
             }
         }
 
@@ -576,7 +579,7 @@ namespace TriangleNet
         /// vertex at or near its midpoint.  Newly inserted vertices may encroach
         /// upon other subsegments; these are also repaired.
         /// </remarks>
-        void SplitEncSegs(bool triflaws)
+        private void SplitEncSegs(bool triflaws)
         {
             Otri enctri = default(Otri);
             Otri testtri = default(Otri);
@@ -610,7 +613,7 @@ namespace TriangleNet
                 // when it was determined to be encroached.  If the segment was
                 // enqueued multiple times (because several newly inserted
                 // vertices encroached it), it may have already been split.
-                if (!Osub.IsDead(currentenc.ss) && (eorg == seg.subsegorg) && (edest == seg.subsegdest))
+                if (!Osub.IsDead(currentenc.seg) && (eorg == seg.subsegorg) && (edest == seg.subsegdest))
                 {
                     // To decide where to split a segment, we need to know if the
                     // segment shares an endpoint with an adjacent segment.
@@ -631,11 +634,11 @@ namespace TriangleNet
                     currentenc.TriPivot(ref enctri);
                     enctri.Lnext(ref testtri);
                     testtri.SegPivot(ref testsh);
-                    acuteorg = testsh.ss != Mesh.dummysub;
+                    acuteorg = testsh.seg != Mesh.dummysub;
                     // Is the destination shared with another segment?
                     testtri.LnextSelf();
                     testtri.SegPivot(ref testsh);
-                    acutedest = testsh.ss != Mesh.dummysub;
+                    acutedest = testsh.seg != Mesh.dummysub;
 
                     // If we're using Chew's algorithm (rather than Ruppert's)
                     // to define encroachment, delete free vertices from the
@@ -644,8 +647,8 @@ namespace TriangleNet
                     {
                         eapex = enctri.Apex();
                         while ((eapex.type == VertexType.FreeVertex) &&
-                               ((eorg.pt.X - eapex.pt.X) * (edest.pt.X - eapex.pt.X) +
-                                (eorg.pt.Y - eapex.pt.Y) * (edest.pt.Y - eapex.pt.Y) < 0.0))
+                               ((eorg.x - eapex.x) * (edest.x - eapex.x) +
+                                (eorg.y - eapex.y) * (edest.y - eapex.y) < 0.0))
                         {
                             mesh.DeleteVertex(ref testtri);
                             currentenc.TriPivot(ref enctri);
@@ -661,12 +664,12 @@ namespace TriangleNet
                         // Is the destination shared with another segment?
                         testtri.LnextSelf();
                         testtri.SegPivot(ref testsh);
-                        acutedest2 = testsh.ss != Mesh.dummysub;
+                        acutedest2 = testsh.seg != Mesh.dummysub;
                         acutedest = acutedest || acutedest2;
                         // Is the origin shared with another segment?
                         testtri.LnextSelf();
                         testtri.SegPivot(ref testsh);
-                        acuteorg2 = testsh.ss != Mesh.dummysub;
+                        acuteorg2 = testsh.seg != Mesh.dummysub;
                         acuteorg = acuteorg || acuteorg2;
 
                         // Delete free vertices from the subsegment's diametral circle.
@@ -674,8 +677,8 @@ namespace TriangleNet
                         {
                             eapex = testtri.Org();
                             while ((eapex.type == VertexType.FreeVertex) &&
-                                   ((eorg.pt.X - eapex.pt.X) * (edest.pt.X - eapex.pt.X) +
-                                    (eorg.pt.Y - eapex.pt.Y) * (edest.pt.Y - eapex.pt.Y) < 0.0))
+                                   ((eorg.x - eapex.x) * (edest.x - eapex.x) +
+                                    (eorg.y - eapex.y) * (edest.y - eapex.y) < 0.0))
                             {
                                 mesh.DeleteVertex(ref testtri);
                                 enctri.Sym(ref testtri);
@@ -689,8 +692,8 @@ namespace TriangleNet
                     // with another adjacent segment.
                     if (acuteorg || acutedest)
                     {
-                        segmentlength = Math.Sqrt((edest.pt.X - eorg.pt.X) * (edest.pt.X - eorg.pt.X) +
-                                             (edest.pt.Y - eorg.pt.Y) * (edest.pt.Y - eorg.pt.Y));
+                        segmentlength = Math.Sqrt((edest.x - eorg.x) * (edest.x - eorg.x) +
+                                             (edest.y - eorg.y) * (edest.y - eorg.y));
                         // Find the power of two that most evenly splits the segment.
                         // The worst case is a 2:1 ratio between subsegment lengths.
                         nearestpoweroftwo = 1.0;
@@ -717,8 +720,12 @@ namespace TriangleNet
                     }
 
                     // Create the new vertex.
-                    newvertex = new Vertex(mesh.nextras);
-                    mesh.vertices.Add(newvertex.Hash, newvertex);
+                    newvertex = new Vertex(); // TODO: mesh.nextras
+
+                    newvertex.hash = mesh.hash_vtx++;
+                    newvertex.id = newvertex.hash;
+
+                    mesh.vertices.Add(newvertex.hash, newvertex);
 
                     // Interpolate its coordinate and attributes.
                     for (int i = 0; i < mesh.nextras; i++)
@@ -727,25 +734,25 @@ namespace TriangleNet
                             + split * (edest.attributes[i] - eorg.attributes[i]);
                     }
 
-                    newvertex.pt.X = eorg.pt.X + split * (edest.pt.X - eorg.pt.X);
-                    newvertex.pt.Y = eorg.pt.Y + split * (edest.pt.Y - eorg.pt.Y);
+                    newvertex.x = eorg.x + split * (edest.x - eorg.x);
+                    newvertex.y = eorg.y + split * (edest.y - eorg.y);
 
                     if (!Behavior.NoExact)
                     {
                         // Roundoff in the above calculation may yield a 'newvertex'
                         // that is not precisely collinear with 'eorg' and 'edest'.
                         // Improve collinearity by one step of iterative refinement.
-                        multiplier = Primitives.CounterClockwise(eorg.pt, edest.pt, newvertex.pt);
-                        divisor = ((eorg.pt.X - edest.pt.X) * (eorg.pt.X - edest.pt.X) +
-                                   (eorg.pt.Y - edest.pt.Y) * (eorg.pt.Y - edest.pt.Y));
+                        multiplier = Primitives.CounterClockwise(eorg, edest, newvertex);
+                        divisor = ((eorg.x - edest.x) * (eorg.x - edest.x) +
+                                   (eorg.y - edest.y) * (eorg.y - edest.y));
                         if ((multiplier != 0.0) && (divisor != 0.0))
                         {
                             multiplier = multiplier / divisor;
                             // Watch out for NANs.
                             if (!double.IsNaN(multiplier))
                             {
-                                newvertex.pt.X += multiplier * (edest.pt.Y - eorg.pt.Y);
-                                newvertex.pt.Y += multiplier * (eorg.pt.X - edest.pt.X);
+                                newvertex.x += multiplier * (edest.y - eorg.y);
+                                newvertex.y += multiplier * (eorg.x - edest.x);
                             }
                         }
                     }
@@ -754,8 +761,8 @@ namespace TriangleNet
                     newvertex.type = VertexType.SegmentVertex;
 
                     // Check whether the new vertex lies on an endpoint.
-                    if (((newvertex.pt.X == eorg.pt.X) && (newvertex.pt.Y == eorg.pt.Y)) ||
-                        ((newvertex.pt.X == edest.pt.X) && (newvertex.pt.Y == edest.pt.Y)))
+                    if (((newvertex.x == eorg.x) && (newvertex.y == eorg.y)) ||
+                        ((newvertex.x == edest.x) && (newvertex.y == edest.y)))
                     {
 
                         logger.Error("Ran out of precision: I attempted to split a"
@@ -791,15 +798,14 @@ namespace TriangleNet
         /// <summary>
         /// Test every triangle in the mesh for quality measures.
         /// </summary>
-        void TallyFaces()
+        private void TallyFaces()
         {
             Otri triangleloop = default(Otri);
-
             triangleloop.orient = 0;
 
-            foreach (var t in mesh.triangles.Values)
+            foreach (var tri in mesh.triangles.Values)
             {
-                triangleloop.triangle = t;
+                triangleloop.triangle = tri;
 
                 // If the triangle is bad, enqueue it.
                 TestTriangle(ref triangleloop);
@@ -811,7 +817,7 @@ namespace TriangleNet
         /// the newly inserted vertex if it encroaches upon a segment.
         /// </summary>
         /// <param name="badtri"></param>
-        void SplitTriangle(BadTriangle badtri)
+        private void SplitTriangle(BadTriangle badtri)
         {
             Otri badotri = default(Otri);
             Vertex borg, bdest, bapex;
@@ -819,7 +825,6 @@ namespace TriangleNet
             double xi = 0, eta = 0;
             InsertVertexResult success;
             bool errorflag;
-            int i;
 
             badotri = badtri.poortri;
             borg = badotri.Org();
@@ -834,7 +839,7 @@ namespace TriangleNet
             {
                 errorflag = false;
                 // Create a new vertex at the triangle's circumcenter.
-                newvertex = new Vertex(mesh.nextras);
+                newvertex = new Vertex(); // TODO: mesh.nextras
 
                 // Using the original (simpler) Steiner point location method
                 // for mesh refinement.
@@ -842,7 +847,9 @@ namespace TriangleNet
                 // reset VertexType?
                 if (Behavior.FixedArea || Behavior.VarArea)
                 {
-                    newvertex.pt = Primitives.FindCircumcenter(borg.pt, bdest.pt, bapex.pt, ref xi, ref eta, true);
+                    Point tmp = Primitives.FindCircumcenter(borg, bdest, bapex, ref xi, ref eta, true);
+                    newvertex.x = tmp.x;
+                    newvertex.y = tmp.y;
                 }
                 else
                 {
@@ -850,9 +857,9 @@ namespace TriangleNet
                 }
 
                 // Check whether the new vertex lies on a triangle vertex.
-                if (((newvertex.pt.X == borg.pt.X) && (newvertex.pt.Y == borg.pt.Y)) ||
-                    ((newvertex.pt.X == bdest.pt.X) && (newvertex.pt.Y == bdest.pt.Y)) ||
-                    ((newvertex.pt.X == bapex.pt.X) && (newvertex.pt.Y == bapex.pt.Y)))
+                if (((newvertex.x == borg.x) && (newvertex.y == borg.y)) ||
+                    ((newvertex.x == bdest.x) && (newvertex.y == bdest.y)) ||
+                    ((newvertex.x == bapex.x) && (newvertex.y == bapex.y)))
                 {
                     if (Behavior.Verbose)
                     {
@@ -862,7 +869,7 @@ namespace TriangleNet
                 }
                 else
                 {
-                    for (i = 0; i < mesh.nextras; i++)
+                    for (int i = 0; i < mesh.nextras; i++)
                     {
                         // Interpolate the vertex attributes at the circumcenter.
                         newvertex.attributes[i] = borg.attributes[i]
@@ -871,8 +878,8 @@ namespace TriangleNet
                     }
                     // The new vertex must be in the interior, and therefore is a
                     // free vertex with a marker of zero.
-                    newvertex.mark = 0;
                     newvertex.type = VertexType.FreeVertex;
+                    //newvertex.mark = 0;
 
                     // Ensure that the handle 'badotri' does not represent the longest
                     // edge of the triangle.  This ensures that the circumcenter must
@@ -893,7 +900,10 @@ namespace TriangleNet
 
                     if (success == InsertVertexResult.Successful)
                     {
-                        mesh.vertices.Add(newvertex.Hash, newvertex);
+                        newvertex.hash = mesh.hash_vtx++;
+                        newvertex.id = newvertex.hash;
+
+                        mesh.vertices.Add(newvertex.hash, newvertex);
 
                         if (mesh.steinerleft > 0)
                         {
@@ -971,11 +981,6 @@ namespace TriangleNet
                         // Record any new bad triangles that result.
                         SplitEncSegs(true);
                     }
-                    else
-                    {
-                        // Return the bad triangle to the pool.
-                        //queue.badtriangles.Remove(badtri);
-                    }
                 }
             }
 
@@ -986,13 +991,14 @@ namespace TriangleNet
             // Might we have run out of Steiner points too soon?
             if (Behavior.Verbose && Behavior.ConformDel && (badsubsegs.Count > 0) && (mesh.steinerleft == 0))
             {
-                
+
                 logger.Warning("I ran out of Steiner points, but the mesh has encroached subsegments, "
                         + "and therefore might not be truly Delaunay. If the Delaunay property is important "
-                        + "to you, try increasing the number of Steiner points", 
+                        + "to you, try increasing the number of Steiner points",
                         "Quality.EnforceQuality()");
             }
         }
+
         #endregion
     }
 }

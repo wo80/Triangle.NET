@@ -11,6 +11,7 @@ namespace TriangleNet.IO
     using System.IO;
     using System.Globalization;
     using TriangleNet.Data;
+    using TriangleNet.Geometry;
 
     /// <summary>
     /// TODO: Update summary.
@@ -67,7 +68,7 @@ namespace TriangleNet.IO
                     if (!Behavior.Jettison || vertex.type != VertexType.UndeadVertex)
                     {
                         // Vertex number, x and y coordinates.
-                        writer.Write("{0} {1} {2}", index, vertex.pt.X.ToString(nfi), vertex.pt.Y.ToString(nfi));
+                        writer.Write("{0} {1} {2}", index, vertex.x.ToString(nfi), vertex.y.ToString(nfi));
 
                         // Write attributes.
                         for (int j = 0; j < mesh.nextras; j++)
@@ -84,7 +85,7 @@ namespace TriangleNet.IO
                         writer.WriteLine();
 
                         // Assign array index to vertex ID for later use.
-                        vertex.ID = index++;
+                        vertex.id = index++;
                     }
                 }
             }
@@ -118,7 +119,7 @@ namespace TriangleNet.IO
                     p3 = tri.Apex();
 
                     // Triangle number, indices for three vertices.
-                    writer.Write("{0} {1} {2} {3}", j, p1.ID, p2.ID, p3.ID);
+                    writer.Write("{0} {1} {2} {3}", j, p1.id, p2.id, p3.id);
 
                     for (int i = 0; i < mesh.eextras; i++)
                     {
@@ -128,7 +129,7 @@ namespace TriangleNet.IO
                     writer.WriteLine();
 
                     // Number elements
-                    item.ID = j++;
+                    item.id = j++;
                 }
             }
         }
@@ -177,12 +178,12 @@ namespace TriangleNet.IO
                 writer.WriteLine("{0} {1}", mesh.subsegs.Count,
                     Behavior.UseBoundaryMarkers ? "1" : "0");
 
-                subseg.ssorient = 0;
+                subseg.orient = 0;
 
                 int j = 0;
                 foreach (var item in mesh.subsegs.Values)
                 {
-                    subseg.ss = item;
+                    subseg.seg = item;
 
                     pt1 = subseg.Org();
                     pt2 = subseg.Dest();
@@ -190,11 +191,11 @@ namespace TriangleNet.IO
                     // Segment number, indices of its two endpoints, and possibly a marker.
                     if (Behavior.UseBoundaryMarkers)
                     {
-                        writer.WriteLine("{0} {1} {2} {3}", j, pt1.ID, pt2.ID, subseg.ss.boundary);
+                        writer.WriteLine("{0} {1} {2} {3}", j, pt1.id, pt2.id, subseg.seg.boundary);
                     }
                     else
                     {
-                        writer.WriteLine("{0} {1} {2}", j, pt1.ID, pt2.ID);
+                        writer.WriteLine("{0} {1} {2}", j, pt1.id, pt2.id);
                     }
 
                     j++;
@@ -214,8 +215,8 @@ namespace TriangleNet.IO
                     writer.WriteLine("{0}", mesh.regions.Count);
                     foreach (var region in mesh.regions)
                     {
-                        writer.WriteLine("{0} {1} {2} {3} {4}", j, region.pt.X.ToString(nfi),
-                            region.pt.Y.ToString(nfi), region.attribute.ToString(nfi),
+                        writer.WriteLine("{0} {1} {2} {3} {4}", j, region.point.X.ToString(nfi),
+                            region.point.Y.ToString(nfi), region.attribute.ToString(nfi),
                             region.area.ToString(nfi));
 
                         j++;
@@ -254,7 +255,7 @@ namespace TriangleNet.IO
                     for (tri.orient = 0; tri.orient < 3; tri.orient++)
                     {
                         tri.Sym(ref trisym);
-                        if ((tri.triangle.ID < trisym.triangle.ID) || (trisym.triangle == Mesh.dummytri))
+                        if ((tri.triangle.id < trisym.triangle.id) || (trisym.triangle == Mesh.dummytri))
                         {
                             p1 = tri.Org();
                             p2 = tri.Dest();
@@ -267,26 +268,26 @@ namespace TriangleNet.IO
                                 {
                                     tri.SegPivot(ref checkmark);
 
-                                    if (checkmark.ss == Mesh.dummysub)
+                                    if (checkmark.seg == Mesh.dummysub)
                                     {
-                                        writer.WriteLine("{0} {1} {2} {3}", index, p1.ID, p2.ID, 0);
+                                        writer.WriteLine("{0} {1} {2} {3}", index, p1.id, p2.id, 0);
                                     }
                                     else
                                     {
-                                        writer.WriteLine("{0} {1} {2} {3}", index, p1.ID, p2.ID,
-                                                checkmark.ss.boundary);
+                                        writer.WriteLine("{0} {1} {2} {3}", index, p1.id, p2.id,
+                                                checkmark.seg.boundary);
                                     }
                                 }
                                 else
                                 {
-                                    writer.WriteLine("{0} {1} {2} {3}", index, p1.ID, p2.ID,
+                                    writer.WriteLine("{0} {1} {2} {3}", index, p1.id, p2.id,
                                             trisym.triangle == Mesh.dummytri ? "1" : "0");
                                 }
                             }
                             else
                             {
                                 // Edge number, indices of two endpoints.
-                                writer.WriteLine("{0} {1} {2}", index, p1.ID, p2.ID);
+                                writer.WriteLine("{0} {1} {2}", index, p1.id, p2.id);
                             }
 
                             index++;
@@ -314,7 +315,7 @@ namespace TriangleNet.IO
                 // Number of triangles, three neighbors per triangle.
                 writer.WriteLine("{0} 3", mesh.triangles.Count);
 
-                Mesh.dummytri.ID = -1;
+                Mesh.dummytri.id = -1;
 
                 foreach (var item in mesh.triangles.Values)
                 {
@@ -322,15 +323,15 @@ namespace TriangleNet.IO
 
                     tri.orient = 1;
                     tri.Sym(ref trisym);
-                    n1 = trisym.triangle.ID;
+                    n1 = trisym.triangle.id;
 
                     tri.orient = 2;
                     tri.Sym(ref trisym);
-                    n2 = trisym.triangle.ID;
+                    n2 = trisym.triangle.id;
 
                     tri.orient = 0;
                     tri.Sym(ref trisym);
-                    n3 = trisym.triangle.ID;
+                    n3 = trisym.triangle.id;
 
                     // Triangle number, neighboring triangle numbers.
                     writer.WriteLine("{0} {1} {2} {3}", i++, n1, n2, n3);
@@ -357,7 +358,7 @@ namespace TriangleNet.IO
         {
             Otri tri = default(Otri), trisym = default(Otri);
             Vertex torg, tdest, tapex;
-            Point2 circumcenter;
+            Point circumcenter;
             double xi = 0, eta = 0;
 
             int p1, p2, index = 0;
@@ -374,10 +375,10 @@ namespace TriangleNet.IO
                     torg = tri.Org();
                     tdest = tri.Dest();
                     tapex = tri.Apex();
-                    circumcenter = Primitives.FindCircumcenter(torg.pt, tdest.pt, tapex.pt, ref xi, ref eta, false);
+                    circumcenter = Primitives.FindCircumcenter(torg, tdest, tapex, ref xi, ref eta, false);
 
                     // X and y coordinates.
-                    writer.Write("{0} {1} {2}", index, circumcenter.X.ToString(nfi), 
+                    writer.Write("{0} {1} {2}", index, circumcenter.X.ToString(nfi),
                         circumcenter.Y.ToString(nfi));
 
                     for (int i = 0; i < mesh.nextras; i++)
@@ -390,7 +391,7 @@ namespace TriangleNet.IO
                     }
                     writer.WriteLine();
 
-                    tri.triangle.ID = index++;
+                    tri.triangle.id = index++;
                 }
 
 
@@ -411,10 +412,10 @@ namespace TriangleNet.IO
                     for (tri.orient = 0; tri.orient < 3; tri.orient++)
                     {
                         tri.Sym(ref trisym);
-                        if ((tri.triangle.ID < trisym.triangle.ID) || (trisym.triangle == Mesh.dummytri))
+                        if ((tri.triangle.id < trisym.triangle.id) || (trisym.triangle == Mesh.dummytri))
                         {
                             // Find the number of this triangle (and Voronoi vertex).
-                            p1 = tri.triangle.ID;
+                            p1 = tri.triangle.id;
 
                             if (trisym.triangle == Mesh.dummytri)
                             {
@@ -431,7 +432,7 @@ namespace TriangleNet.IO
                             else
                             {
                                 // Find the number of the adjacent triangle (and Voronoi vertex).
-                                p2 = trisym.triangle.ID;
+                                p2 = trisym.triangle.id;
                                 // Finite edge.  Write indices of two endpoints.
                                 writer.WriteLine("{0} {1} {2}", index, p1, p2);
                             }
@@ -480,7 +481,7 @@ namespace TriangleNet.IO
                         // The "0.0" is here because the OFF format uses 3D coordinates.
                         writer.WriteLine(" {0}  {1}  0.0", p1[0].ToString(nfi), p1[1].ToString(nfi));
 
-                        p1.ID = index++;
+                        p1.id = index++;
                     }
                 }
 
@@ -495,7 +496,7 @@ namespace TriangleNet.IO
                     p3 = tri.Apex();
 
                     // The "3" means a three-vertex polygon.
-                    writer.WriteLine(" 3   {0}  {1}  {2}", p1.ID, p2.ID, p3.ID);
+                    writer.WriteLine(" 3   {0}  {1}  {2}", p1.id, p2.id, p3.id);
                 }
             }
         }

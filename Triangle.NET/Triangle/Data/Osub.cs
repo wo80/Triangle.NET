@@ -23,16 +23,16 @@ namespace TriangleNet.Data
     /// </remarks>
     struct Osub
     {
-        public Subseg ss;
-        public int ssorient; // Ranges from 0 to 1.
+        public Segment seg;
+        public int orient; // Ranges from 0 to 1.
 
         public override string ToString()
         {
-            if (ss == null)
+            if (seg == null)
             {
                 return "O-TID [null]";
             }
-            return String.Format("O-SID {0}", ss.Hash);
+            return String.Format("O-SID {0}", seg.hash);
         }
 
         #region Osub primitives
@@ -44,8 +44,8 @@ namespace TriangleNet.Data
         /// </remarks>
         public void Sym(ref Osub o2)
         {
-            o2.ss = ss;
-            o2.ssorient = 1 - ssorient;
+            o2.seg = seg;
+            o2.orient = 1 - orient;
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace TriangleNet.Data
         /// </summary>
         public void SymSelf()
         {
-            ssorient = 1 - ssorient;
+            orient = 1 - orient;
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace TriangleNet.Data
         /// </remarks>
         public void Pivot(ref Osub o2)
         {
-            o2 = ss.subsegs[ssorient];
+            o2 = seg.subsegs[orient];
             //sdecode(sptr, o2);
         }
 
@@ -73,7 +73,7 @@ namespace TriangleNet.Data
         /// </summary>
         public void PivotSelf()
         {
-            this = ss.subsegs[ssorient];
+            this = seg.subsegs[orient];
             //sdecode(sptr, osub);
         }
 
@@ -85,7 +85,7 @@ namespace TriangleNet.Data
         /// </remarks>
         public void Next(ref Osub o2)
         {
-            o2 = ss.subsegs[1 - ssorient];
+            o2 = seg.subsegs[1 - orient];
             //sdecode(sptr, o2);
         }
 
@@ -94,7 +94,7 @@ namespace TriangleNet.Data
         /// </summary>
         public void NextSelf()
         {
-            this = ss.subsegs[1 - ssorient];
+            this = seg.subsegs[1 - orient];
             //sdecode(sptr, osub);
         }
 
@@ -103,7 +103,7 @@ namespace TriangleNet.Data
         /// </summary>
         public Vertex Org()
         {
-            return ss.vertices[ssorient];
+            return seg.vertices[orient];
         }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace TriangleNet.Data
         /// </summary>
         public Vertex Dest()
         {
-            return ss.vertices[1 - ssorient];
+            return seg.vertices[1 - orient];
         }
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace TriangleNet.Data
         /// </summary>
         public void SetOrg(Vertex ptr)
         {
-            ss.vertices[ssorient] = ptr;
+            seg.vertices[orient] = ptr;
         }
 
         /// <summary>
@@ -127,7 +127,7 @@ namespace TriangleNet.Data
         /// </summary>
         public void SetDest(Vertex ptr)
         {
-            ss.vertices[1 - ssorient] = ptr;
+            seg.vertices[1 - orient] = ptr;
         }
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace TriangleNet.Data
         /// </summary>
         public Vertex SegOrg()
         {
-            return ss.vertices[2 + ssorient];
+            return seg.vertices[2 + orient];
         }
 
         /// <summary>
@@ -143,7 +143,7 @@ namespace TriangleNet.Data
         /// </summary>
         public Vertex SegDest()
         {
-            return ss.vertices[3 - ssorient];
+            return seg.vertices[3 - orient];
         }
 
         /// <summary>
@@ -151,7 +151,7 @@ namespace TriangleNet.Data
         /// </summary>
         public void SetSegOrg(Vertex ptr)
         {
-            ss.vertices[2 + ssorient] = ptr;
+            seg.vertices[2 + orient] = ptr;
         }
 
         /// <summary>
@@ -159,7 +159,7 @@ namespace TriangleNet.Data
         /// </summary>
         public void SetSegDest(Vertex ptr)
         {
-            ss.vertices[3 - ssorient] = ptr;
+            seg.vertices[3 - orient] = ptr;
         }
 
         /// <summary>
@@ -169,7 +169,7 @@ namespace TriangleNet.Data
         /// setting boundary conditions in finite element solvers.</remarks>
         public int Mark()
         {
-            return ss.boundary;
+            return seg.boundary;
         }
 
         /// <summary>
@@ -177,7 +177,7 @@ namespace TriangleNet.Data
         /// </summary>
         public void SetMark(int value)
         {
-            ss.boundary = value;
+            seg.boundary = value;
         }
 
         /// <summary>
@@ -185,8 +185,8 @@ namespace TriangleNet.Data
         /// </summary>
         public void Bond(ref Osub o2)
         {
-            ss.subsegs[ssorient] = o2;
-            o2.ss.subsegs[o2.ssorient] = this;
+            seg.subsegs[orient] = o2;
+            o2.seg.subsegs[o2.orient] = this;
         }
 
         /// <summary>
@@ -196,7 +196,7 @@ namespace TriangleNet.Data
         /// connected to this subsegment.</remarks>
         public void Dissolve()
         {
-            ss.subsegs[ssorient].ss = Mesh.dummysub;
+            seg.subsegs[orient].seg = Mesh.dummysub;
         }
 
         /// <summary>
@@ -204,8 +204,8 @@ namespace TriangleNet.Data
         /// </summary>
         public void Copy(ref Osub o2)
         {
-            o2.ss = ss;
-            o2.ssorient = ssorient;
+            o2.seg = seg;
+            o2.orient = orient;
         }
 
         /// <summary>
@@ -213,24 +213,24 @@ namespace TriangleNet.Data
         /// </summary>
         public bool Equal(Osub o2)
         {
-            return ((ss == o2.ss) && (ssorient == o2.ssorient));
+            return ((seg == o2.seg) && (orient == o2.orient));
         }
 
         /// <summary>
         /// Check a subsegment's deallocation.
         /// </summary>
-        public static bool IsDead(Subseg sub)
+        public static bool IsDead(Segment sub)
         {
-            return sub.subsegs[0].ss == null;
+            return sub.subsegs[0].seg == null;
         }
 
         /// <summary>
         /// Set a subsegment's deallocation.
         /// </summary>
-        public static void Kill(Subseg sub)
+        public static void Kill(Segment sub)
         {
-            sub.subsegs[0].ss = null;
-            sub.subsegs[1].ss = null;
+            sub.subsegs[0].seg = null;
+            sub.subsegs[1].seg = null;
         }
 
         /// <summary>
@@ -238,7 +238,7 @@ namespace TriangleNet.Data
         /// </summary>
         public void TriPivot(ref Otri ot)
         {
-            ot = ss.triangles[ssorient];
+            ot = seg.triangles[orient];
             //decode(ptr, otri)
         }
 
@@ -247,7 +247,7 @@ namespace TriangleNet.Data
         /// </summary>
         public void TriDissolve()
         {
-            ss.triangles[ssorient].triangle = Mesh.dummytri;
+            seg.triangles[orient].triangle = Mesh.dummytri;
         }
 
         #endregion

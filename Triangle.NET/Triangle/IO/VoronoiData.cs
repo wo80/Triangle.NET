@@ -7,14 +7,16 @@
 
 namespace TriangleNet.IO
 {
+    using TriangleNet.Geometry;
+
     /// <summary>
     /// Stores the voronoi data (output only).
     /// </summary>
     public class VoronoiData
     {
-        public double[][] InputPoints;
-        public double[][] Points;
-        public int[][] Edges;
+        public Point[] InputPoints;
+        public Point[] Points;
+        public Edge[] Edges;
 
         // Stores the direction for infinite voronoi edges
         public double[][] Directions;

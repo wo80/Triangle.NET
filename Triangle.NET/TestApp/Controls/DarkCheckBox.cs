@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace TestApp.Controls
+namespace MeshExplorer.Controls
 {
     using System;
     using System.Collections.Generic;
@@ -107,7 +107,7 @@ namespace TestApp.Controls
                 else
                     brushBorder = new Pen(Color.FromArgb(38, 38, 38), 1f);
 
-                brushOuter = new LinearGradientBrush(newRect, Color.FromArgb(82, 82, 82), Color.FromArgb(96, 96, 96), mode);
+                brushOuter = new LinearGradientBrush(newRect, ColorScheme.ColorGray107, ColorScheme.ColorGray110, mode);
                 e.Graphics.FillRectangle(brushOuter, newRect);
 
                 newRect = new Rectangle(2, y + 1, boxSize - 3, boxSize - 3);

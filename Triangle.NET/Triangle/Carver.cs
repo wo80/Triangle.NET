@@ -9,6 +9,7 @@ namespace TriangleNet
 {
     using TriangleNet.Data;
     using System;
+    using TriangleNet.Geometry;
     using System.Collections.Generic;
 
     /// <summary>
@@ -17,6 +18,7 @@ namespace TriangleNet
     class Carver
     {
         Mesh mesh;
+
 
         public Carver(Mesh mesh)
         {
@@ -28,7 +30,7 @@ namespace TriangleNet
         /// protected by subsegments. Where there are subsegments, set boundary 
         /// markers as appropriate.
         /// </summary>
-        void InfectHull()
+        private void InfectHull()
         {
             Otri hulltri = default(Otri);
             Otri nexttri = default(Otri);
@@ -50,7 +52,7 @@ namespace TriangleNet
                 {
                     // Is the triangle protected by a subsegment?
                     hulltri.SegPivot(ref hullsubseg);
-                    if (hullsubseg.ss == Mesh.dummysub)
+                    if (hullsubseg.seg == Mesh.dummysub)
                     {
                         // The triangle is not protected; infect it.
                         if (!hulltri.IsInfected())
@@ -62,9 +64,9 @@ namespace TriangleNet
                     else
                     {
                         // The triangle is protected; set boundary markers if appropriate.
-                        if (hullsubseg.ss.boundary == 0)
+                        if (hullsubseg.seg.boundary == 0)
                         {
-                            hullsubseg.ss.boundary = 1;
+                            hullsubseg.seg.boundary = 1;
                             horg = hulltri.Org();
                             hdest = hulltri.Dest();
                             if (horg.mark == 0)
@@ -86,6 +88,7 @@ namespace TriangleNet
                     nexttri.Copy(ref hulltri);
                     hulltri.Oprev(ref nexttri);
                 }
+
             } while (!hulltri.Equal(starttri));
         }
 
@@ -108,19 +111,19 @@ namespace TriangleNet
         {
             Otri testtri = default(Otri);
             Otri neighbor = default(Otri);
-            Triangle virusloop;
             Osub neighborsubseg = default(Osub);
             Vertex testvertex;
             Vertex norg, ndest;
-            //Vertex deadorg, deaddest, deadapex;
+
             bool killorg;
 
             // Loop through all the infected triangles, spreading the virus to
             // their neighbors, then to their neighbors' neighbors.
             for (int i = 0; i < mesh.viri.Count; i++)
-			{
-                virusloop = mesh.viri[i];
-                testtri.triangle = virusloop;
+            {
+                // WARNING: Don't use foreach, mesh.viri list may get modified.
+
+                testtri.triangle = mesh.viri[i];
                 // A triangle is marked as infected by messing with one of its pointers
                 // to subsegments, setting it to an illegal value.  Hence, we have to
                 // temporarily uninfect this triangle so that we can examine its
@@ -138,16 +141,16 @@ namespace TriangleNet
                     // Check if the neighbor is nonexistent or already infected.
                     if ((neighbor.triangle == Mesh.dummytri) || neighbor.IsInfected())
                     {
-                        if (neighborsubseg.ss != Mesh.dummysub)
+                        if (neighborsubseg.seg != Mesh.dummysub)
                         {
                             // There is a subsegment separating the triangle from its
-                            //   neighbor, but both triangles are dying, so the subsegment
-                            //   dies too.
-                            mesh.SubsegDealloc(neighborsubseg.ss);
+                            // neighbor, but both triangles are dying, so the subsegment
+                            // dies too.
+                            mesh.SubsegDealloc(neighborsubseg.seg);
                             if (neighbor.triangle != Mesh.dummytri)
                             {
                                 // Make sure the subsegment doesn't get deallocated again
-                                //   later when the infected neighbor is visited.
+                                // later when the infected neighbor is visited.
                                 neighbor.Uninfect();
                                 neighbor.SegDissolve();
                                 neighbor.Infect();
@@ -156,7 +159,7 @@ namespace TriangleNet
                     }
                     else
                     {   // The neighbor exists and is not infected.
-                        if (neighborsubseg.ss == Mesh.dummysub)
+                        if (neighborsubseg.seg == Mesh.dummysub)
                         {
                             // There is no subsegment protecting the neighbor, so
                             // the neighbor becomes infected.
@@ -165,13 +168,14 @@ namespace TriangleNet
                             mesh.viri.Add(neighbor.triangle);
                         }
                         else
-                        {               // The neighbor is protected by a subsegment.
+                        {
+                            // The neighbor is protected by a subsegment.
                             // Remove this triangle from the subsegment.
                             neighborsubseg.TriDissolve();
                             // The subsegment becomes a boundary.  Set markers accordingly.
-                            if (neighborsubseg.ss.boundary == 0)
+                            if (neighborsubseg.seg.boundary == 0)
                             {
-                                neighborsubseg.ss.boundary = 1;
+                                neighborsubseg.seg.boundary = 1;
                             }
                             norg = neighbor.Org();
                             ndest = neighbor.Dest();
@@ -191,17 +195,16 @@ namespace TriangleNet
                 testtri.Infect();
             }
 
-            for (int i = 0; i < mesh.viri.Count; i++)
+            foreach (var virus in mesh.viri)
             {
-                virusloop = mesh.viri[i];
-                testtri.triangle = virusloop;
+                testtri.triangle = virus;
 
                 // Check each of the three corners of the triangle for elimination.
                 // This is done by walking around each vertex, checking if it is
                 // still connected to at least one live triangle.
                 for (testtri.orient = 0; testtri.orient < 3; testtri.orient++)
                 {
-                    testvertex=testtri.Org();
+                    testvertex = testtri.Org();
                     // Check if the vertex has already been tested.
                     if (testvertex != null)
                     {
@@ -266,7 +269,7 @@ namespace TriangleNet
                     if (neighbor.triangle == Mesh.dummytri)
                     {
                         // There is no neighboring triangle on this edge, so this edge
-                        // is a boundary edge.  This triangle is being deleted, so this
+                        // is a boundary edge. This triangle is being deleted, so this
                         // boundary edge is deleted.
                         mesh.hullsize--;
                     }
@@ -282,6 +285,7 @@ namespace TriangleNet
                 // Return the dead triangle to the pool of triangles.
                 mesh.TriangleDealloc(testtri.triangle);
             }
+
             // Empty the virus pool.
             mesh.viri.Clear();
         }
@@ -312,6 +316,8 @@ namespace TriangleNet
             // neighbors.
             for (int i = 0; i < mesh.viri.Count; i++)
             {
+                // WARNING: Don't use foreach, mesh.viri list may get modified.
+
                 testtri.triangle = mesh.viri[i];
                 // A triangle is marked as infected by messing with one of its pointers
                 // to subsegments, setting it to an illegal value.  Hence, we have to
@@ -340,7 +346,7 @@ namespace TriangleNet
                     // Make sure the neighbor exists, is not already infected, and
                     //  isn't protected by a subsegment.
                     if ((neighbor.triangle != Mesh.dummytri) && !neighbor.IsInfected()
-                        && (neighborsubseg.ss == Mesh.dummysub))
+                        && (neighborsubseg.seg == Mesh.dummysub))
                     {
                         // Infect the neighbor.
                         neighbor.Infect();
@@ -364,14 +370,10 @@ namespace TriangleNet
             mesh.viri.Clear();
         }
         /// <summary>
-        /// Find the holes and infect them.  Find the area constraints and infect 
+        /// Find the holes and infect them. Find the area constraints and infect 
         /// them. Infect the convex hull. Spread the infection and kill triangles. 
         /// Spread the area constraints.
         /// </summary>
-        /// <param name="holelist"></param>
-        /// <param name="holes"></param>
-        /// <param name="regionlist"></param>
-        /// <param name="regions"></param>
         public void CarveHoles()
         {
             Otri searchtri = default(Otri);
@@ -379,8 +381,7 @@ namespace TriangleNet
             Vertex searchorg, searchdest;
             LocateResult intersect;
 
-            int numRegions = mesh.regions.Count;
-            Otri[] regiontris = (numRegions > 0) ? new Otri[numRegions] : null;
+            Otri[] regionTris = null;
 
             if (!Behavior.Convex)
             {
@@ -393,10 +394,9 @@ namespace TriangleNet
             {
                 // Infect each triangle in which a hole lies.
                 foreach (var hole in mesh.holes)
-	            {
+                {
                     // Ignore holes that aren't within the bounds of the mesh.
-                    if ((hole.X >= mesh.xmin) && (hole.X <= mesh.xmax)
-                        && (hole.Y >= mesh.ymin) && (hole.Y <= mesh.ymax))
+                    if (mesh.bounds.Contains(hole))
                     {
                         // Start searching from some triangle on the outer boundary.
                         searchtri.triangle = Mesh.dummytri;
@@ -407,7 +407,7 @@ namespace TriangleNet
                         // falls within the starting triangle.
                         searchorg = searchtri.Org();
                         searchdest = searchtri.Dest();
-                        if (Primitives.CounterClockwise(searchorg.pt, searchdest.pt, hole) > 0.0)
+                        if (Primitives.CounterClockwise(searchorg, searchdest, hole) > 0.0)
                         {
                             // Find a triangle that contains the hole.
                             intersect = mesh.Locate(hole, ref searchtri);
@@ -427,17 +427,18 @@ namespace TriangleNet
             // work when the triangulation is no longer convex. (Incidentally, this is the reason why
             // regional attributes and area constraints can't be used when refining a preexisting mesh,
             // which might not be convex; they can only be used with a freshly triangulated PSLG.)
-            if (numRegions > 0)
+            if (mesh.regions.Count > 0)
             {
+                regionTris = new Otri[mesh.regions.Count];
+
                 int i = 0;
 
                 // Find the starting triangle for each region.
                 foreach (var region in mesh.regions)
                 {
-                    regiontris[i].triangle = Mesh.dummytri;
+                    regionTris[i].triangle = Mesh.dummytri;
                     // Ignore region points that aren't within the bounds of the mesh.
-                    if ((region.pt.X >= mesh.xmin) && (region.pt.X <= mesh.xmax) &&
-                        (region.pt.Y >= mesh.ymin) && (region.pt.Y <= mesh.ymax))
+                    if (mesh.bounds.Contains(region.point))
                     {
                         // Start searching from some triangle on the outer boundary.
                         searchtri.triangle = Mesh.dummytri;
@@ -448,15 +449,15 @@ namespace TriangleNet
                         // region point falls within the starting triangle.
                         searchorg = searchtri.Org();
                         searchdest = searchtri.Dest();
-                        if (Primitives.CounterClockwise(searchorg.pt, searchdest.pt, region.pt) > 0.0)
+                        if (Primitives.CounterClockwise(searchorg, searchdest, region.point) > 0.0)
                         {
                             // Find a triangle that contains the region point.
-                            intersect = mesh.Locate(region.pt, ref searchtri);
+                            intersect = mesh.Locate(region.point, ref searchtri);
                             if ((intersect != LocateResult.Outside) && (!searchtri.IsInfected()))
                             {
                                 // Record the triangle for processing after the
                                 // holes have been carved.
-                                searchtri.Copy(ref regiontris[i]);
+                                searchtri.Copy(ref regionTris[i]);
                             }
                         }
                     }
@@ -472,7 +473,7 @@ namespace TriangleNet
             }
             // The virus pool should be empty now.
 
-            if (numRegions > 0)
+            if (regionTris != null)
             {
                 if (Behavior.RegionAttrib)
                 {
@@ -489,19 +490,19 @@ namespace TriangleNet
                     }
                 }
 
-                for (int i = 0; i < numRegions; i++)
+                for (int i = 0; i < regionTris.Length; i++)
                 {
-                    if (regiontris[i].triangle != Mesh.dummytri)
+                    if (regionTris[i].triangle != Mesh.dummytri)
                     {
                         // Make sure the triangle under consideration still exists.
                         // It may have been eaten by the virus.
-                        if (!Otri.IsDead(regiontris[i].triangle))
+                        if (!Otri.IsDead(regionTris[i].triangle))
                         {
                             // Put one triangle in the virus pool.
-                            regiontris[i].Infect();
-                            mesh.viri.Add(regiontris[i].triangle);
+                            regionTris[i].Infect();
+                            mesh.viri.Add(regionTris[i].triangle);
                             // Apply one region's attribute and/or area constraint.
-                            RegionPlague(mesh.regions[i].attribute, mesh.regions[i].area);
+                            RegionPlague(mesh.regions[i].Attribute, mesh.regions[i].Area);
                             // The virus pool should be empty now.
                         }
                     }
@@ -514,16 +515,8 @@ namespace TriangleNet
                 }
             }
 
-            // Free up memory.
-            if (((mesh.holes.Count > 0) && !Behavior.NoHoles) || !Behavior.Convex || (numRegions > 0))
-            {
-                mesh.viri.Clear();
-            }
-
-            if (numRegions > 0)
-            {
-                regiontris = null;
-            }
+            // Free up memory (virus pool should be empty anyway).
+            mesh.viri.Clear();
         }
     }
 }

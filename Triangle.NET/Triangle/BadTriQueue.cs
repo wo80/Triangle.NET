@@ -11,8 +11,13 @@ namespace TriangleNet
     using TriangleNet.Data;
 
     /// <summary>
-    /// TODO: Update summary.
+    /// A (priority) queue for bad triangles.
     /// </summary>
+    /// <remarks>
+    //  The queue is actually a set of 4096 queues. I use multiple queues to
+    //  give priority to smaller angles. I originally implemented a heap, but
+    //  the queues are faster by a larger margin than I'd suspected.
+    /// </remarks>
     class BadTriQueue
     {
         static readonly double SQRT2 = 1.4142135623730950488016887242096980785696718753769480732;
@@ -20,11 +25,10 @@ namespace TriangleNet
         public int Count { get { return this.count; } }
 
         // Variables that maintain the bad triangle queues.  The queues are
-        //   ordered from 4095 (highest priority) to 0 (lowest priority).
-
-        BadTriangle[] queuefront;//[4096];
-        BadTriangle[] queuetail;//[4096];
-        int[] nextnonemptyq;//[4096];
+        // ordered from 4095 (highest priority) to 0 (lowest priority).
+        BadTriangle[] queuefront;
+        BadTriangle[] queuetail;
+        int[] nextnonemptyq;
         int firstnonemptyq;
 
         int count;
@@ -42,17 +46,10 @@ namespace TriangleNet
             count = 0;
         }
 
-        #region Queue
-
         /// <summary>
         /// Add a bad triangle data structure to the end of a queue.
         /// </summary>
-        /// <param name="badtri"></param>
-        /// <remarks>
-        //  The queue is actually a set of 4096 queues.  I use multiple queues to
-        //  give priority to smaller angles.  I originally implemented a heap, but
-        //  the queues are faster by a larger margin than I'd suspected.
-        /// </remarks>
+        /// <param name="badtri">The bad triangle to enqueue.</param>
         public void Enqueue(BadTriangle badtri)
         {
             double length, multiplier;
@@ -154,9 +151,6 @@ namespace TriangleNet
         /// <param name="enqapex"></param>
         /// <param name="enqorg"></param>
         /// <param name="enqdest"></param>
-        /// <remarks>
-        /// Allocates a badtriang data structure for the triangle, then passes it to enqueuebadtriang().
-        /// </remarks>
         public void Enqueue(ref Otri enqtri, double minedge, Vertex enqapex, Vertex enqorg, Vertex enqdest)
         {
             // Allocate space for the bad triangle.
@@ -172,8 +166,6 @@ namespace TriangleNet
             Vertex dest = enqtri.Dest();
             Vertex apex = enqtri.Apex();
 
-            //badtriangles.Add(newbad);
-
             Enqueue(newbad);
         }
 
@@ -183,8 +175,6 @@ namespace TriangleNet
         /// <returns></returns>
         public BadTriangle Dequeue()
         {
-            BadTriangle result;
-
             // If no queues are nonempty, return NULL.
             if (firstnonemptyq < 0)
             {
@@ -194,18 +184,17 @@ namespace TriangleNet
             this.count--;
 
             // Find the first triangle of the highest-priority queue.
-            result = queuefront[firstnonemptyq];
+            BadTriangle result = queuefront[firstnonemptyq];
             // Remove the triangle from the queue.
             queuefront[firstnonemptyq] = result.nexttriang;
             // If this queue is now empty, note the new highest-priority
-            //   nonempty queue.
+            // nonempty queue.
             if (result == queuetail[firstnonemptyq])
             {
                 firstnonemptyq = nextnonemptyq[firstnonemptyq];
             }
+
             return result;
         }
-
-        #endregion
     }
 }

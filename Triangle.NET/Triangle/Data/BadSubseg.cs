@@ -39,7 +39,7 @@ namespace TriangleNet.Data
 
         public override string ToString()
         {
-            return String.Format("B-SID {0}", encsubseg.ss.Hash);
+            return String.Format("B-SID {0}", encsubseg.seg.hash);
         }
     };
 }

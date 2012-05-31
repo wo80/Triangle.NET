@@ -12,6 +12,8 @@ namespace TriangleNet.IO
     using System.Globalization;
     using TriangleNet.Data;
     using TriangleNet.Log;
+    using TriangleNet.Geometry;
+    using System.Collections.Generic;
 
     /// <summary>
     /// Helper for reading Triangle files.
@@ -26,7 +28,7 @@ namespace TriangleNet.IO
         /// </summary>
         /// <param name="filename">The file to read.</param>
         /// <remarks>Will NOT read associated files by default.</remarks>
-        public static MeshData ReadFile(string filename)
+        public static InputGeometry ReadFile(string filename)
         {
             return ReadFile(filename, false);
         }
@@ -36,7 +38,7 @@ namespace TriangleNet.IO
         /// </summary>
         /// <param name="filename">The file to read.</param>
         /// <param name="readsupp">Read associated files (ele, area, neigh).</param>
-        public static MeshData ReadFile(string filename, bool readsupp)
+        public static InputGeometry ReadFile(string filename, bool readsupp)
         {
             string ext = Path.GetExtension(filename);
 
@@ -78,33 +80,36 @@ namespace TriangleNet.IO
             return true;
         }
 
-        static void ReadVertex(MeshData data, int index, string[] line)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="index"></param>
+        /// <param name="line"></param>
+        /// <param name="n">Number of point attributes</param>
+        static void ReadVertex(InputGeometry data, int index, string[] line, int n)
         {
-            int n = data.PointAttributes == null ? 0 : data.PointAttributes.Length;
-
-            data.Points[index] = new double[] {
-                double.Parse(line[1], nfi),
-                double.Parse(line[2], nfi) };
+            double x = double.Parse(line[1], nfi);
+            double y = double.Parse(line[2], nfi);
+            int mark = 0;
 
             // Read the vertex attributes.
             for (int j = 0; j < n; j++)
             {
-                data.PointAttributes[index] = new double[n];
-
                 if (line.Length > 3 + j)
                 {
-                    data.PointAttributes[index][j] = double.Parse(line[3 + j]);
+                    // TODO:
+                    //vertex.attributes[j] = double.Parse(line[3 + j]);
                 }
             }
 
-            if (data.PointMarkers != null)
+            // Read a vertex marker.
+            if (line.Length > 3 + n)
             {
-                // Read a vertex marker.
-                if (line.Length > 3 + n)
-                {
-                    data.PointMarkers[index] = int.Parse(line[3 + n]);
-                }
+                mark = int.Parse(line[3 + n]);
             }
+
+            data.AddPoint(x, y, mark);
         }
 
         /// <summary>
@@ -112,7 +117,7 @@ namespace TriangleNet.IO
         /// </summary>
         /// <param name="nodefilename"></param>
         /// <remarks>Will NOT read associated .ele by default.</remarks>
-        public static MeshData ReadNodeFile(string nodefilename)
+        public static InputGeometry ReadNodeFile(string nodefilename)
         {
             return ReadNodeFile(nodefilename, false);
         }
@@ -122,9 +127,9 @@ namespace TriangleNet.IO
         /// </summary>
         /// <param name="nodefilename"></param>
         /// <param name="readElements"></param>
-        public static MeshData ReadNodeFile(string nodefilename, bool readElements)
+        public static InputGeometry ReadNodeFile(string nodefilename, bool readElements)
         {
-            MeshData data = new MeshData();
+            InputGeometry data;
 
             startIndex = 0;
 
@@ -165,21 +170,11 @@ namespace TriangleNet.IO
                     nodemarkers = int.Parse(line[3]);
                 }
 
+                data = new InputGeometry(invertices);
+
                 // Read the vertices.
                 if (invertices > 0)
                 {
-                    data.Points = new double[invertices][];
-
-                    if (attributes > 0)
-                    {
-                        data.PointAttributes = new double[invertices][];
-                    }
-
-                    if (nodemarkers > 0)
-                    {
-                        data.PointMarkers = new int[invertices];
-                    }
-
                     for (int i = 0; i < invertices; i++)
                     {
                         if (!TryReadLine(reader, out line))
@@ -197,7 +192,7 @@ namespace TriangleNet.IO
                             startIndex = int.Parse(line[0], nfi);
                         }
 
-                        ReadVertex(data, i, line);
+                        ReadVertex(data, i, line, attributes);
                     }
                 }
             }
@@ -208,7 +203,7 @@ namespace TriangleNet.IO
                 string elefile = Path.ChangeExtension(nodefilename, ".ele");
                 if (File.Exists(elefile))
                 {
-                    ReadEleFile(elefile, data, true);
+                    ReadEleFile(elefile, true);
                 }
             }
 
@@ -220,7 +215,7 @@ namespace TriangleNet.IO
         /// </summary>
         /// <param name="polyfilename"></param>
         /// <remarks>Will NOT read associated .ele by default.</remarks>
-        public static MeshData ReadPolyFile(string polyfilename)
+        public static InputGeometry ReadPolyFile(string polyfilename)
         {
             return ReadPolyFile(polyfilename, false, false);
         }
@@ -231,7 +226,7 @@ namespace TriangleNet.IO
         /// <param name="polyfilename"></param>
         /// <param name="readElements">If true, look for an associated .ele file.</param>
         /// <remarks>Will NOT read associated .area by default.</remarks>
-        public static MeshData ReadPolyFile(string polyfilename, bool readElements)
+        public static InputGeometry ReadPolyFile(string polyfilename, bool readElements)
         {
             return ReadPolyFile(polyfilename, readElements, false);
         }
@@ -242,10 +237,10 @@ namespace TriangleNet.IO
         /// <param name="polyfilename"></param>
         /// <param name="readElements">If true, look for an associated .ele file.</param>
         /// <param name="readElements">If true, look for an associated .area file.</param>
-        public static MeshData ReadPolyFile(string polyfilename, bool readElements, bool readArea)
+        public static InputGeometry ReadPolyFile(string polyfilename, bool readElements, bool readArea)
         {
             // Read poly file
-            MeshData data;
+            InputGeometry data;
 
             startIndex = 0;
 
@@ -284,19 +279,7 @@ namespace TriangleNet.IO
                 // Read the vertices.
                 if (invertices > 0)
                 {
-                    data = new MeshData();
-
-                    data.Points = new double[invertices][];
-
-                    if (attributes > 0)
-                    {
-                        data.PointAttributes = new double[invertices][];
-                    }
-
-                    if (nodemarkers > 0)
-                    {
-                        data.PointMarkers = new int[invertices];
-                    }
+                    data = new InputGeometry(invertices);
 
                     for (int i = 0; i < invertices; i++)
                     {
@@ -316,7 +299,7 @@ namespace TriangleNet.IO
                             startIndex = int.Parse(line[0], nfi);
                         }
 
-                        ReadVertex(data, i, line);
+                        ReadVertex(data, i, line, attributes);
                     }
                 }
                 else
@@ -325,7 +308,7 @@ namespace TriangleNet.IO
                     // the vertices should be read from a separate .node file.
                     string nodefile = Path.ChangeExtension(polyfilename, ".node");
                     data = ReadNodeFile(nodefile);
-                    invertices = data.Points.Length;
+                    invertices = data.Count;
                 }
 
                 if (data.Points == null)
@@ -349,17 +332,7 @@ namespace TriangleNet.IO
                     segmentmarkers = int.Parse(line[1]);
                 }
 
-                if (insegments > 0)
-                {
-                    data.Segments = new int[insegments][];
-                }
-
-                if (segmentmarkers > 0)
-                {
-                    data.SegmentMarkers = new int[insegments];
-                }
-
-                int end1, end2;
+                int end1, end2, mark;
                 // Read and insert the segments.
                 for (int i = 0; i < insegments; i++)
                 {
@@ -376,24 +349,18 @@ namespace TriangleNet.IO
                     // TODO: startIndex ok?
                     end1 = int.Parse(line[1]) - startIndex;
                     end2 = int.Parse(line[2]) - startIndex;
+                    mark = 0;
 
-                    if (segmentmarkers > 0)
+                    if (segmentmarkers > 0 && line.Length > 3)
                     {
-                        if (line.Length > 3)
-                        {
-                            data.SegmentMarkers[i] = int.Parse(line[3]);
-                        }
-                        else
-                        {
-                            data.SegmentMarkers[i] = 0;
-                        }
+                        mark = int.Parse(line[3]);
                     }
 
                     if ((end1 < 0) || (end1 >= invertices))
                     {
                         if (Behavior.Verbose)
                         {
-                            SimpleLog.Instance.Warning("Invalid first endpoint of segment.", 
+                            SimpleLog.Instance.Warning("Invalid first endpoint of segment.",
                                 "MeshReader.ReadPolyfile()");
                         }
                     }
@@ -401,13 +368,13 @@ namespace TriangleNet.IO
                     {
                         if (Behavior.Verbose)
                         {
-                            SimpleLog.Instance.Warning("Invalid second endpoint of segment.", 
+                            SimpleLog.Instance.Warning("Invalid second endpoint of segment.",
                                 "MeshReader.ReadPolyfile()");
                         }
                     }
                     else
                     {
-                        data.Segments[i] = new int[] { end1, end2 };
+                        data.AddSegment(end1, end2, mark);
                     }
                 }
 
@@ -422,8 +389,6 @@ namespace TriangleNet.IO
                 int holes = int.Parse(line[0]);
                 if (holes > 0)
                 {
-                    data.Holes = new double[holes][];
-
                     for (int i = 0; i < holes; i++)
                     {
                         if (!TryReadLine(reader, out line))
@@ -436,9 +401,8 @@ namespace TriangleNet.IO
                             throw new Exception("Invalid hole.");
                         }
 
-                        data.Holes[i] = new double[] {
-                            double.Parse(line[1], nfi),
-                            double.Parse(line[2], nfi) };
+                        data.AddHole(double.Parse(line[1], nfi),
+                            double.Parse(line[2], nfi));
                     }
                 }
 
@@ -449,8 +413,6 @@ namespace TriangleNet.IO
 
                     if (regions > 0)
                     {
-                        data.Regions = new double[regions][];
-
                         for (int i = 0; i < regions; i++)
                         {
                             if (!TryReadLine(reader, out line))
@@ -463,14 +425,14 @@ namespace TriangleNet.IO
                                 throw new Exception("Invalid region.");
                             }
 
-                            data.Regions[i] = new double[] {
+                            data.AddRegion(
                                 // Region x and y
                                 double.Parse(line[1]),
                                 double.Parse(line[2]),
                                 // Region attribute
                                 double.Parse(line[3]),
                                 // Region area constraint
-                                double.Parse(line[4]) };
+                                double.Parse(line[4]));
                         }
                     }
                 }
@@ -482,20 +444,16 @@ namespace TriangleNet.IO
                 string elefile = Path.ChangeExtension(polyfilename, ".ele");
                 if (File.Exists(elefile))
                 {
-                    ReadEleFile(elefile, data, readArea);
+                    ReadEleFile(elefile, readArea);
                 }
             }
 
             return data;
         }
 
-        public static MeshData ReadEleFile(string elefilename)
+        public static List<ITriangle> ReadEleFile(string elefilename)
         {
-            MeshData data = new MeshData();
-
-            ReadEleFile(elefilename, data, false);
-
-            return data;
+            return ReadEleFile(elefilename, false);
         }
 
         /// <summary>
@@ -504,9 +462,11 @@ namespace TriangleNet.IO
         /// <param name="elefilename"></param>
         /// <param name="data"></param>
         /// <param name="readArea"></param>
-        private static void ReadEleFile(string elefilename, MeshData data, bool readArea)
+        private static List<ITriangle> ReadEleFile(string elefilename, bool readArea)
         {
             int intriangles = 0, attributes = 0;
+
+            List<ITriangle> triangles;
 
             using (StreamReader reader = new StreamReader(elefilename))
             {
@@ -527,12 +487,9 @@ namespace TriangleNet.IO
                     attributes = int.Parse(line[2]);
                 }
 
-                data.Triangles = new int[intriangles][];
+                triangles = new List<ITriangle>(intriangles);
 
-                if (attributes > 0)
-                {
-                    data.TriangleAttributes = new double[intriangles][];
-                }
+                InputTriangle tri;
 
                 // Read triangles.
                 for (int i = 0; i < intriangles; i++)
@@ -548,24 +505,26 @@ namespace TriangleNet.IO
                     }
 
                     // TODO: startIndex ok?
-                    data.Triangles[i] = new int[] {
+                    tri = new InputTriangle(
                         int.Parse(line[1]) - startIndex,
                         int.Parse(line[2]) - startIndex,
-                        int.Parse(line[3]) - startIndex };
+                        int.Parse(line[3]) - startIndex);
 
                     // Read triangle attributes
                     if (attributes > 0)
                     {
                         for (int j = 0; j < attributes; j++)
                         {
-                            data.TriangleAttributes[i] = new double[attributes];
+                            tri.attributes = new double[attributes];
 
                             if (line.Length > 4 + j)
                             {
-                                data.TriangleAttributes[i][j] = double.Parse(line[4 + j]);
+                                tri.attributes[j] = double.Parse(line[4 + j]);
                             }
                         }
                     }
+
+                    triangles.Add(tri);
                 }
             }
 
@@ -575,9 +534,11 @@ namespace TriangleNet.IO
                 string areafile = Path.ChangeExtension(elefilename, ".area");
                 if (File.Exists(areafile))
                 {
-                    ReadAreaFile(areafile, intriangles, data);
+                    ReadAreaFile(areafile, intriangles);
                 }
             }
+
+            return triangles;
         }
 
         /// <summary>
@@ -586,8 +547,10 @@ namespace TriangleNet.IO
         /// <param name="areafilename"></param>
         /// <param name="intriangles"></param>
         /// <param name="data"></param>
-        private static void ReadAreaFile(string areafilename, int intriangles, MeshData data)
+        private static double[] ReadAreaFile(string areafilename, int intriangles)
         {
+            double[] data = null;
+
             using (StreamReader reader = new StreamReader(areafilename))
             {
                 string[] line;
@@ -599,12 +562,12 @@ namespace TriangleNet.IO
 
                 if (int.Parse(line[0]) != intriangles)
                 {
-                    SimpleLog.Instance.Warning("Number of area constraints doesn't match number of triangles.", 
+                    SimpleLog.Instance.Warning("Number of area constraints doesn't match number of triangles.",
                         "ReadAreaFile()");
-                    return;
+                    return null;
                 }
 
-                data.TriangleAreas = new double[intriangles];
+                data = new double[intriangles];
 
                 // Read area constraints.
                 for (int i = 0; i < intriangles; i++)
@@ -619,15 +582,17 @@ namespace TriangleNet.IO
                         throw new Exception("Triangle has no nodes.");
                     }
 
-                    data.TriangleAreas[i] = double.Parse(line[1], nfi);
+                    data[i] = double.Parse(line[1], nfi);
                 }
             }
+
+            return data;
         }
 
-        public static MeshData ReadEdgeFile(string edgeFile)
+        public static List<Edge> ReadEdgeFile(string edgeFile, int invertices)
         {
             // Read poly file
-            MeshData data = new MeshData();
+            List<Edge> data = null;
 
             startIndex = 0;
 
@@ -653,15 +618,10 @@ namespace TriangleNet.IO
 
                 if (inedges > 0)
                 {
-                    data.Edges = new int[inedges][];
+                    data = new List<Edge>(inedges);
                 }
 
-                if (edgemarkers > 0)
-                {
-                    data.EdgeMarkers = new int[inedges];
-                }
-
-                int end1, end2;
+                int end1, end2, mark;
                 // Read and insert the segments.
                 for (int i = 0; i < inedges; i++)
                 {
@@ -678,41 +638,33 @@ namespace TriangleNet.IO
                     // TODO: startIndex ok?
                     end1 = int.Parse(line[1]) - startIndex;
                     end2 = int.Parse(line[2]) - startIndex;
+                    mark = 0;
 
-                    if (edgemarkers > 0)
+                    if (edgemarkers > 0 && line.Length > 3)
                     {
-                        if (line.Length > 3)
-                        {
-                            data.SegmentMarkers[i] = int.Parse(line[3]);
-                        }
-                        else
-                        {
-                            data.SegmentMarkers[i] = 0;
-                        }
+                        mark = int.Parse(line[3]);
                     }
 
-                    data.Segments[i] = new int[] { end1, end2 };
-
-                    //if ((end1 < 0) || (end1 >= invertices))
-                    //{
-                    //    if (Behavior.Verbose)
-                    //    {
-                    //        SimpleLogger.Instance.Warning("Invalid first endpoint of segment.",
-                    //            "MeshReader.ReadPolyfile()");
-                    //    }
-                    //}
-                    //else if ((end2 < 0) || (end2 >= invertices))
-                    //{
-                    //    if (Behavior.Verbose)
-                    //    {
-                    //        SimpleLogger.Instance.Warning("Invalid second endpoint of segment.",
-                    //            "MeshReader.ReadPolyfile()");
-                    //    }
-                    //}
-                    //else
-                    //{
-                    //    data.Segments[i] = new int[] { end1, end2 };
-                    //}
+                    if ((end1 < 0) || (end1 >= invertices))
+                    {
+                        if (Behavior.Verbose)
+                        {
+                            SimpleLog.Instance.Warning("Invalid first endpoint of segment.",
+                                "MeshReader.ReadPolyfile()");
+                        }
+                    }
+                    else if ((end2 < 0) || (end2 >= invertices))
+                    {
+                        if (Behavior.Verbose)
+                        {
+                            SimpleLog.Instance.Warning("Invalid second endpoint of segment.",
+                                "MeshReader.ReadPolyfile()");
+                        }
+                    }
+                    else
+                    {
+                        data.Add(new Edge(end1, end2, mark));
+                    }
                 }
             }
 

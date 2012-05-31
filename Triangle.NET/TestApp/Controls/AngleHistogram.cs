@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace TestApp.Controls
+namespace MeshExplorer.Controls
 {
     using System;
     using System.Collections.Generic;
@@ -12,10 +12,16 @@ namespace TestApp.Controls
     using System.Drawing;
     using System.Drawing.Drawing2D;
     using System.Windows.Forms;
+    using System.Drawing.Text;
 
     /// <summary>
-    /// TODO: Update summary.
+    /// Displays an angle histogram.
     /// </summary>
+    /// <remarks>
+    /// The angle histogram is divided into two parts:
+    /// the minimum angles on the left side (0 to 60 degrees) and
+    /// the maximum angles on the right (60 to 180 degrees)
+    /// </remarks>
     public class AngleHistogram : Control
     {
         #region Designer
@@ -53,43 +59,106 @@ namespace TestApp.Controls
 
         #endregion
 
-        int[] data;
-        int max = 0;
+        int[] maxAngles;
+        int[] minAngles;
+
+        Brush fillBlue1 = new SolidBrush(Color.FromArgb(60, 100, 140));
+        Brush fillBlue2 = new SolidBrush(Color.FromArgb(110, 150, 200));
+
+        Brush textBack = new SolidBrush(Color.FromArgb(72, 0, 0, 0));
+
+        // The maximum number of angles
+        int maxAngleCount = 0;
 
         public AngleHistogram()
         {
-            this.BackColor = Color.FromArgb(76, 76, 76);
+            this.BackColor = ColorScheme.ColorGray78;
             InitializeComponent();
         }
 
-        public void SetData(int[] data)
+        public void SetData(int[] dataMin, int[] dataMax)
+        {
+            maxAngleCount = 0;
+
+            this.minAngles = dataMin;
+            this.maxAngles = dataMax;
+
+            ParseData(dataMin);
+            ParseData(dataMax);
+
+            if (maxAngleCount == 0)
+            {
+                this.maxAngles = null;
+                return;
+            }
+
+            this.Invalidate();
+        }
+
+        private void ParseData(int[] data)
         {
             if (data != null)
             {
-                this.data = data;
-                this.max = 0;
-
                 for (int i = 0; i < data.Length; i++)
                 {
-                    if (data[i] > max)
+                    if (data[i] > maxAngleCount)
                     {
-                        max = data[i];
+                        maxAngleCount = data[i];
                     }
                 }
-
-                if (max == 0)
-                {
-                    this.data = null;
-                    return;
-                }
-
-                double lg10 = Math.Ceiling(Math.Log10(max)) - 1;
-                int norm = (int)Math.Pow(10, lg10);
-                int mod = -max % norm;
-                max = max + mod + norm;
-
-                this.Invalidate();
             }
+        }
+
+        int padding = 1;
+        int paddingBottom = 0;
+        int paddingTop = 15;
+
+        private void DrawHistogram(Graphics g, int offset, int left, int size, int[] data, Brush brush, Brush brushTop)
+        {
+            int count = maxAngleCount;
+            int totalHeight = this.Height - paddingBottom - paddingTop;
+
+            int n = offset == 0 ? data.Length / 3 : data.Length;
+            float value = 0;
+
+            for (int i = offset; i < n; i++)
+            {
+                if (data[i] > 0)
+                {
+                    // Scale to control height
+                    value = totalHeight * data[i] / count;
+
+                    // Fill bar
+                    g.FillRectangle(brush,
+                        left + i * size, this.Height - paddingBottom - value,
+                        size - 1, value);
+
+                    // Draw top of bar (just a little effect ...)
+                    if (value > 2)
+                    {
+                        g.FillRectangle(brushTop,
+                            left + i * size, this.Height - paddingBottom - value,
+                            size - 1, 2);
+                    }
+                }
+            }
+        }
+
+
+        private void DrawStrings(Graphics g, SizeF fSize, int size, int middle)
+        {
+            int fHeight = (int)(fSize.Height + 2);
+            g.FillRectangle(textBack, 0, this.Height - fHeight, this.Width, fHeight);
+
+            g.DrawString("0", this.Font, Brushes.White, padding, this.Height - fSize.Height - 1);
+            g.DrawString("60", this.Font, Brushes.White,
+                this.minAngles.Length * size / 3.0f - 2 * fSize.Width,
+                this.Height - fSize.Height - 1);
+
+            g.DrawString("60", this.Font, Brushes.White, middle, this.Height - fSize.Height - 1);
+            g.DrawString("180", this.Font, Brushes.White,
+                this.Width - 3 * fSize.Width,
+                this.Height - fSize.Height - 1);
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -98,57 +167,33 @@ namespace TestApp.Controls
 
             g.FillRectangle(new SolidBrush(this.BackColor), this.ClientRectangle);
 
-            SizeF s1 = g.MeasureString("180", base.Font, this.Width);
-            SizeF s2 = g.MeasureString(max.ToString(), base.Font, this.Width);
-
-            // Draw bottom rect
-            g.FillRectangle(Brushes.DimGray, s2.Width, this.Height - s1.Height - 4, this.Width, s1.Height + 4);
-
-            // Draw Histogram
-            if (data != null)
+            if (this.minAngles == null || this.maxAngles == null)
             {
-                int n = data.Length;
-                float width = (this.Width - s2.Width) / n;
-                float value = 0;
-
-                for (int i = 0; i < data.Length; i++)
-                {
-                    if (data[i] > 0)
-                    {
-                        // Scale to control height
-                        value = (this.Height - s1.Height - 4) * data[i] / max;
-
-                        g.FillRectangle(Brushes.DarkGreen,
-                            s2.Width + i * width + width / 8,
-                            this.Height - s1.Height - 4 - value,
-                            3 * width / 4,
-                            value);
-
-                        if (value > 2)
-                        {
-                            g.FillRectangle(Brushes.Green,
-                                s2.Width + i * width + width / 8,
-                                this.Height - s1.Height - 4 - value,
-                                3 * width / 4,
-                                2);
-                        }
-                    }
-                }
+                return;
             }
 
-            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            SizeF fSize = g.MeasureString("0", this.Font, this.Width);
 
-            // Draw data keys
-            g.DrawString("0", this.Font, Brushes.White, s2.Width + 2, this.Height - s1.Height - 2);
-            g.DrawString("90", this.Font, Brushes.White, this.Width / 2 - s1.Width / 3, this.Height - s1.Height - 2);
-            g.DrawString("180", this.Font, Brushes.White, this.Width - s1.Width - 2, this.Height - s1.Height - 2);
+            int n = this.minAngles.Length;
 
-            // Draw data values
-            if (max > 0)
+            // Hack --- TODO: Change stats class
+            if (n != this.maxAngles.Length)
             {
-                g.DrawString(max.ToString(), this.Font, Brushes.White, 2, 10);
-                g.DrawString((max / 2).ToString(), this.Font, Brushes.White, 2, (this.Height - s1.Height) / 2);
+                n = this.minAngles.Length + this.maxAngles.Length;
             }
+
+            // Each bar takes up this space
+            int size = (this.Width - 2 * padding) / (n + 1);
+
+            // Make pixel align
+            int middle = this.Width - padding - n * size;
+
+            DrawHistogram(g, 0, padding, size, this.minAngles, Brushes.DarkGreen, Brushes.Green);
+            DrawHistogram(g, n / 3, middle, size, this.maxAngles, fillBlue1, fillBlue2);
+
+            g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
+
+            DrawStrings(g, fSize, size, middle + n / 3 * size);
         }
     }
 }

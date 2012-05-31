@@ -47,25 +47,23 @@
     <Compile Include="Carver.cs" />
     <Compile Include="Data\BadSubseg.cs" />
     <Compile Include="Data\BadTriangle.cs" />
-    <Compile Include="Data\FlipStacker.cs" />
     <Compile Include="Data\Osub.cs" />
     <Compile Include="Data\Otri.cs" />
-    <Compile Include="Data\Point2.cs" />
-    <Compile Include="Data\Region.cs" />
-    <Compile Include="Data\SplayNode.cs" />
-    <Compile Include="Data\Subseg.cs" />
-    <Compile Include="Data\SweepEvent.cs" />
+    <Compile Include="Data\Segment.cs" />
     <Compile Include="Data\Triangle.cs" />
     <Compile Include="Data\Vertex.cs" />
     <Compile Include="Algorithm\Dwyer.cs" />
     <Compile Include="Geometry\BoundingBox.cs" />
     <Compile Include="Geometry\Edge.cs" />
+    <Compile Include="Geometry\EdgeEnumerator.cs" />
     <Compile Include="Geometry\InputGeometry.cs" />
     <Compile Include="Geometry\ITriangle.cs" />
     <Compile Include="Geometry\Point.cs" />
     <Compile Include="Geometry\RegionPointer.cs" />
     <Compile Include="IO\DataReader.cs" />
+    <Compile Include="IO\DebugWriter.cs" />
     <Compile Include="IO\FileWriter.cs" />
+    <Compile Include="IO\InputTriangle.cs" />
     <Compile Include="IO\VoronoiData.cs" />
     <Compile Include="IO\DataWriter.cs" />
     <Compile Include="IO\FileReader.cs" />
@@ -82,9 +80,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sampler.cs" />
     <Compile Include="Smoothing\ISmoother.cs" />
-    <Compile Include="Statistic.cs" />
+    <Compile Include="Tools\Statistic.cs" />
     <Compile Include="Algorithm\SweepLine.cs" />
-    <Compile Include="IO\MeshData.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

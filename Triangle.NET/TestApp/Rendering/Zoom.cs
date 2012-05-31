@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace TestApp.Rendering
+namespace MeshExplorer.Rendering
 {
     using System;
     using System.Collections.Generic;
@@ -18,8 +18,7 @@ namespace TestApp.Rendering
     class Zoom
     {
         // The complete mesh
-        int screenWidth;
-        int screenHeight;
+        Rectangle Screen { get; set; }
 
         // The complete mesh
         RectangleF World { get; set; }
@@ -40,8 +39,7 @@ namespace TestApp.Rendering
 
         public void Initialize(Rectangle screen, RectangleF world)
         {
-            this.screenWidth = screen.Width;
-            this.screenHeight = screen.Height;
+            this.Screen = screen;
 
             this.World = world;
             this.Level = 1;
@@ -50,22 +48,57 @@ namespace TestApp.Rendering
             float worldMargin = (world.Width < world.Height) ? world.Height * 0.05f : world.Width * 0.05f;
 
             // Get the initial viewport (complete mesh centered on the screen)
-            float screenRatio = this.screenWidth / (float)this.screenHeight;
+            float screenRatio = screen.Width / (float)screen.Height;
             float worldRatio = world.Width / world.Height;
 
-            float scale = (world.Width + worldMargin) / this.screenWidth;
+            float scale = (world.Width + worldMargin) / screen.Width;
 
             if (screenRatio > worldRatio)
             {
-                scale = (world.Height + worldMargin) / this.screenHeight;
+                scale = (world.Height + worldMargin) / screen.Height;
             }
 
             float centerX = world.X + world.Width / 2;
             float centerY = world.Y + world.Height / 2;
 
             // TODO: Add initial margin
-            this.Viewport = new RectangleF(centerX - this.screenWidth * scale / 2,
-                centerY - this.screenHeight * scale / 2,
+            this.Viewport = new RectangleF(centerX - screen.Width * scale / 2,
+                centerY - screen.Height * scale / 2,
+                screen.Width * scale,
+                screen.Height * scale);
+
+            this.ClipMargin = this.Viewport.Width * 0.05f;
+
+            this.World = this.Viewport;
+        }
+
+        public void Resize(Rectangle screen, RectangleF world)
+        {
+            this.Screen = screen;
+
+            this.World = world;
+            this.Level = 1;
+
+            // Add a margin so there's some space around the border
+            float worldMargin = (World.Width < World.Height) ? World.Height * 0.05f : World.Width * 0.05f;
+
+            // Get the initial viewport (complete mesh centered on the screen)
+            float screenRatio = screen.Width / (float)screen.Height;
+            float worldRatio = World.Width / World.Height;
+
+            float scale = (World.Width + worldMargin) / screen.Width;
+
+            if (screenRatio > worldRatio)
+            {
+                scale = (World.Height + worldMargin) / screen.Height;
+            }
+
+            float centerX = World.X + World.Width / 2;
+            float centerY = World.Y + World.Height / 2;
+
+            // TODO: Add initial margin
+            this.Viewport = new RectangleF(centerX - screen.Width * scale / 2,
+                centerY - screen.Height * scale / 2,
                 screen.Width * scale,
                 screen.Height * scale);
 
@@ -155,8 +188,14 @@ namespace TestApp.Rendering
 
         public PointF WorldToScreen(PointF pt)
         {
-            return new PointF((pt.X - Viewport.X) / Viewport.Width * screenWidth,
-                (1 - (pt.Y - Viewport.Y) / Viewport.Height) * screenHeight);
+            return new PointF((pt.X - Viewport.X) / Viewport.Width * Screen.Width,
+                (1 - (pt.Y - Viewport.Y) / Viewport.Height) * Screen.Height);
+        }
+
+        public PointF ScreenToWorld(float ptX, float ptY)
+        {
+            return new PointF(Viewport.X + Viewport.Width * ptX,
+                Viewport.Y + Viewport.Height * (1 - ptY));
         }
 
         public void Reset()

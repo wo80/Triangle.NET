@@ -15,6 +15,8 @@ namespace TriangleNet
     using TriangleNet.IO;
     using TriangleNet.Algorithm;
     using TriangleNet.Smoothing;
+    using TriangleNet.Geometry;
+    using TriangleNet.Tools;
 
     /// <summary>
     /// Mesh data structure.
@@ -28,36 +30,41 @@ namespace TriangleNet
         Quality quality;
         Sampler sampler;
 
-        // Variable that maintains the stack of recently flipped triangles.
-        List<FlipStacker> flipstackers;
-        FlipStacker lastflip;
+        // Stack that maintains a list of recently flipped triangles.
+        Stack<Otri> flipstack;
+        //FlipStacker lastflip;
+
+        // TODO: Check if custom hashmap implementation could be faster.
 
         // Using hashsets for memory management should quite fast.
         internal Dictionary<int, Triangle> triangles;
-        internal Dictionary<int, Subseg> subsegs;
+        internal Dictionary<int, Segment> subsegs;
         internal Dictionary<int, Vertex> vertices;
 
-		// TODO: Check if custom hashmap implementation could be faster.
+        // Hash seeds (should belong to mesh instance)
+        internal int hash_vtx = 0;
+        internal int hash_seg = 0;
+        internal int hash_tri = 0;
 
-        internal List<Point2> holes;
-        internal List<Region> regions;
+        internal List<Point> holes;
+        internal List<RegionPointer> regions;
 
         internal List<Triangle> viri;
 
         // Other variables.
-        internal double xmin, xmax, ymin, ymax;   // x and y bounds.
-        internal int invertices;            // Number of input vertices.
-        internal int inelements;            // Number of input triangles.
-        internal int insegments;            // Number of input segments.
-        internal int undeads;    // Number of input vertices that don't appear in the mesh.
-        internal int edges;                // Number of output edges.
-        internal int mesh_dim;              // Dimension (ought to be 2).
-        internal int nextras;               // Number of attributes per vertex.
-        internal int eextras;               // Number of attributes per triangle.
-        internal int hullsize;             // Number of edges in convex hull.
-        internal int steinerleft;           // Number of Steiner points not yet used.
-        internal bool checksegments;        // Are there segments in the triangulation yet?
-        internal bool checkquality;         // Has quality triangulation begun yet?
+        internal BoundingBox bounds; // x and y bounds.
+        internal int invertices;     // Number of input vertices.
+        internal int inelements;     // Number of input triangles.
+        internal int insegments;     // Number of input segments.
+        internal int undeads;        // Number of input vertices that don't appear in the mesh.
+        internal int edges;          // Number of output edges.
+        internal int mesh_dim;       // Dimension (ought to be 2).
+        internal int nextras;        // Number of attributes per vertex.
+        internal int eextras;        // Number of attributes per triangle.
+        internal int hullsize;       // Number of edges in convex hull.
+        internal int steinerleft;    // Number of Steiner points not yet used.
+        internal bool checksegments; // Are there segments in the triangulation yet?
+        internal bool checkquality;  // Has quality triangulation begun yet?
 
         // Triangular bounding box vertices.
         internal Vertex infvertex1, infvertex2, infvertex3;
@@ -68,21 +75,88 @@ namespace TriangleNet
         // The omnipresent subsegment. Referenced by any triangle or
         // subsegment that isn't really connected to a subsegment at
         // that location.
-        internal static Subseg dummysub;
+        internal static Segment dummysub;
 
         // Pointer to a recently visited triangle. Improves point location if
         // proximate vertices are inserted sequentially.
         internal Otri recenttri;
 
-        static FlipStacker dummyflip;
+        //static FlipStacker dummyflip;
 
         #endregion
+
+        #region Public properties
+
+        /// <summary>
+        /// Gets the mesh bounding box.
+        /// </summary>
+        public BoundingBox Bounds
+        {
+            get { return this.bounds; }
+        }
+
+        /// <summary>
+        /// Gets the mesh vertices.
+        /// </summary>
+        public IEnumerable<Vertex> Vertices
+        {
+            get { return this.vertices.Values; }
+        }
+
+        /// <summary>
+        /// Gets the mesh holes.
+        /// </summary>
+        public IList<Point> Holes
+        {
+            get { return this.holes; }
+        }
+
+        /// <summary>
+        /// Gets the mesh triangles.
+        /// </summary>
+        public IEnumerable<Triangle> Triangles
+        {
+            get { return this.triangles.Values; }
+        }
+
+        /// <summary>
+        /// Gets the mesh segments.
+        /// </summary>
+        public IEnumerable<Segment> Segments
+        {
+            get { return this.subsegs.Values; }
+        }
 
         /// <summary>
         /// Gets the number of input vertices.
         /// </summary>
         public int NumberOfInputPoints { get { return invertices; } }
 
+        /// <summary>
+        /// Gets the number of mesh vertices.
+        /// </summary>
+        public int NumberOfVertices { get { return this.vertices.Count; } }
+
+        /// <summary>
+        /// Gets the number of mesh triangles.
+        /// </summary>
+        public int NumberOfTriangles { get { return this.triangles.Count; } }
+
+        /// <summary>
+        /// Gets the number of mesh segments.
+        /// </summary>
+        public int NumberOfSegments { get { return this.subsegs.Count; } }
+
+        /// <summary>
+        /// Gets the number of mesh edges.
+        /// </summary>
+        public int NumberOfEdges { get { return this.edges; } }
+
+        #endregion
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Mesh" /> class.
+        /// </summary>
         public Mesh()
         {
             logger = SimpleLog.Instance;
@@ -91,13 +165,13 @@ namespace TriangleNet
 
             vertices = new Dictionary<int, Vertex>();
             triangles = new Dictionary<int, Triangle>();
-            subsegs = new Dictionary<int, Subseg>();
+            subsegs = new Dictionary<int, Segment>();
 
             viri = new List<Triangle>();
-            flipstackers = new List<FlipStacker>();
+            flipstack = new Stack<Otri>();
 
-            holes = new List<Point2>();
-            regions = new List<Region>();
+            holes = new List<Point>();
+            regions = new List<RegionPointer>();
 
             quality = new Quality(this);
 
@@ -107,6 +181,7 @@ namespace TriangleNet
 
             if (dummytri == null)
             {
+                // Initialize static dummy triangle and subseg.
                 DummyInit();
             }
         }
@@ -116,7 +191,7 @@ namespace TriangleNet
         /// </summary>
         public void Load(string inputfile)
         {
-            MeshData input = FileReader.ReadFile(inputfile, true);
+            InputGeometry input = FileReader.ReadFile(inputfile, true);
 
             this.Load(input);
         }
@@ -124,9 +199,11 @@ namespace TriangleNet
         /// <summary>
         /// Reconstructs a mesh from raw input data.
         /// </summary>
-        public void Load(MeshData input)
+        public void Load(InputGeometry input)
         {
-            if (input.Triangles == null)
+            throw new NotImplementedException("Load");
+
+            if (input == null)// TODO: if (input.Triangles == null)
             {
                 throw new ArgumentException("The input data contains no triangles.");
             }
@@ -139,15 +216,15 @@ namespace TriangleNet
                 Behavior.Poly = true;
             }
 
-            if (input.EdgeMarkers != null)
-            {
-                Behavior.UseBoundaryMarkers = true;
-            }
+            //if (input.EdgeMarkers != null)
+            //{
+            //    Behavior.UseBoundaryMarkers = true;
+            //}
 
-            if (input.TriangleAreas != null)
-            {
-                Behavior.VarArea = true;
-            }
+            //if (input.TriangleAreas != null)
+            //{
+            //    Behavior.VarArea = true;
+            //}
 
             if (!Behavior.Poly)
             {
@@ -163,7 +240,7 @@ namespace TriangleNet
             TransferNodes(input);
 
             // Read and reconstruct a mesh.
-            hullsize = DataReader.Reconstruct(this, input);
+            hullsize = DataReader.Reconstruct(this, input, null);
         }
 
         /// <summary>
@@ -172,7 +249,7 @@ namespace TriangleNet
         /// <param name="input"></param>
         public void Triangulate(string inputFile)
         {
-            MeshData input = FileReader.ReadFile(inputFile);
+            InputGeometry input = FileReader.ReadFile(inputFile);
 
             this.Triangulate(input);
         }
@@ -181,19 +258,19 @@ namespace TriangleNet
         /// Triangulate given input data.
         /// </summary>
         /// <param name="input"></param>
-        public void Triangulate(MeshData input)
+        public void Triangulate(InputGeometry input)
         {
             ResetData();
 
-            if (input.Segments != null)
+            if (input.HasSegments)
             {
                 Behavior.Poly = true;
             }
 
-            if (input.EdgeMarkers != null)
-            {
-                Behavior.UseBoundaryMarkers = true;
-            }
+            //if (input.EdgeMarkers != null)
+            //{
+            //    Behavior.UseBoundaryMarkers = true;
+            //}
 
             if (!Behavior.Poly)
             {
@@ -213,7 +290,7 @@ namespace TriangleNet
             hullsize = Delaunay(); // Triangulate the vertices.
 
             // Ensure that no vertex can be mistaken for a triangular bounding
-            //   box vertex in insertvertex().
+            // box vertex in insertvertex().
             infvertex1 = null;
             infvertex2 = null;
             infvertex3 = null;
@@ -229,23 +306,19 @@ namespace TriangleNet
 
             if (Behavior.Poly && (triangles.Count > 0))
             {
-                if (input.Holes != null)
+                // Copy holes
+                foreach (var item in input.holes)
                 {
-                    // Copy holes
-                    for (int i = 0; i < input.Holes.Length; i++)
-                    {
-                        holes.Add(new Point2(input.Holes[i][0], input.Holes[i][1]));
-                    }
+                    holes.Add(item);
                 }
 
-                if (input.Regions != null)
+                // Copy regions
+                foreach (var item in input.regions)
                 {
-                    // Copy regions
-                    for (int i = 0; i < input.Regions.Length; i++)
-                    {
-                        regions.Add(new Region(input.Regions[i]));
-                    }
+                    regions.Add(item);
                 }
+
+                //dummytri.neighbors[2].triangle = dummytri;
 
                 // Carve out holes and concavities.
                 Carver c = new Carver(this);
@@ -283,8 +356,8 @@ namespace TriangleNet
 
                 foreach (var t in this.triangles.Values)
                 {
-                    tmp = (t.vertices[2].pt.X - t.vertices[0].pt.X) * (t.vertices[1].pt.Y - t.vertices[0].pt.Y) -
-                        (t.vertices[1].pt.X - t.vertices[0].pt.X) * (t.vertices[2].pt.Y - t.vertices[0].pt.Y);
+                    tmp = (t.vertices[2].x - t.vertices[0].x) * (t.vertices[1].y - t.vertices[0].y) -
+                        (t.vertices[1].x - t.vertices[0].x) * (t.vertices[2].y - t.vertices[0].y);
 
                     tmp = Math.Abs(tmp) / 2.0;
 
@@ -379,69 +452,30 @@ namespace TriangleNet
         }
 
         /// <summary>
+        /// Renumber vertex and triangle id's.
+        /// </summary>
+        public void Renumber()
+        {
+            int id = 0;
+            foreach (var item in this.vertices.Values)
+            {
+                item.id = id++;
+            }
+
+            id = 0;
+            foreach (var item in this.triangles.Values)
+            {
+                item.id = id++;
+            }
+        }
+
+        /// <summary>
         /// Check mesh consistency and (constrained) Delaunay property.
         /// </summary>
         public void Check()
         {
             quality.CheckMesh();
             quality.CheckDelaunay();
-        }
-
-        /// <summary>
-        /// Returns the raw mesh data.
-        /// </summary>
-        /// <returns>Mesh data.</returns>
-        public MeshData GetMeshData()
-        {
-            return GetMeshData(true, true, true);
-        }
-
-        /// <summary>
-        /// Returns the raw mesh data.
-        /// </summary>
-        /// <param name="writeElements">Write elements to output.</param>
-        /// <param name="writeEdges">Write edges to output.</param>
-        /// <param name="writeNeighbors">Write neighbour information to output.</param>
-        /// <returns>Mesh data.</returns>
-        public MeshData GetMeshData(bool writeElements, bool writeEdges, bool writeNeighbors)
-        {
-            MeshData output = new MeshData();
-
-            if (Behavior.UseSegments)
-            {
-                //output.NumberOfSegments = subsegs.Count;
-            }
-            else
-            {
-                //output.NumberOfSegments = (int)hullsize;
-            }
-
-            // Numbers the vertices too.
-            DataWriter.WriteNodes(this, output);
-
-            if (writeElements)
-            {
-                DataWriter.WriteElements(this, output);
-            }
-
-            // The -c switch (convex switch) causes a PSLG to be written
-            // even if none was read.
-            if (Behavior.Poly || Behavior.Convex)
-            {
-                DataWriter.WritePoly(this, output);
-            }
-
-            if (writeEdges)
-            {
-                DataWriter.WriteEdges(this, output);
-            }
-
-            if (writeElements && writeNeighbors)
-            {
-                DataWriter.WriteNeighbors(this, output);
-            }
-
-            return output;
         }
 
         #region Options
@@ -590,7 +624,7 @@ namespace TriangleNet
         /// Form a Delaunay triangulation.
         /// </summary>
         /// <returns>The number of points on the hull.</returns>
-        int Delaunay()
+        private int Delaunay()
         {
             int hulledges = 0;
 
@@ -612,22 +646,15 @@ namespace TriangleNet
                 hulledges = alg.Triangulate(this);
             }
 
-            if (triangles.Count == 0)
-            {
-                // The input vertices were all collinear, 
-                // so there are no triangles.
-                return 0;
-            }
-
-            return hulledges;
+            // The input vertices may all be collinear, so there are 
+            // no triangles.
+            return (triangles.Count == 0) ? 0 : hulledges;
         }
 
         /// <summary>
         /// Reset all the mesh data. This method will also wipe 
         /// out all mesh data.
         /// </summary>
-        /// <param name="points">The number of input points. Used to initialize 
-        /// memory for the mesh data.</param>
         private void ResetData()
         {
             vertices.Clear();
@@ -637,23 +664,19 @@ namespace TriangleNet
             holes.Clear();
             regions.Clear();
 
-            Triangle.ResetHashSeed(0);
-            Vertex.ResetHashSeed(0);
-            Subseg.ResetHashSeed(0);
+            this.hash_vtx = 0;
+            this.hash_seg = 0;
+            this.hash_tri = 0;
 
             viri.Clear();
-            flipstackers.Clear();
+            flipstack.Clear();
 
             hullsize = 0;
-            xmin = 0;
-            xmax = 0;
-            ymin = 0;
-            ymax = 0;
             edges = 0;
 
-            sampler.Reset();
-
             Reset();
+
+            sampler.Reset();
         }
 
         /// <summary>
@@ -680,7 +703,7 @@ namespace TriangleNet
         /// <remarks>
         /// The triangle that fills "outer space," called 'dummytri', is pointed to
         /// by every triangle and subsegment on a boundary (be it outer or inner) of
-        /// the triangulation.  Also, 'dummytri' points to one of the triangles on
+        /// the triangulation. Also, 'dummytri' points to one of the triangles on
         /// the convex hull (until the holes and concavities are carved), making it
         /// possible to find a starting triangle for point location.
         //
@@ -689,9 +712,9 @@ namespace TriangleNet
         /// to point to.
         //
         /// 'dummytri' and 'dummysub' are generally required to fulfill only a few
-        /// invariants:  their vertices must remain NULL and 'dummytri' must always
+        /// invariants: their vertices must remain NULL and 'dummytri' must always
         /// be bonded (at offset zero) to some triangle on the convex hull of the
-        /// mesh, via a boundary edge.  Otherwise, the connections of 'dummytri' and
+        /// mesh, via a boundary edge. Otherwise, the connections of 'dummytri' and
         /// 'dummysub' may change willy-nilly.  This makes it possible to avoid
         /// writing a good deal of special-case code (in the edge flip, for example)
         /// for dealing with the boundary of the mesh, places where no subsegment is
@@ -703,8 +726,10 @@ namespace TriangleNet
         {
             // Set up 'dummytri', the 'triangle' that occupies "outer space."
             dummytri = new Triangle(0);
+            dummytri.hash = -1;
+            dummytri.id = -1;
 
-            // Initialize the three adjoining triangles to be "outer space."  These
+            // Initialize the three adjoining triangles to be "outer space." These
             // will eventually be changed by various bonding operations, but their
             // values don't really matter, as long as they can legally be
             // dereferenced.
@@ -717,41 +742,34 @@ namespace TriangleNet
                 // Set up 'dummysub', the omnipresent subsegment pointed to by any
                 // triangle side or subsegment end that isn't attached to a real
                 // subsegment.
-                dummysub = new Subseg();
+                dummysub = new Segment();
+                dummysub.hash = -1;
 
                 // Initialize the two adjoining subsegments to be the omnipresent
-                // subsegment.  These will eventually be changed by various bonding
+                // subsegment. These will eventually be changed by various bonding
                 // operations, but their values don't really matter, as long as they
                 // can legally be dereferenced.
-                dummysub.subsegs[0].ss = dummysub;
-                dummysub.subsegs[1].ss = dummysub;
+                dummysub.subsegs[0].seg = dummysub;
+                dummysub.subsegs[1].seg = dummysub;
 
                 // Initialize the three adjoining subsegments of 'dummytri' to be
                 // the omnipresent subsegment.
-                dummytri.subsegs[0].ss = dummysub;
-                dummytri.subsegs[1].ss = dummysub;
-                dummytri.subsegs[2].ss = dummysub;
+                dummytri.subsegs[0].seg = dummysub;
+                dummytri.subsegs[1].seg = dummysub;
+                dummytri.subsegs[2].seg = dummysub;
             }
-
-            dummyflip = new FlipStacker();
         }
 
         /// <summary>
         /// Read the vertices from memory.
         /// </summary>
         /// <param name="data">The input data.</param>
-        private void TransferNodes(MeshData data)
+        private void TransferNodes(InputGeometry data)
         {
-            Vertex vertex;
-            double x, y;
-            int attribs;
+            List<Vertex> points = data.points;
 
-            double[][] points = data.Points;
-            attribs = data.PointAttributes == null ? 0 : data.PointAttributes.Length;
-
-            this.invertices = data.Points.Length;
+            this.invertices = points.Count;
             this.mesh_dim = 2;
-            this.nextras = attribs;
 
             if (this.invertices < 3)
             {
@@ -759,45 +777,20 @@ namespace TriangleNet
                 throw new Exception("Input must have at least three input vertices.");
             }
 
-            // Read the vertices.
-            for (int i = 0; i < this.invertices; i++)
+            this.nextras = 0; // TODO: points[0].Attributes == null ? 0 : points[0].Attributes.Length;
+
+            foreach (Vertex vertex in points)
             {
-                vertex = new Vertex(nextras);
-                vertex.type = VertexType.InputVertex;
-                vertex.mark = 0;
-                vertex.ID = vertex.Hash;
+                // TODO: Set vertex attributes.
+                //vertex.attribs = points[i].Attributes;
 
-                // Read the vertex coordinates.
-                x = vertex.pt.X = points[i][0];
-                y = vertex.pt.Y = points[i][1];
+                vertex.hash = this.hash_vtx++;
+                vertex.id = vertex.hash;
 
-                // Read the vertex attributes.
-                for (int j = 0; j < attribs; j++)
-                {
-                    //vertexloop.pt.attribs[j] = pointattriblist[i][j];
-                }
-                if (data.PointMarkers != null)
-                {
-                    // Read a vertex marker.
-                    vertex.mark = data.PointMarkers[i];
-                }
-
-                this.vertices.Add(vertex.Hash, vertex);
-
-                // Determine the smallest and largest x and y coordinates.
-                if (i == 0)
-                {
-                    this.xmin = this.xmax = x;
-                    this.ymin = this.ymax = y;
-                }
-                else
-                {
-                    this.xmin = (x < this.xmin) ? x : this.xmin;
-                    this.xmax = (x > this.xmax) ? x : this.xmax;
-                    this.ymin = (y < this.ymin) ? y : this.ymin;
-                    this.ymax = (y > this.ymax) ? y : this.ymax;
-                }
+                this.vertices.Add(vertex.hash, vertex);
             }
+
+            this.bounds = data.Bounds;
         }
 
         #endregion
@@ -810,12 +803,14 @@ namespace TriangleNet
         /// <param name="newotri">Reference to the new triangle.</param>
         internal void MakeTriangle(ref Otri newotri)
         {
-            Triangle t = new Triangle(eextras);
+            Triangle tri = new Triangle(eextras);
+            tri.hash = this.hash_tri++;
+            tri.id = tri.hash;
 
-            newotri.triangle = t;
+            newotri.triangle = tri;
             newotri.orient = 0;
 
-            triangles.Add(t.Hash, t);
+            triangles.Add(tri.hash, tri);
         }
 
         /// <summary>
@@ -824,12 +819,13 @@ namespace TriangleNet
         /// <param name="newsubseg">Reference to the new subseg.</param>
         internal void MakeSubseg(ref Osub newsubseg)
         {
-            Subseg s = new Subseg();
+            Segment seg = new Segment();
+            seg.hash = this.hash_seg++;
 
-            newsubseg.ss = s;
-            newsubseg.ssorient = 0;
+            newsubseg.seg = seg;
+            newsubseg.orient = 0;
 
-            subsegs.Add(s.Hash, s);
+            subsegs.Add(seg.hash, seg);
         }
         #endregion
 
@@ -839,47 +835,53 @@ namespace TriangleNet
         /// Insert a vertex into a Delaunay triangulation, performing flips as necessary 
         /// to maintain the Delaunay property.
         /// </summary>
+        /// <param name="newvertex">The point to be inserted.</param>
+        /// <param name="searchtri">The triangle to start the search.</param>
+        /// <param name="splitseg">Segment to split.</param>
+        /// <param name="segmentflaws">Check for creation of encroached subsegments.</param>
+        /// <param name="triflaws">Check for creation of bad quality triangles.</param>
+        /// <returns>If a duplicate vertex or violated segment does not prevent the 
+        /// vertex from being inserted, the return value will be ENCROACHINGVERTEX if 
+        /// the vertex encroaches upon a subsegment (and checking is enabled), or
+        /// SUCCESSFULVERTEX otherwise. In either case, 'searchtri' is set to a handle
+        /// whose origin is the newly inserted vertex.</returns>
         /// <remarks>
-        /// The point 'newvertex' is located.  If 'searchtri.tri' is not NULL,
+        /// The point 'newvertex' is located. If 'searchtri.triangle' is not NULL,
         /// the search for the containing triangle begins from 'searchtri'.  If
-        /// 'searchtri.tri' is NULL, a full point location procedure is called.
+        /// 'searchtri.triangle' is NULL, a full point location procedure is called.
         /// If 'insertvertex' is found inside a triangle, the triangle is split into
         /// three; if 'insertvertex' lies on an edge, the edge is split in two,
-        /// thereby splitting the two adjacent triangles into four.  Edge flips are
-        /// used to restore the Delaunay property.  If 'insertvertex' lies on an
+        /// thereby splitting the two adjacent triangles into four. Edge flips are
+        /// used to restore the Delaunay property. If 'insertvertex' lies on an
         /// existing vertex, no action is taken, and the value DUPLICATEVERTEX is
-        /// returned.  On return, 'searchtri' is set to a handle whose origin is the
+        /// returned. On return, 'searchtri' is set to a handle whose origin is the
         /// existing vertex.
         ///
         /// InsertVertex() does not use flip() for reasons of speed; some
         /// information can be reused from edge flip to edge flip, like the
         /// locations of subsegments.
-        /// </remarks>
-        /// <param name="newvertex">The point to be inserted.</param>
-        /// <param name="searchtri">The triangle to start the search.</param>
-        /// <param name="splitseg">Normally, the parameter 'splitseg' is set to NULL, 
-        /// implying that no subsegment should be split.  In this case, if 'insertvertex' 
+        /// 
+        /// Param 'splitseg': Normally, the parameter 'splitseg' is set to NULL, 
+        /// implying that no subsegment should be split. In this case, if 'insertvertex' 
         /// is found to lie on a segment, no action is taken, and the value VIOLATINGVERTEX 
         /// is returned. On return, 'searchtri' is set to a handle whose primary edge is the 
         /// violated subsegment.
+        /// If the calling routine wishes to split a subsegment by inserting a vertex in it, 
+        /// the parameter 'splitseg' should be that subsegment. In this case, 'searchtri' 
+        /// MUST be the triangle handle reached by pivoting from that subsegment; no point 
+        /// location is done.
         /// 
-        /// If the calling routine wishes to split a subsegment 
-        /// by inserting a vertex in it, the parameter 'splitseg' should be that subsegment. 
-        /// In this case, 'searchtri' MUST be the triangle handle reached by pivoting
-        /// from that subsegment; no point location is done.</param>
-        /// <param name="segmentflaws">Flags that indicate whether or not there should
+        /// Param 'segmentflaws': Flags that indicate whether or not there should
         /// be checks for the creation of encroached subsegments. If a newly inserted 
         /// vertex encroaches upon subsegments, these subsegments are added to the list 
-        /// of subsegments to be split if 'segmentflaws' is set.</param>
-        /// <param name="triflaws">Flags that indicate whether or not there should be
+        /// of subsegments to be split if 'segmentflaws' is set.
+        /// 
+        /// Param 'triflaws': Flags that indicate whether or not there should be
         /// checks for the creation of bad quality triangles. If bad triangles are 
-        /// created, these are added to the queue if 'triflaws' is set.</param>
-        /// <returns> If a duplicate vertex or violated segment does not prevent the 
-        /// vertex from being inserted, the return value will be ENCROACHINGVERTEX if 
-        /// the vertex encroaches upon a subsegment (and checking is enabled), or
-        /// SUCCESSFULVERTEX otherwise. In either case, 'searchtri' is set to a handle
-        /// whose origin is the newly inserted vertex.</returns>
-        internal InsertVertexResult InsertVertex(Vertex newvertex, ref Otri searchtri, ref Osub splitseg, bool segmentflaws, bool triflaws)
+        /// created, these are added to the queue if 'triflaws' is set.
+        /// </remarks>
+        internal InsertVertexResult InsertVertex(Vertex newvertex, ref Otri searchtri,
+            ref Osub splitseg, bool segmentflaws, bool triflaws)
         {
             Otri horiz = default(Otri);
             Otri top = default(Otri);
@@ -897,7 +899,7 @@ namespace TriangleNet
             Osub rightsubseg = default(Osub);
             Osub newsubseg = default(Osub);
             BadSubseg encroached;
-            FlipStacker newflip;
+            //FlipStacker newflip;
             Vertex first;
             Vertex leftvertex, rightvertex, botvertex, topvertex, farvertex;
             Vertex segmentorg, segmentdest;
@@ -910,7 +912,7 @@ namespace TriangleNet
             bool enq;
             int i;
 
-            if (splitseg.ss == null)
+            if (splitseg.seg == null)
             {
                 // Find the location of the vertex to be inserted.  Check if a good
                 // starting triangle has already been provided by the caller.
@@ -921,13 +923,13 @@ namespace TriangleNet
                     horiz.orient = 0;
                     horiz.SymSelf();
                     // Search for a triangle containing 'newvertex'.
-                    intersect = Locate(newvertex.pt, ref horiz);
+                    intersect = Locate(newvertex, ref horiz);
                 }
                 else
                 {
                     // Start searching from the triangle provided by the caller.
                     searchtri.Copy(ref horiz);
-                    intersect = PreciseLocate(newvertex.pt, ref horiz, true);
+                    intersect = PreciseLocate(newvertex, ref horiz, true);
                 }
             }
             else
@@ -949,11 +951,11 @@ namespace TriangleNet
             if ((intersect == LocateResult.OnEdge) || (intersect == LocateResult.Outside))
             {
                 // The vertex falls on an edge or boundary.
-                if (checksegments && (splitseg.ss == null))
+                if (checksegments && (splitseg.seg == null))
                 {
                     // Check whether the vertex falls on a subsegment.
                     horiz.SegPivot(ref brokensubseg);
-                    if (brokensubseg.ss != dummysub)
+                    if (brokensubseg.seg != dummysub)
                     {
                         // The vertex falls on a subsegment, and hence will not be inserted.
                         if (segmentflaws)
@@ -1053,7 +1055,7 @@ namespace TriangleNet
                 {
                     botright.SegPivot(ref botrsubseg);
 
-                    if (botrsubseg.ss != dummysub)
+                    if (botrsubseg.seg != dummysub)
                     {
                         botright.SegDissolve();
                         newbotright.SegBond(ref botrsubseg);
@@ -1062,7 +1064,7 @@ namespace TriangleNet
                     if (mirrorflag)
                     {
                         topright.SegPivot(ref toprsubseg);
-                        if (toprsubseg.ss != dummysub)
+                        if (toprsubseg.seg != dummysub)
                         {
                             topright.SegDissolve();
                             newtopright.SegBond(ref toprsubseg);
@@ -1085,7 +1087,7 @@ namespace TriangleNet
                     newtopright.Bond(ref newbotright);
                 }
 
-                if (splitseg.ss != null)
+                if (splitseg.seg != null)
                 {
                     // Split the subsegment into two.
                     splitseg.SetDest(newvertex);
@@ -1093,7 +1095,7 @@ namespace TriangleNet
                     segmentdest = splitseg.SegDest();
                     splitseg.SymSelf();
                     splitseg.Pivot(ref rightsubseg);
-                    InsertSubseg(ref newbotright, splitseg.ss.boundary);
+                    InsertSubseg(ref newbotright, splitseg.seg.boundary);
                     newbotright.SegPivot(ref newsubseg);
                     newsubseg.SetSegOrg(segmentorg);
                     newsubseg.SetSegDest(segmentdest);
@@ -1105,22 +1107,16 @@ namespace TriangleNet
                     // Transfer the subsegment's boundary marker to the vertex if required.
                     if (newvertex.mark == 0)
                     {
-                        newvertex.mark = splitseg.ss.boundary;
+                        newvertex.mark = splitseg.seg.boundary;
                     }
                 }
 
                 if (checkquality)
                 {
-                    //poolrestart(&m.flipstackers);  TODO
-                    flipstackers.Clear();
+                    flipstack.Clear();
 
-                    lastflip = new FlipStacker();
-                    lastflip.flippedtri = horiz;
-                    lastflip.prevflip = dummyflip;
-
-                    flipstackers.Add(lastflip); // TODO: Could be ok???
-
-                    //throw new Exception("insertvertex: what to do here??");
+                    flipstack.Push(default(Otri)); // Dummy flip (see UndoVertex)
+                    flipstack.Push(horiz);
                 }
 
                 // Position 'horiz' on the first edge to check for
@@ -1166,17 +1162,17 @@ namespace TriangleNet
                 }
 
                 // There may be subsegments that need to be bonded
-                //   to the new triangles.
+                // to the new triangles.
                 if (checksegments)
                 {
                     botleft.SegPivot(ref botlsubseg);
-                    if (botlsubseg.ss != dummysub)
+                    if (botlsubseg.seg != dummysub)
                     {
                         botleft.SegDissolve();
                         newbotleft.SegBond(ref botlsubseg);
                     }
                     botright.SegPivot(ref botrsubseg);
-                    if (botrsubseg.ss != dummysub)
+                    if (botrsubseg.seg != dummysub)
                     {
                         botright.SegDissolve();
                         newbotright.SegBond(ref botrsubseg);
@@ -1196,24 +1192,17 @@ namespace TriangleNet
 
                 if (checkquality)
                 {
-                    // poolrestart(&m->flipstackers); TODO
-                    flipstackers.Clear();
-
-                    lastflip = new FlipStacker();
-                    lastflip.flippedtri = horiz;
-                    lastflip.prevflip = null;
-
-                    flipstackers.Add(lastflip);
+                    flipstack.Clear();
+                    flipstack.Push(horiz);
                 }
             }
 
             // The insertion is successful by default, unless an encroached
             // subsegment is found.
             success = InsertVertexResult.Successful;
-            // Circle around the newly inserted vertex, checking each edge opposite
-            // it for the Delaunay property.  Non-Delaunay edges are flipped.
-            // 'horiz' is always the edge being checked.  'first' marks where to
-            // stop circling.
+            // Circle around the newly inserted vertex, checking each edge opposite it 
+            // for the Delaunay property. Non-Delaunay edges are flipped. 'horiz' is 
+            // always the edge being checked. 'first' marks where to stop circling.
             first = horiz.Org();
             rightvertex = first;
             leftvertex = horiz.Dest();
@@ -1227,7 +1216,7 @@ namespace TriangleNet
                 {
                     // Check for a subsegment, which cannot be flipped.
                     horiz.SegPivot(ref checksubseg);
-                    if (checksubseg.ss != dummysub)
+                    if (checksubseg.seg != dummysub)
                     {
                         // The edge is a subsegment and cannot be flipped.
                         doflip = false;
@@ -1258,17 +1247,17 @@ namespace TriangleNet
                         farvertex = top.Apex();
                         // In the incremental Delaunay triangulation algorithm, any of
                         // 'leftvertex', 'rightvertex', and 'farvertex' could be vertices
-                        // of the triangular bounding box.  These vertices must be
+                        // of the triangular bounding box. These vertices must be
                         // treated as if they are infinitely distant, even though their
                         // "coordinates" are not.
                         if ((leftvertex == infvertex1) || (leftvertex == infvertex2) ||
                             (leftvertex == infvertex3))
                         {
-                            // 'leftvertex' is infinitely distant.  Check the convexity of
-                            // the boundary of the triangulation.  'farvertex' might be
+                            // 'leftvertex' is infinitely distant. Check the convexity of
+                            // the boundary of the triangulation. 'farvertex' might be
                             // infinite as well, but trust me, this same condition should
                             // be applied.
-                            doflip = Primitives.CounterClockwise(newvertex.pt, rightvertex.pt, farvertex.pt) > 0.0;
+                            doflip = Primitives.CounterClockwise(newvertex, rightvertex, farvertex) > 0.0;
                         }
                         else if ((rightvertex == infvertex1) ||
                                  (rightvertex == infvertex2) ||
@@ -1278,7 +1267,7 @@ namespace TriangleNet
                             // the boundary of the triangulation. 'farvertex' might be
                             // infinite as well, but trust me, this same condition should
                             // be applied.
-                            doflip = Primitives.CounterClockwise(farvertex.pt, leftvertex.pt, newvertex.pt) > 0.0;
+                            doflip = Primitives.CounterClockwise(farvertex, leftvertex, newvertex) > 0.0;
                         }
                         else if ((farvertex == infvertex1) ||
                                  (farvertex == infvertex2) ||
@@ -1291,7 +1280,7 @@ namespace TriangleNet
                         else
                         {
                             // Test whether the edge is locally Delaunay.
-                            doflip = Primitives.InCircle(leftvertex.pt, newvertex.pt, rightvertex.pt, farvertex.pt) > 0.0;
+                            doflip = Primitives.InCircle(leftvertex, newvertex, rightvertex, farvertex) > 0.0;
                         }
                         if (doflip)
                         {
@@ -1318,7 +1307,7 @@ namespace TriangleNet
                                 botleft.SegPivot(ref botlsubseg);
                                 botright.SegPivot(ref botrsubseg);
                                 topright.SegPivot(ref toprsubseg);
-                                if (toplsubseg.ss == dummysub)
+                                if (toplsubseg.seg == dummysub)
                                 {
                                     topright.SegDissolve();
                                 }
@@ -1326,7 +1315,7 @@ namespace TriangleNet
                                 {
                                     topright.SegBond(ref toplsubseg);
                                 }
-                                if (botlsubseg.ss == dummysub)
+                                if (botlsubseg.seg == dummysub)
                                 {
                                     topleft.SegDissolve();
                                 }
@@ -1334,7 +1323,7 @@ namespace TriangleNet
                                 {
                                     topleft.SegBond(ref botlsubseg);
                                 }
-                                if (botrsubseg.ss == dummysub)
+                                if (botrsubseg.seg == dummysub)
                                 {
                                     botleft.SegDissolve();
                                 }
@@ -1342,7 +1331,7 @@ namespace TriangleNet
                                 {
                                     botleft.SegBond(ref botrsubseg);
                                 }
-                                if (toprsubseg.ss == dummysub)
+                                if (toprsubseg.seg == dummysub)
                                 {
                                     botright.SegDissolve();
                                 }
@@ -1387,17 +1376,11 @@ namespace TriangleNet
 
                             if (checkquality)
                             {
-                                newflip = new FlipStacker();
-                                newflip.flippedtri = horiz;
-                                newflip.prevflip = lastflip;
-                                lastflip = newflip;
-
-                                flipstackers.Add(newflip);
+                                flipstack.Push(horiz);
                             }
 
-                            // On the next iterations, consider the two edges that were
-                            // exposed (this is, are now visible to the newly inserted
-                            // vertex) by the edge flip.
+                            // On the next iterations, consider the two edges that were exposed (this
+                            // is, are now visible to the newly inserted vertex) by the edge flip.
                             horiz.LprevSelf();
                             leftvertex = farvertex;
                         }
@@ -1416,11 +1399,11 @@ namespace TriangleNet
                     horiz.LnextSelf();
                     horiz.Sym(ref testtri);
                     // Check for finishing a complete revolution about the new vertex, or
-                    // falling outside  of the triangulation.  The latter will happen
-                    // when a vertex is inserted at a boundary.
+                    // falling outside of the triangulation. The latter will happen when
+                    // a vertex is inserted at a boundary.
                     if ((leftvertex == first) || (testtri.triangle == dummytri))
                     {
-                        // We're done.  Return a triangle whose origin is the new vertex.
+                        // We're done. Return a triangle whose origin is the new vertex.
                         horiz.Lnext(ref searchtri);
                         horiz.Lnext(ref recenttri);
                         return success;
@@ -1460,7 +1443,7 @@ namespace TriangleNet
             }
             // Check if there's already a subsegment here.
             tri.SegPivot(ref newsubseg);
-            if (newsubseg.ss == dummysub)
+            if (newsubseg.seg == dummysub)
             {
                 // Make new subsegment and initialize its vertices.
                 MakeSubseg(ref newsubseg);
@@ -1469,20 +1452,19 @@ namespace TriangleNet
                 newsubseg.SetSegOrg(tridest);
                 newsubseg.SetSegDest(triorg);
                 // Bond new subsegment to the two triangles it is sandwiched between.
-                // Note that the facing triangle 'oppotri' might be equal to
-                // 'dummytri' (outer space), but the new subsegment is bonded to it
-                // all the same.
+                // Note that the facing triangle 'oppotri' might be equal to 'dummytri'
+                // (outer space), but the new subsegment is bonded to it all the same.
                 tri.SegBond(ref newsubseg);
                 tri.Sym(ref oppotri);
                 newsubseg.SymSelf();
                 oppotri.SegBond(ref newsubseg);
-                newsubseg.ss.boundary = subsegmark;
+                newsubseg.seg.boundary = subsegmark;
             }
             else
             {
-                if (newsubseg.ss.boundary == 0)
+                if (newsubseg.seg.boundary == 0)
                 {
-                    newsubseg.ss.boundary = subsegmark;
+                    newsubseg.seg.boundary = subsegmark;
                 }
             }
         }
@@ -1491,11 +1473,11 @@ namespace TriangleNet
         /// Transform two triangles to two different triangles by flipping an edge 
         /// counterclockwise within a quadrilateral.
         /// </summary>
-        /// <param name="flipedge"></param>
+        /// <param name="flipedge">Handle to the edge that will be flipped.</param>
         /// <remarks>Imagine the original triangles, abc and bad, oriented so that the
         /// shared edge ab lies in a horizontal plane, with the vertex b on the left
-        /// and the vertex a on the right.  The vertex c lies below the edge, and
-        /// the vertex d lies above the edge.  The 'flipedge' handle holds the edge
+        /// and the vertex a on the right. The vertex c lies below the edge, and
+        /// the vertex d lies above the edge. The 'flipedge' handle holds the edge
         /// ab of triangle abc, and is directed left, from vertex a to vertex b.
         ///
         /// The triangles abc and bad are deleted and replaced by the triangles cdb
@@ -1547,6 +1529,26 @@ namespace TriangleNet
             botvertex = flipedge.Apex();
             flipedge.Sym(ref top);
 
+            // SELF CHECK
+
+            //if (top.triangle == dummytri)
+            //{
+            //    logger.Error("Attempt to flip on boundary.", "Mesh.Flip()");
+            //    flipedge.LnextSelf();
+            //    return;
+            //}
+
+            //if (checksegments)
+            //{
+            //    flipedge.SegPivot(ref toplsubseg);
+            //    if (toplsubseg.ss != dummysub)
+            //    {
+            //        logger.Error("Attempt to flip a segment.", "Mesh.Flip()");
+            //        flipedge.LnextSelf();
+            //        return;
+            //    }
+            //}
+
             farvertex = top.Apex();
 
             // Identify the casing of the quadrilateral.
@@ -1571,7 +1573,8 @@ namespace TriangleNet
                 botleft.SegPivot(ref botlsubseg);
                 botright.SegPivot(ref botrsubseg);
                 topright.SegPivot(ref toprsubseg);
-                if (toplsubseg.ss == Mesh.dummysub)
+
+                if (toplsubseg.seg == Mesh.dummysub)
                 {
                     topright.SegDissolve();
                 }
@@ -1579,7 +1582,8 @@ namespace TriangleNet
                 {
                     topright.SegBond(ref toplsubseg);
                 }
-                if (botlsubseg.ss == Mesh.dummysub)
+
+                if (botlsubseg.seg == Mesh.dummysub)
                 {
                     topleft.SegDissolve();
                 }
@@ -1587,7 +1591,8 @@ namespace TriangleNet
                 {
                     topleft.SegBond(ref botlsubseg);
                 }
-                if (botrsubseg.ss == Mesh.dummysub)
+
+                if (botrsubseg.seg == Mesh.dummysub)
                 {
                     botleft.SegDissolve();
                 }
@@ -1595,7 +1600,8 @@ namespace TriangleNet
                 {
                     botleft.SegBond(ref botrsubseg);
                 }
-                if (toprsubseg.ss == Mesh.dummysub)
+
+                if (toprsubseg.seg == Mesh.dummysub)
                 {
                     botright.SegDissolve();
                 }
@@ -1616,35 +1622,17 @@ namespace TriangleNet
 
         /// <summary>
         /// Transform two triangles to two different triangles by flipping an edge 
-        /// clockwise within a quadrilateral.  Reverses the flip() operation so that 
+        /// clockwise within a quadrilateral. Reverses the flip() operation so that 
         /// the data structures representing the triangles are back where they were 
         /// before the flip().
         /// </summary>
         /// <param name="flipedge"></param>
         /// <remarks>
-        /// Imagine the original triangles, abc and bad, oriented so that the
-        /// shared edge ab lies in a horizontal plane, with the vertex b on the left
-        /// and the vertex a on the right.  The vertex c lies below the edge, and
-        /// the vertex d lies above the edge.  The 'flipedge' handle holds the edge
-        /// ab of triangle abc, and is directed left, from vertex a to vertex b.
-        ///
-        /// The triangles abc and bad are deleted and replaced by the triangles cdb
-        /// and dca.  The triangles that represent abc and bad are NOT deallocated;
-        /// they are reused for cdb and dca, respectively.  Hence, any handles that
-        /// may have held the original triangles are still valid, although not
-        /// directed as they were before.
+        /// See above Flip() remarks for more information.
         ///
         /// Upon completion of this routine, the 'flipedge' handle holds the edge
         /// cd of triangle cdb, and is directed up, from vertex c to vertex d.
         /// (Hence, the two triangles have rotated clockwise.)
-        ///
-        /// WARNING:  This transformation is geometrically valid only if the
-        /// quadrilateral adbc is convex.  Furthermore, this transformation is
-        /// valid only if there is not a subsegment between the triangles abc and
-        /// bad.  This routine does not check either of these preconditions, and
-        /// it is the responsibility of the calling routine to ensure that they are
-        /// met.  If they are not, the streets shall be filled with wailing and
-        /// gnashing of teeth.
         /// </remarks>
         internal void Unflip(ref Otri flipedge)
         {
@@ -1688,7 +1676,7 @@ namespace TriangleNet
                 botleft.SegPivot(ref botlsubseg);
                 botright.SegPivot(ref botrsubseg);
                 topright.SegPivot(ref toprsubseg);
-                if (toplsubseg.ss == Mesh.dummysub)
+                if (toplsubseg.seg == Mesh.dummysub)
                 {
                     botleft.SegDissolve();
                 }
@@ -1696,7 +1684,7 @@ namespace TriangleNet
                 {
                     botleft.SegBond(ref toplsubseg);
                 }
-                if (botlsubseg.ss == Mesh.dummysub)
+                if (botlsubseg.seg == Mesh.dummysub)
                 {
                     botright.SegDissolve();
                 }
@@ -1704,7 +1692,7 @@ namespace TriangleNet
                 {
                     botright.SegBond(ref botlsubseg);
                 }
-                if (botrsubseg.ss == Mesh.dummysub)
+                if (botrsubseg.seg == Mesh.dummysub)
                 {
                     topright.SegDissolve();
                 }
@@ -1712,7 +1700,7 @@ namespace TriangleNet
                 {
                     topright.SegBond(ref botrsubseg);
                 }
-                if (toprsubseg.ss == Mesh.dummysub)
+                if (toprsubseg.seg == Mesh.dummysub)
                 {
                     topleft.SegDissolve();
                 }
@@ -1744,14 +1732,14 @@ namespace TriangleNet
         /// <param name="triflaws">A flag that determines whether the new triangles should 
         /// be tested for quality, and enqueued if they are bad.</param>
         /// <remarks>
-        //  This is a conceptually difficult routine.  The starting assumption is
-        //  that we have a polygon with n sides.  n - 1 of these sides are currently
-        //  represented as edges in the mesh.  One side, called the "base", need not
+        //  This is a conceptually difficult routine. The starting assumption is
+        //  that we have a polygon with n sides. n - 1 of these sides are currently
+        //  represented as edges in the mesh. One side, called the "base", need not
         //  be.
         //
         //  Inside the polygon is a structure I call a "fan", consisting of n - 1
         //  triangles that share a common origin. For each of these triangles, the
-        //  edge opposite the origin is one of the sides of the polygon.  The
+        //  edge opposite the origin is one of the sides of the polygon. The
         //  primary edge of each triangle is the edge directed from the origin to
         //  the destination; note that this is not the same edge that is a side of
         //  the polygon. 'firstedge' is the primary edge of the first triangle.
@@ -1803,8 +1791,8 @@ namespace TriangleNet
             Vertex leftbasevertex, rightbasevertex;
             Vertex testvertex;
             Vertex bestvertex;
-            int bestnumber;
-            int i;
+
+            int bestnumber = 1;
 
             // Identify the base vertices.
             leftbasevertex = lastedge.Apex();
@@ -1814,13 +1802,13 @@ namespace TriangleNet
             firstedge.Onext(ref besttri);
             bestvertex = besttri.Dest();
             besttri.Copy(ref testtri);
-            bestnumber = 1;
-            for (i = 2; i <= edgecount - 2; i++)
+
+            for (int i = 2; i <= edgecount - 2; i++)
             {
                 testtri.OnextSelf();
                 testvertex = testtri.Dest();
                 // Is this a better vertex?
-                if (Primitives.InCircle(leftbasevertex.pt, rightbasevertex.pt, bestvertex.pt, testvertex.pt) > 0.0)
+                if (Primitives.InCircle(leftbasevertex, rightbasevertex, bestvertex, testvertex) > 0.0)
                 {
                     testtri.Copy(ref besttri);
                     bestvertex = testvertex;
@@ -1864,12 +1852,12 @@ namespace TriangleNet
         /// triangulation remains Delaunay.
         /// </summary>
         /// <param name="deltri"></param>
-        /// <remarks>The origin of 'deltri' is deleted. The union of the triangles adjacent
-        /// to this vertex is a polygon, for which the Delaunay triangulation is
-        /// found. Two triangles are removed from the mesh.
+        /// <remarks>The origin of 'deltri' is deleted. The union of the triangles 
+        /// adjacent to this vertex is a polygon, for which the Delaunay triangulation 
+        /// is found. Two triangles are removed from the mesh.
         ///
-        /// Only interior vertices that do not lie on segments or boundaries may be
-        /// deleted.
+        /// Only interior vertices that do not lie on segments or boundaries 
+        /// may be deleted.
         /// </remarks>
         internal void DeleteVertex(ref Otri deltri)
         {
@@ -1914,12 +1902,12 @@ namespace TriangleNet
             deltri.Bond(ref leftcasing);
             deltriright.Bond(ref rightcasing);
             lefttri.SegPivot(ref leftsubseg);
-            if (leftsubseg.ss != Mesh.dummysub)
+            if (leftsubseg.seg != Mesh.dummysub)
             {
                 deltri.SegBond(ref leftsubseg);
             }
             righttri.SegPivot(ref rightsubseg);
-            if (rightsubseg.ss != Mesh.dummysub)
+            if (rightsubseg.seg != Mesh.dummysub)
             {
                 deltriright.SegBond(ref rightsubseg);
             }
@@ -1948,7 +1936,8 @@ namespace TriangleNet
         /// </remarks>
         internal void UndoVertex()
         {
-            Otri fliptri = default(Otri);
+            Otri fliptri;
+
             Otri botleft = default(Otri), botright = default(Otri), topright = default(Otri);
             Otri botlcasing = default(Otri), botrcasing = default(Otri), toprcasing = default(Otri);
             Otri gluetri = default(Otri);
@@ -1957,16 +1946,16 @@ namespace TriangleNet
 
             // Walk through the list of transformations (flips and a vertex insertion)
             // in the reverse of the order in which they were done, and undo them.
-            while (lastflip != null)
+            while (flipstack.Count > 0)
             {
                 // Find a triangle involved in the last unreversed transformation.
-                fliptri = lastflip.flippedtri;
+                fliptri = flipstack.Pop();
 
                 // We are reversing one of three transformations:  a trisection of one
                 // triangle into three (by inserting a vertex in the triangle), a
                 // bisection of two triangles into four (by inserting a vertex in an
                 // edge), or an edge flip.
-                if (lastflip.prevflip == null)
+                if (flipstack.Count == 0)
                 {
                     // Restore a triangle that was split into three triangles,
                     // so it is again one triangle.
@@ -1992,7 +1981,7 @@ namespace TriangleNet
                     TriangleDealloc(botleft.triangle);
                     TriangleDealloc(botright.triangle);
                 }
-                else if (lastflip.prevflip == dummyflip)
+                else if (flipstack.Peek().triangle == null) // Dummy flip
                 {
                     // Restore two triangles that were split into four triangles,
                     // so they are again two triangles.
@@ -2026,17 +2015,13 @@ namespace TriangleNet
                         TriangleDealloc(topright.triangle);
                     }
 
-                    // This is the end of the list, sneakily encoded.
-                    lastflip.prevflip = null;
+                    flipstack.Clear();
                 }
                 else
                 {
                     // Undo an edge flip.
                     Unflip(ref fliptri);
                 }
-
-                // Go on and process the next transformation.
-                lastflip = lastflip.prevflip;
             }
         }
 
@@ -2050,12 +2035,12 @@ namespace TriangleNet
         /// </summary>
         /// <remarks>
         /// Traverses all the triangles, and provides each corner of each triangle
-        /// with a pointer to that triangle.  Of course, pointers will be
-        /// overwritten by other pointers because (almost) each vertex is a corner
-        /// of several triangles, but in the end every vertex will point to some
-        /// triangle that contains it.
+        /// with a pointer to that triangle. Of course, pointers will be overwritten
+        /// by other pointers because (almost) each vertex is a corner of several
+        /// triangles, but in the end every vertex will point to some triangle
+        /// that contains it.
         /// </remarks>
-        void MakeVertexMap()
+        private void MakeVertexMap()
         {
             Otri tri = default(Otri);
             Vertex triorg;
@@ -2081,24 +2066,24 @@ namespace TriangleNet
         /// will stop if it tries to walk through a subsegment, and will return OUTSIDE.</param>
         /// <returns>Location information.</returns>
         /// <remarks>
-        /// Begins its search from 'searchtri'.  It is important that 'searchtri'
+        /// Begins its search from 'searchtri'. It is important that 'searchtri'
         /// be a handle with the property that 'searchpoint' is strictly to the left
         /// of the edge denoted by 'searchtri', or is collinear with that edge and
-        /// does not intersect that edge.  (In particular, 'searchpoint' should not
+        /// does not intersect that edge. (In particular, 'searchpoint' should not
         /// be the origin or destination of that edge.)
         ///
         /// These conditions are imposed because preciselocate() is normally used in
         /// one of two situations:
         ///
         /// (1)  To try to find the location to insert a new point.  Normally, we
-        ///      know an edge that the point is strictly to the left of.  In the
+        ///      know an edge that the point is strictly to the left of. In the
         ///      incremental Delaunay algorithm, that edge is a bounding box edge.
         ///      In Ruppert's Delaunay refinement algorithm for quality meshing,
         ///      that edge is the shortest edge of the triangle whose circumcenter
         ///      is being inserted.
         ///
         /// (2)  To try to find an existing point.  In this case, any edge on the
-        ///      convex hull is a good starting edge.  You must screen out the
+        ///      convex hull is a good starting edge. You must screen out the
         ///      possibility that the vertex sought is an endpoint of the starting
         ///      edge before you call preciselocate().
         ///
@@ -2106,31 +2091,31 @@ namespace TriangleNet
         ///
         /// This implementation differs from that given by Guibas and Stolfi.  It
         /// walks from triangle to triangle, crossing an edge only if 'searchpoint'
-        /// is on the other side of the line containing that edge.  After entering
+        /// is on the other side of the line containing that edge. After entering
         /// a triangle, there are two edges by which one can leave that triangle.
         /// If both edges are valid ('searchpoint' is on the other side of both
         /// edges), one of the two is chosen by drawing a line perpendicular to
         /// the entry edge (whose endpoints are 'forg' and 'fdest') passing through
-        /// 'fapex'.  Depending on which side of this perpendicular 'searchpoint'
+        /// 'fapex'. Depending on which side of this perpendicular 'searchpoint'
         /// falls on, an exit edge is chosen.
         ///
         /// This implementation is empirically faster than the Guibas and Stolfi
         /// point location routine (which I originally used), which tends to spiral
         /// in toward its target.
         ///
-        /// Returns ONVERTEX if the point lies on an existing vertex.  'searchtri'
+        /// Returns ONVERTEX if the point lies on an existing vertex. 'searchtri'
         /// is a handle whose origin is the existing vertex.
         ///
-        /// Returns ONEDGE if the point lies on a mesh edge.  'searchtri' is a
+        /// Returns ONEDGE if the point lies on a mesh edge. 'searchtri' is a
         /// handle whose primary edge is the edge on which the point lies.
         ///
         /// Returns INTRIANGLE if the point lies strictly within a triangle.
         /// 'searchtri' is a handle on the triangle that contains the point.
         ///
-        /// Returns OUTSIDE if the point lies outside the mesh.  'searchtri' is a
+        /// Returns OUTSIDE if the point lies outside the mesh. 'searchtri' is a
         /// handle whose primary edge the point is to the right of.  This might
         /// occur when the circumcenter of a triangle falls just slightly outside
-        /// the mesh due to floating-point roundoff error.  It also occurs when
+        /// the mesh due to floating-point roundoff error. It also occurs when
         /// seeking a hole or region point that a foolish user has placed outside
         /// the mesh.
         ///
@@ -2138,7 +2123,7 @@ namespace TriangleNet
         /// not generally work after the holes and concavities have been carved.
         /// However, it can still be used to find the circumcenter of a triangle, as
         /// long as the search is begun from the triangle in question.</remarks>
-        internal LocateResult PreciseLocate(Point2 searchpoint, ref Otri searchtri,
+        internal LocateResult PreciseLocate(Point searchpoint, ref Otri searchtri,
                                         bool stopatsubsegment)
         {
             Otri backtracktri = default(Otri);
@@ -2154,17 +2139,17 @@ namespace TriangleNet
             while (true)
             {
                 // Check whether the apex is the point we seek.
-                if ((fapex.pt.X == searchpoint.X) && (fapex.pt.Y == searchpoint.Y))
+                if ((fapex.x == searchpoint.X) && (fapex.y == searchpoint.Y))
                 {
                     searchtri.LprevSelf();
                     return LocateResult.OnVertex;
                 }
                 // Does the point lie on the other side of the line defined by the
                 // triangle edge opposite the triangle's destination?
-                destorient = Primitives.CounterClockwise(forg.pt, fapex.pt, searchpoint);
+                destorient = Primitives.CounterClockwise(forg, fapex, searchpoint);
                 // Does the point lie on the other side of the line defined by the
                 // triangle edge opposite the triangle's origin?
-                orgorient = Primitives.CounterClockwise(fapex.pt, fdest.pt, searchpoint);
+                orgorient = Primitives.CounterClockwise(fapex, fdest, searchpoint);
                 if (destorient > 0.0)
                 {
                     if (orgorient > 0.0)
@@ -2174,8 +2159,8 @@ namespace TriangleNet
                         // a line perpendicular to the line (forg, fdest) and passing
                         // through 'fapex', and determining which side of this line
                         // 'searchpoint' falls on.
-                        moveleft = (fapex.pt.X - searchpoint.X) * (fdest.pt.X - forg.pt.X) +
-                                   (fapex.pt.Y - searchpoint.Y) * (fdest.pt.Y - forg.pt.Y) > 0.0;
+                        moveleft = (fapex.x - searchpoint.X) * (fdest.x - forg.x) +
+                                   (fapex.y - searchpoint.Y) * (fdest.y - forg.y) > 0.0;
                     }
                     else
                     {
@@ -2206,7 +2191,7 @@ namespace TriangleNet
                     }
                 }
 
-                // Move to another triangle.  Leave a trace 'backtracktri' in case
+                // Move to another triangle. Leave a trace 'backtracktri' in case
                 // floating-point roundoff or some such bogey causes us to walk
                 // off a boundary of the triangulation.
                 if (moveleft)
@@ -2225,7 +2210,7 @@ namespace TriangleNet
                 {
                     // Check for walking through a subsegment.
                     backtracktri.SegPivot(ref checkedge);
-                    if (checkedge.ss != dummysub)
+                    if (checkedge.seg != dummysub)
                     {
                         // Go back to the last triangle.
                         backtracktri.Copy(ref searchtri);
@@ -2253,8 +2238,8 @@ namespace TriangleNet
         /// <remarks>
         /// Searching begins from one of:  the input 'searchtri', a recently
         /// encountered triangle 'recenttri', or from a triangle chosen from a
-        /// random sample.  The choice is made by determining which triangle's
-        /// origin is closest to the point we are searching for.  Normally,
+        /// random sample. The choice is made by determining which triangle's
+        /// origin is closest to the point we are searching for. Normally,
         /// 'searchtri' should be a handle on the convex hull of the triangulation.
         ///
         /// Details on the random sampling method can be found in the Mucke, Saias,
@@ -2262,39 +2247,37 @@ namespace TriangleNet
         ///
         /// On completion, 'searchtri' is a triangle that contains 'searchpoint'.
         ///
-        /// Returns ONVERTEX if the point lies on an existing vertex.  'searchtri'
+        /// Returns ONVERTEX if the point lies on an existing vertex. 'searchtri'
         /// is a handle whose origin is the existing vertex.
         ///
-        /// Returns ONEDGE if the point lies on a mesh edge.  'searchtri' is a
+        /// Returns ONEDGE if the point lies on a mesh edge. 'searchtri' is a
         /// handle whose primary edge is the edge on which the point lies.
         ///
         /// Returns INTRIANGLE if the point lies strictly within a triangle.
         /// 'searchtri' is a handle on the triangle that contains the point.
         ///
-        /// Returns OUTSIDE if the point lies outside the mesh.  'searchtri' is a
+        /// Returns OUTSIDE if the point lies outside the mesh. 'searchtri' is a
         /// handle whose primary edge the point is to the right of.  This might
         /// occur when the circumcenter of a triangle falls just slightly outside
-        /// the mesh due to floating-point roundoff error.  It also occurs when
+        /// the mesh due to floating-point roundoff error. It also occurs when
         /// seeking a hole or region point that a foolish user has placed outside
         /// the mesh.
         ///
         /// WARNING:  This routine is designed for convex triangulations, and will
         /// not generally work after the holes and concavities have been carved.
         /// </remarks>
-        internal LocateResult Locate(Point2 searchpoint, ref Otri searchtri)
+        internal LocateResult Locate(Point searchpoint, ref Otri searchtri)
         {
             Otri sampletri = default(Otri);
             Vertex torg, tdest;
             double searchdist, dist;
             double ahead;
-            //long samplesperblock, totalsamplesleft, samplesleft;
-            //long population, totalpopulation;
 
             // Record the distance from the suggested starting triangle to the
             // point we seek.
             torg = searchtri.Org();
-            searchdist = (searchpoint.X - torg.pt.X) * (searchpoint.X - torg.pt.X) +
-                         (searchpoint.Y - torg.pt.Y) * (searchpoint.Y - torg.pt.Y);
+            searchdist = (searchpoint.X - torg.x) * (searchpoint.X - torg.x) +
+                         (searchpoint.Y - torg.y) * (searchpoint.Y - torg.y);
 
             // If a recently encountered triangle has been recorded and has not been
             // deallocated, test it as a good starting point.
@@ -2303,13 +2286,13 @@ namespace TriangleNet
                 if (!Otri.IsDead(recenttri.triangle))
                 {
                     torg = recenttri.Org();
-                    if ((torg.pt.X == searchpoint.X) && (torg.pt.Y == searchpoint.Y))
+                    if ((torg.x == searchpoint.X) && (torg.y == searchpoint.Y))
                     {
                         recenttri.Copy(ref searchtri);
                         return LocateResult.OnVertex;
                     }
-                    dist = (searchpoint.X - torg.pt.X) * (searchpoint.X - torg.pt.X) +
-                           (searchpoint.Y - torg.pt.Y) * (searchpoint.Y - torg.pt.Y);
+                    dist = (searchpoint.X - torg.x) * (searchpoint.X - torg.x) +
+                           (searchpoint.Y - torg.y) * (searchpoint.Y - torg.y);
                     if (dist < searchdist)
                     {
                         recenttri.Copy(ref searchtri);
@@ -2328,8 +2311,8 @@ namespace TriangleNet
                 if (!Otri.IsDead(sampletri.triangle))
                 {
                     torg = sampletri.Org();
-                    dist = (searchpoint.X - torg.pt.X) * (searchpoint.X - torg.pt.X) +
-                           (searchpoint.Y - torg.pt.Y) * (searchpoint.Y - torg.pt.Y);
+                    dist = (searchpoint.X - torg.x) * (searchpoint.X - torg.x) +
+                           (searchpoint.Y - torg.y) * (searchpoint.Y - torg.y);
                     if (dist < searchdist)
                     {
                         sampletri.Copy(ref searchtri);
@@ -2342,17 +2325,17 @@ namespace TriangleNet
             torg = searchtri.Org();
             tdest = searchtri.Dest();
             // Check the starting triangle's vertices.
-            if ((torg.pt.X == searchpoint.X) && (torg.pt.Y == searchpoint.Y))
+            if ((torg.x == searchpoint.X) && (torg.y == searchpoint.Y))
             {
                 return LocateResult.OnVertex;
             }
-            if ((tdest.pt.X == searchpoint.X) && (tdest.pt.Y == searchpoint.Y))
+            if ((tdest.x == searchpoint.X) && (tdest.y == searchpoint.Y))
             {
                 searchtri.LnextSelf();
                 return LocateResult.OnVertex;
             }
             // Orient 'searchtri' to fit the preconditions of calling preciselocate().
-            ahead = Primitives.CounterClockwise(torg.pt, tdest.pt, searchpoint);
+            ahead = Primitives.CounterClockwise(torg, tdest, searchpoint);
             if (ahead < 0.0)
             {
                 // Turn around so that 'searchpoint' is to the left of the
@@ -2362,8 +2345,8 @@ namespace TriangleNet
             else if (ahead == 0.0)
             {
                 // Check if 'searchpoint' is between 'torg' and 'tdest'.
-                if (((torg.pt.X < searchpoint.X) == (searchpoint.X < tdest.pt.X)) &&
-                    ((torg.pt.Y < searchpoint.Y) == (searchpoint.Y < tdest.pt.Y)))
+                if (((torg.x < searchpoint.X) == (searchpoint.X < tdest.x)) &&
+                    ((torg.y < searchpoint.Y) == (searchpoint.Y < tdest.y)))
                 {
                     return LocateResult.OnEdge;
                 }
@@ -2391,7 +2374,7 @@ namespace TriangleNet
         /// is used to find the direction to move in to get from one point to
         /// another.
         /// </remarks>
-        FindDirectionResult FindDirection(ref Otri searchtri, Vertex searchpoint)
+        private FindDirectionResult FindDirection(ref Otri searchtri, Vertex searchpoint)
         {
             Otri checktri = default(Otri);
             Vertex startvertex;
@@ -2403,10 +2386,10 @@ namespace TriangleNet
             rightvertex = searchtri.Dest();
             leftvertex = searchtri.Apex();
             // Is 'searchpoint' to the left?
-            leftccw = Primitives.CounterClockwise(searchpoint.pt, startvertex.pt, leftvertex.pt);
+            leftccw = Primitives.CounterClockwise(searchpoint, startvertex, leftvertex);
             leftflag = leftccw > 0.0;
             // Is 'searchpoint' to the right?
-            rightccw = Primitives.CounterClockwise(startvertex.pt, searchpoint.pt, rightvertex.pt);
+            rightccw = Primitives.CounterClockwise(startvertex, searchpoint, rightvertex);
             rightflag = rightccw > 0.0;
             if (leftflag && rightflag)
             {
@@ -2433,7 +2416,7 @@ namespace TriangleNet
                 }
                 leftvertex = searchtri.Apex();
                 rightccw = leftccw;
-                leftccw = Primitives.CounterClockwise(searchpoint.pt, startvertex.pt, leftvertex.pt);
+                leftccw = Primitives.CounterClockwise(searchpoint, startvertex, leftvertex);
                 leftflag = leftccw > 0.0;
             }
             while (rightflag)
@@ -2447,7 +2430,7 @@ namespace TriangleNet
                 }
                 rightvertex = searchtri.Dest();
                 leftccw = rightccw;
-                rightccw = Primitives.CounterClockwise(startvertex.pt, searchpoint.pt, rightvertex.pt);
+                rightccw = Primitives.CounterClockwise(startvertex, searchpoint, rightvertex);
                 rightflag = rightccw > 0.0;
             }
             if (leftccw == 0.0)
@@ -2480,7 +2463,7 @@ namespace TriangleNet
         /// On completion, splittri is a handle having the newly inserted
         /// intersection point as its origin, and endpoint1 as its destination.
         /// </remarks>
-        void SegmentIntersection(ref Otri splittri, ref Osub splitsubseg, Vertex endpoint2)
+        private void SegmentIntersection(ref Otri splittri, ref Osub splitsubseg, Vertex endpoint2)
         {
             Osub opposubseg = default(Osub);
             Vertex endpoint1;
@@ -2499,30 +2482,28 @@ namespace TriangleNet
             torg = splittri.Org();
             tdest = splittri.Dest();
             // Segment intersection formulae; see the Antonio reference.
-            tx = tdest.pt.X - torg.pt.X;
-            ty = tdest.pt.Y - torg.pt.Y;
-            ex = endpoint2.pt.X - endpoint1.pt.X;
-            ey = endpoint2.pt.Y - endpoint1.pt.Y;
-            etx = torg.pt.X - endpoint2.pt.X;
-            ety = torg.pt.Y - endpoint2.pt.Y;
+            tx = tdest.x - torg.x;
+            ty = tdest.y - torg.y;
+            ex = endpoint2.x - endpoint1.x;
+            ey = endpoint2.y - endpoint1.y;
+            etx = torg.x - endpoint2.x;
+            ety = torg.y - endpoint2.y;
             denom = ty * ex - tx * ey;
             if (denom == 0.0)
             {
-                logger.Error("Attempt to find intersection of parallel segments.", 
+                logger.Error("Attempt to find intersection of parallel segments.",
                     "Mesh.SegmentIntersection()");
                 throw new Exception("Attempt to find intersection of parallel segments.");
             }
             split = (ey * etx - ex * ety) / denom;
             // Create the new vertex.
-            newvertex = new Vertex(nextras); //(vertex) poolalloc(&m.vertices);
-            vertices.Add(newvertex.Hash, newvertex);
-            // Interpolate its coordinate and attributes.
-            //for (i = 0; i < 2 + nextras; i++) {
-            newvertex.pt.X = torg.pt.X + split * (tdest.pt.X - torg.pt.X);
-            newvertex.pt.Y = torg.pt.Y + split * (tdest.pt.Y - torg.pt.Y);
-            
-            newvertex.mark = splitsubseg.ss.boundary;
-            newvertex.type = VertexType.InputVertex;
+            newvertex = new Vertex(torg.x + split * (tdest.x - torg.x),
+                torg.y + split * (tdest.y - torg.y), splitsubseg.seg.boundary);
+            newvertex.hash = this.hash_vtx++;
+            newvertex.id = newvertex.hash;
+            // TODO: nextras //(vertex) poolalloc(&m.vertices);
+            // Interpolate its attributes.
+            vertices.Add(newvertex.hash, newvertex);
 
             // Insert the intersection vertex.  This should always succeed.
             success = InsertVertex(newvertex, ref splittri, ref splitsubseg, false, false);
@@ -2547,23 +2528,23 @@ namespace TriangleNet
             {
                 splitsubseg.SetSegOrg(newvertex);
                 splitsubseg.NextSelf();
-            } while (splitsubseg.ss != Mesh.dummysub);
+            } while (splitsubseg.seg != Mesh.dummysub);
             do
             {
                 opposubseg.SetSegOrg(newvertex);
                 opposubseg.NextSelf();
-            } while (opposubseg.ss != Mesh.dummysub);
+            } while (opposubseg.seg != Mesh.dummysub);
 
             // Inserting the vertex may have caused edge flips.  We wish to rediscover
             // the edge connecting endpoint1 to the new intersection vertex.
             collinear = FindDirection(ref splittri, endpoint1);
             rightvertex = splittri.Dest();
             leftvertex = splittri.Apex();
-            if ((leftvertex.pt.X == endpoint1.pt.X) && (leftvertex.pt.Y == endpoint1.pt.Y))
+            if ((leftvertex.x == endpoint1.x) && (leftvertex.y == endpoint1.y))
             {
                 splittri.OnextSelf();
             }
-            else if ((rightvertex.pt.X != endpoint1.pt.X) || (rightvertex.pt.Y != endpoint1.pt.Y))
+            else if ((rightvertex.x != endpoint1.x) || (rightvertex.y != endpoint1.y))
             {
                 logger.Error("Topological inconsistency after splitting a segment.", "Mesh.SegmentIntersection()");
                 throw new Exception("Topological inconsistency after splitting a segment.");
@@ -2579,8 +2560,8 @@ namespace TriangleNet
         /// <param name="searchtri"></param>
         /// <param name="endpoint2"></param>
         /// <param name="newmark"></param>
-        /// <returns>Returns one if the entire segment is successfully inserted, and zero 
-        /// if the job must be finished by conformingedge() or constrainededge().</returns>
+        /// <returns>Returns true if the entire segment is successfully inserted, and false 
+        /// if the job must be finished by ConstrainedEdge().</returns>
         /// <remarks>
         /// If the first triangle on the path has the second endpoint as its
         /// destination or apex, a subsegment is inserted and the job is done.
@@ -2594,7 +2575,7 @@ namespace TriangleNet
         /// then there is a segment that intersects the segment being inserted.
         /// Their intersection vertex is inserted, splitting the subsegment.
         /// </remarks>
-        bool ScoutSegment(ref Otri searchtri, Vertex endpoint2, int newmark)
+        private bool ScoutSegment(ref Otri searchtri, Vertex endpoint2, int newmark)
         {
             Otri crosstri = default(Otri);
             Osub crosssubseg = default(Osub);
@@ -2604,11 +2585,11 @@ namespace TriangleNet
             collinear = FindDirection(ref searchtri, endpoint2);
             rightvertex = searchtri.Dest();
             leftvertex = searchtri.Apex();
-            if (((leftvertex.pt.X == endpoint2.pt.X) && (leftvertex.pt.Y == endpoint2.pt.Y)) ||
-                ((rightvertex.pt.X == endpoint2.pt.X) && (rightvertex.pt.Y == endpoint2.pt.Y)))
+            if (((leftvertex.x == endpoint2.x) && (leftvertex.y == endpoint2.y)) ||
+                ((rightvertex.x == endpoint2.x) && (rightvertex.y == endpoint2.y)))
             {
                 // The segment is already an edge in the mesh.
-                if ((leftvertex.pt.X == endpoint2.pt.X) && (leftvertex.pt.Y == endpoint2.pt.Y))
+                if ((leftvertex.x == endpoint2.x) && (leftvertex.y == endpoint2.y))
                 {
                     searchtri.LprevSelf();
                 }
@@ -2639,7 +2620,7 @@ namespace TriangleNet
                 searchtri.Lnext(ref crosstri);
                 crosstri.SegPivot(ref crosssubseg);
                 // Check for a crossing segment.
-                if (crosssubseg.ss == Mesh.dummysub)
+                if (crosssubseg.seg == Mesh.dummysub)
                 {
                     return false;
                 }
@@ -2655,121 +2636,26 @@ namespace TriangleNet
             }
         }
 
-        /*
-        /// <summary>
-        /// Force a segment into a conforming Delaunay triangulation by inserting a 
-        /// vertex at its midpoint, and recursively forcing in the two half-segments 
-        /// if necessary.
-        /// </summary>
-        /// <param name="endpoint1"></param>
-        /// <param name="endpoint2"></param>
-        /// <param name="newmark"></param>
-        /// <remarks>
-        /// Generates a sequence of subsegments connecting 'endpoint1' to
-        /// 'endpoint2'.  'newmark' is the boundary marker of the segment, assigned
-        /// to each new splitting vertex and subsegment.
-        ///
-        /// Note that conformingedge() does not always maintain the conforming
-        /// Delaunay property.  Once inserted, segments are locked into place;
-        /// vertices inserted later (to force other segments in) may render these
-        /// fixed segments non-Delaunay.  The conforming Delaunay property will be
-        /// restored by enforcequality() by splitting encroached subsegments.
-        /// </remarks>
-        void ConformingEdge(Vertex endpoint1, Vertex endpoint2, int newmark)
-        {
-            Otri searchtri1 = default(Otri), searchtri2 = default(Otri);
-            Osub brokensubseg = default(Osub);
-            Vertex newvertex;
-            Vertex midvertex1, midvertex2;
-            InsertVertexResult success;
-            int i;
-
-            // Create a new vertex to insert in the middle of the segment.
-            //newvertex = (vertex) poolalloc(&m.vertices);
-            newvertex = new Vertex(nextras);
-            vertices.Add(newvertex.Hash, newvertex);
-
-            // Interpolate coordinates and attributes.
-            for (i = 0; i < 2 + nextras; i++)
-            {
-                //newvertex.pt[i] = 0.5 * (endpoint1.pt[i] + endpoint2.pt[i]);
-            }
-            newvertex.mark = newmark;
-            newvertex.type = VertexType.SegmentVertex;
-            // No known triangle to search from.
-            searchtri1.triangle = Mesh.dummytri;
-            // Attempt to insert the new vertex.
-            Osub tmp = default(Osub);
-            success = InsertVertex(newvertex, ref searchtri1, ref tmp, false, false);
-            if (success == InsertVertexResult.Duplicate)
-            {
-                // Segment intersects existing vertex. Use the vertex that's already there.
-                VertexDealloc(newvertex);
-                newvertex = searchtri1.Org();
-            }
-            else
-            {
-                if (success == InsertVertexResult.Violating)
-                {
-                    // Two segments intersect. By fluke, we've landed right on another segment. Split it.
-                    searchtri1.SegPivot(ref brokensubseg);
-                    success = InsertVertex(newvertex, ref searchtri1, ref brokensubseg, false, false);
-                    if (success != InsertVertexResult.Successful)
-                    {
-                        logger.Error("Failure to split a segment.", "Mesh.ConformingEdge()");
-                        throw new Exception("Failure to split a segment.");
-                    }
-                }
-                // The vertex has been inserted successfully.
-                if (steinerleft > 0)
-                {
-                    steinerleft--;
-                }
-            }
-            searchtri1.Copy(ref searchtri2);
-            // 'searchtri1' and 'searchtri2' are fastened at their origins to
-            // 'newvertex', and will be directed toward 'endpoint1' and 'endpoint2'
-            // respectively. First, we must get 'searchtri2' out of the way so it
-            // won't be invalidated during the insertion of the first half of the
-            // segment.
-            FindDirection(ref searchtri2, endpoint2);
-            if (!ScoutSegment(ref searchtri1, endpoint1, newmark))
-            {
-                // The origin of searchtri1 may have changed if a collision with an
-                // intervening vertex on the segment occurred.
-                midvertex1 = searchtri1.Org();
-                ConformingEdge(midvertex1, endpoint1, newmark);
-            }
-            if (!ScoutSegment(ref searchtri2, endpoint2, newmark))
-            {
-                // The origin of searchtri2 may have changed if a collision with an
-                // intervening vertex on the segment occurred.
-                midvertex2 = searchtri2.Org();
-                ConformingEdge(midvertex2, endpoint2, newmark);
-            }
-        }
-         * */
-
         /// <summary>
         /// Enforce the Delaunay condition at an edge, fanning out recursively from 
         /// an existing vertex. Pay special attention to stacking inverted triangles.
         /// </summary>
         /// <param name="fixuptri"></param>
-        /// <param name="leftside">indicates whether or not fixuptri is to the left of 
-        /// the segment being inserted.  (Imagine that the segment is pointing up from
+        /// <param name="leftside">Indicates whether or not fixuptri is to the left of 
+        /// the segment being inserted. (Imagine that the segment is pointing up from
         /// endpoint1 to endpoint2.)</param>
         /// <remarks>
         /// This is a support routine for inserting segments into a constrained
         /// Delaunay triangulation.
         ///
         /// The origin of fixuptri is treated as if it has just been inserted, and
-        /// the local Delaunay condition needs to be enforced.  It is only enforced
+        /// the local Delaunay condition needs to be enforced. It is only enforced
         /// in one sector, however, that being the angular range defined by
         /// fixuptri.
         ///
         /// This routine also needs to make decisions regarding the "stacking" of
-        /// triangles.  (Read the description of constrainededge() below before
-        /// reading on here, so you understand the algorithm.)  If the position of
+        /// triangles. (Read the description of ConstrainedEdge() below before
+        /// reading on here, so you understand the algorithm.) If the position of
         /// the new vertex (the origin of fixuptri) indicates that the vertex before
         /// it on the polygon is a reflex vertex, then "stack" the triangle by
         /// doing nothing.  (fixuptri is an inverted triangle, which is how stacked
@@ -2777,7 +2663,7 @@ namespace TriangleNet
         ///
         /// Otherwise, check whether the vertex before that was a reflex vertex.
         /// If so, perform an edge flip, thereby eliminating an inverted triangle
-        /// (popping it off the stack).  The edge flip may result in the creation
+        /// (popping it off the stack). The edge flip may result in the creation
         /// of a new inverted triangle, depending on whether or not the new vertex
         /// is visible to the vertex three edges behind on the polygon.
         ///
@@ -2785,7 +2671,7 @@ namespace TriangleNet
         /// vertices, fixuptri and fartri, the triangle opposite it, are not
         /// inverted; hence, ensure that the edge between them is locally Delaunay.
         /// </remarks>
-        void DelaunayFixup(ref Otri fixuptri, bool leftside)
+        private void DelaunayFixup(ref Otri fixuptri, bool leftside)
         {
             Otri neartri = default(Otri);
             Otri fartri = default(Otri);
@@ -2800,7 +2686,7 @@ namespace TriangleNet
                 return;
             }
             neartri.SegPivot(ref faredge);
-            if (faredge.ss != Mesh.dummysub)
+            if (faredge.seg != Mesh.dummysub)
             {
                 return;
             }
@@ -2812,7 +2698,7 @@ namespace TriangleNet
             // Check whether the previous polygon vertex is a reflex vertex.
             if (leftside)
             {
-                if (Primitives.CounterClockwise(nearvertex.pt, leftvertex.pt, farvertex.pt) <= 0.0)
+                if (Primitives.CounterClockwise(nearvertex, leftvertex, farvertex) <= 0.0)
                 {
                     // leftvertex is a reflex vertex too. Nothing can
                     // be done until a convex section is found.
@@ -2821,20 +2707,20 @@ namespace TriangleNet
             }
             else
             {
-                if (Primitives.CounterClockwise(farvertex.pt, rightvertex.pt, nearvertex.pt) <= 0.0)
+                if (Primitives.CounterClockwise(farvertex, rightvertex, nearvertex) <= 0.0)
                 {
                     // rightvertex is a reflex vertex too.  Nothing can
                     // be done until a convex section is found.
                     return;
                 }
             }
-            if (Primitives.CounterClockwise(rightvertex.pt, leftvertex.pt, farvertex.pt) > 0.0)
+            if (Primitives.CounterClockwise(rightvertex, leftvertex, farvertex) > 0.0)
             {
                 // fartri is not an inverted triangle, and farvertex is not a reflex
                 // vertex.  As there are no reflex vertices, fixuptri isn't an
                 // inverted triangle, either.  Hence, test the edge between the
                 // triangles to ensure it is locally Delaunay.
-                if (Primitives.InCircle(leftvertex.pt, farvertex.pt, rightvertex.pt, nearvertex.pt) <= 0.0)
+                if (Primitives.InCircle(leftvertex, farvertex, rightvertex, nearvertex) <= 0.0)
                 {
                     return;
                 }
@@ -2862,23 +2748,23 @@ namespace TriangleNet
         /// boundary marker of the segment.
         ///
         /// To insert a segment, every triangle whose interior intersects the
-        /// segment is deleted.  The union of these deleted triangles is a polygon
+        /// segment is deleted. The union of these deleted triangles is a polygon
         /// (which is not necessarily monotone, but is close enough), which is
-        /// divided into two polygons by the new segment.  This routine's task is
+        /// divided into two polygons by the new segment. This routine's task is
         /// to generate the Delaunay triangulation of these two polygons.
         ///
         /// You might think of this routine's behavior as a two-step process.  The
         /// first step is to walk from endpoint1 to endpoint2, flipping each edge
         /// encountered.  This step creates a fan of edges connected to endpoint1,
-        /// including the desired edge to endpoint2.  The second step enforces the
+        /// including the desired edge to endpoint2. The second step enforces the
         /// Delaunay condition on each side of the segment in an incremental manner:
         /// proceeding along the polygon from endpoint1 to endpoint2 (this is done
         /// independently on each side of the segment), each vertex is "enforced"
         /// as if it had just been inserted, but affecting only the previous
-        /// vertices.  The result is the same as if the vertices had been inserted
+        /// vertices. The result is the same as if the vertices had been inserted
         /// in the order they appear on the polygon, so the result is Delaunay.
         ///
-        /// In truth, constrainededge() interleaves these two steps.  The procedure
+        /// In truth, ConstrainedEdge() interleaves these two steps. The procedure
         /// walks from endpoint1 to endpoint2, and each time an edge is encountered
         /// and flipped, the newly exposed vertex (at the far end of the flipped
         /// edge) is "enforced" upon the previously flipped edges, usually affecting
@@ -2888,21 +2774,21 @@ namespace TriangleNet
         /// The algorithm is complicated by the need to handle polygons that are not
         /// convex.  Although the polygon is not necessarily monotone, it can be
         /// triangulated in a manner similar to the stack-based algorithms for
-        /// monotone polygons.  For each reflex vertex (local concavity) of the
+        /// monotone polygons. For each reflex vertex (local concavity) of the
         /// polygon, there will be an inverted triangle formed by one of the edge
-        /// flips.  (An inverted triangle is one with negative area - that is, its
+        /// flips. (An inverted triangle is one with negative area - that is, its
         /// vertices are arranged in clockwise order - and is best thought of as a
         /// wrinkle in the fabric of the mesh.)  Each inverted triangle can be
         /// thought of as a reflex vertex pushed on the stack, waiting to be fixed
         /// later.
         ///
         /// A reflex vertex is popped from the stack when a vertex is inserted that
-        /// is visible to the reflex vertex.  (However, if the vertex behind the
+        /// is visible to the reflex vertex. (However, if the vertex behind the
         /// reflex vertex is not visible to the reflex vertex, a new inverted
-        /// triangle will take its place on the stack.)  These details are handled
-        /// by the delaunayfixup() routine above.
+        /// triangle will take its place on the stack.) These details are handled
+        /// by the DelaunayFixup() routine above.
         /// </remarks>
-        void ConstrainedEdge(ref Otri starttri, Vertex endpoint2, int newmark)
+        private void ConstrainedEdge(ref Otri starttri, Vertex endpoint2, int newmark)
         {
             Otri fixuptri = default(Otri), fixuptri2 = default(Otri);
             Osub crosssubseg = default(Osub);
@@ -2923,8 +2809,8 @@ namespace TriangleNet
             {
                 farvertex = fixuptri.Org();
                 // 'farvertex' is the extreme point of the polygon we are "digging"
-                //   to get from endpoint1 to endpoint2.
-                if ((farvertex.pt.X == endpoint2.pt.X) && (farvertex.pt.Y == endpoint2.pt.Y))
+                //  to get from endpoint1 to endpoint2.
+                if ((farvertex.x == endpoint2.x) && (farvertex.y == endpoint2.y))
                 {
                     fixuptri.Oprev(ref fixuptri2);
                     // Enforce the Delaunay condition around endpoint2.
@@ -2934,10 +2820,9 @@ namespace TriangleNet
                 }
                 else
                 {
-                    // Check whether farvertex is to the left or right of the segment
-                    //   being inserted, to decide which edge of fixuptri to dig
-                    //   through next.
-                    area = Primitives.CounterClockwise(endpoint1.pt, endpoint2.pt, farvertex.pt);
+                    // Check whether farvertex is to the left or right of the segment being
+                    // inserted, to decide which edge of fixuptri to dig through next.
+                    area = Primitives.CounterClockwise(endpoint1, endpoint2, farvertex);
                     if (area == 0.0)
                     {
                         // We've collided with a vertex between endpoint1 and endpoint2.
@@ -2951,7 +2836,8 @@ namespace TriangleNet
                     else
                     {
                         if (area > 0.0)
-                        {        // farvertex is to the left of the segment.
+                        {
+                            // farvertex is to the left of the segment.
                             fixuptri.Oprev(ref fixuptri2);
                             // Enforce the Delaunay condition around farvertex, on the
                             // left side of the segment only.
@@ -2962,7 +2848,8 @@ namespace TriangleNet
                             fixuptri.LprevSelf();
                         }
                         else
-                        {                // farvertex is to the right of the segment.
+                        {
+                            // farvertex is to the right of the segment.
                             DelaunayFixup(ref fixuptri, false);
                             // Flip the edge that crosses the segment. After the edge is
                             // flipped, one of its endpoints is the fan vertex, and the
@@ -2971,7 +2858,7 @@ namespace TriangleNet
                         }
                         // Check for two intersecting segments.
                         fixuptri.SegPivot(ref crosssubseg);
-                        if (crosssubseg.ss == Mesh.dummysub)
+                        if (crosssubseg.seg == Mesh.dummysub)
                         {
                             Flip(ref fixuptri);    // May create inverted triangle at left.
                         }
@@ -3006,7 +2893,7 @@ namespace TriangleNet
         /// <param name="endpoint1"></param>
         /// <param name="endpoint2"></param>
         /// <param name="newmark"></param>
-        void InsertSegment(Vertex endpoint1, Vertex endpoint2, int newmark)
+        private void InsertSegment(Vertex endpoint1, Vertex endpoint2, int newmark)
         {
             Otri searchtri1 = default(Otri), searchtri2 = default(Otri);
             Vertex checkvertex = null;
@@ -3025,7 +2912,7 @@ namespace TriangleNet
                 searchtri1.orient = 0;
                 searchtri1.SymSelf();
                 // Search for the segment's first endpoint by point location.
-                if (Locate(endpoint1.pt, ref searchtri1) != LocateResult.OnVertex)
+                if (Locate(endpoint1, ref searchtri1) != LocateResult.OnVertex)
                 {
                     logger.Error("Unable to locate PSLG vertex in triangulation.", "Mesh.InsertSegment().1");
                     throw new Exception("Unable to locate PSLG vertex in triangulation.");
@@ -3059,7 +2946,7 @@ namespace TriangleNet
                 searchtri2.orient = 0;
                 searchtri2.SymSelf();
                 // Search for the segment's second endpoint by point location.
-                if (Locate(endpoint2.pt, ref searchtri2) != LocateResult.OnVertex)
+                if (Locate(endpoint2, ref searchtri2) != LocateResult.OnVertex)
                 {
                     logger.Error("Unable to locate PSLG vertex in triangulation.", "Mesh.InsertSegment().2");
                     throw new Exception("Unable to locate PSLG vertex in triangulation.");
@@ -3078,13 +2965,6 @@ namespace TriangleNet
             // vertex on the segment occurred.
             endpoint2 = searchtri2.Org();
 
-            //if (Behavior.SplitSeg)
-            //{
-            //    // Insert vertices to force the segment into the triangulation.
-            //    ConformingEdge(endpoint1, endpoint2, newmark);
-            //}
-            //else
-
             // Insert the segment directly into the triangulation.
             ConstrainedEdge(ref searchtri1, endpoint2, newmark);
         }
@@ -3092,7 +2972,7 @@ namespace TriangleNet
         /// <summary>
         /// Cover the convex hull of a triangulation with subsegments.
         /// </summary>
-        void MarkHull()
+        private void MarkHull()
         {
             Otri hulltri = default(Otri);
             Otri nexttri = default(Otri);
@@ -3127,19 +3007,16 @@ namespace TriangleNet
         /// <param name="segmentlist"></param>
         /// <param name="segmentmarkerlist"></param>
         /// <param name="numberofsegments"></param>
-        void FormSkeleton(MeshData data)
+        private void FormSkeleton(InputGeometry input)
         {
             Vertex endpoint1, endpoint2;
-            bool segmentmarkers;
             int end1, end2;
             int boundmarker;
-            int numberofsegments = data.Segments == null ? 0 : data.Segments.Length;
+
+            this.insegments = 0;
 
             if (Behavior.Poly)
             {
-                insegments = numberofsegments;
-                segmentmarkers = data.SegmentMarkers != null;
-
                 // If the input vertices are collinear, there is no triangulation,
                 // so don't try to insert segments.
                 if (triangles.Count == 0)
@@ -3149,21 +3026,21 @@ namespace TriangleNet
 
                 // If segments are to be inserted, compute a mapping
                 // from vertices to triangles.
-                if (insegments > 0)
+                if (input.HasSegments)
                 {
                     MakeVertexMap();
                 }
 
                 boundmarker = 0;
+
                 // Read and insert the segments.
-                for (int i = 0; i < insegments; i++)
+                foreach (var seg in input.segments)
                 {
-                    end1 = data.Segments[i][0];
-                    end2 = data.Segments[i][1];
-                    if (segmentmarkers)
-                    {
-                        boundmarker = data.SegmentMarkers[i];
-                    }
+                    this.insegments++;
+
+                    end1 = seg.P0;
+                    end2 = seg.P1;
+                    boundmarker = seg.Boundary;
 
                     if ((end1 < 0) || (end1 >= invertices))
                     {
@@ -3185,9 +3062,9 @@ namespace TriangleNet
                         // It should be. The ID gets appropriately set in TransferNodes().
 
                         // Find the vertices numbered 'end1' and 'end2'.
-                        endpoint1 = vertices[end1]; // getvertex(end1);
-                        endpoint2 = vertices[end2]; // getvertex(end2);
-                        if ((endpoint1.pt.X == endpoint2.pt.X) && (endpoint1.pt.Y == endpoint2.pt.Y))
+                        endpoint1 = vertices[end1];
+                        endpoint2 = vertices[end2];
+                        if ((endpoint1.x == endpoint2.x) && (endpoint1.y == endpoint2.y))
                         {
                             if (Behavior.Verbose)
                             {
@@ -3200,10 +3077,6 @@ namespace TriangleNet
                         }
                     }
                 }
-            }
-            else
-            {
-                insegments = 0;
             }
 
             if (Behavior.Convex || !Behavior.Poly)
@@ -3223,10 +3096,10 @@ namespace TriangleNet
         /// <param name="dyingtriangle"></param>
         internal void TriangleDealloc(Triangle dyingtriangle)
         {
-            // Mark the triangle as dead.  This makes it possible to detect dead 
+            // Mark the triangle as dead. This makes it possible to detect dead 
             // triangles when traversing the list of all triangles.
             Otri.Kill(dyingtriangle);
-            triangles.Remove(dyingtriangle.Hash);
+            triangles.Remove(dyingtriangle.hash);
         }
 
         /// <summary>
@@ -3235,22 +3108,22 @@ namespace TriangleNet
         /// <param name="dyingvertex"></param>
         internal void VertexDealloc(Vertex dyingvertex)
         {
-            // Mark the vertex as dead.  This makes it possible to detect dead 
+            // Mark the vertex as dead. This makes it possible to detect dead 
             // vertices when traversing the list of all vertices.
             dyingvertex.type = VertexType.DeadVertex;
-            vertices.Remove(dyingvertex.Hash);
+            vertices.Remove(dyingvertex.hash);
         }
 
         /// <summary>
         /// Deallocate space for a subsegment, marking it dead.
         /// </summary>
         /// <param name="dyingsubseg"></param>
-        internal void SubsegDealloc(Subseg dyingsubseg)
+        internal void SubsegDealloc(Segment dyingsubseg)
         {
-            // Mark the subsegment as dead.  This makes it possible to detect dead 
+            // Mark the subsegment as dead. This makes it possible to detect dead 
             // subsegments when traversing the list of all subsegments.
             Osub.Kill(dyingsubseg);
-            subsegs.Remove(dyingsubseg.Hash);
+            subsegs.Remove(dyingsubseg.hash);
         }
 
         #endregion

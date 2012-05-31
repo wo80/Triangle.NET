@@ -76,7 +76,7 @@ namespace TriangleNet.Algorithm
                 {
                     var a = sortarray[i];
                     int j = i - 1;
-                    while (j >= left && (sortarray[j].pt.X > a.pt.X || (sortarray[j].pt.X == a.pt.X && sortarray[j].pt.Y > a.pt.Y)))
+                    while (j >= left && (sortarray[j].x > a.x || (sortarray[j].x == a.x && sortarray[j].y > a.y)))
                     {
                         sortarray[j + 1] = sortarray[j];
                         j--;
@@ -89,8 +89,8 @@ namespace TriangleNet.Algorithm
 
             // Choose a random pivot to split the array.
             pivot = rand.Next(left, right);
-            pivotx = sortarray[pivot].pt.X;
-            pivoty = sortarray[pivot].pt.Y;
+            pivotx = sortarray[pivot].x;
+            pivoty = sortarray[pivot].y;
             // Split the array.
             left--;
             right++;
@@ -101,17 +101,17 @@ namespace TriangleNet.Algorithm
                 {
                     left++;
                 }
-                while ((left <= right) && ((sortarray[left].pt.X < pivotx) ||
-                                             ((sortarray[left].pt.X == pivotx) &&
-                                              (sortarray[left].pt.Y < pivoty))));
+                while ((left <= right) && ((sortarray[left].x < pivotx) ||
+                                             ((sortarray[left].x == pivotx) &&
+                                              (sortarray[left].y < pivoty))));
                 // Search for a vertex whose x-coordinate is too small for the right.
                 do
                 {
                     right--;
                 }
-                while ((left <= right) && ((sortarray[right].pt.X > pivotx) ||
-                                             ((sortarray[right].pt.X == pivotx) &&
-                                              (sortarray[right].pt.Y > pivoty))));
+                while ((left <= right) && ((sortarray[right].x > pivotx) ||
+                                             ((sortarray[right].x == pivotx) &&
+                                              (sortarray[right].y > pivoty))));
 
                 if (left < right)
                 {
@@ -295,10 +295,10 @@ namespace TriangleNet.Algorithm
                         ref Otri farright, int axis)
         {
             Otri leftcand = default(Otri), rightcand = default(Otri);
-            Otri baseedge = default(Otri);
             Otri nextedge = default(Otri);
             Otri sidecasing = default(Otri), topcasing = default(Otri), outercasing = default(Otri);
             Otri checkedge = default(Otri);
+            Otri baseedge = default(Otri);
             Vertex innerleftdest;
             Vertex innerrightorg;
             Vertex innerleftapex, innerrightapex;
@@ -326,7 +326,7 @@ namespace TriangleNet.Algorithm
                 // The pointers to the extremal vertices are shifted to point to the
                 // topmost and bottommost vertex of each hull, rather than the
                 // leftmost and rightmost vertices.
-                while (farleftapex.pt.Y < farleftpt.pt.Y)
+                while (farleftapex.y < farleftpt.y)
                 {
                     farleft.LnextSelf();
                     farleft.SymSelf();
@@ -335,7 +335,7 @@ namespace TriangleNet.Algorithm
                 }
                 innerleft.Sym(ref checkedge);
                 checkvertex = checkedge.Apex();
-                while (checkvertex.pt.Y > innerleftdest.pt.Y)
+                while (checkvertex.y > innerleftdest.y)
                 {
                     checkedge.Lnext(ref innerleft);
                     innerleftapex = innerleftdest;
@@ -343,7 +343,7 @@ namespace TriangleNet.Algorithm
                     innerleft.Sym(ref checkedge);
                     checkvertex = checkedge.Apex();
                 }
-                while (innerrightapex.pt.Y < innerrightorg.pt.Y)
+                while (innerrightapex.y < innerrightorg.y)
                 {
                     innerright.LnextSelf();
                     innerright.SymSelf();
@@ -352,7 +352,7 @@ namespace TriangleNet.Algorithm
                 }
                 farright.Sym(ref checkedge);
                 checkvertex = checkedge.Apex();
-                while (checkvertex.pt.Y > farrightpt.pt.Y)
+                while (checkvertex.y > farrightpt.y)
                 {
                     checkedge.Lnext(ref farright);
                     farrightapex = farrightpt;
@@ -366,7 +366,7 @@ namespace TriangleNet.Algorithm
             {
                 changemade = false;
                 // Make innerleftdest the "bottommost" vertex of the left hull.
-                if (Primitives.CounterClockwise(innerleftdest.pt, innerleftapex.pt, innerrightorg.pt) > 0.0)
+                if (Primitives.CounterClockwise(innerleftdest, innerleftapex, innerrightorg) > 0.0)
                 {
                     innerleft.LprevSelf();
                     innerleft.SymSelf();
@@ -375,7 +375,7 @@ namespace TriangleNet.Algorithm
                     changemade = true;
                 }
                 // Make innerrightorg the "bottommost" vertex of the right hull.
-                if (Primitives.CounterClockwise(innerrightapex.pt, innerrightorg.pt, innerleftdest.pt) > 0.0)
+                if (Primitives.CounterClockwise(innerrightapex, innerrightorg, innerleftdest) > 0.0)
                 {
                     innerright.LnextSelf();
                     innerright.SymSelf();
@@ -384,6 +384,7 @@ namespace TriangleNet.Algorithm
                     changemade = true;
                 }
             } while (changemade);
+
             // Find the two candidates to be the next "gear tooth."
             innerleft.Sym(ref leftcand);
             innerright.Sym(ref rightcand);
@@ -418,12 +419,12 @@ namespace TriangleNet.Algorithm
             // Walk up the gap between the two triangulations, knitting them together.
             while (true)
             {
-                // Have we reached the top?  (This isn't quite the right question,
-                //   because even though the left triangulation might seem finished now,
-                //   moving up on the right triangulation might reveal a new vertex of
-                //   the left triangulation.  And vice-versa.)
-                leftfinished = Primitives.CounterClockwise(upperleft.pt, lowerleft.pt, lowerright.pt) <= 0.0;
-                rightfinished = Primitives.CounterClockwise(upperright.pt, lowerleft.pt, lowerright.pt) <= 0.0;
+                // Have we reached the top? (This isn't quite the right question,
+                // because even though the left triangulation might seem finished now,
+                // moving up on the right triangulation might reveal a new vertex of
+                // the left triangulation. And vice-versa.)
+                leftfinished = Primitives.CounterClockwise(upperleft, lowerleft, lowerright) <= 0.0;
+                rightfinished = Primitives.CounterClockwise(upperright, lowerleft, lowerright) <= 0.0;
                 if (leftfinished && rightfinished)
                 {
                     // Create the top new bounding triangle.
@@ -450,7 +451,7 @@ namespace TriangleNet.Algorithm
                         // The pointers to the extremal vertices are restored to the
                         // leftmost and rightmost vertices (rather than topmost and
                         // bottommost).
-                        while (checkvertex.pt.X < farleftpt.pt.X)
+                        while (checkvertex.x < farleftpt.x)
                         {
                             checkedge.Lprev(ref farleft);
                             farleftapex = farleftpt;
@@ -458,7 +459,7 @@ namespace TriangleNet.Algorithm
                             farleft.Sym(ref checkedge);
                             checkvertex = checkedge.Apex();
                         }
-                        while (farrightapex.pt.X > farrightpt.pt.X)
+                        while (farrightapex.x > farrightpt.x)
                         {
                             farright.LprevSelf();
                             farright.SymSelf();
@@ -480,7 +481,7 @@ namespace TriangleNet.Algorithm
                     if (nextapex != null)
                     {
                         // Check whether the edge is Delaunay.
-                        badedge = Primitives.InCircle(lowerleft.pt, lowerright.pt, upperleft.pt, nextapex.pt) > 0.0;
+                        badedge = Primitives.InCircle(lowerleft, lowerright, upperleft, nextapex) > 0.0;
                         while (badedge)
                         {
                             // Eliminate the edge with an edge flip.  As a result, the
@@ -510,7 +511,7 @@ namespace TriangleNet.Algorithm
                             if (nextapex != null)
                             {
                                 // Check whether the edge is Delaunay.
-                                badedge = Primitives.InCircle(lowerleft.pt, lowerright.pt, upperleft.pt, nextapex.pt) > 0.0;
+                                badedge = Primitives.InCircle(lowerleft, lowerright, upperleft, nextapex) > 0.0;
                             }
                             else
                             {
@@ -532,7 +533,7 @@ namespace TriangleNet.Algorithm
                     if (nextapex != null)
                     {
                         // Check whether the edge is Delaunay.
-                        badedge = Primitives.InCircle(lowerleft.pt, lowerright.pt, upperright.pt, nextapex.pt) > 0.0;
+                        badedge = Primitives.InCircle(lowerleft, lowerright, upperright, nextapex) > 0.0;
                         while (badedge)
                         {
                             // Eliminate the edge with an edge flip.  As a result, the
@@ -562,7 +563,7 @@ namespace TriangleNet.Algorithm
                             if (nextapex != null)
                             {
                                 // Check whether the edge is Delaunay.
-                                badedge = Primitives.InCircle(lowerleft.pt, lowerright.pt, upperright.pt, nextapex.pt) > 0.0;
+                                badedge = Primitives.InCircle(lowerleft, lowerright, upperright, nextapex) > 0.0;
                             }
                             else
                             {
@@ -573,7 +574,7 @@ namespace TriangleNet.Algorithm
                     }
                 }
                 if (leftfinished || (!rightfinished &&
-                       (Primitives.InCircle(upperleft.pt, lowerleft.pt, lowerright.pt, upperright.pt) > 0.0)))
+                       (Primitives.InCircle(upperleft, lowerleft, lowerright, upperright) > 0.0)))
                 {
                     // Knit the triangulations, adding an edge from 'lowerleft'
                     // to 'upperright'.
@@ -663,7 +664,7 @@ namespace TriangleNet.Algorithm
                 mesh.MakeTriangle(ref tri1);
                 mesh.MakeTriangle(ref tri2);
                 mesh.MakeTriangle(ref tri3);
-                area = Primitives.CounterClockwise(sortarray[left].pt, sortarray[left + 1].pt, sortarray[left + 2].pt);
+                area = Primitives.CounterClockwise(sortarray[left], sortarray[left + 1], sortarray[left + 2]);
                 if (area == 0.0)
                 {
                     // Three collinear vertices; the triangulation is two edges.
@@ -759,10 +760,13 @@ namespace TriangleNet.Algorithm
                 divider = vertices >> 1;
                 // Recursively triangulate each half.
                 DivconqRecurse(left, left + divider - 1, 1 - axis, ref farleft, ref innerleft);
+                ///dbgWriter.Write();
                 DivconqRecurse(left + divider, right, 1 - axis, ref innerright, ref farright);
+                ///dbgWriter.Write();
 
                 // Merge the two triangulations into one.
                 MergeHulls(ref farleft, ref innerleft, ref innerright, ref farright, axis);
+                ///dbgWriter.Write();
             }
         }
 
@@ -792,6 +796,7 @@ namespace TriangleNet.Algorithm
                 dissolveedge.Lnext(ref deadtriangle);
                 dissolveedge.LprevSelf();
                 dissolveedge.SymSelf();
+
                 // If no PSLG is involved, set the boundary markers of all the vertices
                 // on the convex hull.  If a PSLG is used, this step is done later.
                 if (!Behavior.Poly)
@@ -810,12 +815,15 @@ namespace TriangleNet.Algorithm
                 dissolveedge.Dissolve();
                 // Find the next bounding triangle.
                 deadtriangle.Sym(ref dissolveedge);
+
                 // Delete the bounding triangle.
                 mesh.TriangleDealloc(deadtriangle.triangle);
             } while (!dissolveedge.Equal(startghost));
 
             return hullsize;
         }
+
+        IO.DebugWriter dbgWriter;
 
         /// <summary>
         /// Form a Delaunay triangulation by the divide-and-conquer method.
@@ -833,7 +841,10 @@ namespace TriangleNet.Algorithm
 
             this.mesh = m;
 
+            dbgWriter = new IO.DebugWriter(m);
+
             // Allocate an array of pointers to vertices for sorting.
+            // TODO: use ToArray
             this.sortarray = new Vertex[m.invertices];
             i = 0;
             foreach (var v in m.vertices.Values)
@@ -847,13 +858,13 @@ namespace TriangleNet.Algorithm
             i = 0;
             for (j = 1; j < m.invertices; j++)
             {
-                if ((sortarray[i].pt.X == sortarray[j].pt.X)
-                    && (sortarray[i].pt.Y == sortarray[j].pt.Y))
+                if ((sortarray[i].x == sortarray[j].x)
+                    && (sortarray[i].y == sortarray[j].y))
                 {
                     if (Behavior.Verbose)
                     {
                         SimpleLog.Instance.Warning(
-                            String.Format("A duplicate vertex appeared and was ignored (ID {0}).", sortarray[j].Hash),
+                            String.Format("A duplicate vertex appeared and was ignored (ID {0}).", sortarray[j].hash), 
                             "DivConquer.DivconqDelaunay()");
                     }
                     sortarray[j].type = VertexType.UndeadVertex;

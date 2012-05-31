@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace TestApp.Controls
+namespace MeshExplorer.Controls
 {
     using System;
     using System.Collections.Generic;

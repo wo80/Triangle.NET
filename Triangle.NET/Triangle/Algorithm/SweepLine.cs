@@ -13,27 +13,14 @@ namespace TriangleNet.Algorithm
     using System.Text;
     using TriangleNet.Data;
     using TriangleNet.Log;
+    using TriangleNet.Geometry;
+    using TriangleNet.Tools;
 
     /// <summary>
     /// Builds a delaunay triangulation using the sweepline algorithm.
     /// </summary>
     class SweepLine
     {
-        /// <summary>
-        /// Introducing a new class which aggregates a sweep event is the easiest way
-        /// to handle the pointer magic of the original code (casting a sweep event 
-        /// to vertex etc.).
-        /// </summary>
-        class SweepEventVertex : Vertex
-        {
-            public SweepEvent evt;
-
-            public SweepEventVertex(SweepEvent e)
-            {
-                evt = e;
-            }
-        }
-
         static int randomseed = 1;
         static int SAMPLERATE = 10;
 
@@ -187,8 +174,8 @@ namespace TriangleNet.Algorithm
                 thisvertex = v;
                 evt = new SweepEvent();
                 evt.vertexEvent = thisvertex;
-                evt.xkey = thisvertex.pt.X;
-                evt.ykey = thisvertex.pt.Y;
+                evt.xkey = thisvertex.x;
+                evt.ykey = thisvertex.y;
                 HeapInsert(eventheap, i++, evt);
                 
             }
@@ -198,7 +185,7 @@ namespace TriangleNet.Algorithm
 
         #region Splaytree
 
-        SplayNode Splay(SplayNode splaytree, Vertex searchpoint, ref Otri searchtri)
+        SplayNode Splay(SplayNode splaytree, Point searchpoint, ref Otri searchtri)
         {
             SplayNode child, grandchild;
             SplayNode lefttree, righttree;
@@ -342,7 +329,7 @@ namespace TriangleNet.Algorithm
             }
         }
 
-        SplayNode SplayInsert(SplayNode splayroot, Otri newkey, Vertex searchpoint)
+        SplayNode SplayInsert(SplayNode splayroot, Otri newkey, Point searchpoint)
         {
             SplayNode newsplaynode;
 
@@ -378,22 +365,22 @@ namespace TriangleNet.Algorithm
             double ccwabc;
             double xac, yac, xbc, ybc;
             double aclen2, bclen2;
-            Vertex searchpoint = new Vertex(mesh.nextras);
+            Point searchpoint = new Point(); // TODO: mesh.nextras
             Otri dummytri = default(Otri);
 
-            ccwabc = Primitives.CounterClockwise(pa.pt, pb.pt, pc.pt);
-            xac = pa.pt.X - pc.pt.X;
-            yac = pa.pt.Y - pc.pt.Y;
-            xbc = pb.pt.X - pc.pt.X;
-            ybc = pb.pt.Y - pc.pt.Y;
+            ccwabc = Primitives.CounterClockwise(pa, pb, pc);
+            xac = pa.x - pc.x;
+            yac = pa.y - pc.y;
+            xbc = pb.x - pc.x;
+            ybc = pb.y - pc.y;
             aclen2 = xac * xac + yac * yac;
             bclen2 = xbc * xbc + ybc * ybc;
-            searchpoint.pt.X = pc.pt.X - (yac * bclen2 - ybc * aclen2) / (2.0 * ccwabc);
-            searchpoint.pt.Y = topy;
+            searchpoint.x = pc.x - (yac * bclen2 - ybc * aclen2) / (2.0 * ccwabc);
+            searchpoint.y = topy;
             return SplayInsert(Splay(splayroot, searchpoint, ref dummytri), newkey, searchpoint);
         }
 
-        bool RightOfHyperbola(ref Otri fronttri, Vertex newsite)
+        bool RightOfHyperbola(ref Otri fronttri, Point newsite)
         {
             Vertex leftvertex, rightvertex;
             double dxa, dya, dxb, dyb;
@@ -402,26 +389,26 @@ namespace TriangleNet.Algorithm
 
             leftvertex = fronttri.Dest();
             rightvertex = fronttri.Apex();
-            if ((leftvertex.pt.Y < rightvertex.pt.Y) ||
-                ((leftvertex.pt.Y == rightvertex.pt.Y) &&
-                 (leftvertex.pt.X < rightvertex.pt.X)))
+            if ((leftvertex.y < rightvertex.y) ||
+                ((leftvertex.y == rightvertex.y) &&
+                 (leftvertex.x < rightvertex.x)))
             {
-                if (newsite.pt.X >= rightvertex.pt.X)
+                if (newsite.x >= rightvertex.x)
                 {
                     return true;
                 }
             }
             else
             {
-                if (newsite.pt.X <= leftvertex.pt.X)
+                if (newsite.x <= leftvertex.x)
                 {
                     return false;
                 }
             }
-            dxa = leftvertex.pt.X - newsite.pt.X;
-            dya = leftvertex.pt.Y - newsite.pt.Y;
-            dxb = rightvertex.pt.X - newsite.pt.X;
-            dyb = rightvertex.pt.Y - newsite.pt.Y;
+            dxa = leftvertex.x - newsite.x;
+            dya = leftvertex.y - newsite.y;
+            dxb = rightvertex.x - newsite.x;
+            dyb = rightvertex.y - newsite.y;
             return dya * (dxb * dxb + dyb * dyb) > dyb * (dxa * dxa + dya * dya);
         }
 
@@ -432,16 +419,16 @@ namespace TriangleNet.Algorithm
 
             Statistic.CircleTopCount++;
 
-            xac = pa.pt.X - pc.pt.X;
-            yac = pa.pt.Y - pc.pt.Y;
-            xbc = pb.pt.X - pc.pt.X;
-            ybc = pb.pt.Y - pc.pt.Y;
-            xab = pa.pt.X - pb.pt.X;
-            yab = pa.pt.Y - pb.pt.Y;
+            xac = pa.x - pc.x;
+            yac = pa.y - pc.y;
+            xbc = pb.x - pc.x;
+            ybc = pb.y - pc.y;
+            xab = pa.x - pb.x;
+            yab = pa.y - pb.y;
             aclen2 = xac * xac + yac * yac;
             bclen2 = xbc * xbc + ybc * ybc;
             ablen2 = xab * xab + yab * yab;
-            return pc.pt.Y + (xac * bclen2 - xbc * aclen2 + Math.Sqrt(aclen2 * bclen2 * ablen2)) / (2.0 * ccwabc);
+            return pc.y + (xac * bclen2 - xbc * aclen2 + Math.Sqrt(aclen2 * bclen2 * ablen2)) / (2.0 * ccwabc);
         }
 
         void Check4DeadEvent(ref Otri checktri, SweepEvent[] eventheap, ref int heapsize)
@@ -506,6 +493,7 @@ namespace TriangleNet.Algorithm
                 dissolveedge.Lnext(ref deadtriangle);
                 dissolveedge.LprevSelf();
                 dissolveedge.SymSelf();
+
                 // If no PSLG is involved, set the boundary markers of all the vertices
                 // on the convex hull.  If a PSLG is used, this step is done later.
                 if (!Behavior.Poly)
@@ -524,6 +512,7 @@ namespace TriangleNet.Algorithm
                 dissolveedge.Dissolve();
                 // Find the next bounding triangle.
                 deadtriangle.Sym(ref dissolveedge);
+
                 // Delete the bounding triangle.
                 mesh.TriangleDealloc(deadtriangle.triangle);
             } while (!dissolveedge.Equal(startghost));
@@ -537,7 +526,7 @@ namespace TriangleNet.Algorithm
 
             // Nonexistent x value used as a flag to mark circle events in sweepline
             // Delaunay algorithm.
-            xminextreme = 10 * mesh.xmin - 9 * mesh.xmax;
+            xminextreme = 10 * mesh.bounds.Xmin - 9 * mesh.bounds.Xmax;
 
             SweepEvent[] eventheap;
 
@@ -589,8 +578,8 @@ namespace TriangleNet.Algorithm
                 secondvertex = eventheap[0].vertexEvent;
                 HeapDelete(eventheap, heapsize, 0);
                 heapsize--;
-                if ((firstvertex.pt.X == secondvertex.pt.X) &&
-                    (firstvertex.pt.Y == secondvertex.pt.Y))
+                if ((firstvertex.x == secondvertex.x) &&
+                    (firstvertex.y == secondvertex.y))
                 {
                     if (Behavior.Verbose)
                     {
@@ -600,8 +589,8 @@ namespace TriangleNet.Algorithm
                     secondvertex.type = VertexType.UndeadVertex;
                     mesh.undeads++;
                 }
-            } while ((firstvertex.pt.X == secondvertex.pt.X) &&
-                     (firstvertex.pt.Y == secondvertex.pt.Y));
+            } while ((firstvertex.x == secondvertex.x) &&
+                     (firstvertex.y == secondvertex.y));
             lefttri.SetOrg(firstvertex);
             lefttri.SetDest(secondvertex);
             righttri.SetOrg(secondvertex);
@@ -615,7 +604,7 @@ namespace TriangleNet.Algorithm
                 HeapDelete(eventheap, heapsize, 0);
                 heapsize--;
                 check4events = true;
-                if (nextevent.xkey < mesh.xmin)
+                if (nextevent.xkey < mesh.bounds.Xmin)
                 {
                     fliptri = nextevent.otriEvent;
                     fliptri.Oprev(ref farlefttri);
@@ -645,8 +634,8 @@ namespace TriangleNet.Algorithm
                 else
                 {
                     nextvertex = nextevent.vertexEvent;
-                    if ((nextvertex.pt.X == lastvertex.pt.X) &&
-                        (nextvertex.pt.Y == lastvertex.pt.Y))
+                    if ((nextvertex.x == lastvertex.x) &&
+                        (nextvertex.y == lastvertex.y))
                     {
                         if (Behavior.Verbose)
                         {
@@ -714,7 +703,7 @@ namespace TriangleNet.Algorithm
                     leftvertex = farlefttri.Apex();
                     midvertex = lefttri.Dest();
                     rightvertex = lefttri.Apex();
-                    lefttest = Primitives.CounterClockwise(leftvertex.pt, midvertex.pt, rightvertex.pt);
+                    lefttest = Primitives.CounterClockwise(leftvertex, midvertex, rightvertex);
                     if (lefttest > 0.0)
                     {
                         newevent = new SweepEvent();
@@ -729,7 +718,7 @@ namespace TriangleNet.Algorithm
                     leftvertex = righttri.Apex();
                     midvertex = righttri.Org();
                     rightvertex = farrighttri.Apex();
-                    righttest = Primitives.CounterClockwise(leftvertex.pt, midvertex.pt, rightvertex.pt);
+                    righttest = Primitives.CounterClockwise(leftvertex, midvertex, rightvertex);
                     if (righttest > 0.0)
                     {
                         newevent = new SweepEvent();
@@ -748,5 +737,66 @@ namespace TriangleNet.Algorithm
             bottommost.LprevSelf();
             return RemoveGhosts(ref bottommost);
         }
+
+        #region Internal classes
+
+        /// <summary>
+        /// A node in a heap used to store events for the sweepline Delaunay algorithm.
+        /// </summary>
+        /// <remarks>
+        /// Only used in the sweepline algorithm.
+        /// 
+        /// Nodes do not point directly to their parents or children in the heap. Instead, each
+        /// node knows its position in the heap, and can look up its parent and children in a
+        /// separate array. To distinguish site events from circle events, all circle events are
+        /// given an invalid (smaller than 'xmin') x-coordinate 'xkey'.
+        /// </remarks>
+        class SweepEvent
+        {
+            public double xkey, ykey;     // Coordinates of the event.
+            public Vertex vertexEvent;    // Vertex event.
+            public Otri otriEvent;        // Circle event.
+            public int heapposition;      // Marks this event's position in the heap.
+        }
+
+        /// <summary>
+        /// Introducing a new class which aggregates a sweep event is the easiest way
+        /// to handle the pointer magic of the original code (casting a sweep event 
+        /// to vertex etc.).
+        /// </summary>
+        class SweepEventVertex : Vertex
+        {
+            public SweepEvent evt;
+
+            public SweepEventVertex(SweepEvent e)
+            {
+                evt = e;
+            }
+        }
+
+        /// <summary>
+        /// A node in the splay tree.
+        /// </summary>
+        /// <remarks>
+        /// Only used in the sweepline algorithm.
+        /// 
+        /// Each node holds an oriented ghost triangle that represents a boundary edge
+        /// of the growing triangulation. When a circle event covers two boundary edges
+        /// with a triangle, so that they are no longer boundary edges, those edges are
+        /// not immediately deleted from the tree; rather, they are lazily deleted when
+        /// they are next encountered. (Since only a random sample of boundary edges are
+        /// kept in the tree, lazy deletion is faster.) 'keydest' is used to verify that
+        /// a triangle is still the same as when it entered the splay tree; if it has
+        /// been rotated (due to a circle event), it no longer represents a boundary
+        /// edge and should be deleted.
+        /// </remarks>
+        class SplayNode
+        {
+            public Otri keyedge;              // Lprev of an edge on the front.
+            public Vertex keydest;            // Used to verify that splay node is still live.
+            public SplayNode lchild, rchild;  // Children in splay tree.
+        }
+
+        #endregion
     }
 }

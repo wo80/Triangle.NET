@@ -14,6 +14,7 @@ namespace TriangleNet.IO
     using System.Globalization;
     using TriangleNet.Data;
     using TriangleNet.Log;
+    using TriangleNet.Geometry;
 
     /// <summary>
     /// TODO: Update summary.
@@ -47,9 +48,9 @@ namespace TriangleNet.IO
         /// the corresponding pointer is adjusted to refer to a subsegment rather
         /// than the next triangle of the stack.
         /// </remarks>
-        public static int Reconstruct(Mesh mesh, MeshData input)
+        public static int Reconstruct(Mesh mesh, InputGeometry input, ITriangle[] triangles)
         {
-            long hullsize = 0;
+            int hullsize = 0;
 
             Otri tri = default(Otri);
             Otri triangleleft = default(Otri);
@@ -66,18 +67,17 @@ namespace TriangleNet.IO
             Vertex segmentorg, segmentdest;
             int[] corner = new int[3];
             int[] end = new int[2];
-            bool segmentmarkers = false;
+            //bool segmentmarkers = false;
             int boundmarker;
             int aroundvertex;
             bool notfound;
             int i = 0;
 
-            int elements = input.Triangles == null ? 0 : input.Triangles.Length;
-            int attribs = input.TriangleAttributes == null ? 0 : input.TriangleAttributes.Length;
-            int numberofsegments = input.Segments == null ? 0 : input.Segments.Length;
+            int elements = triangles == null ? 0 : triangles.Length;
+            int numberofsegments = input.segments.Count;
 
             mesh.inelements = elements;
-            mesh.eextras = attribs;
+            mesh.eextras = mesh.inelements > 0 ? triangles[0].Attributes.Length : 0;
 
             // Create the triangles.
             for (i = 0; i < mesh.inelements; i++)
@@ -90,7 +90,6 @@ namespace TriangleNet.IO
             if (Behavior.Poly)
             {
                 mesh.insegments = numberofsegments;
-                segmentmarkers = input.SegmentMarkers != null;
 
                 // Create the subsegments.
                 for (i = 0; i < mesh.insegments; i++)
@@ -115,7 +114,7 @@ namespace TriangleNet.IO
             }
 
             i = 0;
-            string debug = "";
+
             // Read the triangles from the .ele file, and link
             // together those that share an edge.
             foreach (var item in mesh.triangles.Values)
@@ -125,7 +124,7 @@ namespace TriangleNet.IO
                 // Copy the triangle's three corners.
                 for (int j = 0; j < 3; j++)
                 {
-                    corner[j] = input.Triangles[i][j];
+                    corner[j] = triangles[i][j];
                     if ((corner[j] < 0) || (corner[j] >= mesh.invertices))
                     {
                         SimpleLog.Instance.Error("Triangle has an invalid vertex index.", "MeshReader.Reconstruct()");
@@ -134,15 +133,12 @@ namespace TriangleNet.IO
                 }
 
                 // Read the triangle's attributes.
-                for (int j = 0; j < mesh.eextras; j++)
-                {
-                    tri.triangle.attributes[j] = input.TriangleAttributes[i][j];
-                }
+                tri.triangle.attributes = triangles[i].Attributes;
 
                 // TODO
                 if (Behavior.VarArea)
                 {
-                    tri.triangle.area = input.TriangleAreas[i];
+                    tri.triangle.area = triangles[i].Area;
                 }
 
                 // Set the triangle's vertices.
@@ -150,8 +146,6 @@ namespace TriangleNet.IO
                 tri.SetOrg(mesh.vertices[corner[0]]);
                 tri.SetDest(mesh.vertices[corner[1]]);
                 tri.SetApex(mesh.vertices[corner[2]]);
-
-                debug += String.Format("Checking element {0} [{1}, {2}, {3}]\n", i, corner[0], corner[1], corner[2]);
 
                 // Try linking the triangle to others that share these vertices.
                 for (tri.orient = 0; tri.orient < 3; tri.orient++)
@@ -168,35 +162,25 @@ namespace TriangleNet.IO
 
                     checktri = nexttri;
 
-                    debug += String.Format("  {0}: aroundvertex = {1}\n", tri.orient, aroundvertex);
                     if (checktri.triangle != Mesh.dummytri)
                     {
                         tdest = tri.Dest();
                         tapex = tri.Apex();
 
-                        debug += String.Format("  No dummy: tdest ({0}, {1}), tapex ({2}, {3})\n",
-                            tdest[0], tdest[1], tapex[0], tapex[1]);
                         // Look for other triangles that share an edge.
                         do
                         {
                             checkdest = checktri.Dest();
                             checkapex = checktri.Apex();
 
-                            debug += String.Format("    checktri.orient {0}\n", checktri.orient);
-
-                            debug += String.Format("    checkdest ({0}, {1}), checkapex ({2}, {3})\n",
-                                checkdest[0], checkdest[1], checkapex[0], checkapex[1]);
-
                             if (tapex == checkdest)
                             {
-                                debug += String.Format("    > tapex == checkdest\n");
                                 // The two triangles share an edge; bond them together.
                                 tri.Lprev(ref triangleleft);
                                 triangleleft.Bond(ref checktri);
                             }
                             if (tdest == checkapex)
                             {
-                                debug += String.Format("    > tdest == checkapex\n");
                                 // The two triangles share an edge; bond them together.
                                 checktri.Lprev(ref checkleft);
                                 tri.Bond(ref checkleft);
@@ -223,14 +207,11 @@ namespace TriangleNet.IO
                 i = 0;
                 foreach (var item in mesh.subsegs.Values)
                 {
-                    subseg.ss = item;
+                    subseg.seg = item;
 
-                    end[0] = input.Segments[i][0];
-                    end[1] = input.Segments[i][1];
-                    if (segmentmarkers)
-                    {
-                        boundmarker = input.SegmentMarkers[i];
-                    }
+                    end[0] = input.segments[i].P0;
+                    end[1] = input.segments[i].P1;
+                    boundmarker = input.segments[i].Boundary;
 
                     for (int j = 0; j < 2; j++)
                     {
@@ -241,22 +222,20 @@ namespace TriangleNet.IO
                         }
                     }
 
-                    debug += String.Format("Checking segment {0} [{1}, {2}]\n", i, end[0], end[1]);
                     // set the subsegment's vertices.
-                    subseg.ssorient = 0;
+                    subseg.orient = 0;
                     segmentorg = mesh.vertices[end[0]];
                     segmentdest = mesh.vertices[end[1]];
                     subseg.SetOrg(segmentorg);
                     subseg.SetDest(segmentdest);
                     subseg.SetSegOrg(segmentorg);
                     subseg.SetSegDest(segmentdest);
-                    subseg.ss.boundary = boundmarker;
+                    subseg.seg.boundary = boundmarker;
                     // Try linking the subsegment to triangles that share these vertices.
-                    for (subseg.ssorient = 0; subseg.ssorient < 2; subseg.ssorient++)
+                    for (subseg.orient = 0; subseg.orient < 2; subseg.orient++)
                     {
                         // Take the number for the destination of subsegloop.
-                        aroundvertex = end[1 - subseg.ssorient];
-                        debug += String.Format("  {0}: aroundvertex = {1}\n", subseg.ssorient, aroundvertex);
+                        aroundvertex = end[1 - subseg.orient];
                         int index = vertexarray[aroundvertex].Count - 1;
                         // Look for triangles having this vertex.
                         prevlink = vertexarray[aroundvertex][index];
@@ -275,12 +254,9 @@ namespace TriangleNet.IO
                         while (notfound && (checktri.triangle != Mesh.dummytri))
                         {
                             checkdest = checktri.Dest();
-                            debug += String.Format("  No dummy: shorg ({0}, {1}), checkdest ({2}, {3})\n", 
-                                shorg[0], shorg[1], checkdest[0], checkdest[1]);
-          
+
                             if (shorg == checkdest)
                             {
-                                debug +="    shorg == checkdest\n";
                                 // We have a match. Remove this triangle from the list.
                                 //prevlink = vertexarray[aroundvertex][index];
                                 vertexarray[aroundvertex].Remove(prevlink);
@@ -290,7 +266,6 @@ namespace TriangleNet.IO
                                 checktri.Sym(ref checkneighbor);
                                 if (checkneighbor.triangle == Mesh.dummytri)
                                 {
-                                    debug +="    checkneighbor.tri == m->dummytri\n";
                                     // The next line doesn't insert a subsegment (because there's
                                     // already one there), but it sets the boundary markers of
                                     // the existing subsegment and its vertices.
@@ -312,7 +287,6 @@ namespace TriangleNet.IO
                 }
             }
 
-            debug += "\nMark the remaining edges\n\n";
             // Mark the remaining edges as not being attached to any subsegment.
             // Also, count the (yet uncounted) boundary edges.
             for (i = 0; i < mesh.vertices.Count; i++)
@@ -324,7 +298,6 @@ namespace TriangleNet.IO
 
                 while (checktri.triangle != Mesh.dummytri)
                 {
-                    debug += "  checktri.triangle != Mesh.dummytri\n";
                     // Find the next triangle in the stack before this
                     // information gets overwritten.
                     index--;
@@ -336,16 +309,13 @@ namespace TriangleNet.IO
                     {
                         mesh.InsertSubseg(ref checktri, 1);
                         hullsize++;
-                        debug += "checkneighbor.triangle == Mesh.dummytri (hullsize = " + hullsize + ")\n";
                     }
 
                     checktri = nexttri;
                 }
             }
 
-            debug += "\nmesh.subsegs.Count = " + mesh.subsegs.Count;
-
-            return (int)hullsize;
+            return hullsize;
         }
 
         #endregion
