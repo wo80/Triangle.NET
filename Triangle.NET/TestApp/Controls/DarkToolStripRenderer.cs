@@ -12,6 +12,7 @@ namespace MeshExplorer.Controls
     using System.Text;
     using System.Windows.Forms;
     using System.Drawing;
+    using System.Drawing.Drawing2D;
 
     /// <summary>
     /// TODO: Update summary.
@@ -23,6 +24,24 @@ namespace MeshExplorer.Controls
             e.TextColor = e.Item.Enabled ? Color.White : Color.Gray;
 
             base.OnRenderItemText(e);
+        }
+
+        protected override void OnRenderItemCheck(ToolStripItemImageRenderEventArgs e)
+        {
+            int h = e.Item.Height;
+            int size = h / 2 - 2; // Box size
+            Rectangle rect = new Rectangle(10, (h - size) / 2, size - 2, size);
+
+            var mode = e.Graphics.SmoothingMode;
+
+            using (Pen pen = new Pen(Color.White, 1.6f))
+            {
+                e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+                e.Graphics.DrawLine(pen, rect.Left, rect.Bottom - size / 2, rect.Left + size / 2.5f, rect.Bottom - 2);
+                e.Graphics.DrawLine(pen, rect.Left + size / 2.6f, rect.Bottom - 2, rect.Right, rect.Top);
+            }
+
+            e.Graphics.SmoothingMode = mode;
         }
 
         protected override void OnRenderArrow(ToolStripArrowRenderEventArgs e)

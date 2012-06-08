@@ -32,6 +32,8 @@ namespace MeshExplorer.Controls
         Zoom zoom;
         RenderData data;
         bool initialized = false;
+        VoronoiRenderer voronoi;
+        bool showVoronoi = false;
 
         string coordinate = String.Empty;
 
@@ -39,6 +41,21 @@ namespace MeshExplorer.Controls
 
         public long RenderTime { get; private set; }
         public RenderData Data { get { return data; } }
+        public bool ShowVoronoi
+        {
+            get { return showVoronoi; }
+            set
+            {
+                showVoronoi = value;
+
+                if (voronoi != null && showVoronoi)
+                {
+                    voronoi.Update();
+                }
+
+                this.Render();
+            }
+        }
 
         public MeshRenderer()
         {
@@ -83,6 +100,9 @@ namespace MeshExplorer.Controls
 
         public void SetData(Mesh mesh)
         {
+            voronoi = new VoronoiRenderer(mesh);
+            voronoi.Update();
+
             data.SetData(mesh);
 
             initialized = true;
@@ -257,6 +277,11 @@ namespace MeshExplorer.Controls
             else if (data.Triangles != null)
             {
                 this.RenderTriangles(g);
+            }
+
+            if (voronoi != null && this.showVoronoi)
+            {
+                voronoi.Render(g, zoom);
             }
 
             if (data.Segments != null)

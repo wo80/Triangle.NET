@@ -142,7 +142,7 @@ namespace TriangleNet
         /// </summary>
         public bool CheckDelaunay()
         {
-            Otri triangleloop = default(Otri);
+            Otri loop = default(Otri);
             Otri oppotri = default(Otri);
             Osub opposubseg = default(Osub);
             Vertex triorg, tridest, triapex;
@@ -157,18 +157,18 @@ namespace TriangleNet
             horrors = 0;
 
             // Run through the list of triangles, checking each one.
-            foreach (var t in mesh.triangles.Values)
+            foreach (var tri in mesh.triangles.Values)
             {
-                triangleloop.triangle = t;
+                loop.triangle = tri;
 
                 // Check all three edges of the triangle.
-                for (triangleloop.orient = 0; triangleloop.orient < 3;
-                     triangleloop.orient++)
+                for (loop.orient = 0; loop.orient < 3;
+                     loop.orient++)
                 {
-                    triorg = triangleloop.Org();
-                    tridest = triangleloop.Dest();
-                    triapex = triangleloop.Apex();
-                    triangleloop.Sym(ref oppotri);
+                    triorg = loop.Org();
+                    tridest = loop.Dest();
+                    triapex = loop.Apex();
+                    loop.Sym(ref oppotri);
                     oppoapex = oppotri.Apex();
                     // Only test that the edge is locally Delaunay if there is an
                     // adjoining triangle whose pointer is larger (to ensure that
@@ -187,7 +187,7 @@ namespace TriangleNet
                     {
                         // If a subsegment separates the triangles, then the edge is
                         // constrained, so no local Delaunay test should be done.
-                        triangleloop.SegPivot(ref opposubseg);
+                        loop.SegPivot(ref opposubseg);
                         if (opposubseg.seg != Mesh.dummysub)
                         {
                             shouldbedelaunay = false;

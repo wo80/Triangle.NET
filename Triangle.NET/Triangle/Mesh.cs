@@ -152,6 +152,11 @@ namespace TriangleNet
         /// </summary>
         public int NumberOfEdges { get { return this.edges; } }
 
+        /// <summary>
+        /// Indicates whether the input is a PSLG or a point set.
+        /// </summary>
+        public bool IsPolygon { get { return this.insegments > 0; } }
+
         #endregion
 
         /// <summary>
@@ -2040,7 +2045,7 @@ namespace TriangleNet
         /// triangles, but in the end every vertex will point to some triangle
         /// that contains it.
         /// </remarks>
-        private void MakeVertexMap()
+        internal void MakeVertexMap()
         {
             Otri tri = default(Otri);
             Vertex triorg;

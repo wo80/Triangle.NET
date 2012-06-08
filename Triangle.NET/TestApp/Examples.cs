@@ -13,6 +13,7 @@ namespace MeshExplorer
     using TriangleNet;
     using TriangleNet.IO;
     using TriangleNet.Geometry;
+    using MeshExplorer.IO;
 
     /// <summary>
     /// Code of the online examples.

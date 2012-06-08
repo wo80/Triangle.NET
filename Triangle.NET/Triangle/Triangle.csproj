@@ -64,8 +64,6 @@
     <Compile Include="IO\DebugWriter.cs" />
     <Compile Include="IO\FileWriter.cs" />
     <Compile Include="IO\InputTriangle.cs" />
-    <Compile Include="IO\VoronoiData.cs" />
-    <Compile Include="IO\DataWriter.cs" />
     <Compile Include="IO\FileReader.cs" />
     <Compile Include="Log\ILog.cs" />
     <Compile Include="Log\ILogItem.cs" />
@@ -80,8 +78,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sampler.cs" />
     <Compile Include="Smoothing\ISmoother.cs" />
+    <Compile Include="Tools\BoundedVoronoi.cs" />
+    <Compile Include="Tools\QualityMeasure.cs" />
     <Compile Include="Tools\Statistic.cs" />
     <Compile Include="Algorithm\SweepLine.cs" />
+    <Compile Include="Tools\Voronoi.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

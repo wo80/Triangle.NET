@@ -15,7 +15,7 @@ namespace MeshExplorer.Rendering
     /// <summary>
     /// Manages the current world to screen transformation
     /// </summary>
-    class Zoom
+    internal class Zoom
     {
         // The complete mesh
         Rectangle Screen { get; set; }

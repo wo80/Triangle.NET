@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace MeshExplorer
+namespace MeshExplorer.IO
 {
     using System;
     using System.Drawing;
@@ -14,6 +14,7 @@ namespace MeshExplorer
     using TriangleNet;
     using TriangleNet.Data;
     using TriangleNet.IO;
+    using TriangleNet.Tools;
 
     /// <summary>
     /// Writes an image of the mesh to disk.
@@ -187,7 +188,7 @@ namespace MeshExplorer
                 filename = String.Format("mesh-{0}.png", DateTime.Now.ToString("yyyy-M-d-hh-mm-ss"));
             }
 
-            VoronoiData data = DataWriter.WriteVoronoi(mesh);
+            Voronoi data = null; // DataWriter.WriteVoronoi(mesh);
 
             int n = data.Points.Length;
 
@@ -332,7 +333,7 @@ namespace MeshExplorer
         /// <summary>
         /// Draw mesh to the graphics object.
         /// </summary>
-        private static void DrawVoronoi(Graphics g, Mesh mesh, VoronoiData voronoi, float scale)
+        private static void DrawVoronoi(Graphics g, Mesh mesh, Voronoi voronoi, float scale)
         {
             g.SmoothingMode = SmoothingMode.AntiAlias;
             // Colors
@@ -399,16 +400,16 @@ namespace MeshExplorer
             }
 
             // Draw input points
-            n = voronoi.InputPoints.Length;
+            //n = voronoi.InputPoints.Length;
 
-            for (int i = 0; i < n; i++)
-            {
-                x = (float)voronoi.InputPoints[i].X;
-                y = (float)voronoi.InputPoints[i].Y;
+            //for (int i = 0; i < n; i++)
+            //{
+            //    x = (float)voronoi.InputPoints[i].X;
+            //    y = (float)voronoi.InputPoints[i].Y;
 
-                g.FillEllipse(spBrush, x - radius, y - radius, 2 * radius, 2 * radius);
-                //g.DrawEllipse(spBrush, x - radius, y - radius, 2 * radius, 2 * radius);
-            }
+            //    g.FillEllipse(spBrush, x - radius, y - radius, 2 * radius, 2 * radius);
+            //    //g.DrawEllipse(spBrush, x - radius, y - radius, 2 * radius, 2 * radius);
+            //}
 
             bgBrush.Dispose();
             ptBrush.Dispose();
@@ -418,12 +419,13 @@ namespace MeshExplorer
             trBrush.Dispose();
         }
 
-        private static PointF VoronoiBoxIntersection(BBox bounds, TriangleNet.Geometry.Point pt, double[] direction)
+        private static PointF VoronoiBoxIntersection(BBox bounds, TriangleNet.Geometry.Point pt,
+            TriangleNet.Geometry.Point direction)
         {
             double x = pt.X;
             double y = pt.Y;
-            double dx = direction[0];
-            double dy = direction[1];
+            double dx = direction.X;
+            double dy = direction.Y;
 
             double t1, x1, y1, t2, x2, y2;
 
