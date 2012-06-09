@@ -1,6 +1,6 @@
 ﻿namespace MeshExplorer
 {
-    partial class FormQuality
+    partial class FormExport
     {
         /// <summary>
         /// Required designer variable.
@@ -29,33 +29,59 @@
         private void InitializeComponent()
         {
             this.label1 = new System.Windows.Forms.Label();
+            this.darkButton1 = new MeshExplorer.Controls.DarkButton();
+            this.btnExport = new MeshExplorer.Controls.DarkButton();
             this.SuspendLayout();
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.ForeColor = System.Drawing.Color.White;
+            this.label1.BackColor = System.Drawing.Color.Transparent;
             this.label1.Location = new System.Drawing.Point(12, 9);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(38, 13);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "-";
+            this.label1.Size = new System.Drawing.Size(302, 39);
+            this.label1.TabIndex = 2;
+            this.label1.Text = "No options available at the moment.\r\n\r\nYou will find the saved image in the appli" +
+    "cation directory.";
             // 
-            // FormQuality
+            // darkButton1
+            // 
+            this.darkButton1.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.darkButton1.Location = new System.Drawing.Point(162, 141);
+            this.darkButton1.Name = "darkButton1";
+            this.darkButton1.Size = new System.Drawing.Size(82, 23);
+            this.darkButton1.TabIndex = 1;
+            this.darkButton1.Text = "Cancel";
+            this.darkButton1.UseVisualStyleBackColor = true;
+            // 
+            // btnExport
+            // 
+            this.btnExport.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.btnExport.Location = new System.Drawing.Point(250, 141);
+            this.btnExport.Name = "btnExport";
+            this.btnExport.Size = new System.Drawing.Size(82, 23);
+            this.btnExport.TabIndex = 0;
+            this.btnExport.Text = "Save";
+            this.btnExport.UseVisualStyleBackColor = true;
+            // 
+            // FormExport
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(76)))), ((int)(((byte)(76)))));
-            this.ClientSize = new System.Drawing.Size(200, 300);
+            this.ClientSize = new System.Drawing.Size(344, 172);
             this.Controls.Add(this.label1);
+            this.Controls.Add(this.darkButton1);
+            this.Controls.Add(this.btnExport);
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ForeColor = System.Drawing.Color.White;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "FormQuality";
+            this.Name = "FormExport";
             this.ShowInTaskbar = false;
-            this.Text = "Mesh Quality";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormQuality_FormClosing);
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            this.Text = "Export Image";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -63,6 +89,8 @@
 
         #endregion
 
+        private Controls.DarkButton btnExport;
+        private Controls.DarkButton darkButton1;
         private System.Windows.Forms.Label label1;
     }
 }

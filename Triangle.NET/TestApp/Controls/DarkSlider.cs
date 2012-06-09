@@ -179,7 +179,7 @@ namespace MeshExplorer.Controls
             get { return criticalPercent; }
             set { criticalPercent = value; }
         }
-        
+
         private Color thumbOuterColor = Color.White;
         private Color thumbInnerColor = Color.Gainsboro;
         private Color thumbPenColor = Color.Silver;
@@ -190,7 +190,7 @@ namespace MeshExplorer.Controls
         private Color elapsedInnerColor = Color.Chartreuse;
 
         #endregion
-        
+
         #region Constructors
 
         /// <summary>
@@ -204,7 +204,7 @@ namespace MeshExplorer.Controls
                 | ControlStyles.ResizeRedraw
                 | ControlStyles.Selectable
                 | ControlStyles.SupportsTransparentBackColor
-                | ControlStyles.UserMouse 
+                | ControlStyles.UserMouse
                 | ControlStyles.UserPaint, true);
 
             BackColor = Color.Transparent;
@@ -226,7 +226,7 @@ namespace MeshExplorer.Controls
         {
             if (!Enabled)
             {
-                DrawColorSlider(e.Graphics);
+                DrawDisabledSlider(e.Graphics);
             }
             else
             {
@@ -245,18 +245,39 @@ namespace MeshExplorer.Controls
             }
         }
 
+        private void DrawDisabledSlider(Graphics g)
+        {
+            try
+            {
+                //adjust drawing rects
+                barRect = new Rectangle(1, this.Height / 2, this.Width - 2, 5);
+
+                Brush sliderLGBrushH = new LinearGradientBrush(barRect, ColorScheme.ColorGray122,
+                    ColorScheme.ColorGray107, LinearGradientMode.Horizontal);
+
+                //draw bar
+                {
+                    // Background gradient
+                    g.FillRectangle(sliderLGBrushH, barRect);
+                    // Background fill
+                    g.FillRectangle(ColorScheme.SliderBorderBrush,
+                        barRect.Left + 1, barRect.Top, barRect.Width - 2, barRect.Height - 1);
+                    // Bar fill
+                    g.FillRectangle(ColorScheme.SliderFillBrush,
+                        barRect.Left + 2, barRect.Top + 1, barRect.Width - 4, barRect.Height - 3);
+                }
+
+                sliderLGBrushH.Dispose();
+            }
+            catch (Exception)
+            { }
+            finally
+            { }
+        }
+
         /// <summary>
         /// Draws the colorslider control using passed colors.
         /// </summary>
-        /// <param name="e">The <see cref="T:System.Windows.Forms.PaintEventArgs"/> instance containing the event data.</param>
-        /// <param name="thumbOuterColorPaint">The thumb outer color paint.</param>
-        /// <param name="thumbInnerColorPaint">The thumb inner color paint.</param>
-        /// <param name="thumbPenColorPaint">The thumb pen color paint.</param>
-        /// <param name="barOuterColorPaint">The bar outer color paint.</param>
-        /// <param name="barInnerColorPaint">The bar inner color paint.</param>
-        /// <param name="barPenColorPaint">The bar pen color paint.</param>
-        /// <param name="elapsedOuterColorPaint">The elapsed outer color paint.</param>
-        /// <param name="elapsedInnerColorPaint">The elapsed inner color paint.</param>
         private void DrawColorSlider(Graphics g)
         {
             try
@@ -305,10 +326,10 @@ namespace MeshExplorer.Controls
                 sliderLGBrushH.Dispose();
 
                 //draw thumb
-                Brush brushInner = new LinearGradientBrush(thumbRect, 
+                Brush brushInner = new LinearGradientBrush(thumbRect,
                     Color.FromArgb(111, 111, 111), Color.FromArgb(80, 80, 80),
                     LinearGradientMode.Vertical);
-                        
+
                 g.SmoothingMode = SmoothingMode.AntiAlias;
                 g.FillPath(brushInner, thumbPath);
                 g.DrawPath(Pens.Black, thumbPath);
@@ -357,7 +378,7 @@ namespace MeshExplorer.Controls
         protected override void OnMouseDown(MouseEventArgs e)
         {
             base.OnMouseDown(e);
-            if (e.Button == MouseButtons.Left)
+            if (e.Button == MouseButtons.Left && this.Enabled)
             {
                 this.Capture = true;
                 OnValueChanging();
@@ -403,11 +424,14 @@ namespace MeshExplorer.Controls
         /// <param name="e">A <see cref="T:System.Windows.Forms.MouseEventArgs"></see> that contains the event data.</param>
         protected override void OnMouseUp(MouseEventArgs e)
         {
-            base.OnMouseUp(e);
-            this.Capture = false;
-            mouseInThumbRegion = thumbRect.Contains(e.Location);
-            OnValueChanged();
-            Invalidate();
+            if (this.Enabled)
+            {
+                base.OnMouseUp(e);
+                this.Capture = false;
+                mouseInThumbRegion = thumbRect.Contains(e.Location);
+                OnValueChanged();
+                Invalidate();
+            }
         }
 
         #endregion

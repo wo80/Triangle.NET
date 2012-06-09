@@ -4,12 +4,10 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using System.Collections.Generic;
 using MeshExplorer.Controls;
 using MeshExplorer.IO;
 using TriangleNet;
 using TriangleNet.Geometry;
-using TriangleNet.IO;
 using TriangleNet.Tools;
 
 namespace MeshExplorer
@@ -20,9 +18,10 @@ namespace MeshExplorer
         InputGeometry input;
         Mesh mesh;
         Statistic stats;
+        QualityMeasure quality;
 
         FormLog frmLog;
-        FormQuality frmQuality;
+        FormGenerator frmGenerator;
 
         public FormMain()
         {
@@ -37,7 +36,7 @@ namespace MeshExplorer
 
             settings = new Settings();
 
-            meshRenderer1.Initialize();
+            renderControl1.Initialize();
 
             stats = new Statistic();
 
@@ -48,17 +47,17 @@ namespace MeshExplorer
         {
             try
             {
-                Mesh m = new Mesh();
-                m.SetOption(Options.MinAngle, 20);
+                //Mesh m = new Mesh();
+                //m.SetOption(Options.MinAngle, 20);
 
 
                 for (int j = 0; j < 10; j++)
                 {
                     for (int i = 20; i > 0; i--)
                     {
-                        var geom = PolygonGenerator.CreateRandomPoints(10 * i, 100, 100);
+                        //var geom = PolygonGenerator.CreateRandomPoints(10 * i, 100, 100);
 
-                        m.Triangulate(geom);
+                        //m.Triangulate(geom);
                     }
                 }
             }
@@ -93,6 +92,16 @@ namespace MeshExplorer
             }
         }
 
+        void frmGenerator_InputGenerated(object sender, EventArgs e)
+        {
+            this.input = sender as InputGeometry;
+
+            if (input != null)
+            {
+                HandleNewInput();
+            }
+        }
+
         private void btnMesh_Click(object sender, EventArgs e)
         {
             TriangulateOrRefine();
@@ -100,7 +109,18 @@ namespace MeshExplorer
 
         private void btnSmooth_Click(object sender, EventArgs e)
         {
-            //Smooth();
+            Smooth();
+        }
+
+        private void lbCodeplex_Clicked(object sender, EventArgs e)
+        {
+            try
+            {
+                ProcessStartInfo sInfo = new ProcessStartInfo("http://triangle.codeplex.com/");
+                Process.Start(sInfo);
+            }
+            catch (Exception)
+            { }
         }
 
         private void slMinAngle_ValueChanging(object sender, EventArgs e)
@@ -122,9 +142,9 @@ namespace MeshExplorer
             System.Drawing.Point pt = e.Location;
             pt.Offset(-splitContainer1.SplitterDistance, 0);
 
-            if (meshRenderer1.ClientRectangle.Contains(pt))
+            if (renderControl1.ClientRectangle.Contains(pt))
             {
-                meshRenderer1.Zoom(pt, e.Delta);
+                renderControl1.Zoom(pt, e.Delta);
             }
             base.OnMouseWheel(e);
         }
@@ -139,7 +159,7 @@ namespace MeshExplorer
             // Handle window minimize and maximize
             if (!isResizing)
             {
-                meshRenderer1.HandleResize();
+                renderControl1.HandleResize();
             }
         }
 
@@ -150,7 +170,7 @@ namespace MeshExplorer
             if (this.ClientSize != this.oldClientSize)
             {
                 this.oldClientSize = this.ClientSize;
-                meshRenderer1.HandleResize();
+                renderControl1.HandleResize();
             }
         }
 
@@ -187,19 +207,23 @@ namespace MeshExplorer
             btnSmooth.Enabled = false;
 
             // Render input
-            meshRenderer1.SetData(input);
+            renderControl1.SetData(input);
 
             // Update window caption
             this.Text = "Triangle.NET - Mesh Explorer - " + settings.CurrentFile;
 
             // Disable menu items
-            viewMenuMQuality.Enabled = false;
+            viewMenuVoronoi.Enabled = false;
+
+            // Clear voronoi
+            viewMenuVoronoi.Checked = false;
+            renderControl1.ShowVoronoi = false;
         }
 
         private void HandleMeshChange()
         {
             // Render mesh
-            meshRenderer1.SetData(mesh);
+            renderControl1.SetData(mesh);
 
             // Previous mesh stats
             lbNumVert2.Text = lbNumVert.Text;
@@ -218,13 +242,25 @@ namespace MeshExplorer
             lbAreaMax.Text = Util.DoubleToString(stats.LargestArea);
             lbEdgeMin.Text = Util.DoubleToString(stats.ShortestEdge);
             lbEdgeMax.Text = Util.DoubleToString(stats.LongestEdge);
-            lbRatioMin.Text = Util.DoubleToString(stats.ShortestAltitude);
-            lbRatioMax.Text = Util.DoubleToString(stats.LargestAspectRatio);
             lbAngleMin.Text = Util.AngleToString(stats.SmallestAngle);
             lbAngleMax.Text = Util.AngleToString(stats.LargestAngle);
 
             // Enable menu items
-            viewMenuMQuality.Enabled = true;
+            viewMenuVoronoi.Enabled = true;
+
+            // Update quality
+            if (quality == null)
+            {
+                quality = new QualityMeasure();
+            }
+
+            quality.Update(this.mesh);
+
+            lbQualAlphaMin.Text = Util.DoubleToString(quality.AlphaMinimum);
+            lbQualAlphaAve.Text = Util.DoubleToString(quality.AlphaAverage);
+
+            lbQualAspectMin.Text = Util.DoubleToString(quality.Q_Minimum);
+            lbQualAspectAve.Text = Util.DoubleToString(quality.Q_Average);
         }
 
         #endregion
@@ -297,7 +333,7 @@ namespace MeshExplorer
                 if (cbQuality.Checked)
                 {
                     btnMesh.Text = "Refine";
-                    //btnSmooth.Enabled = true;
+                    btnSmooth.Enabled = true;
                 }
             }
             else
@@ -321,16 +357,15 @@ namespace MeshExplorer
                 int angle = (slMinAngle.Value * 40) / 100;
                 mesh.SetOption(Options.MinAngle, angle);
 
-                double area = slMaxArea.Value * 0.01;
+                // Ignore area constraints on initial triangulation.
 
-                if (area > 0 && area < 1)
-                {
-                    var size = input.Bounds;
-
-                    double min = Math.Min(size.Width, size.Height);
-
-                    mesh.SetOption(Options.MaxArea, area * min);
-                }
+                //double area = slMaxArea.Value * 0.01;
+                //if (area > 0 && area < 1)
+                //{
+                //    var size = input.Bounds;
+                //    double min = Math.Min(size.Width, size.Height);
+                //    mesh.SetOption(Options.MaxArea, area * min);
+                //}
             }
 
             if (cbConvex.Checked)
@@ -338,7 +373,7 @@ namespace MeshExplorer
                 mesh.SetOption(Options.Convex, true);
             }
 
-            try
+            //try
             {
                 //sw.Start();
                 mesh.Triangulate(input);
@@ -353,11 +388,11 @@ namespace MeshExplorer
                     settings.RefineMode = true;
                 }
             }
-            catch (Exception ex)
-            {
-                settings.ExceptionThrown = true;
-                DarkMessageBox.Show("Exception - Triangulate", ex.Message);
-            }
+            //catch (Exception ex)
+            //{
+            //    settings.ExceptionThrown = true;
+            //    DarkMessageBox.Show("Exception - Triangulate", ex.Message);
+            //}
 
             UpdateLog();
         }
@@ -445,21 +480,6 @@ namespace MeshExplorer
             }
         }
 
-        private void ShowQuality()
-        {
-            if (frmQuality == null)
-            {
-                frmQuality = new FormQuality();
-            }
-
-            //UpdateLog();
-
-            if (!frmQuality.Visible)
-            {
-                frmQuality.Show(this);
-            }
-        }
-
         #endregion
 
         #region Menu Handler
@@ -482,18 +502,22 @@ namespace MeshExplorer
             ShowLog();
         }
 
-        private void toolsMenuPoly1_Click(object sender, EventArgs e)
+        private void toolsMenuGenerator_Click(object sender, EventArgs e)
         {
-            input = PolygonGenerator.StarInBox(20);
-            settings.CurrentFile = "star *";
-            HandleNewInput();
-        }
+            if (frmGenerator == null || frmGenerator.IsDisposed)
+            {
+                frmGenerator = new FormGenerator();
+                frmGenerator.InputGenerated += new EventHandler(frmGenerator_InputGenerated);
+            }
 
-        private void toolsMenuRandPts_Click(object sender, EventArgs e)
-        {
-            input = PolygonGenerator.CreateRandomPoints(10, 120, 100);
-            settings.CurrentFile = "points *";
-            HandleNewInput();
+            if (!frmGenerator.Visible)
+            {
+                frmGenerator.Show();
+            }
+            else
+            {
+                frmGenerator.Activate();
+            }
         }
 
         private void toolsMenuCheck_Click(object sender, EventArgs e)
@@ -505,14 +529,24 @@ namespace MeshExplorer
             }
         }
 
-        private void viewMenuMQuality_Click(object sender, EventArgs e)
+        private void menuFileExport_Click(object sender, EventArgs e)
         {
             if (mesh != null)
             {
-                ShowQuality();
-            }
+                FormExport export = new FormExport();
 
-            frmQuality.UpdateQuality(meshRenderer1.Data);
+                if (export.ShowDialog() == DialogResult.OK)
+                {
+                    ImageWriter imgWriter = new ImageWriter();
+                    imgWriter.WritePng(this.mesh);
+                }
+            }
+        }
+
+        private void viewMenuVoronoi_Click(object sender, EventArgs e)
+        {
+            viewMenuVoronoi.Checked = !viewMenuVoronoi.Checked;
+            renderControl1.ShowVoronoi = viewMenuVoronoi.Checked;
         }
 
         private void fileMenuQuit_Click(object sender, EventArgs e)

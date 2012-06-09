@@ -21,25 +21,27 @@ namespace MeshExplorer.Controls
     /// <summary>
     /// Renders a mesh using GDI.
     /// </summary>
-    public class MeshRenderer : Control
+    public class RendererControl : Control
     {
         // Rendering stuff
         private BufferedGraphics buffer;
         private BufferedGraphicsContext context;
 
-        Pen lines = new Pen(Color.FromArgb(30, 30, 30));
-
         Zoom zoom;
         RenderData data;
+
+        MeshRenderer meshRenderer;
+        VoronoiRenderer voronoiRenderer;
+
+        RenderColors renderColors;
+
         bool initialized = false;
-        VoronoiRenderer voronoi;
         bool showVoronoi = false;
 
         string coordinate = String.Empty;
 
         Timer timer;
 
-        public long RenderTime { get; private set; }
         public RenderData Data { get { return data; } }
         public bool ShowVoronoi
         {
@@ -48,20 +50,22 @@ namespace MeshExplorer.Controls
             {
                 showVoronoi = value;
 
-                if (voronoi != null && showVoronoi)
+                if (voronoiRenderer != null && showVoronoi)
                 {
-                    voronoi.Update();
+                    voronoiRenderer.Update();
                 }
 
                 this.Render();
             }
         }
 
-        public MeshRenderer()
+        public RendererControl()
         {
             SetStyle(ControlStyles.ResizeRedraw, true);
 
-            this.BackColor = Color.Black;
+            renderColors = RenderColors.Default;
+
+            this.BackColor = renderColors.Background;
 
             zoom = new Zoom();
             context = new BufferedGraphicsContext();
@@ -86,9 +90,18 @@ namespace MeshExplorer.Controls
             this.Invalidate();
         }
 
+        public void ShowQuality(int measure)
+        {
+            //Tuple<int, byte>[] q = TriangleQuality.Measure(data, measure);
+
+            //this.RenderQualities(q);
+        }
+
         public void SetData(InputGeometry mesh)
         {
             data.SetData(mesh);
+
+            meshRenderer = new MeshRenderer(data);
 
             // Reset the zoom on new data
             zoom.Initialize(this.ClientRectangle, data.Bounds);
@@ -100,10 +113,12 @@ namespace MeshExplorer.Controls
 
         public void SetData(Mesh mesh)
         {
-            voronoi = new VoronoiRenderer(mesh);
-            voronoi.Update();
-
             data.SetData(mesh);
+
+            meshRenderer = new MeshRenderer(data);
+
+            voronoiRenderer = new VoronoiRenderer(mesh);
+            voronoiRenderer.Update();
 
             initialized = true;
 
@@ -154,108 +169,14 @@ namespace MeshExplorer.Controls
             }
         }
 
-        private void RenderPoints(Graphics g)
-        {
-            PointF pt;
-            PointF[] pts = data.Points;
-            int i, n;
-
-            // Draw input points
-            n = data.NumberOfInputPoints;
-            for (i = 0; i < n; i++)
-            {
-                if (zoom.ViewportContains(pts[i]))
-                {
-                    pt = zoom.WorldToScreen(pts[i]);
-                    g.FillEllipse(Brushes.Green, pt.X - 1.5f, pt.Y - 1.5f, 3, 3);
-                    //g.FillEllipse(Brushes.Black, pt.X - 2, pt.Y - 2, 4, 4);
-                    //g.DrawEllipse(Pens.Green, pt.X - 2, pt.Y - 2, 4, 4);
-                }
-            }
-
-            // Draw Steiner points
-            n = pts.Length;
-            for (; i < n; i++)
-            {
-                if (zoom.ViewportContains(pts[i]))
-                {
-                    pt = zoom.WorldToScreen(pts[i]);
-                    g.FillEllipse(Brushes.Peru, pt.X - 1.5f, pt.Y - 1.5f, 3, 3);
-                    //g.FillEllipse(Brushes.Black, pt.X - 2, pt.Y - 2, 4, 4);
-                    //g.DrawEllipse(Pens.Peru, pt.X - 2, pt.Y - 2, 4, 4);
-                }
-            }
-        }
-
-        private void RenderTriangles(Graphics g)
-        {
-            PointF p0, p1, p2;
-            PointF[] pts = data.Points;
-
-            var triangles = data.Triangles;
-
-            // Draw triangles
-            foreach (var tri in triangles)
-            {
-                if (zoom.ViewportContains(pts[tri.P0]) ||
-                    zoom.ViewportContains(pts[tri.P1]) ||
-                    zoom.ViewportContains(pts[tri.P2]))
-                {
-                    p0 = zoom.WorldToScreen(pts[tri.P0]);
-                    p1 = zoom.WorldToScreen(pts[tri.P1]);
-                    p2 = zoom.WorldToScreen(pts[tri.P2]);
-
-                    g.DrawLine(lines, p0, p1);
-                    g.DrawLine(lines, p1, p2);
-                    g.DrawLine(lines, p2, p0);
-                }
-            }
-        }
-
-        private void RenderEdges(Graphics g)
-        {
-            PointF p0, p1;
-            PointF[] pts = data.Points;
-
-            var edges = data.Edges;
-
-            // Draw edges
-            foreach (var edge in edges)
-            {
-                if (zoom.ViewportContains(pts[edge.P0]) ||
-                    zoom.ViewportContains(pts[edge.P1]))
-                {
-                    p0 = zoom.WorldToScreen(pts[edge.P0]);
-                    p1 = zoom.WorldToScreen(pts[edge.P1]);
-
-                    g.DrawLine(lines, p0, p1);
-                }
-            }
-        }
-
-        private void RenderSegments(Graphics g)
-        {
-            PointF p0, p1;
-            PointF[] pts = data.Points;
-
-            var segments = data.Segments;
-
-            foreach (var seg in segments)
-            {
-                if (zoom.ViewportContains(pts[seg.P0]) ||
-                    zoom.ViewportContains(pts[seg.P1]))
-                {
-                    p0 = zoom.WorldToScreen(pts[seg.P0]);
-                    p1 = zoom.WorldToScreen(pts[seg.P1]);
-
-                    g.DrawLine(Pens.DarkBlue, p0, p1);
-                }
-            }
-        }
-
         private void Render()
         {
             coordinate = String.Empty;
+
+            if (buffer == null)
+            {
+                return;
+            }
 
             Graphics g = buffer.Graphics;
             g.Clear(this.BackColor);
@@ -267,39 +188,65 @@ namespace MeshExplorer.Controls
 
             g.SmoothingMode = SmoothingMode.AntiAlias;
 
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-
-            if (data.Edges != null)
+            if (meshRenderer != null)
             {
-                this.RenderEdges(g);
-            }
-            else if (data.Triangles != null)
-            {
-                this.RenderTriangles(g);
+                meshRenderer.Render(g, zoom, renderColors);
             }
 
-            if (voronoi != null && this.showVoronoi)
+            if (voronoiRenderer != null && this.showVoronoi)
             {
-                voronoi.Render(g, zoom);
+                voronoiRenderer.Render(g, zoom, renderColors);
             }
-
-            if (data.Segments != null)
-            {
-                this.RenderSegments(g);
-            }
-
-            if (data.Points != null)
-            {
-                this.RenderPoints(g);
-            }
-
-            stopwatch.Stop();
-
-            this.RenderTime = stopwatch.ElapsedMilliseconds;
 
             this.Invalidate();
         }
+
+        /*
+        private void RenderQualitiesX(Tuple<int, byte>[] q)
+        {
+            PointF[] p = new PointF[3];
+            PointF[] pts = data.Points;
+
+            int[] tri;
+
+            Brush q1 = new SolidBrush(Color.FromArgb(50, Color.Orange));
+            Brush q2 = new SolidBrush(Color.FromArgb(50, Color.Red));
+
+            Graphics g = buffer.Graphics;
+
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+
+            int n = q.Length;
+
+            for (int i = 0; i < n; i++)
+            {
+                tri = data.Triangles[q[i].Item1];
+
+                if (zoom.ViewportContains(pts[tri[0]]) ||
+                    zoom.ViewportContains(pts[tri[1]]) ||
+                    zoom.ViewportContains(pts[tri[2]]))
+                {
+                    p[0] = zoom.WorldToScreen(pts[tri[0]]);
+                    p[1] = zoom.WorldToScreen(pts[tri[1]]);
+                    p[2] = zoom.WorldToScreen(pts[tri[2]]);
+
+                    // Fill
+                    g.FillPolygon(q[i].Item2 > 1 ? q2 : q1, p);
+
+                    // Outline
+                    g.DrawLine(lines, p[0], p[1]);
+                    g.DrawLine(lines, p[1], p[2]);
+                    g.DrawLine(lines, p[2], p[0]);
+
+                    // Points
+                    g.FillEllipse(Brushes.Green, p[0].X - 1.5f, p[0].Y - 1.5f, 3, 3);
+                    g.FillEllipse(Brushes.Green, p[1].X - 1.5f, p[1].Y - 1.5f, 3, 3);
+                    g.FillEllipse(Brushes.Green, p[2].X - 1.5f, p[2].Y - 1.5f, 3, 3);
+                }
+            }
+
+            this.Invalidate();
+        }*/
 
         #region Control overrides
 

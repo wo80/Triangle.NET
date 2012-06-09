@@ -22,8 +22,7 @@ namespace MeshExplorer.Rendering
         Mesh mesh;
         Voronoi simpleVoro;
         BoundedVoronoi boundedVoro;
-
-        Pen lines = new Pen(Color.FromArgb(40, 50, 60));
+        RenderColors renderColors;
 
         public VoronoiRenderer(Mesh mesh)
         {
@@ -59,8 +58,10 @@ namespace MeshExplorer.Rendering
             boundedVoro = null;
         }
 
-        internal void Render(Graphics g, Zoom zoom)
+        public void Render(Graphics g, Zoom zoom, RenderColors renderColors)
         {
+            this.renderColors = renderColors;
+
             if (simpleVoro != null)
             {
                 RenderSimple(g, zoom);
@@ -78,12 +79,7 @@ namespace MeshExplorer.Rendering
         {
             PointF p0, p1;
 
-            BBox bounds = new BBox(mesh.Bounds);
-
             TriangleNet.Geometry.Point[] points = simpleVoro.Points;
-
-            // Enlarge 50%
-            bounds.Extend(0.5f);
 
             // Draw edges
             int n = simpleVoro.Edges == null ? 0 : simpleVoro.Edges.Length;
@@ -97,23 +93,20 @@ namespace MeshExplorer.Rendering
                     // Infinite voronoi edge
                     p0 = new PointF((float)points[seg.P0].X, (float)points[seg.P0].Y);
 
-                    if (!BoxRayIntersection(bounds, points[seg.P0], simpleVoro.Directions[i], out p1))
+                    if (zoom.ViewportContains(p0) &&
+                        BoxRayIntersection(points[seg.P0], simpleVoro.Directions[i], out p1))
                     {
-                        continue;
+                        RenderEdge(g, zoom, p0, p1);
                     }
                 }
                 else
                 {
                     p0 = new PointF((float)points[seg.P0].X, (float)points[seg.P0].Y);
                     p1 = new PointF((float)points[seg.P1].X, (float)points[seg.P1].Y);
+
+                    RenderEdge(g, zoom, p0, p1);
                 }
-
-                // Draw line
-                RenderEdge(g, zoom, p0, p1);
             }
-
-            // Shrink 50%
-            bounds.Extend(-0.5f);
 
             // Scale the points radius to 2 pixel.
             //float radius = 1.5f / scale, x, y;
@@ -157,11 +150,11 @@ namespace MeshExplorer.Rendering
                 p0 = zoom.WorldToScreen(p0);
                 p1 = zoom.WorldToScreen(p1);
 
-                g.DrawLine(lines, p0, p1);
+                g.DrawLine(renderColors.VoronoiLine, p0, p1);
             }
         }
 
-        private bool BoxRayIntersection(BBox bounds, TriangleNet.Geometry.Point pt,
+        private bool BoxRayIntersection(TriangleNet.Geometry.Point pt,
             TriangleNet.Geometry.Point direction, out PointF intersect)
         {
             double x = pt.X;
@@ -171,10 +164,21 @@ namespace MeshExplorer.Rendering
 
             double t1, x1, y1, t2, x2, y2;
 
+            // Bounding box (50% enlarged)
+            var box = mesh.Bounds;
+
+            double dw = box.Width * 0.5f;
+            double dh = box.Height * 0.5f;
+
+            double minX = box.Xmin - dw;
+            double maxX = box.Xmax + dw;
+            double minY = box.Ymin - dh;
+            double maxY = box.Ymax + dh;
+
             intersect = new PointF();
 
             // Check if point is inside the bounds
-            if (x < bounds.MinX || x > bounds.MaxX || y < bounds.MinY || y > bounds.MaxY)
+            if (x < minX || x > maxX || y < minY || y > maxY)
             {
                 return false;
             }
@@ -182,16 +186,16 @@ namespace MeshExplorer.Rendering
             // Calculate the cut through the vertical boundaries
             if (dx < 0)
             {
-                // Line going to the left: intersect with x = bounds.MinX
-                t1 = (bounds.MinX - x) / dx;
-                x1 = bounds.MinX;
+                // Line going to the left: intersect with x = minX
+                t1 = (minX - x) / dx;
+                x1 = minX;
                 y1 = y + t1 * dy;
             }
             else if (dx > 0)
             {
-                // Line going to the right: intersect with x = bounds.MaxX
-                t1 = (bounds.MaxX - x) / dx;
-                x1 = bounds.MaxX;
+                // Line going to the right: intersect with x = maxX
+                t1 = (maxX - x) / dx;
+                x1 = maxX;
                 y1 = y + t1 * dy;
             }
             else
@@ -204,17 +208,17 @@ namespace MeshExplorer.Rendering
             // Calculate the cut through upper and lower boundaries
             if (dy < 0)
             {
-                // Line going downwards: intersect with y = bounds.MinY
-                t2 = (bounds.MinY - y) / dy;
+                // Line going downwards: intersect with y = minY
+                t2 = (minY - y) / dy;
                 x2 = x + t2 * dx;
-                y2 = bounds.MinY;
+                y2 = minY;
             }
             else if (dx > 0)
             {
-                // Line going upwards: intersect with y = bounds.MaxY
-                t2 = (bounds.MaxY - y) / dy;
+                // Line going upwards: intersect with y = maxY
+                t2 = (maxY - y) / dy;
                 x2 = x + t2 * dx;
-                y2 = bounds.MaxY;
+                y2 = maxY;
             }
             else
             {
@@ -235,39 +239,6 @@ namespace MeshExplorer.Rendering
             }
 
             return true;
-        }
-
-        /// <summary>
-        /// Bounding box.
-        /// </summary>
-        struct BBox
-        {
-            public float MinX;
-            public float MaxX;
-            public float MinY;
-            public float MaxY;
-
-            public float Width { get { return MaxX - MinX; } }
-            public float Height { get { return MaxY - MinY; } }
-
-            public BBox(TriangleNet.Geometry.BoundingBox box)
-            {
-                MinX = (float)box.Xmin;
-                MaxX = (float)box.Xmax;
-                MinY = (float)box.Ymin;
-                MaxY = (float)box.Ymax;
-            }
-
-            public void Extend(float amount)
-            {
-                float dx = amount * this.Width;
-                float dy = amount * this.Height;
-
-                MinX -= dx;
-                MaxX += dx;
-                MinY -= dy;
-                MaxY += dy;
-            }
         }
     }
 }

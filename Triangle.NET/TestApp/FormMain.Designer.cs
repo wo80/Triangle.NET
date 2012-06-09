@@ -31,65 +31,76 @@
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.btnSmooth = new MeshExplorer.Controls.DarkButton();
             this.btnMesh = new MeshExplorer.Controls.DarkButton();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.lbNumSeg = new System.Windows.Forms.Label();
-            this.lbNumSeg2 = new System.Windows.Forms.Label();
-            this.lbNumTri = new System.Windows.Forms.Label();
-            this.lbNumTri2 = new System.Windows.Forms.Label();
-            this.lbNumVert = new System.Windows.Forms.Label();
-            this.lbNumVert2 = new System.Windows.Forms.Label();
             this.flatTabControl1 = new MeshExplorer.Controls.DarkTabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.label20 = new System.Windows.Forms.Label();
             this.lbMaxArea = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
             this.lbMinAngle = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.lbNumSeg = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
+            this.lbNumSeg2 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
+            this.lbNumTri = new System.Windows.Forms.Label();
             this.slMaxArea = new MeshExplorer.Controls.DarkSlider();
+            this.lbNumTri2 = new System.Windows.Forms.Label();
             this.slMinAngle = new MeshExplorer.Controls.DarkSlider();
+            this.lbNumVert = new System.Windows.Forms.Label();
             this.cbConvex = new MeshExplorer.Controls.DarkCheckBox();
+            this.lbNumVert2 = new System.Windows.Forms.Label();
             this.cbQuality = new MeshExplorer.Controls.DarkCheckBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.label32 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
+            this.label31 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
             this.label16 = new System.Windows.Forms.Label();
-            this.label15 = new System.Windows.Forms.Label();
+            this.label29 = new System.Windows.Forms.Label();
             this.label14 = new System.Windows.Forms.Label();
             this.lbAngleMax = new System.Windows.Forms.Label();
-            this.lbRatioMax = new System.Windows.Forms.Label();
+            this.lbQualAspectAve = new System.Windows.Forms.Label();
             this.lbEdgeMax = new System.Windows.Forms.Label();
+            this.lbQualAlphaAve = new System.Windows.Forms.Label();
             this.lbAreaMax = new System.Windows.Forms.Label();
             this.lbAngleMin = new System.Windows.Forms.Label();
-            this.lbRatioMin = new System.Windows.Forms.Label();
+            this.lbQualAspectMin = new System.Windows.Forms.Label();
             this.lbEdgeMin = new System.Windows.Forms.Label();
+            this.lbQualAlphaMin = new System.Windows.Forms.Label();
             this.lbAreaMin = new System.Windows.Forms.Label();
+            this.label22 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.label17 = new System.Windows.Forms.Label();
+            this.label21 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
             this.angleHistogram1 = new MeshExplorer.Controls.AngleHistogram();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.lbCodeplex = new System.Windows.Forms.Label();
+            this.label15 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
+            this.label19 = new System.Windows.Forms.Label();
+            this.label18 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.lbShortcuts = new System.Windows.Forms.Label();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.fileMenuOpen = new System.Windows.Forms.ToolStripMenuItem();
             this.fileMenuSave = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuFileExport = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.fileMenuQuit = new System.Windows.Forms.ToolStripMenuItem();
             this.viewMenu = new System.Windows.Forms.ToolStripMenuItem();
-            this.viewMenuMQuality = new System.Windows.Forms.ToolStripMenuItem();
+            this.viewMenuVoronoi = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.viewMenuLog = new System.Windows.Forms.ToolStripMenuItem();
             this.toolsMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.toolsMenuGen = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolsMenuPoly1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolsMenuRandPts = new System.Windows.Forms.ToolStripMenuItem();
             this.toolsMenuCheck = new System.Windows.Forms.ToolStripMenuItem();
-            this.meshRenderer1 = new MeshExplorer.Controls.MeshRenderer();
+            this.renderControl1 = new MeshExplorer.Controls.RendererControl();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -115,22 +126,13 @@
             this.splitContainer1.Panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(76)))), ((int)(((byte)(76)))));
             this.splitContainer1.Panel1.Controls.Add(this.btnSmooth);
             this.splitContainer1.Panel1.Controls.Add(this.btnMesh);
-            this.splitContainer1.Panel1.Controls.Add(this.label4);
-            this.splitContainer1.Panel1.Controls.Add(this.label3);
-            this.splitContainer1.Panel1.Controls.Add(this.label2);
-            this.splitContainer1.Panel1.Controls.Add(this.lbNumSeg);
-            this.splitContainer1.Panel1.Controls.Add(this.lbNumSeg2);
-            this.splitContainer1.Panel1.Controls.Add(this.lbNumTri);
-            this.splitContainer1.Panel1.Controls.Add(this.lbNumTri2);
-            this.splitContainer1.Panel1.Controls.Add(this.lbNumVert);
-            this.splitContainer1.Panel1.Controls.Add(this.lbNumVert2);
             this.splitContainer1.Panel1.Controls.Add(this.flatTabControl1);
             this.splitContainer1.Panel1.Controls.Add(this.menuStrip1);
             // 
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.BackColor = System.Drawing.Color.Black;
-            this.splitContainer1.Panel2.Controls.Add(this.meshRenderer1);
+            this.splitContainer1.Panel2.Controls.Add(this.renderControl1);
             this.splitContainer1.Size = new System.Drawing.Size(984, 612);
             this.splitContainer1.SplitterDistance = 280;
             this.splitContainer1.SplitterWidth = 1;
@@ -139,7 +141,7 @@
             // btnSmooth
             // 
             this.btnSmooth.Enabled = false;
-            this.btnSmooth.Location = new System.Drawing.Point(150, 196);
+            this.btnSmooth.Location = new System.Drawing.Point(149, 39);
             this.btnSmooth.Name = "btnSmooth";
             this.btnSmooth.Size = new System.Drawing.Size(126, 23);
             this.btnSmooth.TabIndex = 12;
@@ -150,7 +152,7 @@
             // btnMesh
             // 
             this.btnMesh.Enabled = false;
-            this.btnMesh.Location = new System.Drawing.Point(4, 196);
+            this.btnMesh.Location = new System.Drawing.Point(3, 39);
             this.btnMesh.Name = "btnMesh";
             this.btnMesh.Size = new System.Drawing.Size(126, 23);
             this.btnMesh.TabIndex = 12;
@@ -158,132 +160,64 @@
             this.btnMesh.UseVisualStyleBackColor = true;
             this.btnMesh.Click += new System.EventHandler(this.btnMesh_Click);
             // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.ForeColor = System.Drawing.Color.Gray;
-            this.label4.Location = new System.Drawing.Point(12, 121);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(60, 13);
-            this.label4.TabIndex = 7;
-            this.label4.Text = "Segments:";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.ForeColor = System.Drawing.Color.Gray;
-            this.label3.Location = new System.Drawing.Point(12, 142);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(56, 13);
-            this.label3.TabIndex = 9;
-            this.label3.Text = "Triangles:";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.ForeColor = System.Drawing.Color.Gray;
-            this.label2.Location = new System.Drawing.Point(12, 100);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(50, 13);
-            this.label2.TabIndex = 11;
-            this.label2.Text = "Vertices:";
-            // 
-            // lbNumSeg
-            // 
-            this.lbNumSeg.ForeColor = System.Drawing.Color.White;
-            this.lbNumSeg.Location = new System.Drawing.Point(95, 121);
-            this.lbNumSeg.Name = "lbNumSeg";
-            this.lbNumSeg.Size = new System.Drawing.Size(70, 13);
-            this.lbNumSeg.TabIndex = 3;
-            this.lbNumSeg.Text = "-";
-            this.lbNumSeg.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
-            // lbNumSeg2
-            // 
-            this.lbNumSeg2.ForeColor = System.Drawing.Color.Gray;
-            this.lbNumSeg2.Location = new System.Drawing.Point(182, 121);
-            this.lbNumSeg2.Name = "lbNumSeg2";
-            this.lbNumSeg2.Size = new System.Drawing.Size(70, 13);
-            this.lbNumSeg2.TabIndex = 3;
-            this.lbNumSeg2.Text = "-";
-            this.lbNumSeg2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
-            // lbNumTri
-            // 
-            this.lbNumTri.ForeColor = System.Drawing.Color.White;
-            this.lbNumTri.Location = new System.Drawing.Point(95, 142);
-            this.lbNumTri.Name = "lbNumTri";
-            this.lbNumTri.Size = new System.Drawing.Size(70, 13);
-            this.lbNumTri.TabIndex = 2;
-            this.lbNumTri.Text = "-";
-            this.lbNumTri.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
-            // lbNumTri2
-            // 
-            this.lbNumTri2.ForeColor = System.Drawing.Color.Gray;
-            this.lbNumTri2.Location = new System.Drawing.Point(182, 142);
-            this.lbNumTri2.Name = "lbNumTri2";
-            this.lbNumTri2.Size = new System.Drawing.Size(70, 13);
-            this.lbNumTri2.TabIndex = 2;
-            this.lbNumTri2.Text = "-";
-            this.lbNumTri2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
-            // lbNumVert
-            // 
-            this.lbNumVert.ForeColor = System.Drawing.Color.White;
-            this.lbNumVert.Location = new System.Drawing.Point(95, 100);
-            this.lbNumVert.Name = "lbNumVert";
-            this.lbNumVert.Size = new System.Drawing.Size(70, 13);
-            this.lbNumVert.TabIndex = 4;
-            this.lbNumVert.Text = "-";
-            this.lbNumVert.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
-            // lbNumVert2
-            // 
-            this.lbNumVert2.ForeColor = System.Drawing.Color.Gray;
-            this.lbNumVert2.Location = new System.Drawing.Point(182, 100);
-            this.lbNumVert2.Name = "lbNumVert2";
-            this.lbNumVert2.Size = new System.Drawing.Size(70, 13);
-            this.lbNumVert2.TabIndex = 4;
-            this.lbNumVert2.Text = "-";
-            this.lbNumVert2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
             // flatTabControl1
             // 
             this.flatTabControl1.Alignment = System.Windows.Forms.TabAlignment.Bottom;
             this.flatTabControl1.Controls.Add(this.tabPage1);
             this.flatTabControl1.Controls.Add(this.tabPage2);
             this.flatTabControl1.Controls.Add(this.tabPage3);
-            this.flatTabControl1.Location = new System.Drawing.Point(0, 224);
+            this.flatTabControl1.Location = new System.Drawing.Point(0, 83);
             this.flatTabControl1.Name = "flatTabControl1";
             this.flatTabControl1.SelectedIndex = 0;
-            this.flatTabControl1.Size = new System.Drawing.Size(280, 387);
+            this.flatTabControl1.Size = new System.Drawing.Size(280, 528);
             this.flatTabControl1.TabIndex = 1;
             // 
             // tabPage1
             // 
             this.tabPage1.BackColor = System.Drawing.Color.DimGray;
+            this.tabPage1.Controls.Add(this.label20);
             this.tabPage1.Controls.Add(this.lbMaxArea);
             this.tabPage1.Controls.Add(this.label6);
+            this.tabPage1.Controls.Add(this.label4);
             this.tabPage1.Controls.Add(this.lbMinAngle);
+            this.tabPage1.Controls.Add(this.label3);
             this.tabPage1.Controls.Add(this.label9);
+            this.tabPage1.Controls.Add(this.label2);
+            this.tabPage1.Controls.Add(this.lbNumSeg);
             this.tabPage1.Controls.Add(this.label8);
+            this.tabPage1.Controls.Add(this.lbNumSeg2);
             this.tabPage1.Controls.Add(this.label5);
+            this.tabPage1.Controls.Add(this.lbNumTri);
             this.tabPage1.Controls.Add(this.slMaxArea);
+            this.tabPage1.Controls.Add(this.lbNumTri2);
             this.tabPage1.Controls.Add(this.slMinAngle);
+            this.tabPage1.Controls.Add(this.lbNumVert);
             this.tabPage1.Controls.Add(this.cbConvex);
+            this.tabPage1.Controls.Add(this.lbNumVert2);
             this.tabPage1.Controls.Add(this.cbQuality);
-            this.tabPage1.ForeColor = System.Drawing.Color.White;
+            this.tabPage1.ForeColor = System.Drawing.Color.DarkGray;
             this.tabPage1.Location = new System.Drawing.Point(4, 4);
             this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Size = new System.Drawing.Size(272, 358);
+            this.tabPage1.Size = new System.Drawing.Size(272, 499);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Mesh Control";
+            // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label20.ForeColor = System.Drawing.Color.White;
+            this.label20.Location = new System.Drawing.Point(8, 12);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(89, 13);
+            this.label20.TabIndex = 15;
+            this.label20.Text = "Mesh Elements:";
             // 
             // lbMaxArea
             // 
             this.lbMaxArea.AutoSize = true;
-            this.lbMaxArea.Location = new System.Drawing.Point(227, 61);
+            this.lbMaxArea.ForeColor = System.Drawing.Color.White;
+            this.lbMaxArea.Location = new System.Drawing.Point(227, 191);
             this.lbMaxArea.Name = "lbMaxArea";
             this.lbMaxArea.Size = new System.Drawing.Size(13, 13);
             this.lbMaxArea.TabIndex = 14;
@@ -292,56 +226,119 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(8, 61);
+            this.label6.ForeColor = System.Drawing.Color.White;
+            this.label6.Location = new System.Drawing.Point(8, 191);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(81, 13);
             this.label6.TabIndex = 14;
             this.label6.Text = "Maximum area";
             // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.ForeColor = System.Drawing.Color.DarkGray;
+            this.label4.Location = new System.Drawing.Point(8, 59);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(60, 13);
+            this.label4.TabIndex = 7;
+            this.label4.Text = "Segments:";
+            // 
             // lbMinAngle
             // 
             this.lbMinAngle.AutoSize = true;
-            this.lbMinAngle.Location = new System.Drawing.Point(227, 39);
+            this.lbMinAngle.ForeColor = System.Drawing.Color.White;
+            this.lbMinAngle.Location = new System.Drawing.Point(227, 169);
             this.lbMinAngle.Name = "lbMinAngle";
             this.lbMinAngle.Size = new System.Drawing.Size(19, 13);
             this.lbMinAngle.TabIndex = 14;
             this.lbMinAngle.Text = "20";
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.ForeColor = System.Drawing.Color.DarkGray;
+            this.label3.Location = new System.Drawing.Point(8, 80);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(56, 13);
+            this.label3.TabIndex = 9;
+            this.label3.Text = "Triangles:";
+            // 
             // label9
             // 
             this.label9.BackColor = System.Drawing.Color.DimGray;
             this.label9.ForeColor = System.Drawing.Color.DarkGray;
-            this.label9.Location = new System.Drawing.Point(8, 166);
+            this.label9.Location = new System.Drawing.Point(8, 296);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(258, 33);
             this.label9.TabIndex = 14;
             this.label9.Text = "Use the convex mesh option, if the convex hull should be included in the output.";
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.ForeColor = System.Drawing.Color.DarkGray;
+            this.label2.Location = new System.Drawing.Point(8, 39);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(50, 13);
+            this.label2.TabIndex = 11;
+            this.label2.Text = "Vertices:";
+            // 
+            // lbNumSeg
+            // 
+            this.lbNumSeg.ForeColor = System.Drawing.Color.White;
+            this.lbNumSeg.Location = new System.Drawing.Point(92, 59);
+            this.lbNumSeg.Name = "lbNumSeg";
+            this.lbNumSeg.Size = new System.Drawing.Size(70, 13);
+            this.lbNumSeg.TabIndex = 3;
+            this.lbNumSeg.Text = "-";
+            this.lbNumSeg.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
             // label8
             // 
             this.label8.BackColor = System.Drawing.Color.DimGray;
             this.label8.ForeColor = System.Drawing.Color.DarkGray;
-            this.label8.Location = new System.Drawing.Point(8, 85);
+            this.label8.Location = new System.Drawing.Point(8, 215);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(258, 33);
             this.label8.TabIndex = 14;
             this.label8.Text = "Hint: maximum area values of 0 or 1 will be irgnored (no area constraints are set" +
     ").";
             // 
+            // lbNumSeg2
+            // 
+            this.lbNumSeg2.ForeColor = System.Drawing.Color.DarkGray;
+            this.lbNumSeg2.Location = new System.Drawing.Point(182, 59);
+            this.lbNumSeg2.Name = "lbNumSeg2";
+            this.lbNumSeg2.Size = new System.Drawing.Size(70, 13);
+            this.lbNumSeg2.TabIndex = 3;
+            this.lbNumSeg2.Text = "-";
+            this.lbNumSeg2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(8, 39);
+            this.label5.ForeColor = System.Drawing.Color.White;
+            this.label5.Location = new System.Drawing.Point(8, 169);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(87, 13);
             this.label5.TabIndex = 14;
             this.label5.Text = "Minimum angle";
             // 
+            // lbNumTri
+            // 
+            this.lbNumTri.ForeColor = System.Drawing.Color.White;
+            this.lbNumTri.Location = new System.Drawing.Point(92, 80);
+            this.lbNumTri.Name = "lbNumTri";
+            this.lbNumTri.Size = new System.Drawing.Size(70, 13);
+            this.lbNumTri.TabIndex = 2;
+            this.lbNumTri.Text = "-";
+            this.lbNumTri.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
             // slMaxArea
             // 
             this.slMaxArea.BackColor = System.Drawing.Color.Transparent;
             this.slMaxArea.CriticalPercent = ((uint)(0u));
-            this.slMaxArea.Location = new System.Drawing.Point(102, 58);
+            this.slMaxArea.Location = new System.Drawing.Point(102, 188);
             this.slMaxArea.Maximum = 100;
             this.slMaxArea.Minimum = 0;
             this.slMaxArea.Name = "slMaxArea";
@@ -351,11 +348,21 @@
             this.slMaxArea.Value = 0;
             this.slMaxArea.ValueChanging += new System.EventHandler(this.slMaxArea_ValueChanging);
             // 
+            // lbNumTri2
+            // 
+            this.lbNumTri2.ForeColor = System.Drawing.Color.DarkGray;
+            this.lbNumTri2.Location = new System.Drawing.Point(182, 80);
+            this.lbNumTri2.Name = "lbNumTri2";
+            this.lbNumTri2.Size = new System.Drawing.Size(70, 13);
+            this.lbNumTri2.TabIndex = 2;
+            this.lbNumTri2.Text = "-";
+            this.lbNumTri2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
             // slMinAngle
             // 
             this.slMinAngle.BackColor = System.Drawing.Color.Transparent;
             this.slMinAngle.CriticalPercent = ((uint)(89u));
-            this.slMinAngle.Location = new System.Drawing.Point(102, 36);
+            this.slMinAngle.Location = new System.Drawing.Point(102, 166);
             this.slMinAngle.Maximum = 100;
             this.slMinAngle.Minimum = 0;
             this.slMinAngle.Name = "slMinAngle";
@@ -365,22 +372,42 @@
             this.slMinAngle.Value = 50;
             this.slMinAngle.ValueChanging += new System.EventHandler(this.slMinAngle_ValueChanging);
             // 
+            // lbNumVert
+            // 
+            this.lbNumVert.ForeColor = System.Drawing.Color.White;
+            this.lbNumVert.Location = new System.Drawing.Point(92, 39);
+            this.lbNumVert.Name = "lbNumVert";
+            this.lbNumVert.Size = new System.Drawing.Size(70, 13);
+            this.lbNumVert.TabIndex = 4;
+            this.lbNumVert.Text = "-";
+            this.lbNumVert.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
             // cbConvex
             // 
             this.cbConvex.BackColor = System.Drawing.Color.DimGray;
             this.cbConvex.Checked = false;
-            this.cbConvex.Location = new System.Drawing.Point(11, 146);
+            this.cbConvex.Location = new System.Drawing.Point(11, 276);
             this.cbConvex.Name = "cbConvex";
             this.cbConvex.Size = new System.Drawing.Size(115, 17);
             this.cbConvex.TabIndex = 0;
             this.cbConvex.Text = "Convex mesh";
             this.cbConvex.UseVisualStyleBackColor = false;
             // 
+            // lbNumVert2
+            // 
+            this.lbNumVert2.ForeColor = System.Drawing.Color.DarkGray;
+            this.lbNumVert2.Location = new System.Drawing.Point(182, 39);
+            this.lbNumVert2.Name = "lbNumVert2";
+            this.lbNumVert2.Size = new System.Drawing.Size(70, 13);
+            this.lbNumVert2.TabIndex = 4;
+            this.lbNumVert2.Text = "-";
+            this.lbNumVert2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
             // cbQuality
             // 
             this.cbQuality.BackColor = System.Drawing.Color.DimGray;
             this.cbQuality.Checked = false;
-            this.cbQuality.Location = new System.Drawing.Point(11, 13);
+            this.cbQuality.Location = new System.Drawing.Point(11, 143);
             this.cbQuality.Name = "cbQuality";
             this.cbQuality.Size = new System.Drawing.Size(115, 17);
             this.cbQuality.TabIndex = 0;
@@ -390,30 +417,46 @@
             // tabPage2
             // 
             this.tabPage2.BackColor = System.Drawing.Color.DimGray;
+            this.tabPage2.Controls.Add(this.label32);
             this.tabPage2.Controls.Add(this.label13);
+            this.tabPage2.Controls.Add(this.label31);
             this.tabPage2.Controls.Add(this.label12);
             this.tabPage2.Controls.Add(this.label16);
-            this.tabPage2.Controls.Add(this.label15);
+            this.tabPage2.Controls.Add(this.label29);
             this.tabPage2.Controls.Add(this.label14);
             this.tabPage2.Controls.Add(this.lbAngleMax);
-            this.tabPage2.Controls.Add(this.lbRatioMax);
+            this.tabPage2.Controls.Add(this.lbQualAspectAve);
             this.tabPage2.Controls.Add(this.lbEdgeMax);
+            this.tabPage2.Controls.Add(this.lbQualAlphaAve);
             this.tabPage2.Controls.Add(this.lbAreaMax);
             this.tabPage2.Controls.Add(this.lbAngleMin);
-            this.tabPage2.Controls.Add(this.lbRatioMin);
+            this.tabPage2.Controls.Add(this.lbQualAspectMin);
             this.tabPage2.Controls.Add(this.lbEdgeMin);
+            this.tabPage2.Controls.Add(this.lbQualAlphaMin);
             this.tabPage2.Controls.Add(this.lbAreaMin);
+            this.tabPage2.Controls.Add(this.label22);
             this.tabPage2.Controls.Add(this.label10);
             this.tabPage2.Controls.Add(this.label17);
+            this.tabPage2.Controls.Add(this.label21);
             this.tabPage2.Controls.Add(this.label11);
             this.tabPage2.Controls.Add(this.angleHistogram1);
             this.tabPage2.ForeColor = System.Drawing.Color.White;
             this.tabPage2.Location = new System.Drawing.Point(4, 4);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(272, 358);
+            this.tabPage2.Size = new System.Drawing.Size(272, 499);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Statistic";
+            // 
+            // label32
+            // 
+            this.label32.AutoSize = true;
+            this.label32.ForeColor = System.Drawing.Color.DarkGray;
+            this.label32.Location = new System.Drawing.Point(204, 156);
+            this.label32.Name = "label32";
+            this.label32.Size = new System.Drawing.Size(48, 13);
+            this.label32.TabIndex = 11;
+            this.label32.Text = "Average";
             // 
             // label13
             // 
@@ -424,6 +467,16 @@
             this.label13.Size = new System.Drawing.Size(56, 13);
             this.label13.TabIndex = 11;
             this.label13.Text = "Maximum";
+            // 
+            // label31
+            // 
+            this.label31.AutoSize = true;
+            this.label31.ForeColor = System.Drawing.Color.DarkGray;
+            this.label31.Location = new System.Drawing.Point(106, 156);
+            this.label31.Name = "label31";
+            this.label31.Size = new System.Drawing.Size(55, 13);
+            this.label31.TabIndex = 12;
+            this.label31.Text = "Minimum";
             // 
             // label12
             // 
@@ -439,27 +492,27 @@
             // 
             this.label16.AutoSize = true;
             this.label16.ForeColor = System.Drawing.Color.DarkGray;
-            this.label16.Location = new System.Drawing.Point(8, 107);
+            this.label16.Location = new System.Drawing.Point(8, 80);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(40, 13);
             this.label16.TabIndex = 9;
             this.label16.Text = "Angle:";
             // 
-            // label15
+            // label29
             // 
-            this.label15.AutoSize = true;
-            this.label15.ForeColor = System.Drawing.Color.DarkGray;
-            this.label15.Location = new System.Drawing.Point(8, 84);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(71, 13);
-            this.label15.TabIndex = 10;
-            this.label15.Text = "Aspect ratio:";
+            this.label29.AutoSize = true;
+            this.label29.ForeColor = System.Drawing.Color.DarkGray;
+            this.label29.Location = new System.Drawing.Point(9, 203);
+            this.label29.Name = "label29";
+            this.label29.Size = new System.Drawing.Size(71, 13);
+            this.label29.TabIndex = 15;
+            this.label29.Text = "Aspect ratio:";
             // 
             // label14
             // 
             this.label14.AutoSize = true;
             this.label14.ForeColor = System.Drawing.Color.DarkGray;
-            this.label14.Location = new System.Drawing.Point(9, 61);
+            this.label14.Location = new System.Drawing.Point(9, 59);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(73, 13);
             this.label14.TabIndex = 15;
@@ -468,32 +521,42 @@
             // lbAngleMax
             // 
             this.lbAngleMax.ForeColor = System.Drawing.Color.White;
-            this.lbAngleMax.Location = new System.Drawing.Point(176, 107);
+            this.lbAngleMax.Location = new System.Drawing.Point(176, 80);
             this.lbAngleMax.Name = "lbAngleMax";
             this.lbAngleMax.Size = new System.Drawing.Size(76, 13);
             this.lbAngleMax.TabIndex = 16;
             this.lbAngleMax.Text = "-";
             this.lbAngleMax.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
-            // lbRatioMax
+            // lbQualAspectAve
             // 
-            this.lbRatioMax.ForeColor = System.Drawing.Color.White;
-            this.lbRatioMax.Location = new System.Drawing.Point(176, 84);
-            this.lbRatioMax.Name = "lbRatioMax";
-            this.lbRatioMax.Size = new System.Drawing.Size(76, 13);
-            this.lbRatioMax.TabIndex = 13;
-            this.lbRatioMax.Text = "-";
-            this.lbRatioMax.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.lbQualAspectAve.ForeColor = System.Drawing.Color.White;
+            this.lbQualAspectAve.Location = new System.Drawing.Point(176, 203);
+            this.lbQualAspectAve.Name = "lbQualAspectAve";
+            this.lbQualAspectAve.Size = new System.Drawing.Size(76, 13);
+            this.lbQualAspectAve.TabIndex = 14;
+            this.lbQualAspectAve.Text = "-";
+            this.lbQualAspectAve.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // lbEdgeMax
             // 
             this.lbEdgeMax.ForeColor = System.Drawing.Color.White;
-            this.lbEdgeMax.Location = new System.Drawing.Point(176, 61);
+            this.lbEdgeMax.Location = new System.Drawing.Point(176, 59);
             this.lbEdgeMax.Name = "lbEdgeMax";
             this.lbEdgeMax.Size = new System.Drawing.Size(76, 13);
             this.lbEdgeMax.TabIndex = 14;
             this.lbEdgeMax.Text = "-";
             this.lbEdgeMax.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // lbQualAlphaAve
+            // 
+            this.lbQualAlphaAve.ForeColor = System.Drawing.Color.White;
+            this.lbQualAlphaAve.Location = new System.Drawing.Point(176, 183);
+            this.lbQualAlphaAve.Name = "lbQualAlphaAve";
+            this.lbQualAlphaAve.Size = new System.Drawing.Size(76, 13);
+            this.lbQualAlphaAve.TabIndex = 3;
+            this.lbQualAlphaAve.Text = "-";
+            this.lbQualAlphaAve.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // lbAreaMax
             // 
@@ -508,32 +571,42 @@
             // lbAngleMin
             // 
             this.lbAngleMin.ForeColor = System.Drawing.Color.White;
-            this.lbAngleMin.Location = new System.Drawing.Point(94, 107);
+            this.lbAngleMin.Location = new System.Drawing.Point(94, 80);
             this.lbAngleMin.Name = "lbAngleMin";
             this.lbAngleMin.Size = new System.Drawing.Size(68, 13);
             this.lbAngleMin.TabIndex = 4;
             this.lbAngleMin.Text = "-";
             this.lbAngleMin.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
-            // lbRatioMin
+            // lbQualAspectMin
             // 
-            this.lbRatioMin.ForeColor = System.Drawing.Color.White;
-            this.lbRatioMin.Location = new System.Drawing.Point(94, 84);
-            this.lbRatioMin.Name = "lbRatioMin";
-            this.lbRatioMin.Size = new System.Drawing.Size(68, 13);
-            this.lbRatioMin.TabIndex = 1;
-            this.lbRatioMin.Text = "-";
-            this.lbRatioMin.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.lbQualAspectMin.ForeColor = System.Drawing.Color.White;
+            this.lbQualAspectMin.Location = new System.Drawing.Point(94, 203);
+            this.lbQualAspectMin.Name = "lbQualAspectMin";
+            this.lbQualAspectMin.Size = new System.Drawing.Size(68, 13);
+            this.lbQualAspectMin.TabIndex = 2;
+            this.lbQualAspectMin.Text = "-";
+            this.lbQualAspectMin.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // lbEdgeMin
             // 
             this.lbEdgeMin.ForeColor = System.Drawing.Color.White;
-            this.lbEdgeMin.Location = new System.Drawing.Point(94, 61);
+            this.lbEdgeMin.Location = new System.Drawing.Point(94, 59);
             this.lbEdgeMin.Name = "lbEdgeMin";
             this.lbEdgeMin.Size = new System.Drawing.Size(68, 13);
             this.lbEdgeMin.TabIndex = 2;
             this.lbEdgeMin.Text = "-";
             this.lbEdgeMin.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // lbQualAlphaMin
+            // 
+            this.lbQualAlphaMin.ForeColor = System.Drawing.Color.White;
+            this.lbQualAlphaMin.Location = new System.Drawing.Point(94, 183);
+            this.lbQualAlphaMin.Name = "lbQualAlphaMin";
+            this.lbQualAlphaMin.Size = new System.Drawing.Size(68, 13);
+            this.lbQualAlphaMin.TabIndex = 7;
+            this.lbQualAlphaMin.Text = "-";
+            this.lbQualAlphaMin.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // lbAreaMin
             // 
@@ -544,6 +617,16 @@
             this.lbAreaMin.TabIndex = 7;
             this.lbAreaMin.Text = "-";
             this.lbAreaMin.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // label22
+            // 
+            this.label22.AutoSize = true;
+            this.label22.ForeColor = System.Drawing.Color.DarkGray;
+            this.label22.Location = new System.Drawing.Point(9, 183);
+            this.label22.Name = "label22";
+            this.label22.Size = new System.Drawing.Size(65, 13);
+            this.label22.TabIndex = 8;
+            this.label22.Text = "Min. angle:";
             // 
             // label10
             // 
@@ -560,11 +643,22 @@
             this.label17.AutoSize = true;
             this.label17.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label17.ForeColor = System.Drawing.Color.White;
-            this.label17.Location = new System.Drawing.Point(8, 139);
+            this.label17.Location = new System.Drawing.Point(8, 280);
             this.label17.Name = "label17";
             this.label17.Size = new System.Drawing.Size(97, 13);
             this.label17.TabIndex = 5;
             this.label17.Text = "Angle histogram:";
+            // 
+            // label21
+            // 
+            this.label21.AutoSize = true;
+            this.label21.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label21.ForeColor = System.Drawing.Color.White;
+            this.label21.Location = new System.Drawing.Point(8, 156);
+            this.label21.Name = "label21";
+            this.label21.Size = new System.Drawing.Size(47, 13);
+            this.label21.TabIndex = 6;
+            this.label21.Text = "Quality:";
             // 
             // label11
             // 
@@ -581,7 +675,7 @@
             // 
             this.angleHistogram1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(76)))), ((int)(((byte)(76)))));
             this.angleHistogram1.Font = new System.Drawing.Font("Segoe UI", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.angleHistogram1.Location = new System.Drawing.Point(6, 157);
+            this.angleHistogram1.Location = new System.Drawing.Point(6, 298);
             this.angleHistogram1.Name = "angleHistogram1";
             this.angleHistogram1.Size = new System.Drawing.Size(260, 195);
             this.angleHistogram1.TabIndex = 0;
@@ -590,32 +684,79 @@
             // tabPage3
             // 
             this.tabPage3.BackColor = System.Drawing.Color.DimGray;
+            this.tabPage3.Controls.Add(this.lbCodeplex);
+            this.tabPage3.Controls.Add(this.label15);
             this.tabPage3.Controls.Add(this.label1);
+            this.tabPage3.Controls.Add(this.label19);
+            this.tabPage3.Controls.Add(this.label18);
             this.tabPage3.Controls.Add(this.label7);
             this.tabPage3.Controls.Add(this.lbShortcuts);
             this.tabPage3.Location = new System.Drawing.Point(4, 4);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(272, 358);
+            this.tabPage3.Size = new System.Drawing.Size(272, 499);
             this.tabPage3.TabIndex = 2;
-            this.tabPage3.Text = "Shortcuts";
+            this.tabPage3.Text = "About";
+            // 
+            // lbCodeplex
+            // 
+            this.lbCodeplex.AutoSize = true;
+            this.lbCodeplex.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbCodeplex.ForeColor = System.Drawing.Color.White;
+            this.lbCodeplex.Location = new System.Drawing.Point(70, 80);
+            this.lbCodeplex.Name = "lbCodeplex";
+            this.lbCodeplex.Size = new System.Drawing.Size(153, 13);
+            this.lbCodeplex.TabIndex = 2;
+            this.lbCodeplex.Text = "http://triangle.codeplex.com";
+            this.lbCodeplex.Click += new System.EventHandler(this.lbCodeplex_Clicked);
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label15.ForeColor = System.Drawing.Color.White;
+            this.label15.Location = new System.Drawing.Point(8, 15);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(73, 13);
+            this.label15.TabIndex = 1;
+            this.label15.Text = "Triangle.NET";
             // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.ForeColor = System.Drawing.Color.White;
-            this.label1.Location = new System.Drawing.Point(8, 14);
+            this.label1.Location = new System.Drawing.Point(8, 130);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(108, 13);
             this.label1.TabIndex = 1;
             this.label1.Text = "Keyboard shortcuts";
             // 
+            // label19
+            // 
+            this.label19.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label19.ForeColor = System.Drawing.Color.White;
+            this.label19.Location = new System.Drawing.Point(70, 40);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(134, 40);
+            this.label19.TabIndex = 0;
+            this.label19.Text = "Beta 2 (2012-06-09)\r\nChristian Woltering\r\nMIT";
+            // 
+            // label18
+            // 
+            this.label18.ForeColor = System.Drawing.Color.White;
+            this.label18.Location = new System.Drawing.Point(13, 40);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(51, 40);
+            this.label18.TabIndex = 0;
+            this.label18.Text = "Version:\r\nAuthor:\r\nLicense:";
+            this.label18.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
             // label7
             // 
             this.label7.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label7.ForeColor = System.Drawing.Color.White;
-            this.label7.Location = new System.Drawing.Point(55, 37);
+            this.label7.Location = new System.Drawing.Point(70, 153);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(134, 108);
             this.label7.TabIndex = 0;
@@ -624,7 +765,7 @@
             // lbShortcuts
             // 
             this.lbShortcuts.ForeColor = System.Drawing.Color.White;
-            this.lbShortcuts.Location = new System.Drawing.Point(13, 37);
+            this.lbShortcuts.Location = new System.Drawing.Point(22, 153);
             this.lbShortcuts.Name = "lbShortcuts";
             this.lbShortcuts.Size = new System.Drawing.Size(36, 108);
             this.lbShortcuts.TabIndex = 0;
@@ -654,6 +795,8 @@
             this.fileMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileMenuOpen,
             this.fileMenuSave,
+            this.toolStripSeparator3,
+            this.menuFileExport,
             this.toolStripSeparator2,
             this.fileMenuQuit});
             this.fileMenu.Name = "fileMenu";
@@ -664,7 +807,7 @@
             // 
             this.fileMenuOpen.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.fileMenuOpen.Name = "fileMenuOpen";
-            this.fileMenuOpen.Size = new System.Drawing.Size(103, 22);
+            this.fileMenuOpen.Size = new System.Drawing.Size(141, 22);
             this.fileMenuOpen.Text = "Open";
             this.fileMenuOpen.Click += new System.EventHandler(this.fileMenuOpen_Click);
             // 
@@ -672,49 +815,61 @@
             // 
             this.fileMenuSave.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.fileMenuSave.Name = "fileMenuSave";
-            this.fileMenuSave.Size = new System.Drawing.Size(103, 22);
+            this.fileMenuSave.Size = new System.Drawing.Size(141, 22);
             this.fileMenuSave.Text = "Save";
             this.fileMenuSave.Click += new System.EventHandler(this.fileMenuSave_Click);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(138, 6);
+            // 
+            // menuFileExport
+            // 
+            this.menuFileExport.Name = "menuFileExport";
+            this.menuFileExport.Size = new System.Drawing.Size(141, 22);
+            this.menuFileExport.Text = "Export Image";
+            this.menuFileExport.Click += new System.EventHandler(this.menuFileExport_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(100, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(138, 6);
             // 
             // fileMenuQuit
             // 
             this.fileMenuQuit.Name = "fileMenuQuit";
-            this.fileMenuQuit.Size = new System.Drawing.Size(103, 22);
+            this.fileMenuQuit.Size = new System.Drawing.Size(141, 22);
             this.fileMenuQuit.Text = "Quit";
             this.fileMenuQuit.Click += new System.EventHandler(this.fileMenuQuit_Click);
             // 
             // viewMenu
             // 
             this.viewMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.viewMenuMQuality,
+            this.viewMenuVoronoi,
             this.toolStripSeparator1,
             this.viewMenuLog});
             this.viewMenu.Name = "viewMenu";
             this.viewMenu.Size = new System.Drawing.Size(44, 24);
             this.viewMenu.Text = "View";
             // 
-            // viewMenuMQuality
+            // viewMenuVoronoi
             // 
-            this.viewMenuMQuality.Enabled = false;
-            this.viewMenuMQuality.Name = "viewMenuMQuality";
-            this.viewMenuMQuality.Size = new System.Drawing.Size(154, 22);
-            this.viewMenuMQuality.Text = "Mesh Quality ...";
-            this.viewMenuMQuality.Click += new System.EventHandler(this.viewMenuMQuality_Click);
+            this.viewMenuVoronoi.Enabled = false;
+            this.viewMenuVoronoi.Name = "viewMenuVoronoi";
+            this.viewMenuVoronoi.Size = new System.Drawing.Size(162, 22);
+            this.viewMenuVoronoi.Text = "Voronoi Diagram";
+            this.viewMenuVoronoi.Click += new System.EventHandler(this.viewMenuVoronoi_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(151, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(159, 6);
             // 
             // viewMenuLog
             // 
             this.viewMenuLog.Name = "viewMenuLog";
-            this.viewMenuLog.Size = new System.Drawing.Size(154, 22);
+            this.viewMenuLog.Size = new System.Drawing.Size(162, 22);
             this.viewMenuLog.Text = "Show Log";
             this.viewMenuLog.Click += new System.EventHandler(this.viewMenuLog_Click);
             // 
@@ -729,44 +884,29 @@
             // 
             // toolsMenuGen
             // 
-            this.toolsMenuGen.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolsMenuPoly1,
-            this.toolsMenuRandPts});
             this.toolsMenuGen.Name = "toolsMenuGen";
-            this.toolsMenuGen.Size = new System.Drawing.Size(152, 22);
-            this.toolsMenuGen.Text = "Generator";
-            // 
-            // toolsMenuPoly1
-            // 
-            this.toolsMenuPoly1.Name = "toolsMenuPoly1";
-            this.toolsMenuPoly1.Size = new System.Drawing.Size(153, 22);
-            this.toolsMenuPoly1.Text = "Star 1";
-            this.toolsMenuPoly1.Click += new System.EventHandler(this.toolsMenuPoly1_Click);
-            // 
-            // toolsMenuRandPts
-            // 
-            this.toolsMenuRandPts.Name = "toolsMenuRandPts";
-            this.toolsMenuRandPts.Size = new System.Drawing.Size(153, 22);
-            this.toolsMenuRandPts.Text = "Random points";
-            this.toolsMenuRandPts.Click += new System.EventHandler(this.toolsMenuRandPts_Click);
+            this.toolsMenuGen.Size = new System.Drawing.Size(157, 22);
+            this.toolsMenuGen.Text = "Input Generator";
+            this.toolsMenuGen.Click += new System.EventHandler(this.toolsMenuGenerator_Click);
             // 
             // toolsMenuCheck
             // 
             this.toolsMenuCheck.Name = "toolsMenuCheck";
-            this.toolsMenuCheck.Size = new System.Drawing.Size(152, 22);
+            this.toolsMenuCheck.Size = new System.Drawing.Size(157, 22);
             this.toolsMenuCheck.Text = "Check Mesh";
             this.toolsMenuCheck.Click += new System.EventHandler(this.toolsMenuCheck_Click);
             // 
-            // meshRenderer1
+            // renderControl1
             // 
-            this.meshRenderer1.BackColor = System.Drawing.Color.Black;
-            this.meshRenderer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.meshRenderer1.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.meshRenderer1.Location = new System.Drawing.Point(0, 0);
-            this.meshRenderer1.Name = "meshRenderer1";
-            this.meshRenderer1.Size = new System.Drawing.Size(703, 612);
-            this.meshRenderer1.TabIndex = 0;
-            this.meshRenderer1.Text = "meshRenderer1";
+            this.renderControl1.BackColor = System.Drawing.Color.Black;
+            this.renderControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.renderControl1.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.renderControl1.Location = new System.Drawing.Point(0, 0);
+            this.renderControl1.Name = "renderControl1";
+            this.renderControl1.ShowVoronoi = false;
+            this.renderControl1.Size = new System.Drawing.Size(703, 612);
+            this.renderControl1.TabIndex = 0;
+            this.renderControl1.Text = "meshRenderer1";
             // 
             // FormMain
             // 
@@ -807,7 +947,7 @@
         #endregion
 
         private System.Windows.Forms.SplitContainer splitContainer1;
-        private Controls.MeshRenderer meshRenderer1;
+        private Controls.RendererControl renderControl1;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem fileMenu;
         private System.Windows.Forms.ToolStripMenuItem fileMenuOpen;
@@ -844,30 +984,41 @@
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.Label label16;
-        private System.Windows.Forms.Label label15;
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.Label lbAngleMax;
-        private System.Windows.Forms.Label lbRatioMax;
         private System.Windows.Forms.Label lbEdgeMax;
         private System.Windows.Forms.Label lbAreaMax;
         private System.Windows.Forms.Label lbAngleMin;
-        private System.Windows.Forms.Label lbRatioMin;
         private System.Windows.Forms.Label lbEdgeMin;
         private System.Windows.Forms.Label lbAreaMin;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label label17;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.ToolStripMenuItem viewMenu;
-        private System.Windows.Forms.ToolStripMenuItem viewMenuMQuality;
+        private System.Windows.Forms.ToolStripMenuItem viewMenuVoronoi;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem viewMenuLog;
         private System.Windows.Forms.ToolStripMenuItem toolsMenu;
         private System.Windows.Forms.ToolStripMenuItem toolsMenuGen;
-        private System.Windows.Forms.ToolStripMenuItem toolsMenuPoly1;
-        private System.Windows.Forms.ToolStripMenuItem toolsMenuRandPts;
         private System.Windows.Forms.ToolStripMenuItem toolsMenuCheck;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem fileMenuQuit;
+        private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.Label label19;
+        private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.Label lbCodeplex;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripMenuItem menuFileExport;
+        private System.Windows.Forms.Label label20;
+        private System.Windows.Forms.Label label32;
+        private System.Windows.Forms.Label label31;
+        private System.Windows.Forms.Label label29;
+        private System.Windows.Forms.Label lbQualAspectAve;
+        private System.Windows.Forms.Label lbQualAlphaAve;
+        private System.Windows.Forms.Label lbQualAspectMin;
+        private System.Windows.Forms.Label lbQualAlphaMin;
+        private System.Windows.Forms.Label label22;
+        private System.Windows.Forms.Label label21;
 
     }
 }

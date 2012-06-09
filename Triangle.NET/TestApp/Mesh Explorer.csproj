@@ -69,10 +69,25 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\DarkToolStripRenderer.cs" />
+    <Compile Include="Controls\RendererControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="DarkMessageBox.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Examples.cs" />
+    <Compile Include="FormExport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormExport.Designer.cs">
+      <DependentUpon>FormExport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormGenerator.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormGenerator.Designer.cs">
+      <DependentUpon>FormGenerator.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormLog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -85,15 +100,11 @@
     <Compile Include="FormMain.Designer.cs">
       <DependentUpon>FormMain.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controls\MeshRenderer.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="FormQuality.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FormQuality.Designer.cs">
-      <DependentUpon>FormQuality.cs</DependentUpon>
-    </Compile>
+    <Compile Include="Generators\IGenerator.cs" />
+    <Compile Include="Generators\RandomPoints.cs" />
+    <Compile Include="Generators\RandomPointsCircle.cs" />
+    <Compile Include="Generators\RingPolygon.cs" />
+    <Compile Include="Generators\StarInBox.cs" />
     <Compile Include="IO\ImageWriter.cs" />
     <Compile Include="IO\FileProcessor.cs" />
     <Compile Include="IO\Formats\DatFile.cs" />
@@ -101,19 +112,23 @@
     <Compile Include="IO\Formats\TriangleFile.cs" />
     <Compile Include="IO\IMeshFormat.cs" />
     <Compile Include="IO\JsonParser.cs" />
-    <Compile Include="PolygonGenerator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rendering\MeshRenderer.cs" />
+    <Compile Include="Rendering\RenderColors.cs" />
     <Compile Include="Rendering\RenderData.cs" />
     <Compile Include="Rendering\VoronoiRenderer.cs" />
     <Compile Include="Rendering\Zoom.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Util.cs" />
+    <EmbeddedResource Include="FormExport.resx">
+      <DependentUpon>FormExport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormGenerator.resx">
+      <DependentUpon>FormGenerator.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FormMain.resx">
       <DependentUpon>FormMain.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="FormQuality.resx">
-      <DependentUpon>FormQuality.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

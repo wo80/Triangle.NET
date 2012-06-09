@@ -11,14 +11,12 @@ namespace MeshExplorer.Controls
     using System.Linq;
     using System.Text;
     using System.Drawing;
-using System.Drawing.Drawing2D;
 
     /// <summary>
     /// TODO: Update summary.
     /// </summary>
     public static class ColorScheme
     {
-
         public static Color ColorGray13 = Color.FromArgb(13, 13, 13);
         public static Color ColorGray46 = Color.FromArgb(46, 46, 46);
         public static Color ColorGray64 = Color.FromArgb(64, 64, 64);

@@ -23,12 +23,14 @@ namespace MeshExplorer
         // Make sure this path points to the polygon sample data.
         static readonly string pathToData = @"..\..\..\Data\";
 
+        static ImageWriter imageWriter = new ImageWriter();
+
         /// <summary>
         /// Generating Delaunay triangulations
         /// </summary>
         public static void Example1()
         {
-            ImageWriter.SetColorSchemeLight();
+            imageWriter.SetColorSchemeLight();
 
             // Create a mesh instance.
             Mesh mesh = new Mesh();
@@ -36,18 +38,18 @@ namespace MeshExplorer
             // Read spiral node file and gernerate the delaunay triangulation 
             // of the point set.
             mesh.Triangulate(pathToData + "spiral.node");
-            ImageWriter.WritePng(mesh, "spiral.png", 180);
+            imageWriter.WritePng(mesh, "spiral.png", 180);
 
             // Read face polygon file and gernerate the delaunay triangulation 
             // of the PSLG. We reuse the mesh instance here.
             InputGeometry data = FileReader.ReadFile(pathToData + "face.poly");
             mesh.Triangulate(data);
-            ImageWriter.WritePng(mesh, "face.png", 200);
+            imageWriter.WritePng(mesh, "face.png", 200);
 
             // Generate a conforming delaunay triangulation of the face polygon.
             mesh.SetOption(Options.ConformingDelaunay, true);
             mesh.Triangulate(data);
-            ImageWriter.WritePng(mesh, "face-CDT.png", 200);
+            imageWriter.WritePng(mesh, "face-CDT.png", 200);
         }
 
         /// <summary>
@@ -55,7 +57,7 @@ namespace MeshExplorer
         /// </summary>
         public static void Example2()
         {
-            ImageWriter.SetColorSchemeLight();
+            imageWriter.SetColorSchemeLight();
 
             // Create a mesh instance.
             Mesh mesh = new Mesh();
@@ -66,18 +68,18 @@ namespace MeshExplorer
             InputGeometry data = FileReader.ReadNodeFile(pathToData + "spiral.node");
             mesh.SetOption(Options.Quality, true);
             mesh.Triangulate(data);
-            ImageWriter.WritePng(mesh, "spiral-Angle-20.png", 200);
+            imageWriter.WritePng(mesh, "spiral-Angle-20.png", 200);
 
             // Set a minimum angle of 30 degrees. 
             mesh.SetOption(Options.MinAngle, 35);
             mesh.Triangulate(data);
-            ImageWriter.WritePng(mesh, "spiral-Angle-35.png", 200);
+            imageWriter.WritePng(mesh, "spiral-Angle-35.png", 200);
 
             // Reset the minimum angle and add a global area constraint.
             mesh.SetOption(Options.MinAngle, 20);
             mesh.SetOption(Options.MaxArea, 0.2);
             mesh.Triangulate(data);
-            ImageWriter.WritePng(mesh, "spiral-Area.png", 200);
+            imageWriter.WritePng(mesh, "spiral-Area.png", 200);
         }
 
         /// <summary>
@@ -85,7 +87,7 @@ namespace MeshExplorer
         /// </summary>
         public static void Example3()
         {
-            ImageWriter.SetColorSchemeLight();
+            imageWriter.SetColorSchemeLight();
 
             // Create a mesh instance.
             Mesh mesh = new Mesh();
@@ -95,7 +97,7 @@ namespace MeshExplorer
             mesh.SetOption(Options.Quality, true);
             mesh.SetOption(Options.Convex, true);
             mesh.Triangulate(pathToData + "box.poly");
-            ImageWriter.WritePng(mesh, "box.png", 200);
+            imageWriter.WritePng(mesh, "box.png", 200);
 
             // Save the current mesh to .node and .ele files
             FileWriter.WriteNodes(mesh, "box.1.node");
@@ -103,11 +105,11 @@ namespace MeshExplorer
 
             // Refine the mesh by setting a global area constraint.
             mesh.Refine(0.2);
-            ImageWriter.WritePng(mesh, "box-Refine-1.png", 200);
+            imageWriter.WritePng(mesh, "box-Refine-1.png", 200);
 
             // Refine again by setting a smaller area constraint.
             mesh.Refine(0.05);
-            ImageWriter.WritePng(mesh, "box-Refine-2.png", 200);
+            imageWriter.WritePng(mesh, "box-Refine-2.png", 200);
 
             // Load the previously saved box.1 mesh. Since a box.1.area
             // file exist, the variable area constraint option is set
@@ -115,7 +117,7 @@ namespace MeshExplorer
             mesh.Load(pathToData + "box.1.node");
             mesh.SetOption(Options.MinAngle, 0);
             mesh.Refine();
-            ImageWriter.WritePng(mesh, "box-Refine-3.png", 200);
+            imageWriter.WritePng(mesh, "box-Refine-3.png", 200);
         }
 
         /// <summary>
@@ -123,19 +125,19 @@ namespace MeshExplorer
         /// </summary>
         public static void Example4()
         {
-            ImageWriter.SetColorSchemeLight();
+            //imageWriter.SetColorSchemeLight();
 
-            // Create mesh data (random point set)
-            //data.Points = Util.CreateCirclePoints(0, 0, 5, 50); // Ooops, TODO !!!
-            InputGeometry data = PolygonGenerator.CreateStarPoints(0, 0, 5, 10);
+            //// Create mesh data (random point set)
+            ////data.Points = Util.CreateCirclePoints(0, 0, 5, 50); // Ooops, TODO !!!
+            //InputGeometry data = PolygonGenerator.CreateStarPoints(0, 0, 5, 10);
 
-            // Create a mesh instance.
-            Mesh mesh = new Mesh();
+            //// Create a mesh instance.
+            //Mesh mesh = new Mesh();
 
-            // Gernerate a delaunay triangulation
-            mesh.Triangulate(data);
-            ImageWriter.WritePng(mesh, "circle-mesh.png", 400);
-            ImageWriter.WriteVoronoiPng(mesh, "circle-voronoi.png", 400);
+            //// Gernerate a delaunay triangulation
+            //mesh.Triangulate(data);
+            //ImageWriter.WritePng(mesh, "circle-mesh.png", 400);
+            //ImageWriter.WriteVoronoiPng(mesh, "circle-voronoi.png", 400);
         }
 
         /// <summary>
@@ -143,18 +145,18 @@ namespace MeshExplorer
         /// </summary>
         public static void Example5()
         {
-            ImageWriter.SetColorSchemeLight();
+            //ImageWriter.SetColorSchemeLight();
 
-            // Create a mesh instance.
-            Mesh mesh = new Mesh();
+            //// Create a mesh instance.
+            //Mesh mesh = new Mesh();
 
-            mesh.SetOption(Options.Quality, true);
-            mesh.SetOption(Options.MinAngle, 25);
-            mesh.SetOption(Options.MaxArea, 0.0075);
-            mesh.Triangulate(pathToData + "Smooth-Slit.poly");
-            mesh.Smooth();
+            //mesh.SetOption(Options.Quality, true);
+            //mesh.SetOption(Options.MinAngle, 25);
+            //mesh.SetOption(Options.MaxArea, 0.0075);
+            //mesh.Triangulate(pathToData + "Smooth-Slit.poly");
+            //mesh.Smooth();
 
-            ImageWriter.WritePng(mesh, "slit-smooth.png", 300);
+            //ImageWriter.WritePng(mesh, "slit-smooth.png", 300);
         }
 
         /// <summary>
@@ -162,29 +164,29 @@ namespace MeshExplorer
         /// </summary>
         public static void ExampleXYZ()
         {
-            ImageWriter.SetColorSchemeLight();
+            //ImageWriter.SetColorSchemeLight();
 
-            Mesh mesh = new Mesh();
+            //Mesh mesh = new Mesh();
 
-            mesh.SetOption(Options.Quality, true);
-            mesh.SetOption(Options.MinAngle, 25);
-            mesh.SetOption(Options.MaxArea, 0.05);
+            //mesh.SetOption(Options.Quality, true);
+            //mesh.SetOption(Options.MinAngle, 25);
+            //mesh.SetOption(Options.MaxArea, 0.05);
 
-            mesh.Triangulate(pathToData + "Smooth-Square.poly");
+            //mesh.Triangulate(pathToData + "Smooth-Square.poly");
 
-            ImageWriter.WritePng(mesh, "test1.png", 300);
+            //ImageWriter.WritePng(mesh, "test1.png", 300);
 
-            mesh.SetOption(Options.MaxArea, 0.01);
+            //mesh.SetOption(Options.MaxArea, 0.01);
 
-            // Refine with new max area
-            mesh.Refine();
+            //// Refine with new max area
+            //mesh.Refine();
 
-            ImageWriter.WritePng(mesh, "test2.png", 300);
+            //ImageWriter.WritePng(mesh, "test2.png", 300);
 
-            mesh.SetOption(Options.SteinerPoints, 50);
-            mesh.Triangulate(pathToData + "Smooth-Square.poly");
+            //mesh.SetOption(Options.SteinerPoints, 50);
+            //mesh.Triangulate(pathToData + "Smooth-Square.poly");
 
-            ImageWriter.WritePng(mesh, "test3.png", 300);
+            //ImageWriter.WritePng(mesh, "test3.png", 300);
         }
     }
 }
