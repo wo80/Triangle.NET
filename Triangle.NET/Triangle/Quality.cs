@@ -197,8 +197,8 @@ namespace TriangleNet
                     {
                         if (Primitives.NonRegular(triorg, tridest, triapex, oppoapex) > 0.0)
                         {
-                            string coords = triorg.ToString() + " " + tridest.ToString();
-                            logger.Warning("Non-regular pair of triangles found. " + coords, "Quality.CheckDelaunay()");
+                            logger.Warning("Non-regular pair of triangles found (ID " + loop.triangle.id + ").",
+                                "Quality.CheckDelaunay()");
                             horrors++;
                         }
                     }

@@ -16,43 +16,14 @@ namespace TriangleNet.IO
     using System.Collections.Generic;
 
     /// <summary>
-    /// Helper for reading Triangle files.
+    /// Helper methods for reading Triangle file formats.
     /// </summary>
     public static class FileReader
     {
         static NumberFormatInfo nfi = CultureInfo.InvariantCulture.NumberFormat;
         static int startIndex = 0;
 
-        /// <summary>
-        /// Read the input data from a file, which may be a .node or .poly file.
-        /// </summary>
-        /// <param name="filename">The file to read.</param>
-        /// <remarks>Will NOT read associated files by default.</remarks>
-        public static InputGeometry ReadFile(string filename)
-        {
-            return ReadFile(filename, false);
-        }
-
-        /// <summary>
-        /// Read the input data from a file, which may be a .node or .poly file.
-        /// </summary>
-        /// <param name="filename">The file to read.</param>
-        /// <param name="readsupp">Read associated files (ele, area, neigh).</param>
-        public static InputGeometry ReadFile(string filename, bool readsupp)
-        {
-            string ext = Path.GetExtension(filename);
-
-            if (ext == ".node")
-            {
-                return ReadNodeFile(filename, readsupp);
-            }
-            else if (ext == ".poly")
-            {
-                return ReadPolyFile(filename, readsupp, readsupp);
-            }
-
-            throw new NotSupportedException("File format '" + ext + "' not supported.");
-        }
+        #region Helper methods
 
         static bool TryReadLine(StreamReader reader, out string[] token)
         {
@@ -81,11 +52,11 @@ namespace TriangleNet.IO
         }
 
         /// <summary>
-        /// 
+        /// Read vertex information of the given line.
         /// </summary>
-        /// <param name="data"></param>
-        /// <param name="index"></param>
-        /// <param name="line"></param>
+        /// <param name="data">The input geometry.</param>
+        /// <param name="index">The current vertex index.</param>
+        /// <param name="line">The current line.</param>
         /// <param name="n">Number of point attributes</param>
         static void ReadVertex(InputGeometry data, int index, string[] line, int n)
         {
@@ -111,6 +82,61 @@ namespace TriangleNet.IO
 
             data.AddPoint(x, y, mark);
         }
+
+        #endregion
+
+        #region Main I/O methods
+
+        /// <summary>
+        /// Reads geometry information from .node or .poly files.
+        /// </summary>
+        public static void Read(string filename, out InputGeometry geometry)
+        {
+            geometry = null;
+
+            string path = Path.ChangeExtension(filename, ".poly");
+
+            if (File.Exists(path))
+            {
+                geometry = FileReader.ReadPolyFile(path);
+            }
+            else
+            {
+                path = Path.ChangeExtension(filename, ".node");
+                geometry = FileReader.ReadNodeFile(path);
+            }
+        }
+
+        /// <summary>
+        /// Reads a mesh from .node, .poly or .ele files.
+        /// </summary>
+        public static void Read(string filename, out InputGeometry geometry, out List<ITriangle> triangles)
+        {
+            triangles = null;
+
+            FileReader.Read(filename, out geometry);
+
+            string path = Path.ChangeExtension(filename, ".ele");
+
+            if (File.Exists(path) && geometry != null)
+            {
+                triangles = FileReader.ReadEleFile(path);
+            }
+        }
+
+        /// <summary>
+        /// Reads geometry information from .node or .poly files.
+        /// </summary>
+        public static InputGeometry Read(string filename)
+        {
+            InputGeometry geometry = null;
+
+            FileReader.Read(filename, out geometry);
+
+            return geometry;
+        }
+
+        #endregion
 
         /// <summary>
         /// Read the vertices from a file, which may be a .node or .poly file.
@@ -451,6 +477,11 @@ namespace TriangleNet.IO
             return data;
         }
 
+        /// <summary>
+        /// Read elements from an .ele file.
+        /// </summary>
+        /// <param name="elefilename">The file name.</param>
+        /// <returns>A list of triangles.</returns>
         public static List<ITriangle> ReadEleFile(string elefilename)
         {
             return ReadEleFile(elefilename, false);
@@ -589,6 +620,12 @@ namespace TriangleNet.IO
             return data;
         }
 
+        /// <summary>
+        /// Read an .edge file.
+        /// </summary>
+        /// <param name="edgeFile">The file name.</param>
+        /// <param name="invertices">The number of input vertices (read from a .node or .poly file).</param>
+        /// <returns>A List of edges.</returns>
         public static List<Edge> ReadEdgeFile(string edgeFile, int invertices)
         {
             // Read poly file

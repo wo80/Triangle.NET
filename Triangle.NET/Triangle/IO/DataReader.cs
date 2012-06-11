@@ -17,12 +17,10 @@ namespace TriangleNet.IO
     using TriangleNet.Geometry;
 
     /// <summary>
-    /// TODO: Update summary.
+    /// The DataReader class provides methods for mesh reconstruction.
     /// </summary>
-    public static class DataReader
+    static class DataReader
     {
-        #region Library
-
         /// <summary>
         /// Reconstruct a triangulation from its raw data representation.
         /// </summary>
@@ -77,7 +75,7 @@ namespace TriangleNet.IO
             int numberofsegments = input.segments.Count;
 
             mesh.inelements = elements;
-            mesh.eextras = mesh.inelements > 0 ? triangles[0].Attributes.Length : 0;
+            mesh.eextras = triangles[0].Attributes != null ? triangles[0].Attributes.Length : 0;
 
             // Create the triangles.
             for (i = 0; i < mesh.inelements; i++)
@@ -317,7 +315,5 @@ namespace TriangleNet.IO
 
             return hullsize;
         }
-
-        #endregion
     }
 }

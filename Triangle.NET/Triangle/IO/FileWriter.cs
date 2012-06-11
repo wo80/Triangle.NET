@@ -14,15 +14,11 @@ namespace TriangleNet.IO
     using TriangleNet.Geometry;
 
     /// <summary>
-    /// TODO: Update summary.
+    /// Helper methods for writing Triangle file formats.
     /// </summary>
     public static class FileWriter
     {
         static NumberFormatInfo nfi = CultureInfo.InvariantCulture.NumberFormat;
-
-        // TODO: Intelligent file name guessing
-
-        #region File IO
 
         /// <summary>
         /// Number the vertices and write them to a .node file.
@@ -500,7 +496,5 @@ namespace TriangleNet.IO
                 }
             }
         }
-
-        #endregion
     }
 }

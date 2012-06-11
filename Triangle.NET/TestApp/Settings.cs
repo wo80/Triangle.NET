@@ -18,6 +18,10 @@ namespace MeshExplorer
     /// </summary>
     public class Settings
     {
+        // String resources
+        public static string ImportString = "The selected file has associated mesh information. " +
+            "You can choose to import the mesh or just read the geometry.";
+
         // Open file dialog
         public string OfdDirectory { get; set; }
         public string OfdFilter { get; set; }
@@ -49,18 +53,18 @@ namespace MeshExplorer
                 OfdDirectory = Application.StartupPath;
             }
 
-            OfdFilter = "Triangle file (*.node;*.poly)|*.node;*.poly";
-            OfdFilter += "|Triangle.NET JSON (*.json)|*.json";
+            SfdDirectory = OfdDirectory;
+            SfdFilter = "Triangle file (*.node;*.poly)|*.node;*.poly";
+            SfdFilter += "|Triangle.NET JSON (*.json)|*.json";
+            SfdFilterIndex = 1;
+
+            OfdFilter = SfdFilter;
             OfdFilter += "|Polygon data (*.dat)|*.dat";
             //OfdFilter += "|COMSOL mesh (*.mphtxt)|*.mphtxt";
             //OfdFilter += "|AVS UCD data (*.ucd)|*.ucd";
             //OfdFilter += "|VTK data (*.vtk)|*.vtk";
 
             OfdFilterIndex = 0;
-
-            SfdDirectory = OfdDirectory;
-            SfdFilter = OfdFilter;
-            SfdFilterIndex = 1;
 
             CurrentFile = "";
 

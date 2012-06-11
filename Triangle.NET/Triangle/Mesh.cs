@@ -194,29 +194,33 @@ namespace TriangleNet
         /// <summary>
         /// Load a mesh from file (.node/poly and .ele).
         /// </summary>
-        public void Load(string inputfile)
+        public void Load(string filename)
         {
-            InputGeometry input = FileReader.ReadFile(inputfile, true);
+            List<ITriangle> triangles;
+            InputGeometry geometry;
 
-            this.Load(input);
+            FileReader.Read(filename, out geometry, out triangles);
+
+            if (geometry != null && triangles != null)
+            {
+                Load(geometry, triangles);
+            }
         }
 
         /// <summary>
         /// Reconstructs a mesh from raw input data.
         /// </summary>
-        public void Load(InputGeometry input)
+        public void Load(InputGeometry input, List<ITriangle> triangles)
         {
-            throw new NotImplementedException("Load");
-
-            if (input == null)// TODO: if (input.Triangles == null)
+            if (input == null || triangles == null)
             {
-                throw new ArgumentException("The input data contains no triangles.");
+                throw new ArgumentException("Invalid input (argument is null).");
             }
 
             // Clear all data structures / reset hash seeds
             this.ResetData();
 
-            if (input.Segments != null)
+            if (input.HasSegments)
             {
                 Behavior.Poly = true;
             }
@@ -245,7 +249,11 @@ namespace TriangleNet
             TransferNodes(input);
 
             // Read and reconstruct a mesh.
-            hullsize = DataReader.Reconstruct(this, input, null);
+            hullsize = DataReader.Reconstruct(this, input, triangles.ToArray());
+
+
+            // Calculate the number of edges.
+            edges = (3 * triangles.Count + hullsize) / 2;
         }
 
         /// <summary>
@@ -254,7 +262,7 @@ namespace TriangleNet
         /// <param name="input"></param>
         public void Triangulate(string inputFile)
         {
-            InputGeometry input = FileReader.ReadFile(inputFile);
+            InputGeometry input = FileReader.Read(inputFile);
 
             this.Triangulate(input);
         }

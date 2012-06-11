@@ -42,7 +42,7 @@ namespace MeshExplorer
 
             // Read face polygon file and gernerate the delaunay triangulation 
             // of the PSLG. We reuse the mesh instance here.
-            InputGeometry data = FileReader.ReadFile(pathToData + "face.poly");
+            InputGeometry data = FileReader.Read(pathToData + "face.poly");
             mesh.Triangulate(data);
             imageWriter.WritePng(mesh, "face.png", 200);
 

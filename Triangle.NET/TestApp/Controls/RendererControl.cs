@@ -111,18 +111,32 @@ namespace MeshExplorer.Controls
             this.Render();
         }
 
-        public void SetData(Mesh mesh)
+        public void SetData(Mesh mesh, bool initZoom)
         {
             data.SetData(mesh);
 
-            meshRenderer = new MeshRenderer(data);
+            if (initZoom)
+            {
+                // Reset the zoom on new data
+                zoom.Initialize(this.ClientRectangle, data.Bounds);
+            }
 
+            meshRenderer = new MeshRenderer(data);
             voronoiRenderer = new VoronoiRenderer(mesh);
-            voronoiRenderer.Update();
+
+            if (showVoronoi)
+            {
+                voronoiRenderer.Update();
+            }
 
             initialized = true;
 
             this.Render();
+        }
+
+        public void SetData(Mesh mesh)
+        {
+            SetData(mesh, false);
         }
 
         public void Zoom(PointF location, int delta)

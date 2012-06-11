@@ -19,31 +19,41 @@ namespace MeshExplorer.IO
     /// </summary>
     public static class FileProcessor
     {
-        static Dictionary<string, IMeshFormat> container = new Dictionary<string,IMeshFormat>();
+        static Dictionary<string, IMeshFile> container = new Dictionary<string, IMeshFile>();
 
-        public static InputGeometry Open(string path)
+        public static bool ContainsMeshData(string path)
         {
-            string ext = Path.GetExtension(path);
+            IMeshFile provider = GetProviderInstance(path);
 
-            IMeshFormat provider;
+            return provider.ContainsMeshData(path);
+        }
 
-            if (container.ContainsKey(ext))
-            {
-                provider = container[ext];
-            }
-            else
-            {
-                provider = CreateInstance(ext);
-            }
+        public static InputGeometry Read(string path)
+        {
+            IMeshFile provider = GetProviderInstance(path);
 
             return provider.Read(path);
         }
 
-        public static void Save(string path, Mesh data)
+        public static Mesh Import(string path)
+        {
+            IMeshFile provider = GetProviderInstance(path);
+
+            return provider.Import(path);
+        }
+
+        public static void Save(string path, Mesh mesh)
+        {
+            IMeshFile provider = GetProviderInstance(path);
+
+            provider.Write(mesh, path);
+        }
+
+        private static IMeshFile GetProviderInstance(string path)
         {
             string ext = Path.GetExtension(path);
 
-            IMeshFormat provider;
+            IMeshFile provider;
 
             if (container.ContainsKey(ext))
             {
@@ -51,19 +61,19 @@ namespace MeshExplorer.IO
             }
             else
             {
-                provider = CreateInstance(ext);
+                provider = CreateProviderInstance(ext);
             }
 
-            provider.Write(path, data);
+            return provider;
         }
 
-        private static IMeshFormat CreateInstance(string ext)
+        private static IMeshFile CreateProviderInstance(string ext)
         {
             // TODO: automate by using IMeshFormat's Extensions property.
 
-            IMeshFormat provider = null;
+            IMeshFile provider = null;
 
-            if (ext == ".node" || ext == ".poly")
+            if (ext == ".node" || ext == ".poly" || ext == ".ele")
             {
                 provider = new TriangleFile();
             }
@@ -74,14 +84,6 @@ namespace MeshExplorer.IO
             else if (ext == ".dat")
             {
                 provider = new DatFile();
-            }
-            else if (ext == ".mphtxt")
-            {
-                //provider = new COMSOL();
-            }
-            else if (ext == ".vtk")
-            {
-                //provider = new VtkFile();
             }
 
             if (provider == null)

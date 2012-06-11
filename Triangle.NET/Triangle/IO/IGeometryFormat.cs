@@ -4,23 +4,24 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace MeshExplorer.IO
+namespace TriangleNet.IO
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
-    using TriangleNet;
     using TriangleNet.Geometry;
 
     /// <summary>
-    /// Defines an interface for mesh file formats.
+    /// Interface for geometry input.
     /// </summary>
-    public interface IMeshFormat
+    public interface IGeometryFormat
     {
-        string[] Extensions { get; }
-
-        InputGeometry Read(string file);
-        void Write(string file, Mesh data);
+        /// <summary>
+        /// Read a file containing geometry information.
+        /// </summary>
+        /// <param name="filename">The path of the file to read.</param>
+        /// <returns>An instance of the <see cref="InputGeometry" /> class.</returns>
+        InputGeometry Read(string filename);
     }
 }

@@ -18,115 +18,48 @@ namespace MeshExplorer.IO.Formats
     /// <summary>
     /// TODO: Update summary.
     /// </summary>
-    public class TriangleFile : MeshExplorer.IO.IMeshFormat
+    public class TriangleFile : IMeshFile
     {
+        TriangleFormat format = new TriangleFormat();
+
         /// <summary>
         /// Gets the supported file extensions.
         /// </summary>
         public string[] Extensions
         {
-            get { return new string[] { ".node", ".poly" }; }
+            get { return new string[] { ".node", ".poly", ".ele" }; }
         }
 
-
-        public InputGeometry Read(string file)
+        public bool ContainsMeshData(string filename)
         {
-            string supp = Path.ChangeExtension(file, ".ele");
+            string ext = Path.GetExtension(filename);
 
-            return FileReader.ReadFile(file, File.Exists(supp));
-        }
-
-        public void Write(string file, Mesh data)
-        {
-            if (data.NumberOfVertices > 0)
+            if (ext == ".node" || ext == ".poly")
             {
-                WritePoly(file, data);
-
-                if (data.Triangles != null)
+                if (File.Exists(Path.ChangeExtension(filename, ".ele")))
                 {
-                    file = Path.ChangeExtension(file, "ele");
-
-                    WriteElements(file, data);
+                    return true;
                 }
             }
+
+            return (ext == ".ele");
         }
 
-        private void WritePoly(string file, Mesh data)
+        public InputGeometry Read(string filename)
         {
-            int i = 0;
-            int n = data.NumberOfVertices;
-            bool markers = true;
-
-            using (StreamWriter writer = new StreamWriter(file))
-            {
-                // Write nodes
-                writer.WriteLine("{0} 2 0 {1}", n, markers ? "1" : "0");
-
-                // TODO: point attributes
-                foreach (var item in data.Vertices)
-                {
-                    writer.Write("{0} {1} {2}", i++,
-                        item.X.ToString(Util.Nfi),
-                        item.Y.ToString(Util.Nfi));
-
-                    if (markers)
-                    {
-                        writer.Write(" {0}", item.Boundary);
-                    }
-
-                    writer.WriteLine();
-                }
-
-                // Write segments
-                n = data.NumberOfSegments;
-                i = 0;
-
-                // Number of segments, number of boundary markers (zero or one).
-                writer.WriteLine("{0} {1}", n, markers ? "1" : "0");
-
-                foreach (var item in data.Segments)
-                {
-                    writer.Write("{0} {1} {2}", i,
-                        item.P0, item.P1);
-
-                    if (markers)
-                    {
-                        writer.Write(" {0}", item.Boundary);
-                    }
-
-                    writer.WriteLine();
-                }
-
-                // Write holes
-                n = data.Holes.Count;
-
-                writer.WriteLine("{0}", n);
-
-                foreach (var item in data.Holes)
-                {
-                    writer.WriteLine("{0} {1}",
-                        data.Holes[i].X.ToString(Util.Nfi),
-                        data.Holes[i].Y.ToString(Util.Nfi));
-                }
-
-                // TODO: Regions
-            }
+            return format.Read(filename);
         }
 
-        public void WriteElements(string file, Mesh data)
+        public Mesh Import(string filename)
         {
-            using (StreamWriter writer = new StreamWriter(file))
+            return format.Import(filename);
+        }
+
+        public void Write(Mesh mesh, string filename)
+        {
+            if (mesh.NumberOfVertices > 0)
             {
-                int i = 0;
-
-                // TODO: attributes
-                writer.WriteLine("{0} 3 0", data.NumberOfTriangles);
-
-                foreach (var item in data.Triangles)
-                {
-                    writer.WriteLine("{0} {1} {2} {3}", i++,
-                        item.P0, item.P1, item.P2);
-                }
+                format.Write(mesh, filename);
             }
         }
     }

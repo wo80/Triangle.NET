@@ -9,16 +9,17 @@ namespace MeshExplorer.IO.Formats
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.IO;
     using System.Text;
-    using TriangleNet;
-    using TriangleNet.Geometry;
     using TriangleNet.IO;
+    using System.IO;
+    using MeshExplorer.Rendering;
+    using TriangleNet.Geometry;
+    using TriangleNet;
 
     /// <summary>
     /// TODO: Update summary.
     /// </summary>
-    public class DatFile : MeshExplorer.IO.IMeshFormat
+    public class DatFile : IMeshFile
     {
         /// <summary>
         /// Gets the supported file extensions.
@@ -26,6 +27,11 @@ namespace MeshExplorer.IO.Formats
         public string[] Extensions
         {
             get { return new string[] { ".dat" }; }
+        }
+
+        public bool ContainsMeshData(string filename)
+        {
+            return false;
         }
 
         public InputGeometry Read(string filename)
@@ -44,7 +50,7 @@ namespace MeshExplorer.IO.Formats
                     if (split.Length == 2)
                     {
                         data.AddPoint(
-                            double.Parse(split[0], Util.Nfi), 
+                            double.Parse(split[0], Util.Nfi),
                             double.Parse(split[1], Util.Nfi));
                     }
                 }
@@ -61,7 +67,12 @@ namespace MeshExplorer.IO.Formats
             return data;
         }
 
-        public void Write(string filename, Mesh data)
+        public Mesh Import(string filename)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Write(Mesh mesh, string filename)
         {
             throw new NotImplementedException();
         }

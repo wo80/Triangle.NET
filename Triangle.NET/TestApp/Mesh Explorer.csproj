@@ -110,7 +110,7 @@
     <Compile Include="IO\Formats\DatFile.cs" />
     <Compile Include="IO\Formats\JsonFile.cs" />
     <Compile Include="IO\Formats\TriangleFile.cs" />
-    <Compile Include="IO\IMeshFormat.cs" />
+    <Compile Include="IO\IMeshFile.cs" />
     <Compile Include="IO\JsonParser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -39,31 +39,31 @@ namespace MeshExplorer
         /// </summary>
         private void InitializeComponent()
         {
-            this.btnClose = new MeshExplorer.Controls.DarkButton();
-            this.btnShowLog = new MeshExplorer.Controls.DarkButton();
+            this.btnCancel = new MeshExplorer.Controls.DarkButton();
+            this.btnOk = new MeshExplorer.Controls.DarkButton();
             this.lbMessage = new System.Windows.Forms.Label();
             this.lbInfo = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
-            // btnClose
+            // btnCancel
             // 
-            this.btnClose.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnClose.Location = new System.Drawing.Point(336, 87);
-            this.btnClose.Name = "btnClose";
-            this.btnClose.Size = new System.Drawing.Size(92, 23);
-            this.btnClose.TabIndex = 0;
-            this.btnClose.Text = "Close";
-            this.btnClose.UseVisualStyleBackColor = true;
+            this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.btnCancel.Location = new System.Drawing.Point(336, 87);
+            this.btnCancel.Name = "btnCancel";
+            this.btnCancel.Size = new System.Drawing.Size(92, 23);
+            this.btnCancel.TabIndex = 0;
+            this.btnCancel.Text = "Cancel";
+            this.btnCancel.UseVisualStyleBackColor = true;
             // 
-            // btnShowLog
+            // btnOk
             // 
-            this.btnShowLog.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btnShowLog.Location = new System.Drawing.Point(234, 87);
-            this.btnShowLog.Name = "btnShowLog";
-            this.btnShowLog.Size = new System.Drawing.Size(92, 23);
-            this.btnShowLog.TabIndex = 1;
-            this.btnShowLog.Text = "Show Log";
-            this.btnShowLog.UseVisualStyleBackColor = true;
+            this.btnOk.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.btnOk.Location = new System.Drawing.Point(234, 87);
+            this.btnOk.Name = "btnOk";
+            this.btnOk.Size = new System.Drawing.Size(92, 23);
+            this.btnOk.TabIndex = 1;
+            this.btnOk.Text = "Ok";
+            this.btnOk.UseVisualStyleBackColor = true;
             // 
             // lbMessage
             // 
@@ -94,8 +94,8 @@ namespace MeshExplorer
             this.ClientSize = new System.Drawing.Size(436, 118);
             this.Controls.Add(this.lbInfo);
             this.Controls.Add(this.lbMessage);
-            this.Controls.Add(this.btnShowLog);
-            this.Controls.Add(this.btnClose);
+            this.Controls.Add(this.btnOk);
+            this.Controls.Add(this.btnCancel);
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
@@ -111,10 +111,10 @@ namespace MeshExplorer
 
         #endregion
 
-        private Controls.DarkButton btnClose;
+        private Controls.DarkButton btnCancel;
         private Label lbMessage;
         private Label lbInfo;
-        private Controls.DarkButton btnShowLog;
+        private Controls.DarkButton btnOk;
 
         #endregion
 
@@ -133,32 +133,53 @@ namespace MeshExplorer
             e.Graphics.FillRectangle(Brushes.DimGray, rect);
         }
 
-        public static DialogResult Show(string title, string message, string info, bool log)
+        public static DialogResult Show(string title, string message, string info, MessageBoxButtons buttons)
         {
-            DarkMessageBox m = new DarkMessageBox();
+            DarkMessageBox dialog = new DarkMessageBox();
 
-            if (!log)
-            {
-                m.btnShowLog.Enabled = false;
-                m.btnShowLog.Visible = false;
-            }
+            SetButtonsText(dialog, buttons);
 
-            m.Text = title;
+            dialog.Text = title;
 
-            m.lbInfo.Text = info;
-            m.lbMessage.Text = message;
+            dialog.lbInfo.Text = info;
+            dialog.lbMessage.Text = message;
 
-            return m.ShowDialog();
+            return dialog.ShowDialog();
         }
 
         public static DialogResult Show(string title, string message, string info)
         {
-            return Show(title, message, info, false);
+            return Show(title, message, info, MessageBoxButtons.OKCancel);
+        }
+
+        public static DialogResult Show(string title, string message, MessageBoxButtons buttons)
+        {
+            return Show(title, message, "", buttons);
         }
 
         public static DialogResult Show(string title, string message)
         {
-            return Show(title, message, "", false);
+            return Show(title, message, "", MessageBoxButtons.OKCancel);
+        }
+
+        private static void SetButtonsText(DarkMessageBox dialog, MessageBoxButtons buttons)
+        {
+            if (buttons == MessageBoxButtons.OKCancel)
+            {
+                dialog.btnOk.Text = "OK";
+                dialog.btnCancel.Text = "Cancel";
+            }
+            else if (buttons == MessageBoxButtons.YesNo)
+            {
+                dialog.btnOk.Text = "Yes";
+                dialog.btnCancel.Text = "No";
+            }
+            else
+            {
+                dialog.btnCancel.Text = "Close";
+                dialog.btnOk.Visible = false;
+                dialog.btnOk.Enabled = false;
+            }
         }
     }
 }
