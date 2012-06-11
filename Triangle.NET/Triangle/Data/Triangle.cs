@@ -48,7 +48,7 @@ namespace TriangleNet.Data
             // Three NULL vertices.
             vertices = new Vertex[3];
 
-            if (Behavior.UseSegments)
+            // TODO: if (Behavior.UseSegments)
             {
                 // Initialize the three adjoining subsegments to be the
                 // omnipresent subsegment.
@@ -63,10 +63,11 @@ namespace TriangleNet.Data
                 attributes = new double[numAttributes];
             }
 
-            if (Behavior.VarArea)
-            {
-                area = -1.0;
-            }
+            // TODO:
+            //if (Behavior.VarArea)
+            //{
+            //    area = -1.0;
+            //}
         }
 
 

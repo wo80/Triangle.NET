@@ -75,6 +75,8 @@ namespace TriangleNet.Algorithm
             Vertex markorg;
             int hullsize;
 
+            bool noPoly = !mesh.behavior.Poly;
+
             // Find a boundary triangle.
             nextedge.triangle = Mesh.dummytri;
             nextedge.orient = 0;
@@ -110,7 +112,7 @@ namespace TriangleNet.Algorithm
                 dissolveedge.SymSelf();
                 // If not using a PSLG, the vertices should be marked now.
                 // (If using a PSLG, markhull() will do the job.)
-                if (!Behavior.Poly)
+                if (noPoly)
                 {
                     // Be careful!  One must check for the case where all the input
                     // vertices are collinear, and thus all the triangles are part of

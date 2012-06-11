@@ -146,5 +146,42 @@ namespace MeshExplorer.Rendering
                 this.RenderPoints(g);
             }
         }
+
+        /// <summary>
+        /// Renders only the mesh edges (no points or segments).
+        /// </summary>
+        public void RenderMesh(Graphics g, Zoom zoom, RenderColors renderColors)
+        {
+            this.renderColors = renderColors;
+            this.zoom = zoom;
+
+            if (data.Edges != null)
+            {
+                this.RenderEdges(g);
+            }
+            else if (data.Triangles != null)
+            {
+                this.RenderTriangles(g);
+            }
+        }
+
+        /// <summary>
+        /// Renders only points and segments (no mesh triangles).
+        /// </summary>
+        public void RenderGeometry(Graphics g, Zoom zoom, RenderColors renderColors)
+        {
+            this.renderColors = renderColors;
+            this.zoom = zoom;
+
+            if (data.Segments != null)
+            {
+                this.RenderSegments(g);
+            }
+
+            if (data.Points != null)
+            {
+                this.RenderPoints(g);
+            }
+        }
     }
 }

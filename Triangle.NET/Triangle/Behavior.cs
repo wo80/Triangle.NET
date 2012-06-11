@@ -5,115 +5,19 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-using System;
 namespace TriangleNet
 {
-    // TODO: Make Behavior non-static and an instance member of mesh class.
+    using System;
 
     /// <summary>
     /// Controls the behavior of the meshing software.
     /// </summary>
-    static class Behavior
+    class Behavior
     {
-        /// <summary>
-        /// Input is a Planar Straight Line Graph.
-        /// </summary>
-        public static bool Poly { get; set; }
-        /// <summary>
-        /// Quality mesh generation.
-        /// </summary>
-        public static bool Quality { get; set; }
-        /// <summary>
-        /// Apply a maximum triangle area constraint.
-        /// </summary>
-        public static bool VarArea { get; set; }
-        /// <summary>
-        /// Apply a maximum triangle area constraint.
-        /// </summary>
-        public static bool FixedArea { get; set; }
-        /// <summary>
-        /// Apply a user-defined triangle constraint.
-        /// </summary>
-        public static bool Usertest { get; set; }
-        /// <summary>
-        /// Apply attributes to identify triangles in certain regions.
-        /// </summary>
-        public static bool RegionAttrib { get; set; }
-        /// <summary>
-        /// Enclose the convex hull with segments.
-        /// </summary>
-        public static bool Convex { get; set; }
-        /// <summary>
-        /// Jettison unused vertices from output.
-        /// </summary>
-        public static bool Jettison { get; set; }
-        /// <summary>
-        /// Compute boundary information.
-        /// </summary>
-        public static bool UseBoundaryMarkers { get; set; }
-        /// <summary>
-        /// Ignores holes in polygons.
-        /// </summary>
-        public static bool NoHoles { get; set; }
-        /// <summary>
-        /// No exact arithmetic.
-        /// </summary>
-        public static bool NoExact { get; set; }
-        /// <summary>
-        /// Conforming Delaunay (all triangles are truly Delaunay).
-        /// </summary>
-        public static bool ConformDel { get; set; }
-        /// <summary>
-        /// Algorithm to use for triangulation.
-        /// </summary>
-        public static TriangulationAlgorithm Algorithm { get; set; }
-        /// <summary>
-        /// Log detailed information.
-        /// </summary>
-        public static bool Verbose { get; set; }
-        /// <summary>
-        /// Use segments (should not be set manually)
-        /// </summary>
-        public static bool UseSegments { get; set; } // TODO: internal set
-
-        /// <summary>
-        /// Suppresses boundary segment splitting.
-        /// </summary>
-        public static int NoBisect { get; set; } // <- int !
-        /// <summary>
-        /// Use maximum number of added Steiner points.
-        /// </summary>
-        public static int Steiner { get; set; }
-
-        /// <summary>
-        /// Minimum angle constraint.
-        /// </summary>
-        public static double MinAngle { get; set; }
-        /// <summary>
-        /// (should not be set manually)
-        /// </summary>
-        public static double GoodAngle { get; set; }
-        /// <summary>
-        /// (should not be set manually)
-        /// </summary>
-        public static double Offconstant { get; set; }
-        /// <summary>
-        /// Maximum area constraint.
-        /// </summary>
-        public static double MaxArea { get; set; }
-        /// <summary>
-        /// Maximum angle constraint.
-        /// </summary>
-        public static double MaxAngle { get; set; }
-        /// <summary>
-        /// (should not be set manually)
-        /// </summary>
-        public static double MaxGoodAngle { get; set; }
-
         /// <summary>
         /// Load behavior defaults.
         /// </summary>
-        public static void Init()
+        public Behavior()
         {
             Poly = false;
             Quality = false;
@@ -125,10 +29,8 @@ namespace TriangleNet
             Jettison = false;
             UseBoundaryMarkers = true;
             NoHoles = false;
-            NoExact = false;
             ConformDel = false;
             Algorithm = TriangulationAlgorithm.Dwyer;
-            Verbose = true;
             UseSegments = true;
 
             NoBisect = 0;
@@ -140,6 +42,114 @@ namespace TriangleNet
             MaxGoodAngle = 0.0;
             MaxArea = -1.0;
             Offconstant = 0.0;
+
+            Verbose = true;
+            NoExact = false;
         }
+
+        #region Static properties
+
+        /// <summary>
+        /// No exact arithmetic.
+        /// </summary>
+        public static bool NoExact { get; set; }
+
+        /// <summary>
+        /// Log detailed information.
+        /// </summary>
+        public static bool Verbose { get; set; }
+
+        #endregion
+
+        #region Public properties
+
+        /// <summary>
+        /// Input is a Planar Straight Line Graph.
+        /// </summary>
+        public bool Poly { get; set; }
+        /// <summary>
+        /// Quality mesh generation.
+        /// </summary>
+        public bool Quality { get; set; }
+        /// <summary>
+        /// Apply a maximum triangle area constraint.
+        /// </summary>
+        public bool VarArea { get; set; }
+        /// <summary>
+        /// Apply a maximum triangle area constraint.
+        /// </summary>
+        public bool FixedArea { get; set; }
+        /// <summary>
+        /// Apply a user-defined triangle constraint.
+        /// </summary>
+        public bool Usertest { get; set; }
+        /// <summary>
+        /// Apply attributes to identify triangles in certain regions.
+        /// </summary>
+        public bool RegionAttrib { get; set; }
+        /// <summary>
+        /// Enclose the convex hull with segments.
+        /// </summary>
+        public bool Convex { get; set; }
+        /// <summary>
+        /// Jettison unused vertices from output.
+        /// </summary>
+        public bool Jettison { get; set; }
+        /// <summary>
+        /// Compute boundary information.
+        /// </summary>
+        public bool UseBoundaryMarkers { get; set; }
+        /// <summary>
+        /// Ignores holes in polygons.
+        /// </summary>
+        public bool NoHoles { get; set; }
+        /// <summary>
+        /// Conforming Delaunay (all triangles are truly Delaunay).
+        /// </summary>
+        public bool ConformDel { get; set; }
+        /// <summary>
+        /// Algorithm to use for triangulation.
+        /// </summary>
+        public TriangulationAlgorithm Algorithm { get; set; }
+        /// <summary>
+        /// Use segments (should not be set manually)
+        /// </summary>
+        public bool UseSegments { get; set; } // TODO: internal set
+
+        /// <summary>
+        /// Suppresses boundary segment splitting.
+        /// </summary>
+        public int NoBisect { get; set; } // <- int !
+        /// <summary>
+        /// Use maximum number of added Steiner points.
+        /// </summary>
+        public int Steiner { get; set; }
+
+        /// <summary>
+        /// Minimum angle constraint.
+        /// </summary>
+        public double MinAngle { get; set; }
+        /// <summary>
+        /// (should not be set manually)
+        /// </summary>
+        public double GoodAngle { get; set; }
+        /// <summary>
+        /// (should not be set manually)
+        /// </summary>
+        public double Offconstant { get; set; }
+        /// <summary>
+        /// Maximum area constraint.
+        /// </summary>
+        public double MaxArea { get; set; }
+        /// <summary>
+        /// Maximum angle constraint.
+        /// </summary>
+        public double MaxAngle { get; set; }
+        /// <summary>
+        /// (should not be set manually)
+        /// </summary>
+        public double MaxGoodAngle { get; set; }
+
+        #endregion
     }
 }

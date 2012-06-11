@@ -781,7 +781,10 @@ namespace TriangleNet.Algorithm
             Otri dissolveedge = default(Otri);
             Otri deadtriangle = default(Otri);
             Vertex markorg;
+
             int hullsize;
+
+            bool noPoly = !mesh.behavior.Poly;
 
             // Find an edge on the convex hull to start point location from.
             startghost.Lprev(ref searchedge);
@@ -799,7 +802,7 @@ namespace TriangleNet.Algorithm
 
                 // If no PSLG is involved, set the boundary markers of all the vertices
                 // on the convex hull.  If a PSLG is used, this step is done later.
-                if (!Behavior.Poly)
+                if (noPoly)
                 {
                     // Watch out for the case where all the input vertices are collinear.
                     if (dissolveedge.triangle != Mesh.dummytri)

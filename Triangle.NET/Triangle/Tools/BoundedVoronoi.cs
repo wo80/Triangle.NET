@@ -162,7 +162,7 @@ namespace TriangleNet.Tools
             Vertex tdest = tri.Dest();
             Vertex tapex = tri.Apex();
 
-            cc = Primitives.FindCircumcenter(torg, tdest, tapex, ref xi, ref eta, false);
+            cc = Primitives.FindCircumcenter(torg, tdest, tapex, ref xi, ref eta);
 
             if (SegmentsIntersect(ref seg, cc, torg, ref pt, true))
             {
@@ -217,12 +217,12 @@ namespace TriangleNet.Tools
                 torg = f.Org();
                 tdest = f.Dest();
                 tapex = f.Apex();
-                cc_f = Primitives.FindCircumcenter(torg, tdest, tapex, ref xi, ref eta, false);
+                cc_f = Primitives.FindCircumcenter(torg, tdest, tapex, ref xi, ref eta);
 
                 torg = f_next.Org();
                 tdest = f_next.Dest();
                 tapex = f_next.Apex();
-                cc_f_next = Primitives.FindCircumcenter(torg, tdest, tapex, ref xi, ref eta, false);
+                cc_f_next = Primitives.FindCircumcenter(torg, tdest, tapex, ref xi, ref eta);
 
                 // if f is tagged non-blind then
                 if (!f.triangle.infected)
@@ -353,7 +353,7 @@ namespace TriangleNet.Tools
                 torg = f.Org();
                 tdest = f.Dest();
                 tapex = f.Apex();
-                cc_f = Primitives.FindCircumcenter(torg, tdest, tapex, ref xi, ref eta, false);
+                cc_f = Primitives.FindCircumcenter(torg, tdest, tapex, ref xi, ref eta);
 
                 if (f_next.triangle == Mesh.dummytri)
                 {
@@ -375,7 +375,7 @@ namespace TriangleNet.Tools
                 torg = f_next.Org();
                 tdest = f_next.Dest();
                 tapex = f_next.Apex();
-                cc_f_next = Primitives.FindCircumcenter(torg, tdest, tapex, ref xi, ref eta, false);
+                cc_f_next = Primitives.FindCircumcenter(torg, tdest, tapex, ref xi, ref eta);
 
                 // if f is tagged non-blind then
                 if (!f.triangle.infected)

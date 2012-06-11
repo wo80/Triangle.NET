@@ -87,7 +87,7 @@ namespace TriangleNet.Tools
                 torg = tri.Org();
                 tdest = tri.Dest();
                 tapex = tri.Apex();
-                circumcenter = Primitives.FindCircumcenter(torg, tdest, tapex, ref xi, ref eta, false);
+                circumcenter = Primitives.FindCircumcenter(torg, tdest, tapex, ref xi, ref eta);
 
                 // X and y coordinates.
                 this.points[i] = new Point(circumcenter.x, circumcenter.y);

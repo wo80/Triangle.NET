@@ -19,7 +19,6 @@ namespace TriangleNet
     {
         Mesh mesh;
 
-
         public Carver(Mesh mesh)
         {
             this.mesh = mesh;
@@ -311,6 +310,8 @@ namespace TriangleNet
             Otri neighbor = default(Otri);
             Osub neighborsubseg = default(Osub);
 
+            Behavior behavior = mesh.behavior;
+
             // Loop through all the infected triangles, spreading the attribute
             // and/or area constraint to their neighbors, then to their neighbors'
             // neighbors.
@@ -325,12 +326,12 @@ namespace TriangleNet
                 // adjacent subsegments.
                 // TODO: Not true in the C# version (so we could skip this).
                 testtri.Uninfect();
-                if (Behavior.RegionAttrib)
+                if (behavior.RegionAttrib)
                 {
                     // Set an attribute (Note: the attributes array was resized before).
                     testtri.triangle.attributes[mesh.eextras] = attribute;
                 }
-                if (Behavior.VarArea)
+                if (behavior.VarArea)
                 {
                     // Set an area constraint.
                     testtri.triangle.area = area;
@@ -383,14 +384,14 @@ namespace TriangleNet
 
             Otri[] regionTris = null;
 
-            if (!Behavior.Convex)
+            if (!mesh.behavior.Convex)
             {
                 // Mark as infected any unprotected triangles on the boundary.
                 // This is one way by which concavities are created.
                 InfectHull();
             }
 
-            if (!Behavior.NoHoles)
+            if (!mesh.behavior.NoHoles)
             {
                 // Infect each triangle in which a hole lies.
                 foreach (var hole in mesh.holes)
@@ -475,7 +476,7 @@ namespace TriangleNet
 
             if (regionTris != null)
             {
-                if (Behavior.RegionAttrib)
+                if (mesh.behavior.RegionAttrib)
                 {
                     // Make the triangle's attributes larger.
                     double[] attributes = new double[mesh.eextras + 1];
@@ -508,7 +509,7 @@ namespace TriangleNet
                     }
                 }
 
-                if (Behavior.RegionAttrib)
+                if (mesh.behavior.RegionAttrib)
                 {
                     // Note the fact that each triangle has an additional attribute.
                     mesh.eextras++;

@@ -43,7 +43,9 @@ namespace TriangleNet.IO
             Vertex vertex;
             long outvertices = mesh.vertices.Count;
 
-            if (Behavior.Jettison)
+            Behavior behavior = mesh.behavior;
+
+            if (behavior.Jettison)
             {
                 outvertices = mesh.vertices.Count - mesh.undeads;
             }
@@ -55,13 +57,13 @@ namespace TriangleNet.IO
                 // Number of vertices, number of dimensions, number of vertex attributes,
                 // and number of boundary markers (zero or one).
                 writer.WriteLine("{0} {1} {2} {3}", outvertices, mesh.mesh_dim, mesh.nextras,
-                    Behavior.UseBoundaryMarkers ? "1" : "0");
+                    behavior.UseBoundaryMarkers ? "1" : "0");
 
                 foreach (var item in mesh.vertices.Values)
                 {
                     vertex = item;
 
-                    if (!Behavior.Jettison || vertex.type != VertexType.UndeadVertex)
+                    if (!behavior.Jettison || vertex.type != VertexType.UndeadVertex)
                     {
                         // Vertex number, x and y coordinates.
                         writer.Write("{0} {1} {2}", index, vertex.x.ToString(nfi), vertex.y.ToString(nfi));
@@ -72,7 +74,7 @@ namespace TriangleNet.IO
                             writer.Write(" {0}", vertex.attributes[j].ToString(nfi));
                         }
 
-                        if (Behavior.UseBoundaryMarkers)
+                        if (behavior.UseBoundaryMarkers)
                         {
                             // Write the boundary marker.
                             writer.Write(" {0}", vertex.mark);
@@ -154,6 +156,8 @@ namespace TriangleNet.IO
             Osub subseg = default(Osub);
             Vertex pt1, pt2;
 
+            bool useBoundaryMarkers = mesh.behavior.UseBoundaryMarkers;
+
             using (StreamWriter writer = new StreamWriter(filename))
             {
                 if (writeNodes)
@@ -167,12 +171,12 @@ namespace TriangleNet.IO
                     // Followed by number of dimensions, number of vertex attributes,
                     // and number of boundary markers (zero or one).
                     writer.WriteLine("0 {0} {1} {2}", mesh.mesh_dim, mesh.nextras,
-                        Behavior.UseBoundaryMarkers ? "1" : "0");
+                        useBoundaryMarkers ? "1" : "0");
                 }
 
                 // Number of segments, number of boundary markers (zero or one).
                 writer.WriteLine("{0} {1}", mesh.subsegs.Count,
-                    Behavior.UseBoundaryMarkers ? "1" : "0");
+                    useBoundaryMarkers ? "1" : "0");
 
                 subseg.orient = 0;
 
@@ -185,7 +189,7 @@ namespace TriangleNet.IO
                     pt2 = subseg.Dest();
 
                     // Segment number, indices of its two endpoints, and possibly a marker.
-                    if (Behavior.UseBoundaryMarkers)
+                    if (useBoundaryMarkers)
                     {
                         writer.WriteLine("{0} {1} {2} {3}", j, pt1.id, pt2.id, subseg.seg.boundary);
                     }
@@ -232,10 +236,12 @@ namespace TriangleNet.IO
             Osub checkmark = default(Osub);
             Vertex p1, p2;
 
+            Behavior behavior = mesh.behavior;
+
             using (StreamWriter writer = new StreamWriter(filename))
             {
                 // Number of edges, number of boundary markers (zero or one).
-                writer.WriteLine("{0} {1}", mesh.edges, Behavior.UseBoundaryMarkers ? "1" : "0");
+                writer.WriteLine("{0} {1}", mesh.edges, behavior.UseBoundaryMarkers ? "1" : "0");
 
                 long index = 0;
                 // To loop over the set of edges, loop over all triangles, and look at
@@ -256,11 +262,11 @@ namespace TriangleNet.IO
                             p1 = tri.Org();
                             p2 = tri.Dest();
 
-                            if (Behavior.UseBoundaryMarkers)
+                            if (behavior.UseBoundaryMarkers)
                             {
                                 // Edge number, indices of two endpoints, and a boundary marker.
                                 // If there's no subsegment, the boundary marker is zero.
-                                if (Behavior.UseSegments)
+                                if (behavior.UseSegments)
                                 {
                                     tri.SegPivot(ref checkmark);
 
@@ -371,7 +377,7 @@ namespace TriangleNet.IO
                     torg = tri.Org();
                     tdest = tri.Dest();
                     tapex = tri.Apex();
-                    circumcenter = Primitives.FindCircumcenter(torg, tdest, tapex, ref xi, ref eta, false);
+                    circumcenter = Primitives.FindCircumcenter(torg, tdest, tapex, ref xi, ref eta);
 
                     // X and y coordinates.
                     writer.Write("{0} {1} {2}", index, circumcenter.X.ToString(nfi),
@@ -456,7 +462,7 @@ namespace TriangleNet.IO
 
             long outvertices = mesh.vertices.Count;
 
-            if (Behavior.Jettison)
+            if (mesh.behavior.Jettison)
             {
                 outvertices = mesh.vertices.Count - mesh.undeads;
             }
@@ -472,7 +478,7 @@ namespace TriangleNet.IO
                 {
                     p1 = item;
 
-                    if (!Behavior.Jettison || p1.type != VertexType.UndeadVertex)
+                    if (!mesh.behavior.Jettison || p1.type != VertexType.UndeadVertex)
                     {
                         // The "0.0" is here because the OFF format uses 3D coordinates.
                         writer.WriteLine(" {0}  {1}  0.0", p1[0].ToString(nfi), p1[1].ToString(nfi));

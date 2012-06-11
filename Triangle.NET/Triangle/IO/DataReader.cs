@@ -85,7 +85,7 @@ namespace TriangleNet.IO
                 //tri.triangle.neighbors[0].triangle = tri.triangle;
             }
 
-            if (Behavior.Poly)
+            if (mesh.behavior.Poly)
             {
                 mesh.insegments = numberofsegments;
 
@@ -134,7 +134,7 @@ namespace TriangleNet.IO
                 tri.triangle.attributes = triangles[i].Attributes;
 
                 // TODO
-                if (Behavior.VarArea)
+                if (mesh.behavior.VarArea)
                 {
                     tri.triangle.area = triangles[i].Area;
                 }
@@ -197,7 +197,7 @@ namespace TriangleNet.IO
 
             // Prepare to count the boundary edges.
             hullsize = 0;
-            if (Behavior.Poly)
+            if (mesh.behavior.Poly)
             {
                 // Read the segments from the .poly file, and link them
                 // to their neighboring triangles.

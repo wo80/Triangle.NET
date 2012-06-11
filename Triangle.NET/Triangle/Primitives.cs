@@ -261,19 +261,10 @@ namespace TriangleNet
         /// <param name="tapex">Triangle point.</param>
         /// <param name="xi">Relative coordinate of new location.</param>
         /// <param name="eta">Relative coordinate of new location.</param>
-        /// <param name="offcenter">Use off-center for new location.</param>
+        /// <param name="offconstant">Off-center constant.</param>
         /// <returns>Coordinates of the circumcenter (or off-center)</returns>
-        /// <remarks>
-        /// The result is returned both in terms of x-y coordinates and xi-eta
-        /// (barycentric) coordinates. The xi-eta coordinate system is defined in
-        /// terms of the triangle: the origin of the triangle is the origin of the
-        /// coordinate system; the destination of the triangle is one unit along the
-        /// xi axis; and the apex of the triangle is one unit along the eta axis.
-        /// This procedure also returns the square of the length of the triangle's
-        /// shortest edge.
-        /// </remarks>
         public static Point FindCircumcenter(Point torg, Point tdest, Point tapex,
-                              ref double xi, ref double eta, bool offcenter)
+                              ref double xi, ref double eta, double offconstant)
         {
             double xdo, ydo, xao, yao;
             double dodist, aodist, dadist;
@@ -291,6 +282,7 @@ namespace TriangleNet
             aodist = xao * xao + yao * yao;
             dadist = (tdest.x - tapex.x) * (tdest.x - tapex.x) +
                      (tdest.y - tapex.y) * (tdest.y - tapex.y);
+
             if (Behavior.NoExact)
             {
                 denominator = 0.5 / (xdo * yao - xao * ydo);
@@ -304,6 +296,7 @@ namespace TriangleNet
                 // Don't count the above as an orientation test.
                 Statistic.CounterClockwiseCount--;
             }
+
             dx = (yao * dodist - ydo * aodist) * denominator;
             dy = (xdo * aodist - xao * dodist) * denominator;
 
@@ -314,11 +307,11 @@ namespace TriangleNet
             // the input PSLG.
             if ((dodist < aodist) && (dodist < dadist))
             {
-                if (offcenter && (Behavior.Offconstant > 0.0))
+                if (offconstant > 0.0)
                 {
                     // Find the position of the off-center, as described by Alper Ungor.
-                    dxoff = 0.5 * xdo - Behavior.Offconstant * ydo;
-                    dyoff = 0.5 * ydo + Behavior.Offconstant * xdo;
+                    dxoff = 0.5 * xdo - offconstant * ydo;
+                    dyoff = 0.5 * ydo + offconstant * xdo;
                     // If the off-center is closer to the origin than the
                     // circumcenter, use the off-center instead.
                     if (dxoff * dxoff + dyoff * dyoff < dx * dx + dy * dy)
@@ -330,10 +323,10 @@ namespace TriangleNet
             }
             else if (aodist < dadist)
             {
-                if (offcenter && (Behavior.Offconstant > 0.0))
+                if (offconstant > 0.0)
                 {
-                    dxoff = 0.5 * xao + Behavior.Offconstant * yao;
-                    dyoff = 0.5 * yao - Behavior.Offconstant * xao;
+                    dxoff = 0.5 * xao + offconstant * yao;
+                    dyoff = 0.5 * yao - offconstant * xao;
                     // If the off-center is closer to the origin than the
                     // circumcenter, use the off-center instead.
                     if (dxoff * dxoff + dyoff * dyoff < dx * dx + dy * dy)
@@ -345,12 +338,10 @@ namespace TriangleNet
             }
             else
             {
-                if (offcenter && (Behavior.Offconstant > 0.0))
+                if (offconstant > 0.0)
                 {
-                    dxoff = 0.5 * (tapex.x - tdest.x) -
-                          Behavior.Offconstant * (tapex.y - tdest.y);
-                    dyoff = 0.5 * (tapex.y - tdest.y) +
-                          Behavior.Offconstant * (tapex.x - tdest.x);
+                    dxoff = 0.5 * (tapex.x - tdest.x) - offconstant * (tapex.y - tdest.y);
+                    dyoff = 0.5 * (tapex.y - tdest.y) + offconstant * (tapex.x - tdest.x);
                     // If the off-center is closer to the destination than the
                     // circumcenter, use the off-center instead.
                     if (dxoff * dxoff + dyoff * dyoff <
@@ -362,7 +353,71 @@ namespace TriangleNet
                 }
             }
 
-            Point circumcenter = new Point(torg.x + dx, torg.y + dy);
+            // To interpolate vertex attributes for the new vertex inserted at
+            // the circumcenter, define a coordinate system with a xi-axis,
+            // directed from the triangle's origin to its destination, and
+            // an eta-axis, directed from its origin to its apex.
+            // Calculate the xi and eta coordinates of the circumcenter.
+            xi = (yao * dx - xao * dy) * (2.0 * denominator);
+            eta = (xdo * dy - ydo * dx) * (2.0 * denominator);
+
+            return new Point(torg.x + dx, torg.y + dy);
+        }
+
+        /// <summary>
+        /// Find the circumcenter of a triangle.
+        /// </summary>
+        /// <param name="torg">Triangle point.</param>
+        /// <param name="tdest">Triangle point.</param>
+        /// <param name="tapex">Triangle point.</param>
+        /// <param name="xi">Relative coordinate of new location.</param>
+        /// <param name="eta">Relative coordinate of new location.</param>
+        /// <returns>Coordinates of the circumcenter</returns>
+        /// <remarks>
+        /// The result is returned both in terms of x-y coordinates and xi-eta
+        /// (barycentric) coordinates. The xi-eta coordinate system is defined in
+        /// terms of the triangle: the origin of the triangle is the origin of the
+        /// coordinate system; the destination of the triangle is one unit along the
+        /// xi axis; and the apex of the triangle is one unit along the eta axis.
+        /// This procedure also returns the square of the length of the triangle's
+        /// shortest edge.
+        /// </remarks>
+        public static Point FindCircumcenter(Point torg, Point tdest, Point tapex,
+                              ref double xi, ref double eta)
+        {
+            double xdo, ydo, xao, yao;
+            double dodist, aodist, dadist;
+            double denominator;
+            double dx, dy;
+
+            Statistic.CircumcenterCount++;
+
+            // Compute the circumcenter of the triangle.
+            xdo = tdest.x - torg.x;
+            ydo = tdest.y - torg.y;
+            xao = tapex.x - torg.x;
+            yao = tapex.y - torg.y;
+            dodist = xdo * xdo + ydo * ydo;
+            aodist = xao * xao + yao * yao;
+            dadist = (tdest.x - tapex.x) * (tdest.x - tapex.x) +
+                     (tdest.y - tapex.y) * (tdest.y - tapex.y);
+
+            if (Behavior.NoExact)
+            {
+                denominator = 0.5 / (xdo * yao - xao * ydo);
+            }
+            else
+            {
+                // Use the counterclockwise() routine to ensure a positive (and
+                // reasonably accurate) result, avoiding any possibility of
+                // division by zero.
+                denominator = 0.5 / CounterClockwise(tdest, tapex, torg);
+                // Don't count the above as an orientation test.
+                Statistic.CounterClockwiseCount--;
+            }
+
+            dx = (yao * dodist - ydo * aodist) * denominator;
+            dy = (xdo * aodist - xao * dodist) * denominator;
 
             // To interpolate vertex attributes for the new vertex inserted at
             // the circumcenter, define a coordinate system with a xi-axis,
@@ -372,7 +427,7 @@ namespace TriangleNet
             xi = (yao * dx - xao * dy) * (2.0 * denominator);
             eta = (xdo * dy - ydo * dx) * (2.0 * denominator);
 
-            return circumcenter;
+            return new Point(torg.x + dx, torg.y + dy);
         }
     }
 }

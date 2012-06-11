@@ -81,7 +81,8 @@ namespace TriangleNet
         // proximate vertices are inserted sequentially.
         internal Otri recenttri;
 
-        //static FlipStacker dummyflip;
+        // Controls the behavior of the mesh instance.
+        internal Behavior behavior;
 
         #endregion
 
@@ -166,7 +167,7 @@ namespace TriangleNet
         {
             logger = SimpleLog.Instance;
 
-            Behavior.Init();
+            behavior = new Behavior();
 
             vertices = new Dictionary<int, Vertex>();
             triangles = new Dictionary<int, Triangle>();
@@ -222,28 +223,28 @@ namespace TriangleNet
 
             if (input.HasSegments)
             {
-                Behavior.Poly = true;
+                behavior.Poly = true;
             }
 
             //if (input.EdgeMarkers != null)
             //{
-            //    Behavior.UseBoundaryMarkers = true;
+            //    behavior.UseBoundaryMarkers = true;
             //}
 
             //if (input.TriangleAreas != null)
             //{
-            //    Behavior.VarArea = true;
+            //    behavior.VarArea = true;
             //}
 
-            if (!Behavior.Poly)
+            if (!behavior.Poly)
             {
                 // Be careful not to allocate space for element area constraints that
                 // will never be assigned any value (other than the default -1.0).
-                Behavior.VarArea = false;
+                behavior.VarArea = false;
 
                 // Be careful not to add an extra attribute to each element unless the
                 // input supports it (PSLG in, but not refining a preexisting mesh).
-                Behavior.RegionAttrib = false;
+                behavior.RegionAttrib = false;
             }
 
             TransferNodes(input);
@@ -277,26 +278,26 @@ namespace TriangleNet
 
             if (input.HasSegments)
             {
-                Behavior.Poly = true;
+                behavior.Poly = true;
             }
 
             //if (input.EdgeMarkers != null)
             //{
-            //    Behavior.UseBoundaryMarkers = true;
+            //    behavior.UseBoundaryMarkers = true;
             //}
 
-            if (!Behavior.Poly)
+            if (!behavior.Poly)
             {
                 // Be careful not to allocate space for element area constraints that
                 // will never be assigned any value (other than the default -1.0).
-                Behavior.VarArea = false;
+                behavior.VarArea = false;
 
                 // Be careful not to add an extra attribute to each element unless the
                 // input supports it (PSLG in, but not refining a preexisting mesh).
-                Behavior.RegionAttrib = false;
+                behavior.RegionAttrib = false;
             }
 
-            steinerleft = Behavior.Steiner;
+            steinerleft = behavior.Steiner;
 
             TransferNodes(input);
 
@@ -308,7 +309,7 @@ namespace TriangleNet
             infvertex2 = null;
             infvertex3 = null;
 
-            if (Behavior.UseSegments)
+            if (behavior.UseSegments)
             {
                 // Segments will be introduced next.
                 checksegments = true;
@@ -317,7 +318,7 @@ namespace TriangleNet
                 FormSkeleton(input);
             }
 
-            if (Behavior.Poly && (triangles.Count > 0))
+            if (behavior.Poly && (triangles.Count > 0))
             {
                 // Copy holes
                 foreach (var item in input.holes)
@@ -348,7 +349,7 @@ namespace TriangleNet
                 regions.Clear();
             }
 
-            if (Behavior.Quality && (triangles.Count > 0))
+            if (behavior.Quality && (triangles.Count > 0))
             {
                 quality.EnforceQuality();           // Enforce angle and area constraints.
             }
@@ -394,14 +395,14 @@ namespace TriangleNet
         /// <param name="areaConstraint">Global area constraint.</param>
         public void Refine(double areaConstraint)
         {
-            Behavior.FixedArea = true;
-            Behavior.MaxArea = areaConstraint;
+            behavior.FixedArea = true;
+            behavior.MaxArea = areaConstraint;
 
             this.Refine();
 
             // Reset option for sanity
-            Behavior.FixedArea = false;
-            Behavior.MaxArea = -1.0;
+            behavior.FixedArea = false;
+            behavior.MaxArea = -1.0;
         }
 
         /// <summary>
@@ -414,9 +415,9 @@ namespace TriangleNet
 
             // TODO: Set all vertex types to input (i.e. NOT free)?
 
-            if (Behavior.Poly)
+            if (behavior.Poly)
             {
-                if (Behavior.UseSegments)
+                if (behavior.UseSegments)
                 {
                     insegments = subsegs.Count;
                 }
@@ -428,7 +429,7 @@ namespace TriangleNet
 
             Reset();
 
-            steinerleft = Behavior.Steiner;
+            steinerleft = behavior.Steiner;
 
             // Ensure that no vertex can be mistaken for a triangular bounding
             // box vertex in insertvertex().
@@ -436,7 +437,7 @@ namespace TriangleNet
             infvertex2 = null;
             infvertex3 = null;
 
-            if (Behavior.UseSegments)
+            if (behavior.UseSegments)
             {
                 checksegments = true;
             }
@@ -502,23 +503,23 @@ namespace TriangleNet
         {
             if (option == Options.ConformingDelaunay)
             {
-                Behavior.ConformDel = value;
-                Behavior.Quality = value; // TODO: ok?
+                behavior.ConformDel = value;
+                behavior.Quality = value; // TODO: ok?
                 return;
             }
             else if (option == Options.BoundaryMarkers)
             {
-                Behavior.UseBoundaryMarkers = value;
+                behavior.UseBoundaryMarkers = value;
                 return;
             }
             else if (option == Options.Quality)
             {
-                Behavior.Quality = value;
+                behavior.Quality = value;
 
                 if (value)
                 {
-                    Behavior.MinAngle = 20.0;
-                    Behavior.MaxAngle = 140.0;
+                    behavior.MinAngle = 20.0;
+                    behavior.MaxAngle = 140.0;
                     UpdateOptions();
                 }
 
@@ -526,7 +527,7 @@ namespace TriangleNet
             }
             else if (option == Options.Convex)
             {
-                Behavior.Convex = value;
+                behavior.Convex = value;
                 return;
             }
 
@@ -543,23 +544,23 @@ namespace TriangleNet
 
             if (option == Options.MinAngle)
             {
-                Behavior.MinAngle = value;
-                Behavior.Quality = (value >= 0); // TODO: ok?
+                behavior.MinAngle = value;
+                behavior.Quality = (value >= 0); // TODO: ok?
                 UpdateOptions();
                 return;
             }
             else if (option == Options.MaxAngle)
             {
-                Behavior.MaxAngle = value;
-                Behavior.Quality = (value >= 0); // TODO: ok?
+                behavior.MaxAngle = value;
+                behavior.Quality = (value >= 0); // TODO: ok?
                 UpdateOptions();
                 return;
             }
             else if (option == Options.MaxArea)
             {
-                Behavior.MaxArea = value;
-                Behavior.FixedArea = true;
-                Behavior.Quality = (value >= 0); // TODO: ok?
+                behavior.MaxArea = value;
+                behavior.FixedArea = true;
+                behavior.Quality = (value >= 0); // TODO: ok?
                 return;
             }
 
@@ -575,33 +576,33 @@ namespace TriangleNet
         {
             if (option == Options.NoBisect)
             {
-                Behavior.NoBisect = value;
+                behavior.NoBisect = value;
                 return;
             }
             else if (option == Options.SteinerPoints)
             {
-                Behavior.Steiner = value;
+                behavior.Steiner = value;
                 return;
             }
             else if (option == Options.MinAngle)
             {
-                Behavior.MinAngle = value;
-                Behavior.Quality = (value >= 0); // TODO: ok?
+                behavior.MinAngle = value;
+                behavior.Quality = (value >= 0); // TODO: ok?
                 UpdateOptions();
                 return;
             }
             else if (option == Options.MaxAngle)
             {
-                Behavior.MaxAngle = value;
-                Behavior.Quality = (value >= 0); // TODO: ok?
+                behavior.MaxAngle = value;
+                behavior.Quality = (value >= 0); // TODO: ok?
                 UpdateOptions();
                 return;
             }
             else if (option == Options.MaxArea)
             {
-                Behavior.MaxArea = value;
-                Behavior.Quality = (value >= 0); // TODO: ok?
-                Behavior.FixedArea = true;
+                behavior.MaxArea = value;
+                behavior.Quality = (value >= 0); // TODO: ok?
+                behavior.FixedArea = true;
                 return;
             }
 
@@ -613,20 +614,20 @@ namespace TriangleNet
         /// </summary>
         private void UpdateOptions()
         {
-            Behavior.UseSegments = Behavior.Poly || Behavior.Quality || Behavior.Convex;
-            Behavior.GoodAngle = Math.Cos(Behavior.MinAngle * Math.PI / 180.0);
-            Behavior.MaxGoodAngle = Math.Cos(Behavior.MaxAngle * Math.PI / 180.0);
+            behavior.UseSegments = behavior.Poly || behavior.Quality || behavior.Convex;
+            behavior.GoodAngle = Math.Cos(behavior.MinAngle * Math.PI / 180.0);
+            behavior.MaxGoodAngle = Math.Cos(behavior.MaxAngle * Math.PI / 180.0);
 
-            if (Behavior.GoodAngle == 1.0)
+            if (behavior.GoodAngle == 1.0)
             {
-                Behavior.Offconstant = 0.0;
+                behavior.Offconstant = 0.0;
             }
             else
             {
-                Behavior.Offconstant = 0.475 * Math.Sqrt((1.0 + Behavior.GoodAngle) / (1.0 - Behavior.GoodAngle));
+                behavior.Offconstant = 0.475 * Math.Sqrt((1.0 + behavior.GoodAngle) / (1.0 - behavior.GoodAngle));
             }
 
-            Behavior.GoodAngle *= Behavior.GoodAngle;
+            behavior.GoodAngle *= behavior.GoodAngle;
         }
 
         #endregion
@@ -643,12 +644,12 @@ namespace TriangleNet
 
             eextras = 0;
 
-            if (Behavior.Algorithm == TriangulationAlgorithm.Dwyer)
+            if (behavior.Algorithm == TriangulationAlgorithm.Dwyer)
             {
                 Dwyer alg = new Dwyer();
                 hulledges = alg.Triangulate(this);
             }
-            else if (Behavior.Algorithm == TriangulationAlgorithm.SweepLine)
+            else if (behavior.Algorithm == TriangulationAlgorithm.SweepLine)
             {
                 SweepLine alg = new SweepLine();
                 hulledges = alg.Triangulate(this);
@@ -750,7 +751,7 @@ namespace TriangleNet
             dummytri.neighbors[1].triangle = dummytri;
             dummytri.neighbors[2].triangle = dummytri;
 
-            if (Behavior.UseSegments)
+            if (behavior.UseSegments)
             {
                 // Set up 'dummysub', the omnipresent subsegment pointed to by any
                 // triangle side or subsegment end that isn't attached to a real
@@ -973,8 +974,8 @@ namespace TriangleNet
                         // The vertex falls on a subsegment, and hence will not be inserted.
                         if (segmentflaws)
                         {
-                            enq = Behavior.NoBisect != 2;
-                            if (enq && (Behavior.NoBisect == 1))
+                            enq = behavior.NoBisect != 2;
+                            if (enq && (behavior.NoBisect == 1))
                             {
                                 // This subsegment may be split only if it is an
                                 // internal boundary.
@@ -1035,7 +1036,7 @@ namespace TriangleNet
                     newbotright.triangle.attributes[i] = botright.triangle.attributes[i];
                 }
 
-                if (Behavior.VarArea)
+                if (behavior.VarArea)
                 {
                     // Set the area constraint of a new triangle.
                     newbotright.triangle.area = botright.triangle.area;
@@ -1055,7 +1056,7 @@ namespace TriangleNet
                         newtopright.triangle.attributes[i] = topright.triangle.attributes[i];
                     }
 
-                    if (Behavior.VarArea)
+                    if (behavior.VarArea)
                     {
                         // Set the area constraint of another new triangle.
                         newtopright.triangle.area = topright.triangle.area;
@@ -1166,7 +1167,7 @@ namespace TriangleNet
                     newbotright.triangle.attributes[i] = attrib;
                 }
 
-                if (Behavior.VarArea)
+                if (behavior.VarArea)
                 {
                     // Set the area constraint of the new triangles.
                     area = horiz.triangle.area;
@@ -1369,7 +1370,7 @@ namespace TriangleNet
                                 horiz.triangle.attributes[i] = attrib;
                             }
 
-                            if (Behavior.VarArea)
+                            if (behavior.VarArea)
                             {
                                 if ((top.triangle.area <= 0.0) || (horiz.triangle.area <= 0.0))
                                 {
@@ -1904,7 +1905,7 @@ namespace TriangleNet
                 // the resulting triangles.
                 deltri.Onext(ref firstedge);
                 deltri.Oprev(ref lastedge);
-                TriangulatePolygon(firstedge, lastedge, edgecount, false, Behavior.NoBisect == 0);
+                TriangulatePolygon(firstedge, lastedge, edgecount, false, behavior.NoBisect == 0);
             }
             // Splice out two triangles.
             deltri.Lprev(ref deltriright);
@@ -1928,7 +1929,7 @@ namespace TriangleNet
             // Set the new origin of 'deltri' and check its quality.
             neworg = lefttri.Org();
             deltri.SetOrg(neworg);
-            if (Behavior.NoBisect == 0)
+            if (behavior.NoBisect == 0)
             {
                 quality.TestTriangle(ref deltri);
             }
@@ -3028,7 +3029,7 @@ namespace TriangleNet
 
             this.insegments = 0;
 
-            if (Behavior.Poly)
+            if (behavior.Poly)
             {
                 // If the input vertices are collinear, there is no triangulation,
                 // so don't try to insert segments.
@@ -3092,7 +3093,7 @@ namespace TriangleNet
                 }
             }
 
-            if (Behavior.Convex || !Behavior.Poly)
+            if (behavior.Convex || !behavior.Poly)
             {
                 // Enclose the convex hull with subsegments.
                 MarkHull();

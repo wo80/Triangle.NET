@@ -21,19 +21,26 @@ namespace TriangleNet
         Queue<BadSubseg> badsubsegs;
         BadTriQueue queue;
         Mesh mesh;
+        Behavior behavior;
+
+        NewLocation newLocation;
 
         // Not used at the moment
         Func<Point, Point, Point, double, bool> userTest;
 
         ILog<SimpleLogItem> logger;
 
-        public Quality(Mesh m)
+        public Quality(Mesh mesh)
         {
             logger = SimpleLog.Instance;
 
             badsubsegs = new Queue<BadSubseg>();
             queue = new BadTriQueue();
-            mesh = m;
+
+            this.mesh = mesh;
+            this.behavior = mesh.behavior;
+
+            newLocation = new NewLocation(mesh);
         }
 
         /// <summary>
@@ -278,9 +285,9 @@ namespace TriangleNet
                              (eorg.y - eapex.y) * (edest.y - eapex.y);
                 if (dotproduct < 0.0)
                 {
-                    if (Behavior.ConformDel ||
+                    if (behavior.ConformDel ||
                         (dotproduct * dotproduct >=
-                         (2.0 * Behavior.GoodAngle - 1.0) * (2.0 * Behavior.GoodAngle - 1.0) *
+                         (2.0 * behavior.GoodAngle - 1.0) * (2.0 * behavior.GoodAngle - 1.0) *
                          ((eorg.x - eapex.x) * (eorg.x - eapex.x) +
                           (eorg.y - eapex.y) * (eorg.y - eapex.y)) *
                          ((edest.x - eapex.x) * (edest.x - eapex.x) +
@@ -305,9 +312,9 @@ namespace TriangleNet
                              (eorg.y - eapex.y) * (edest.y - eapex.y);
                 if (dotproduct < 0.0)
                 {
-                    if (Behavior.ConformDel ||
+                    if (behavior.ConformDel ||
                         (dotproduct * dotproduct >=
-                         (2.0 * Behavior.GoodAngle - 1.0) * (2.0 * Behavior.GoodAngle - 1.0) *
+                         (2.0 * behavior.GoodAngle - 1.0) * (2.0 * behavior.GoodAngle - 1.0) *
                          ((eorg.x - eapex.x) * (eorg.x - eapex.x) +
                           (eorg.y - eapex.y) * (eorg.y - eapex.y)) *
                          ((edest.x - eapex.x) * (edest.x - eapex.x) +
@@ -318,7 +325,7 @@ namespace TriangleNet
                 }
             }
 
-            if (encroached > 0 && (Behavior.NoBisect == 0 || ((Behavior.NoBisect == 1) && (sides == 2))))
+            if (encroached > 0 && (behavior.NoBisect == 0 || ((behavior.NoBisect == 1) && (sides == 2))))
             {
                 // Add the subsegment to the list of encroached subsegments.
                 // Be sure to get the orientation right.
@@ -422,11 +429,11 @@ namespace TriangleNet
                 testtri.Lprev(ref tri1);
             }
 
-            if (Behavior.VarArea || Behavior.FixedArea || Behavior.Usertest)
+            if (behavior.VarArea || behavior.FixedArea || behavior.Usertest)
             {
                 // Check whether the area is larger than permitted.
                 area = 0.5 * (dxod * dyda - dyod * dxda);
-                if (Behavior.FixedArea && (area > Behavior.MaxArea))
+                if (behavior.FixedArea && (area > behavior.MaxArea))
                 {
                     // Add this triangle to the list of bad triangles.
                     queue.Enqueue(ref testtri, minedge, tapex, torg, tdest);
@@ -434,7 +441,7 @@ namespace TriangleNet
                 }
 
                 // Nonpositive area constraints are treated as unconstrained.
-                if ((Behavior.VarArea) && (area > testtri.triangle.area) && (testtri.triangle.area > 0.0))
+                if ((behavior.VarArea) && (area > testtri.triangle.area) && (testtri.triangle.area > 0.0))
                 {
                     // Add this triangle to the list of bad triangles.
                     queue.Enqueue(ref testtri, minedge, tapex, torg, tdest);
@@ -442,7 +449,7 @@ namespace TriangleNet
                 }
 
                 // Check whether the user thinks this triangle is too large.
-                if (Behavior.Usertest && userTest != null)
+                if (behavior.Usertest && userTest != null)
                 {
                     if (userTest(torg, tdest, tapex, area))
                     {
@@ -476,7 +483,7 @@ namespace TriangleNet
             }
 
             // Check whether the angle is smaller than permitted.
-            if ((angle > Behavior.GoodAngle) || (maxangle < Behavior.MaxGoodAngle && Behavior.MaxAngle != 0.0))
+            if ((angle > behavior.GoodAngle) || (maxangle < behavior.MaxGoodAngle && behavior.MaxAngle != 0.0))
             {
                 // Use the rules of Miller, Pav, and Walkington to decide that certain
                 // triangles should not be split, even if they have bad angles.
@@ -643,7 +650,7 @@ namespace TriangleNet
                     // If we're using Chew's algorithm (rather than Ruppert's)
                     // to define encroachment, delete free vertices from the
                     // subsegment's diametral circle.
-                    if (!Behavior.ConformDel && !acuteorg && !acutedest)
+                    if (!behavior.ConformDel && !acuteorg && !acutedest)
                     {
                         eapex = enctri.Apex();
                         while ((eapex.type == VertexType.FreeVertex) &&
@@ -673,7 +680,7 @@ namespace TriangleNet
                         acuteorg = acuteorg || acuteorg2;
 
                         // Delete free vertices from the subsegment's diametral circle.
-                        if (!Behavior.ConformDel && !acuteorg2 && !acutedest2)
+                        if (!behavior.ConformDel && !acuteorg2 && !acutedest2)
                         {
                             eapex = testtri.Org();
                             while ((eapex.type == VertexType.FreeVertex) &&
@@ -845,15 +852,15 @@ namespace TriangleNet
                 // for mesh refinement.
                 // TODO: NewLocation doesn't work for refinement. Why? Maybe 
                 // reset VertexType?
-                if (Behavior.FixedArea || Behavior.VarArea)
+                if (behavior.FixedArea || behavior.VarArea)
                 {
-                    Point tmp = Primitives.FindCircumcenter(borg, bdest, bapex, ref xi, ref eta, true);
+                    Point tmp = Primitives.FindCircumcenter(borg, bdest, bapex, ref xi, ref eta, behavior.Offconstant);
                     newvertex.x = tmp.x;
                     newvertex.y = tmp.y;
                 }
                 else
                 {
-                    NewLocation.FindLocation(mesh, borg, bdest, bapex, newvertex, ref xi, ref eta, true, badotri);
+                    newLocation.FindLocation(borg, bdest, bapex, newvertex, ref xi, ref eta, true, badotri);
                 }
 
                 // Check whether the new vertex lies on a triangle vertex.
@@ -959,7 +966,7 @@ namespace TriangleNet
             // triangulation should be (conforming) Delaunay.
 
             // Next, we worry about enforcing triangle quality.
-            if ((Behavior.MinAngle > 0.0) || Behavior.VarArea || Behavior.FixedArea || Behavior.Usertest)
+            if ((behavior.MinAngle > 0.0) || behavior.VarArea || behavior.FixedArea || behavior.Usertest)
             {
                 // TODO: Reset queue? (Or is it always empty at this point)
 
@@ -989,7 +996,7 @@ namespace TriangleNet
             // and have no low-quality triangles.
 
             // Might we have run out of Steiner points too soon?
-            if (Behavior.Verbose && Behavior.ConformDel && (badsubsegs.Count > 0) && (mesh.steinerleft == 0))
+            if (Behavior.Verbose && behavior.ConformDel && (badsubsegs.Count > 0) && (mesh.steinerleft == 0))
             {
 
                 logger.Warning("I ran out of Steiner points, but the mesh has encroached subsegments, "

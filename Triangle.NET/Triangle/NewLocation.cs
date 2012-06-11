@@ -18,14 +18,23 @@ namespace TriangleNet
     /// <remarks>
     /// http://www.cise.ufl.edu/~ungor/aCute/index.html
     /// </remarks>
-    static class NewLocation
+    class NewLocation
     {
         const double EPS = 0.000000000000000000000000000000000000000000000000000000000000000000000000000000000000001;
+
+        Mesh mesh;
+        Behavior behavior;
+
+        public NewLocation(Mesh mesh)
+        {
+            this.mesh = mesh;
+            this.behavior = mesh.behavior;
+        }
 
         /// <summary>
         /// Find a new location for a Steiner point.
         /// </summary>
-        /// <param name="m"></param>
+        /// <param name="mesh"></param>
         /// <param name="torg"></param>
         /// <param name="tdest"></param>
         /// <param name="tapex"></param>
@@ -34,17 +43,17 @@ namespace TriangleNet
         /// <param name="eta"></param>
         /// <param name="offcenter"></param>
         /// <param name="badotri"></param>
-        public static void FindLocation(Mesh m, Vertex torg, Vertex tdest, Vertex tapex,
+        public void FindLocation(Vertex torg, Vertex tdest, Vertex tapex,
                               Vertex circumcenter, ref double xi, ref double eta, bool offcenter, Otri badotri) // TODO: ref circumcenter???
         {
             // Based on using -U switch, call the corresponding function
-            if (Behavior.MaxAngle == 0.0)
+            if (behavior.MaxAngle == 0.0)
             {
-                FindNewLocationWithoutMaxAngle(m, torg, tdest, tapex, circumcenter, ref xi, ref eta, true, badotri);
+                FindNewLocationWithoutMaxAngle(torg, tdest, tapex, circumcenter, ref xi, ref eta, true, badotri);
             }
             else
             {
-                FindNewLocation(m, torg, tdest, tapex, circumcenter, ref xi, ref eta, true, badotri);
+                FindNewLocation(torg, tdest, tapex, circumcenter, ref xi, ref eta, true, badotri);
             }
 
         }
@@ -52,7 +61,6 @@ namespace TriangleNet
         /// <summary>
         /// Find a new location for a Steiner point.
         /// </summary>
-        /// <param name="m"></param>
         /// <param name="torg"></param>
         /// <param name="tdest"></param>
         /// <param name="tapex"></param>
@@ -61,9 +69,10 @@ namespace TriangleNet
         /// <param name="eta"></param>
         /// <param name="offcenter"></param>
         /// <param name="badotri"></param>
-        static void FindNewLocationWithoutMaxAngle(Mesh m, Vertex torg, Vertex tdest, Vertex tapex,
+        private void FindNewLocationWithoutMaxAngle(Vertex torg, Vertex tdest, Vertex tapex,
                               Vertex circumcenter, ref double xi, ref double eta, bool offcenter, Otri badotri)
         {
+            double offconstant = behavior.Offconstant;
 
             // for calculating the distances of the edges
             double xdo, ydo, xao, yao, xda, yda;
@@ -284,14 +293,14 @@ namespace TriangleNet
 
             }// end of switch	
             // check for offcenter condition
-            if (offcenter && (Behavior.Offconstant > 0.0))
+            if (offcenter && (offconstant > 0.0))
             {
                 // origin has the smallest angle
                 if (orientation == 213 || orientation == 231)
                 {
                     // Find the position of the off-center, as described by Alper Ungor.
-                    dxoff = 0.5 * xShortestEdge - Behavior.Offconstant * yShortestEdge;
-                    dyoff = 0.5 * yShortestEdge + Behavior.Offconstant * xShortestEdge;
+                    dxoff = 0.5 * xShortestEdge - offconstant * yShortestEdge;
+                    dyoff = 0.5 * yShortestEdge + offconstant * xShortestEdge;
                     // If the off-center is closer to destination than the
                     //   circumcenter, use the off-center instead.
                     /// doubleLY BAD CASE ///			
@@ -311,8 +320,8 @@ namespace TriangleNet
                 else if (orientation == 123 || orientation == 132)
                 {
                     // Find the position of the off-center, as described by Alper Ungor.
-                    dxoff = 0.5 * xShortestEdge + Behavior.Offconstant * yShortestEdge;
-                    dyoff = 0.5 * yShortestEdge - Behavior.Offconstant * xShortestEdge;
+                    dxoff = 0.5 * xShortestEdge + offconstant * yShortestEdge;
+                    dyoff = 0.5 * yShortestEdge - offconstant * xShortestEdge;
                     // If the off-center is closer to the origin than the
                     //   circumcenter, use the off-center instead.
                     /// doubleLY BAD CASE ///
@@ -331,8 +340,8 @@ namespace TriangleNet
                 else
                 {//orientation == 312 || orientation == 321 
                     // Find the position of the off-center, as described by Alper Ungor.
-                    dxoff = 0.5 * xShortestEdge - Behavior.Offconstant * yShortestEdge;
-                    dyoff = 0.5 * yShortestEdge + Behavior.Offconstant * xShortestEdge;
+                    dxoff = 0.5 * xShortestEdge - offconstant * yShortestEdge;
+                    dyoff = 0.5 * yShortestEdge + offconstant * xShortestEdge;
                     // If the off-center is closer to the origin than the
                     //   circumcenter, use the off-center instead.
                     /// doubleLY BAD CASE ///
@@ -371,7 +380,7 @@ namespace TriangleNet
                 }
                 /// RELOCATION	(LOCAL SMOOTHING) ///
                 /// check for possible relocation of one of triangle's points ///				
-                relocated = DoSmoothing(m, delotri, torg, tdest, tapex, ref newloc);
+                relocated = DoSmoothing(delotri, torg, tdest, tapex, ref newloc);
                 /// if relocation is possible, delete that vertex and insert a vertex at the new location ///		
                 if (relocated > 0)
                 {
@@ -385,17 +394,17 @@ namespace TriangleNet
                     {
                         case 1:
                             //printf("Relocate: (%f,%f)\n", torg[0],torg[1]);			
-                            m.DeleteVertex(ref delotri);
+                            mesh.DeleteVertex(ref delotri);
                             break;
                         case 2:
                             //printf("Relocate: (%f,%f)\n", tdest[0],tdest[1]);			
                             delotri.LnextSelf();
-                            m.DeleteVertex(ref delotri);
+                            mesh.DeleteVertex(ref delotri);
                             break;
                         case 3:
                             //printf("Relocate: (%f,%f)\n", tapex[0],tapex[1]);						
                             delotri.LprevSelf();
-                            m.DeleteVertex(ref delotri);
+                            mesh.DeleteVertex(ref delotri);
                             break;
 
                     }
@@ -405,7 +414,7 @@ namespace TriangleNet
                     // calculate radius of the petal according to angle constraint
                     // first find the visible region, PETAL
                     // find the center of the circle and radius
-                    petalRadius = Math.Sqrt(shortestEdgeDist) / (2 * Math.Sin(Behavior.MinAngle * Math.PI / 180.0));
+                    petalRadius = Math.Sqrt(shortestEdgeDist) / (2 * Math.Sin(behavior.MinAngle * Math.PI / 180.0));
                     /// compute two possible centers of the petal ///
                     // finding the center
                     // first find the middle point of smallest edge
@@ -439,7 +448,7 @@ namespace TriangleNet
                     }
 
                     /// find the third point of the neighbor triangle  ///
-                    neighborNotFound = GetNeighborsVertex(m, badotri, middleAngleCorner.x, middleAngleCorner.y,
+                    neighborNotFound = GetNeighborsVertex(badotri, middleAngleCorner.x, middleAngleCorner.y,
                                 smallestAngleCorner.x, smallestAngleCorner.y, ref thirdPoint, ref neighborotri);
                     /// find the circumcenter of the neighbor triangle ///
                     dxFirstSuggestion = dx;	// if we cannot find any appropriate suggestion, we use circumcenter
@@ -451,7 +460,9 @@ namespace TriangleNet
                         neighborvertex_2 = neighborotri.Dest();
                         neighborvertex_3 = neighborotri.Apex();
                         // now calculate neighbor's circumcenter which is the voronoi site
-                        neighborCircumcenter = Primitives.FindCircumcenter(neighborvertex_1, neighborvertex_2, neighborvertex_3, ref xi_tmp, ref eta_tmp, false);
+                        neighborCircumcenter = Primitives.FindCircumcenter(neighborvertex_1, neighborvertex_2, neighborvertex_3,
+                            ref xi_tmp, ref eta_tmp);
+
                         /// compute petal and Voronoi edge intersection ///
                         // in order to avoid degenerate cases, we need to do a vector based calculation for line		
                         vector_x = (middleAngleCorner.y - smallestAngleCorner.y);//(-y, x)
@@ -568,7 +579,7 @@ namespace TriangleNet
 
                     /// DO THE SAME THING FOR THE OTHER DIRECTION ///
                     /// find the third point of the neighbor triangle  ///
-                    neighborNotFound = GetNeighborsVertex(m, badotri, largestAngleCorner.x, largestAngleCorner.y,
+                    neighborNotFound = GetNeighborsVertex(badotri, largestAngleCorner.x, largestAngleCorner.y,
                                 smallestAngleCorner.x, smallestAngleCorner.y, ref thirdPoint, ref neighborotri);
                     /// find the circumcenter of the neighbor triangle ///
                     dxSecondSuggestion = dx;	// if we cannot find any appropriate suggestion, we use circumcenter
@@ -580,7 +591,8 @@ namespace TriangleNet
                         neighborvertex_2 = neighborotri.Dest();
                         neighborvertex_3 = neighborotri.Apex();
                         // now calculate neighbor's circumcenter which is the voronoi site
-                        neighborCircumcenter = Primitives.FindCircumcenter(neighborvertex_1, neighborvertex_2, neighborvertex_3, ref xi_tmp, ref eta_tmp, false);
+                        neighborCircumcenter = Primitives.FindCircumcenter(neighborvertex_1, neighborvertex_2, neighborvertex_3,
+                            ref xi_tmp, ref eta_tmp);
 
                         /// compute petal and Voronoi edge intersection ///
                         // in order to avoid degenerate cases, we need to do a vector based calculation for line		
@@ -747,7 +759,6 @@ namespace TriangleNet
         /// <summary>
         /// Find a new location for a Steiner point.
         /// </summary>
-        /// <param name="m"></param>
         /// <param name="torg"></param>
         /// <param name="tdest"></param>
         /// <param name="tapex"></param>
@@ -756,10 +767,10 @@ namespace TriangleNet
         /// <param name="eta"></param>
         /// <param name="offcenter"></param>
         /// <param name="badotri"></param>
-        static void FindNewLocation(Mesh m,
-                              Vertex torg, Vertex tdest, Vertex tapex,
+        private void FindNewLocation(Vertex torg, Vertex tdest, Vertex tapex,
                               Vertex circumcenter, ref double xi, ref double eta, bool offcenter, Otri badotri)
         {
+            double offconstant = behavior.Offconstant;
 
             // for calculating the distances of the edges
             double xdo, ydo, xao, yao, xda, yda;
@@ -992,14 +1003,14 @@ namespace TriangleNet
 
             }// end of switch	
             // check for offcenter condition
-            if (offcenter && (Behavior.Offconstant > 0.0))
+            if (offcenter && (offconstant > 0.0))
             {
                 // origin has the smallest angle
                 if (orientation == 213 || orientation == 231)
                 {
                     // Find the position of the off-center, as described by Alper Ungor.
-                    dxoff = 0.5 * xShortestEdge - Behavior.Offconstant * yShortestEdge;
-                    dyoff = 0.5 * yShortestEdge + Behavior.Offconstant * xShortestEdge;
+                    dxoff = 0.5 * xShortestEdge - offconstant * yShortestEdge;
+                    dyoff = 0.5 * yShortestEdge + offconstant * xShortestEdge;
                     // If the off-center is closer to destination than the
                     //   circumcenter, use the off-center instead.
                     /// doubleLY BAD CASE ///			
@@ -1019,8 +1030,8 @@ namespace TriangleNet
                 else if (orientation == 123 || orientation == 132)
                 {
                     // Find the position of the off-center, as described by Alper Ungor.
-                    dxoff = 0.5 * xShortestEdge + Behavior.Offconstant * yShortestEdge;
-                    dyoff = 0.5 * yShortestEdge - Behavior.Offconstant * xShortestEdge;
+                    dxoff = 0.5 * xShortestEdge + offconstant * yShortestEdge;
+                    dyoff = 0.5 * yShortestEdge - offconstant * xShortestEdge;
                     // If the off-center is closer to the origin than the
                     //   circumcenter, use the off-center instead.
                     /// doubleLY BAD CASE ///
@@ -1039,8 +1050,8 @@ namespace TriangleNet
                 else
                 {//orientation == 312 || orientation == 321 
                     // Find the position of the off-center, as described by Alper Ungor.
-                    dxoff = 0.5 * xShortestEdge - Behavior.Offconstant * yShortestEdge;
-                    dyoff = 0.5 * yShortestEdge + Behavior.Offconstant * xShortestEdge;
+                    dxoff = 0.5 * xShortestEdge - offconstant * yShortestEdge;
+                    dyoff = 0.5 * yShortestEdge + offconstant * xShortestEdge;
                     // If the off-center is closer to the origin than the
                     //   circumcenter, use the off-center instead.
                     /// doubleLY BAD CASE ///
@@ -1079,7 +1090,7 @@ namespace TriangleNet
                 }
                 /// RELOCATION	(LOCAL SMOOTHING) ///
                 /// check for possible relocation of one of triangle's points ///				
-                relocated = DoSmoothing(m, delotri, torg, tdest, tapex, ref newloc);
+                relocated = DoSmoothing(delotri, torg, tdest, tapex, ref newloc);
                 /// if relocation is possible, delete that vertex and insert a vertex at the new location ///		
                 if (relocated > 0)
                 {
@@ -1093,17 +1104,17 @@ namespace TriangleNet
                     {
                         case 1:
                             //printf("Relocate: (%f,%f)\n", torg[0],torg[1]);			
-                            m.DeleteVertex(ref delotri);
+                            mesh.DeleteVertex(ref delotri);
                             break;
                         case 2:
                             //printf("Relocate: (%f,%f)\n", tdest[0],tdest[1]);			
                             delotri.LnextSelf();
-                            m.DeleteVertex(ref delotri);
+                            mesh.DeleteVertex(ref delotri);
                             break;
                         case 3:
                             //printf("Relocate: (%f,%f)\n", tapex[0],tapex[1]);						
                             delotri.LprevSelf();
-                            m.DeleteVertex(ref delotri);
+                            mesh.DeleteVertex(ref delotri);
                             break;
                     }
                 }
@@ -1114,9 +1125,9 @@ namespace TriangleNet
                     // find the center of the circle and radius
                     // choose minimum angle as the maximum of quality angle and the minimum angle of the bad triangle
                     minangle = Math.Acos((middleEdgeDist + longestEdgeDist - shortestEdgeDist) / (2 * Math.Sqrt(middleEdgeDist) * Math.Sqrt(longestEdgeDist))) * 180.0 / Math.PI;
-                    if (Behavior.MinAngle > minangle)
+                    if (behavior.MinAngle > minangle)
                     {
-                        minangle = Behavior.MinAngle;
+                        minangle = behavior.MinAngle;
                     }
                     else
                     {
@@ -1155,7 +1166,7 @@ namespace TriangleNet
                         xPetalCtr = xPetalCtr_2; yPetalCtr = yPetalCtr_2;
                     }
                     /// find the third point of the neighbor triangle  ///
-                    neighborNotFound_first = GetNeighborsVertex(m, badotri, middleAngleCorner.x, middleAngleCorner.y,
+                    neighborNotFound_first = GetNeighborsVertex(badotri, middleAngleCorner.x, middleAngleCorner.y,
                                 smallestAngleCorner.x, smallestAngleCorner.y, ref thirdPoint, ref neighborotri);
                     /// find the circumcenter of the neighbor triangle ///
                     dxFirstSuggestion = dx;	// if we cannot find any appropriate suggestion, we use circumcenter
@@ -1171,7 +1182,7 @@ namespace TriangleNet
                     // find the third point other than p and q
                     petal_bisector_x = xPetalCtr + line_vector_x * petalRadius;
                     petal_bisector_y = yPetalCtr + line_vector_y * petalRadius;
-                    alpha = (2.0 * Behavior.MaxAngle + minangle - 180.0) * Math.PI / 180.0;
+                    alpha = (2.0 * behavior.MaxAngle + minangle - 180.0) * Math.PI / 180.0;
                     // rotate the vector cw around the petal center			
                     x_1 = petal_bisector_x * Math.Cos(alpha) + petal_bisector_y * Math.Sin(alpha) + xPetalCtr - xPetalCtr * Math.Cos(alpha) - yPetalCtr * Math.Sin(alpha);
                     y_1 = -petal_bisector_x * Math.Sin(alpha) + petal_bisector_y * Math.Cos(alpha) + yPetalCtr + xPetalCtr * Math.Sin(alpha) - yPetalCtr * Math.Cos(alpha);
@@ -1207,7 +1218,9 @@ namespace TriangleNet
                         neighborvertex_2 = neighborotri.Dest();
                         neighborvertex_3 = neighborotri.Apex();
                         // now calculate neighbor's circumcenter which is the voronoi site
-                        neighborCircumcenter = Primitives.FindCircumcenter(neighborvertex_1, neighborvertex_2, neighborvertex_3, ref xi_tmp, ref eta_tmp, false);
+                        neighborCircumcenter = Primitives.FindCircumcenter(neighborvertex_1, neighborvertex_2, neighborvertex_3,
+                            ref xi_tmp, ref eta_tmp);
+
                         /// compute petal and Voronoi edge intersection ///						
                         // in order to avoid degenerate cases, we need to do a vector based calculation for line		
                         vector_x = (middleAngleCorner.y - smallestAngleCorner.y);//(-y, x)
@@ -1285,7 +1298,7 @@ namespace TriangleNet
                                         (smallestAngleCorner.y - line_inter_y) *
                                         (smallestAngleCorner.y - line_inter_y)))
                                         && (IsBadTriangleAngle(middleAngleCorner.x, middleAngleCorner.y, largestAngleCorner.x, largestAngleCorner.y, petal_slab_inter_x_first, petal_slab_inter_y_first))
-                                        && MinDistanceToNeighbor(m, petal_slab_inter_x_first, petal_slab_inter_y_first, ref neighborotri) > MinDistanceToNeighbor(m, line_inter_x, line_inter_y, ref neighborotri))
+                                        && MinDistanceToNeighbor(petal_slab_inter_x_first, petal_slab_inter_y_first, ref neighborotri) > MinDistanceToNeighbor(line_inter_x, line_inter_y, ref neighborotri))
                                     {
                                         // 							
                                         /// check the neighbor's vertices also, which one if better
@@ -1379,7 +1392,7 @@ namespace TriangleNet
                                         (smallestAngleCorner.y - line_inter_y) *
                                         (smallestAngleCorner.y - line_inter_y)))
                                         && (IsBadTriangleAngle(middleAngleCorner.x, middleAngleCorner.y, largestAngleCorner.x, largestAngleCorner.y, petal_slab_inter_x_first, petal_slab_inter_y_first))
-                                        && MinDistanceToNeighbor(m, petal_slab_inter_x_first, petal_slab_inter_y_first, ref neighborotri) > MinDistanceToNeighbor(m, line_inter_x, line_inter_y, ref neighborotri))
+                                        && MinDistanceToNeighbor(petal_slab_inter_x_first, petal_slab_inter_y_first, ref neighborotri) > MinDistanceToNeighbor(line_inter_x, line_inter_y, ref neighborotri))
                                     {
                                         //slab and petal intersection is advised
                                         dxFirstSuggestion = petal_slab_inter_x_first - torg.x;
@@ -1497,7 +1510,7 @@ namespace TriangleNet
 
                     /// DO THE SAME THING FOR THE OTHER DIRECTION ///
                     /// find the third point of the neighbor triangle  ///
-                    neighborNotFound_second = GetNeighborsVertex(m, badotri, largestAngleCorner.x, largestAngleCorner.y,
+                    neighborNotFound_second = GetNeighborsVertex(badotri, largestAngleCorner.x, largestAngleCorner.y,
                                 smallestAngleCorner.x, smallestAngleCorner.y, ref thirdPoint, ref neighborotri);
                     /// find the circumcenter of the neighbor triangle ///
                     dxSecondSuggestion = dx;	// if we cannot find any appropriate suggestion, we use circumcenter
@@ -1514,7 +1527,8 @@ namespace TriangleNet
                         neighborvertex_2 = neighborotri.Dest();
                         neighborvertex_3 = neighborotri.Apex();
                         // now calculate neighbor's circumcenter which is the voronoi site
-                        neighborCircumcenter = Primitives.FindCircumcenter(neighborvertex_1, neighborvertex_2, neighborvertex_3, ref xi_tmp, ref eta_tmp, false);
+                        neighborCircumcenter = Primitives.FindCircumcenter(neighborvertex_1, neighborvertex_2, neighborvertex_3,
+                            ref xi_tmp, ref eta_tmp);
 
                         /// compute petal and Voronoi edge intersection ///
                         // in order to avoid degenerate cases, we need to do a vector based calculation for line		
@@ -1595,7 +1609,7 @@ namespace TriangleNet
                                         (smallestAngleCorner.y - line_inter_y) *
                                         (smallestAngleCorner.y - line_inter_y)))
                                         && (IsBadTriangleAngle(middleAngleCorner.x, middleAngleCorner.y, largestAngleCorner.x, largestAngleCorner.y, petal_slab_inter_x_second, petal_slab_inter_y_second))
-                                        && MinDistanceToNeighbor(m, petal_slab_inter_x_second, petal_slab_inter_y_second, ref neighborotri) > MinDistanceToNeighbor(m, line_inter_x, line_inter_y, ref neighborotri))
+                                        && MinDistanceToNeighbor(petal_slab_inter_x_second, petal_slab_inter_y_second, ref neighborotri) > MinDistanceToNeighbor(line_inter_x, line_inter_y, ref neighborotri))
                                     {
                                         // slab and petal intersection is advised
                                         dxSecondSuggestion = petal_slab_inter_x_second - torg.x;
@@ -1684,7 +1698,7 @@ namespace TriangleNet
                                         (smallestAngleCorner.y - line_inter_y) *
                                         (smallestAngleCorner.y - line_inter_y)))
                                         && (IsBadTriangleAngle(middleAngleCorner.x, middleAngleCorner.y, largestAngleCorner.x, largestAngleCorner.y, petal_slab_inter_x_second, petal_slab_inter_y_second))
-                                        && MinDistanceToNeighbor(m, petal_slab_inter_x_second, petal_slab_inter_y_second, ref neighborotri) > MinDistanceToNeighbor(m, line_inter_x, line_inter_y, ref neighborotri))
+                                        && MinDistanceToNeighbor(petal_slab_inter_x_second, petal_slab_inter_y_second, ref neighborotri) > MinDistanceToNeighbor(line_inter_x, line_inter_y, ref neighborotri))
                                     {
                                         // slab and petal intersection is advised
                                         dxSecondSuggestion = petal_slab_inter_x_second - torg.x;
@@ -2015,7 +2029,7 @@ namespace TriangleNet
         /// <param name="dadist"></param>
         /// <param name="dodist"></param>
         /// <returns>Returns a number indicating an orientation.</returns>
-        static int LongestShortestEdge(double aodist, double dadist, double dodist)
+        private int LongestShortestEdge(double aodist, double dadist, double dodist)
         {
             // 123: shortest: aodist	// 213: shortest: dadist	// 312: shortest: dodist	
             //	middle: dadist 		//	middle: aodist 		//	middle: aodist 
@@ -2075,15 +2089,14 @@ namespace TriangleNet
         /// <summary>
         /// Checks if smothing is possible for a given bad triangle.
         /// </summary>
-        /// <param name="m"></param>
         /// <param name="badotri"></param>
         /// <param name="torg"></param>
         /// <param name="tdest"></param>
         /// <param name="tapex"></param>
         /// <param name="newloc">The new location for the point, if somothing is possible.</param>
         /// <returns>Returns 1, 2 or 3 if smoothing will work, 0 otherwise.</returns>
-        static int DoSmoothing(Mesh m, Otri badotri,
-                Vertex torg, Vertex tdest, Vertex tapex, ref double[] newloc)
+        private int DoSmoothing(Otri badotri, Vertex torg, Vertex tdest, Vertex tapex,
+            ref double[] newloc)
         {
 
             int numpoints_p = 0;// keeps the number of points in a star of point p, q, r
@@ -2106,7 +2119,7 @@ namespace TriangleNet
             //********************* TRY TO RELOCATE POINT "p" ***************
 
             // get the surrounding points of p, so this gives us the triangles
-            numpoints_p = GetStarPoints(m, badotri, torg, tdest, tapex, 1, ref points_p);
+            numpoints_p = GetStarPoints(badotri, torg, tdest, tapex, 1, ref points_p);
             // check if the points in counterclockwise order
             // 	p1[0] = points_p[0];  p1[1] = points_p[1];
             // 	p2[0] = points_p[2];  p2[1] = points_p[3];
@@ -2130,13 +2143,13 @@ namespace TriangleNet
             {
                 //newLocFound = getPetalIntersection(m, b, numpoints_p, points_p, newloc);
                 //newLocFound = getPetalIntersectionBruteForce(m, b,numpoints_p, points_p, newloc,torg[0],torg[1]);
-                if (Behavior.MaxAngle == 0.0)
+                if (behavior.MaxAngle == 0.0)
                 {
-                    newLocFound = GetWedgeIntersectionWithoutMaxAngle(m, numpoints_p, points_p, ref newloc);
+                    newLocFound = GetWedgeIntersectionWithoutMaxAngle(numpoints_p, points_p, ref newloc);
                 }
                 else
                 {
-                    newLocFound = GetWedgeIntersection(m, numpoints_p, points_p, ref newloc);
+                    newLocFound = GetWedgeIntersection(numpoints_p, points_p, ref newloc);
                 }
                 //printf("call petal intersection for p\n");
                 // make sure the relocated point is a free vertex	
@@ -2152,7 +2165,7 @@ namespace TriangleNet
             //********************* TRY TO RELOCATE POINT "q" ***************		
 
             // get the surrounding points of q, so this gives us the triangles
-            numpoints_q = GetStarPoints(m, badotri, torg, tdest, tapex, 2, ref points_q);
+            numpoints_q = GetStarPoints(badotri, torg, tdest, tapex, 2, ref points_q);
             // 	// check if the points in counterclockwise order
             // 	v1[0] = points_q[0];  v1[1] = points_q[1];
             // 	v2[0] = points_q[2];  v2[1] = points_q[3];
@@ -2175,13 +2188,13 @@ namespace TriangleNet
             {
                 //newLocFound = getPetalIntersection(m, b,numpoints_q, points_q, newloc);
                 //newLocFound = getPetalIntersectionBruteForce(m, b,numpoints_q, points_q, newloc,tapex[0],tapex[1]);
-                if (Behavior.MaxAngle == 0.0)
+                if (behavior.MaxAngle == 0.0)
                 {
-                    newLocFound = GetWedgeIntersectionWithoutMaxAngle(m, numpoints_q, points_q, ref newloc);
+                    newLocFound = GetWedgeIntersectionWithoutMaxAngle(numpoints_q, points_q, ref newloc);
                 }
                 else
                 {
-                    newLocFound = GetWedgeIntersection(m, numpoints_q, points_q, ref newloc);
+                    newLocFound = GetWedgeIntersection(numpoints_q, points_q, ref newloc);
                 }
                 //printf("call petal intersection for q\n");	
 
@@ -2198,7 +2211,7 @@ namespace TriangleNet
 
             //********************* TRY TO RELOCATE POINT "q" ***************		
             // get the surrounding points of r, so this gives us the triangles
-            numpoints_r = GetStarPoints(m, badotri, torg, tdest, tapex, 3, ref points_r);
+            numpoints_r = GetStarPoints(badotri, torg, tdest, tapex, 3, ref points_r);
             // check if the points in counterclockwise order
             // 	v1[0] = points_r[0];  v1[1] = points_r[1];
             // 	v2[0] = points_r[2];  v2[1] = points_r[3];
@@ -2221,13 +2234,13 @@ namespace TriangleNet
             {
                 //newLocFound = getPetalIntersection(m, b,numpoints_r, points_r, newloc);
                 //newLocFound = getPetalIntersectionBruteForce(m, b,numpoints_r, points_r, newloc,tdest[0],tdest[1]);
-                if (Behavior.MaxAngle == 0.0)
+                if (behavior.MaxAngle == 0.0)
                 {
-                    newLocFound = GetWedgeIntersectionWithoutMaxAngle(m, numpoints_r, points_r, ref newloc);
+                    newLocFound = GetWedgeIntersectionWithoutMaxAngle(numpoints_r, points_r, ref newloc);
                 }
                 else
                 {
-                    newLocFound = GetWedgeIntersection(m, numpoints_r, points_r, ref newloc);
+                    newLocFound = GetWedgeIntersection(numpoints_r, points_r, ref newloc);
                 }
 
                 //printf("call petal intersection for r\n");
@@ -2281,7 +2294,6 @@ namespace TriangleNet
         /// <summary>
         /// Finds the star of a given point.
         /// </summary>
-        /// <param name="m"></param>
         /// <param name="badotri"></param>
         /// <param name="p"></param>
         /// <param name="q"></param>
@@ -2289,12 +2301,8 @@ namespace TriangleNet
         /// <param name="whichPoint"></param>
         /// <param name="points">List of points on the star of the given point.</param>
         /// <returns>Number of points on the star of the given point.</returns>
-        static int GetStarPoints(Mesh m, Otri badotri,
-                    Vertex p,
-                    Vertex q,
-                    Vertex r,
-                    int whichPoint,
-                    ref double[] points)
+        private int GetStarPoints(Otri badotri, Vertex p, Vertex q, Vertex r,
+                    int whichPoint, ref double[] points)
         {
 
             Otri neighotri = default(Otri);  // for return value of the function
@@ -2345,7 +2353,7 @@ namespace TriangleNet
             do
             {
                 // find the neighbor's third point where it is incident to given edge
-                if (!GetNeighborsVertex(m, tempotri, first_x, first_y, second_x, second_y, ref returnPoint, ref neighotri))
+                if (!GetNeighborsVertex(tempotri, first_x, first_y, second_x, second_y, ref returnPoint, ref neighotri))
                 {
                     // go to next triangle
                     tempotri = neighotri;
@@ -2373,7 +2381,6 @@ namespace TriangleNet
         /// <summary>
         /// Gets a neighbours vertex.
         /// </summary>
-        /// <param name="m"></param>
         /// <param name="badotri"></param>
         /// <param name="first_x"></param>
         /// <param name="first_y"></param>
@@ -2382,7 +2389,7 @@ namespace TriangleNet
         /// <param name="thirdpoint">Neighbor's third vertex incident to given edge.</param>
         /// <param name="neighotri">Pointer for the neighbor triangle.</param>
         /// <returns>Returns true if vertex was found.</returns>
-        static bool GetNeighborsVertex(Mesh m, Otri badotri,
+        private bool GetNeighborsVertex(Otri badotri,
                         double first_x, double first_y,
                         double second_x, double second_y,
                         ref double[] thirdpoint, ref Otri neighotri)
@@ -2534,13 +2541,12 @@ namespace TriangleNet
         /// <summary>
         /// Find a new point location by wedge intersection.
         /// </summary>
-        /// <param name="m"></param>
         /// <param name="numpoints"></param>
         /// <param name="points"></param>
         /// <param name="newloc">A new location for the point according to surrounding points.</param>
         /// <returns>Returns true if new location found</returns>
-        static bool GetWedgeIntersectionWithoutMaxAngle(Mesh m,
-                        int numpoints, double[] points, ref double[] newloc)
+        private bool GetWedgeIntersectionWithoutMaxAngle(int numpoints,
+            double[] points, ref double[] newloc)
         {
             //double total_x = 0;
             //double total_y = 0;
@@ -2586,9 +2592,9 @@ namespace TriangleNet
             y1 = points[2 * numpoints - 1];
 
             // minimum angle
-            alpha = Behavior.MinAngle * Math.PI / 180.0;
+            alpha = behavior.MinAngle * Math.PI / 180.0;
             // initialize the constants
-            if (Behavior.GoodAngle == 1.0)
+            if (behavior.GoodAngle == 1.0)
             {
                 petalcenterconstant = 0;
                 petalradiusconstant = 0;
@@ -2759,7 +2765,7 @@ namespace TriangleNet
                 /// IF THERE IS A FEASIBLE INTERSECTION POLYGON, FIND ITS CENTROID AS THE NEW LOCATION
                 FindPolyCentroid(numpolypoints, initialConvexPoly, ref newloc);
 
-                if (Behavior.FixedArea)
+                if (behavior.FixedArea)
                 {
                     // 		numBadTriangle = 0;
                     // 		for(j= 0; j < numpoints *2-2; j = j+2){
@@ -2794,12 +2800,11 @@ namespace TriangleNet
         /// <summary>
         /// Find a new point location by wedge intersection.
         /// </summary>
-        /// <param name="m"></param>
         /// <param name="numpoints"></param>
         /// <param name="points"></param>
         /// <param name="newloc">A new location for the point according to surrounding points.</param>
         /// <returns>Returns true if new location found</returns>
-        static bool GetWedgeIntersection(Mesh m, int numpoints, double[] points, ref double[] newloc)
+        private bool GetWedgeIntersection(int numpoints, double[] points, ref double[] newloc)
         {
             //double total_x = 0;
             //double total_y = 0;
@@ -2851,15 +2856,15 @@ namespace TriangleNet
 
             // minimum / maximum angle
             double alpha, sinAlpha, cosAlpha, beta, sinBeta, cosBeta;
-            alpha = Behavior.MinAngle * Math.PI / 180.0;
+            alpha = behavior.MinAngle * Math.PI / 180.0;
             sinAlpha = Math.Sin(alpha);
             cosAlpha = Math.Cos(alpha);
-            beta = Behavior.MaxAngle * Math.PI / 180.0;
+            beta = behavior.MaxAngle * Math.PI / 180.0;
             sinBeta = Math.Sin(beta);
             cosBeta = Math.Cos(beta);
 
             // initialize the constants
-            if (Behavior.GoodAngle == 1.0)
+            if (behavior.GoodAngle == 1.0)
             {
                 petalcenterconstant = 0;
                 petalradiusconstant = 0;
@@ -2941,7 +2946,7 @@ namespace TriangleNet
 
                 /// DETERMINE HOW MANY POINTS TO USE ACCORDING TO THE MINANGLE-MAXANGLE COMBINATION
                 // petal center angle
-                alpha = (2.0 * Behavior.MaxAngle + Behavior.MinAngle - 180.0);
+                alpha = (2.0 * behavior.MaxAngle + behavior.MinAngle - 180.0);
                 if (alpha <= 0.0)
                 {// when only angle lines needed
                     // 4 point case
@@ -3199,7 +3204,7 @@ namespace TriangleNet
                 /// IF THERE IS A FEASIBLE INTERSECTION POLYGON, FIND ITS CENTROID AS THE NEW LOCATION
                 FindPolyCentroid(numpolypoints, initialConvexPoly, ref newloc);
 
-                if (Behavior.MaxAngle != 0.0)
+                if (behavior.MaxAngle != 0.0)
                 {
                     numBadTriangle = 0;
                     for (j = 0; j < numpoints * 2 - 2; j = j + 2)
@@ -3284,7 +3289,7 @@ namespace TriangleNet
         /// <param name="numpoints"></param>
         /// <param name="points"></param>
         /// <returns>Returns true if the polygon has angles greater than 2*minangle.</returns>
-        static bool ValidPolygonAngles(int numpoints, double[] points)
+        private bool ValidPolygonAngles(int numpoints, double[] points)
         {
             int i;//,j
             for (i = 0; i < numpoints; i++)
@@ -3326,7 +3331,7 @@ namespace TriangleNet
         /// <param name="y3"></param>
         /// <returns>Returns true, if it is a BAD polygon corner, returns false if it is a GOOD 
         /// polygon corner</returns>
-        static bool IsBadPolygonAngle(double x1, double y1,
+        private bool IsBadPolygonAngle(double x1, double y1,
                         double x2, double y2, double x3, double y3)
         {
             // variables keeping the distance values for the edges
@@ -3352,7 +3357,7 @@ namespace TriangleNet
             cosAngle = (dist12 + dist23 - dist31) / (2 * Math.Sqrt(dist12) * Math.Sqrt(dist23));
             // Check whether the angle is smaller than permitted which is 2*minangle!!!  
             //printf("angle: %f 2*minangle = %f\n",acos(cosAngle)*180/PI, 2*acos(Math.Sqrt(b.goodangle))*180/PI);
-            if (Math.Acos(cosAngle) < 2 * Math.Acos(Math.Sqrt(Behavior.GoodAngle)))
+            if (Math.Acos(cosAngle) < 2 * Math.Acos(Math.Sqrt(behavior.GoodAngle)))
             {
                 return true;// it is a BAD triangle
             }
@@ -3375,7 +3380,7 @@ namespace TriangleNet
         /// <remarks>
         // referenced to: http://local.wasp.uwa.edu.au/~pbourke/geometry/
         /// </remarks>
-        static void LineLineIntersection(
+        private void LineLineIntersection(
             double x1, double y1,
             double x2, double y2,
             double x3, double y3,
@@ -3431,7 +3436,7 @@ namespace TriangleNet
         /// <remarks>
         /// http://www.mathematik.uni-ulm.de/stochastik/lehre/ws03_04/rt/Geometry2D.ps
         /// </remarks>
-        static int HalfPlaneIntersection(int numvertices, ref double[] convexPoly, double x1, double y1, double x2, double y2)
+        private int HalfPlaneIntersection(int numvertices, ref double[] convexPoly, double x1, double y1, double x2, double y2)
         {
             double dx, dy;	// direction of the line
             double z, min, max;
@@ -3509,7 +3514,7 @@ namespace TriangleNet
         /// <remarks>
         /// http://www.mathematik.uni-ulm.de/stochastik/lehre/ws03_04/rt/Geometry2D.ps
         /// </remarks>
-        static int SplitConvexPolygon(int numvertices, double[] convexPoly, double x1, double y1, double x2, double y2, ref double[][] polys)
+        private int SplitConvexPolygon(int numvertices, double[] convexPoly, double x1, double y1, double x2, double y2, ref double[][] polys)
         {
             // state = 0: before the first intersection (with the line)
             // state = 1: after the first intersection (with the line)
@@ -3699,7 +3704,7 @@ namespace TriangleNet
         /// <remarks>
         /// http://www.mathematik.uni-ulm.de/stochastik/lehre/ws03_04/rt/Geometry2D.ps
         /// </remarks>
-        static int LinePointLocation(double x1, double y1, double x2, double y2, double x, double y)
+        private int LinePointLocation(double x1, double y1, double x2, double y2, double x, double y)
         {
             double z;
             if (Math.Atan((y2 - y1) / (x2 - x1)) * 180.0 / Math.PI == 90.0)
@@ -3743,7 +3748,7 @@ namespace TriangleNet
         /// <remarks>
         /// referenced to: http://local.wasp.uwa.edu.au/~pbourke/geometry/
         /// </remarks>
-        static void LineLineSegmentIntersection(
+        private void LineLineSegmentIntersection(
             double x1, double y1,
             double x2, double y2,
             double x3, double y3,
@@ -3806,7 +3811,7 @@ namespace TriangleNet
         /// <param name="numpoints"></param>
         /// <param name="points"></param>
         /// <param name="centroid">Centroid of a given polygon </param>
-        static void FindPolyCentroid(int numpoints, double[] points, ref double[] centroid)
+        private void FindPolyCentroid(int numpoints, double[] points, ref double[] centroid)
         {
             int i;
             //double area = 0.0;//, temp
@@ -3838,7 +3843,7 @@ namespace TriangleNet
         /// <remarks>
         /// referenced to: http://local.wasp.uwa.edu.au/~pbourke/geometry/sphereline/
         /// </remarks>
-        static void CircleLineIntersection(
+        private void CircleLineIntersection(
             double x1, double y1,
             double x2, double y2,
             double x3, double y3, double r, ref double[] p)
@@ -3906,7 +3911,7 @@ namespace TriangleNet
         /// <param name="y3">P3 coordinates (circumcenter point)</param>
         /// <param name="isObtuse"></param>
         /// <returns>Returns true, if given point is the correct one otherwise return false.</returns>
-        static bool ChooseCorrectPoint(
+        private bool ChooseCorrectPoint(
             double x1, double y1,
             double x2, double y2,
             double x3, double y3, bool isObtuse)
@@ -3959,7 +3964,7 @@ namespace TriangleNet
         /// <param name="x">P3 coordinates [point to be compared]	(neighbor's circumcenter)</param>
         /// <param name="y">P3 coordinates [point to be compared]	(neighbor's circumcenter)</param>
         /// <param name="p"></param>
-        static void PointBetweenPoints(double x1, double y1, double x2, double y2, double x, double y, ref double[] p)
+        private void PointBetweenPoints(double x1, double y1, double x2, double y2, double x, double y, ref double[] p)
         {
             // now check whether the point is close to circumcenter than intersection point
             // BETWEEN THE POINTS
@@ -3991,7 +3996,7 @@ namespace TriangleNet
         /// <param name="x3"></param>
         /// <param name="y3"></param>
         /// <returns>Returns true, if it is a BAD triangle, returns false if it is a GOOD triangle.</returns>
-        static bool IsBadTriangleAngle(double x1, double y1, double x2, double y2, double x3, double y3)
+        private bool IsBadTriangleAngle(double x1, double y1, double x2, double y2, double x3, double y3)
         {
             // variables keeping the distance values for the edges
             double dxod, dyod, dxda, dyda, dxao, dyao;
@@ -4077,7 +4082,7 @@ namespace TriangleNet
 
 
             // Check whether the angle is smaller than permitted.
-            if ((angle > Behavior.GoodAngle) || (Behavior.MaxAngle != 0.00 && maxangle < Behavior.MaxGoodAngle))
+            if ((angle > behavior.GoodAngle) || (behavior.MaxAngle != 0.00 && maxangle < behavior.MaxGoodAngle))
             {
                 return true;// it is a bad triangle
             }
@@ -4089,12 +4094,11 @@ namespace TriangleNet
         /// Given the triangulation, and a vertex returns the minimum distance to the 
         /// vertices of the triangle where the given vertex located.
         /// </summary>
-        /// <param name="m"></param>
         /// <param name="newlocX"></param>
         /// <param name="newlocY"></param>
         /// <param name="searchtri"></param>
         /// <returns></returns>
-        static double MinDistanceToNeighbor(Mesh m, double newlocX, double newlocY, ref Otri searchtri)
+        private double MinDistanceToNeighbor(double newlocX, double newlocY, ref Otri searchtri)
         {
             Otri horiz = default(Otri);	// for search operation
             LocateResult intersect = LocateResult.Outside;
@@ -4139,7 +4143,7 @@ namespace TriangleNet
                     //   edge specified by 'searchtri'.
                     searchtri.SymSelf();
                     searchtri.Copy(ref horiz);
-                    intersect = m.PreciseLocate(newvertex, ref horiz, false);
+                    intersect = mesh.PreciseLocate(newvertex, ref horiz, false);
                 }
                 else if (ahead == 0.0)
                 {
@@ -4155,7 +4159,7 @@ namespace TriangleNet
                 else
                 {
                     searchtri.Copy(ref horiz);
-                    intersect = m.PreciseLocate(newvertex, ref horiz, false);
+                    intersect = mesh.PreciseLocate(newvertex, ref horiz, false);
                 }
             }
             if (intersect == LocateResult.OnVertex || intersect == LocateResult.Outside)
