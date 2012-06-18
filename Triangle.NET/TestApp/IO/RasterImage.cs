@@ -20,82 +20,14 @@ namespace MeshExplorer.IO
     /// <summary>
     /// Writes an image of the mesh to disk.
     /// </summary>
-    public class ImageWriter
+    public class RasterImage
     {
-        RenderColors colors = RenderColors.Default;
+        RenderColors colors = RenderColors.Default();
 
-        /// <summary>
-        /// Sets the color scheme.
-        /// </summary>
-        /// <param name="background">Background color.</param>
-        /// <param name="points">Points color.</param>
-        /// <param name="steiner">Steiner points color.</param>
-        /// <param name="lines">Line color.</param>
-        /// <param name="segments">Segment color.</param>
-        public void SetColorScheme(Color background, Color points, Color steiner,
-            Color lines, Color segments, Color triangles)
+        public RenderColors ColorScheme
         {
-            colors.Background = background;
-            colors.Point = new SolidBrush(points);
-            colors.SteinerPoint = new SolidBrush(steiner);
-            colors.Triangle = new SolidBrush(triangles);
-            colors.Line = new Pen(lines);
-            colors.Segment = new Pen(segments);
-        }
-
-        /// <summary>
-        /// Set a color scheme with white background.
-        /// </summary>
-        public void SetColorSchemeLight()
-        {
-            colors.Background = Color.White;
-            colors.Point = new SolidBrush(Color.MidnightBlue);
-            colors.SteinerPoint = new SolidBrush(Color.DarkGreen);
-            colors.Triangle = new SolidBrush(Color.FromArgb(230, 240, 250));
-            colors.Line = new Pen(Color.FromArgb(150, 150, 150));
-            colors.Segment = new Pen(Color.SteelBlue);
-        }
-
-        /// <summary>
-        /// Set a color scheme with black background.
-        /// </summary>
-        public void SetColorSchemeDark()
-        {
-            colors.Background = Color.Black;
-            colors.Point = new SolidBrush(Color.Green);
-            colors.SteinerPoint = new SolidBrush(Color.Peru);
-            colors.Triangle = new SolidBrush(Color.FromArgb(30, 40, 50));
-            colors.Line = new Pen(Color.FromArgb(30, 30, 30));
-            colors.Segment = new Pen(Color.Blue);
-        }
-
-        /// <summary>
-        /// Draws the mesh and writes the image file.
-        /// </summary>
-        /// <param name="mesh">The mesh to visualize.</param>
-        public void WritePng(Mesh mesh)
-        {
-            WritePng(mesh, "", 1000);
-        }
-
-        /// <summary>
-        /// Draws the mesh and writes the image file.
-        /// </summary>
-        /// <param name="mesh">The mesh to visualize.</param>
-        /// <param name="filename">The filename (only PNG supported).</param>
-        public void WritePng(Mesh mesh, string filename)
-        {
-            WritePng(mesh, filename, 1000);
-        }
-
-        /// <summary>
-        /// Draws the mesh and writes the image file.
-        /// </summary>
-        /// <param name="mesh">The mesh to visualize.</param>
-        /// <param name="width">The target width of the image (pixel).</param>
-        public void WritePng(Mesh mesh, int width)
-        {
-            WritePng(mesh, "", width);
+            get { return colors; }
+            set { colors = value; }
         }
 
         /// <summary>
@@ -104,7 +36,7 @@ namespace MeshExplorer.IO
         /// <param name="mesh">The mesh to visualize.</param>
         /// <param name="filename">The filename (only PNG supported).</param>
         /// <param name="width">The target width of the image (pixel).</param>
-        public void WritePng(Mesh mesh, string filename, int width)
+        public void Export(Mesh mesh, string filename, int width)
         {
             // Get mesh data -- TODO: Use RenderControl's RenderData
             RenderData data = new RenderData();

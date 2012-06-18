@@ -826,8 +826,6 @@ namespace TriangleNet.Algorithm
             return hullsize;
         }
 
-        IO.DebugWriter dbgWriter;
-
         /// <summary>
         /// Form a Delaunay triangulation by the divide-and-conquer method.
         /// </summary>
@@ -843,8 +841,6 @@ namespace TriangleNet.Algorithm
             int i, j;
 
             this.mesh = m;
-
-            dbgWriter = new IO.DebugWriter(m);
 
             // Allocate an array of pointers to vertices for sorting.
             // TODO: use ToArray

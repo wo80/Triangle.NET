@@ -53,11 +53,11 @@ namespace MeshExplorer.Controls
             // 
             this.textBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.textBox.Location = new System.Drawing.Point(3, 2);
+            this.textBox.Location = new System.Drawing.Point(4, 2);
             this.textBox.Name = "textBox";
             this.textBox.TabIndex = 0;
             // 
-            // TextBoxDark
+            // DarkTextBox
             // 
             this.BackColor = System.Drawing.Color.White;
             this.Controls.Add(this.textBox);
@@ -83,40 +83,49 @@ namespace MeshExplorer.Controls
             };
 
             textBox.Font = this.Font;
-            textBox.Location = new Point(3, (this.Height - textBox.Height) / 2 + 1);
+            textBox.Location = new Point(4, (this.Height - textBox.Height) / 2);
             textBox.Width = this.Width - 8;
-            textBox.TextAlign = HorizontalAlignment.Right;
+            textBox.TextAlign = HorizontalAlignment.Left;
             textBox.ForeColor = this.ForeColor;
-            textBox.MaxLength = 6;
+            //textBox.MaxLength = 6;
 
             textBox.GotFocus += delegate(object sender, EventArgs e)
             {
-                textBox.ForeColor = Color.White;
+                textBox.ForeColor = this.ForeColor;
             };
+
             textBox.LostFocus += delegate(object sender, EventArgs e)
             {
-                textBox.ForeColor = this.ForeColor;
+                textBox.ForeColor = ColorScheme.ColorGray68;
             };
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
+            Graphics g = e.Graphics;
+
             Rectangle rect = this.ClientRectangle;
 
-            Brush brushOuter = new LinearGradientBrush(rect, Color.FromArgb(82, 82, 82), Color.FromArgb(96, 96, 96),
-                LinearGradientMode.Vertical);
+            //Brush brushOuter = new LinearGradientBrush(rect, Color.FromArgb(82, 82, 82), 
+            //    Color.FromArgb(96, 96, 96), LinearGradientMode.Vertical);
 
-            Pen brushBorder = new Pen(Color.FromArgb(38, 38, 38), 1f);
+            Pen borderTop = new Pen(Color.FromArgb(76, 76, 76), 1f);
+            Pen borderBottom = new Pen(Color.FromArgb(128, 128, 128), 1f);
 
-            e.Graphics.FillRectangle(brushOuter, rect);
+            //e.Graphics.FillRectangle(brushOuter, rect);
 
             rect = new Rectangle(1, 1, this.Width - 3, this.Height - 3);
-            e.Graphics.FillRectangle(new SolidBrush(this.BackColor), rect);
+            g.FillRectangle(new SolidBrush(this.BackColor), rect);
 
-            e.Graphics.DrawRectangle(brushBorder, rect);
+            g.DrawLine(borderTop, 0, 0, this.Width - 1, 0);
+            g.DrawLine(borderTop, 0, 0, 0, this.Height - 1);
+            g.DrawLine(borderBottom, 1, this.Height - 1, this.Width - 1, this.Height - 1);
+            g.DrawLine(borderBottom, this.Width - 1, this.Height - 1, this.Width - 1, this.Height - 1);
 
-            brushOuter.Dispose();
-            brushBorder.Dispose();
+
+            //brushOuter.Dispose();
+            borderTop.Dispose();
+            borderBottom.Dispose();
 
             base.OnPaint(e);
         }

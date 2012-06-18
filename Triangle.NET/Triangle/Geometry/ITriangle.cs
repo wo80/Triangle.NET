@@ -10,6 +10,7 @@ namespace TriangleNet.Geometry
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
+    using TriangleNet.Data;
 
     /// <summary>
     /// Triangle interface.
@@ -34,9 +35,9 @@ namespace TriangleNet.Geometry
         /// </summary>
         int P2 { get; }
         /// <summary>
-        /// Gets the specified vertex id.
+        /// Gets the vertex at specified index.
         /// </summary>
-        int this[int index] { get; }
+        Vertex this[int index] { get; }
 
         /// <summary>
         /// True if the triangle implementation contains neighbor information.

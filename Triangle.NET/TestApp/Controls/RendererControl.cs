@@ -63,7 +63,7 @@ namespace MeshExplorer.Controls
         {
             SetStyle(ControlStyles.ResizeRedraw, true);
 
-            renderColors = RenderColors.Default;
+            renderColors = RenderColors.Default();
 
             this.BackColor = renderColors.Background;
 

@@ -17,16 +17,40 @@ namespace MeshExplorer.Rendering
     /// </summary>
     public class RenderColors
     {
-        public static RenderColors Default = new RenderColors()
+        /// <summary>
+        /// Gets a color scheme with black background.
+        /// </summary>
+        public static RenderColors Default()
         {
-            Background = Color.FromArgb(0, 0, 0),
-            Point = new SolidBrush(Color.Green),
-            SteinerPoint = new SolidBrush(Color.Peru),
-            Triangle = new SolidBrush(Color.Black),
-            Line = new Pen(Color.FromArgb(30, 30, 30)),
-            Segment = new Pen(Color.DarkBlue),
-            VoronoiLine = new Pen(Color.FromArgb(40, 50, 60))
-        };
+            var colors = new RenderColors();
+
+            colors.Background = Color.FromArgb(0, 0, 0);
+            colors.Point = new SolidBrush(Color.Green);
+            colors.SteinerPoint = new SolidBrush(Color.Peru);
+            colors.Triangle = new SolidBrush(Color.Black);
+            colors.Line = new Pen(Color.FromArgb(30, 30, 30));
+            colors.Segment = new Pen(Color.DarkBlue);
+            colors.VoronoiLine = new Pen(Color.FromArgb(40, 50, 60));
+
+            return colors;
+        }
+        /// <summary>
+        /// Gets a color scheme with white background.
+        /// </summary>
+        public static RenderColors LightScheme()
+        {
+            var colors = new RenderColors();
+
+            colors.Background = Color.White;
+            colors.Point = new SolidBrush(Color.FromArgb(60, 80, 120));
+            colors.SteinerPoint = new SolidBrush(Color.DarkGreen);
+            colors.Triangle = new SolidBrush(Color.FromArgb(230, 240, 250));
+            colors.Line = new Pen(Color.FromArgb(150, 150, 150));
+            colors.Segment = new Pen(Color.SteelBlue);
+            colors.VoronoiLine = new Pen(Color.FromArgb(160, 170, 180));
+
+            return colors;
+        }
 
         public Color Background;
         public Brush Point;

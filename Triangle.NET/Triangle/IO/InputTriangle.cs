@@ -9,6 +9,7 @@ namespace TriangleNet.IO
 {
     using System;
     using TriangleNet.Geometry;
+    using TriangleNet.Data;
 
     /// <summary>
     /// Simple triangle class for input.
@@ -61,9 +62,9 @@ namespace TriangleNet.IO
         /// <summary>
         /// Gets the specified corners vertex id.
         /// </summary>
-        public int this[int index]
+        public Vertex this[int index]
         {
-            get { return this.vertices[index]; }
+            get { return null; } // TODO: throw NotSupportedException?
         }
 
         public bool SupportsNeighbors

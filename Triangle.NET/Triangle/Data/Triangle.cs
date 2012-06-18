@@ -100,9 +100,9 @@ namespace TriangleNet.Data
         /// <summary>
         /// Gets the specified corners vertex id.
         /// </summary>
-        public int this[int index]
+        public Vertex this[int index]
         {
-            get { return this.vertices[index] == null ? -1 : this.vertices[index].id; }
+            get { return this.vertices[index]; } // TODO: Check range?
         }
 
         /// <summary>

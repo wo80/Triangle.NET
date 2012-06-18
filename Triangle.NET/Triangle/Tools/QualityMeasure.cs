@@ -248,11 +248,11 @@ namespace TriangleNet.Tools
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    gi = tri[j];
+                    gi = tri[j].id;
 
                     for (int k = 0; k < 3; k++)
                     {
-                        gj = tri[k];
+                        gj = tri[k].id;
 
                         mu = Math.Max(mu, gj - gi);
                         ml = Math.Max(ml, gi - gj);

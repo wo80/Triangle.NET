@@ -9,6 +9,7 @@ using MeshExplorer.IO;
 using TriangleNet;
 using TriangleNet.Geometry;
 using TriangleNet.Tools;
+using MeshExplorer.Rendering;
 
 namespace MeshExplorer
 {
@@ -319,21 +320,25 @@ namespace MeshExplorer
                             HandleMeshImport();
                         }
                         // else Message
+
+                        // Update folder settings
+                        settings.OfdFilterIndex = ofd.FilterIndex;
+                        settings.OfdDirectory = Path.GetFullPath(ofd.FileName);
+
+                        return;
                     }
                 }
-                else
+
+                input = FileProcessor.Read(ofd.FileName);
+
+                if (input != null)
                 {
-                    input = FileProcessor.Read(ofd.FileName);
+                    // Update settings
+                    settings.CurrentFile = Path.GetFileName(ofd.FileName);
 
-                    if (input != null)
-                    {
-                        // Update settings
-                        settings.CurrentFile = Path.GetFileName(ofd.FileName);
-
-                        HandleNewInput();
-                    }
-                    // else Message
+                    HandleNewInput();
                 }
+                // else Message
 
                 // Update folder settings
                 settings.OfdFilterIndex = ofd.FilterIndex;
@@ -588,8 +593,25 @@ namespace MeshExplorer
 
                 if (export.ShowDialog() == DialogResult.OK)
                 {
-                    ImageWriter imgWriter = new ImageWriter();
-                    imgWriter.WritePng(this.mesh);
+                    int format = export.ImageFormat;
+                    int size = export.ImageSize;
+
+                    if (format == 1)
+                    {
+                        EpsImage eps = new EpsImage();
+                        eps.Export(this.mesh, export.ImageName, size);
+                    }
+                    else if (format == 2)
+                    {
+                        SvgImage svg = new SvgImage();
+                        svg.Export(this.mesh, export.ImageName, size);
+                    }
+                    else
+                    {
+                        RasterImage img = new RasterImage();
+                        img.ColorScheme = RenderColors.LightScheme();
+                        img.Export(this.mesh, export.ImageName, size);
+                    }
                 }
             }
         }

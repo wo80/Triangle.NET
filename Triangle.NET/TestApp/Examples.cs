@@ -14,6 +14,7 @@ namespace MeshExplorer
     using TriangleNet.IO;
     using TriangleNet.Geometry;
     using MeshExplorer.IO;
+    using MeshExplorer.Rendering;
 
     /// <summary>
     /// Code of the online examples.
@@ -23,14 +24,14 @@ namespace MeshExplorer
         // Make sure this path points to the polygon sample data.
         static readonly string pathToData = @"..\..\..\Data\";
 
-        static ImageWriter imageWriter = new ImageWriter();
+        static RasterImage imageWriter = new RasterImage();
 
         /// <summary>
         /// Generating Delaunay triangulations
         /// </summary>
         public static void Example1()
         {
-            imageWriter.SetColorSchemeLight();
+            imageWriter.ColorScheme = RenderColors.LightScheme();
 
             // Create a mesh instance.
             Mesh mesh = new Mesh();
@@ -38,18 +39,18 @@ namespace MeshExplorer
             // Read spiral node file and gernerate the delaunay triangulation 
             // of the point set.
             mesh.Triangulate(pathToData + "spiral.node");
-            imageWriter.WritePng(mesh, "spiral.png", 180);
+            imageWriter.Export(mesh, "spiral.png", 180);
 
             // Read face polygon file and gernerate the delaunay triangulation 
             // of the PSLG. We reuse the mesh instance here.
             InputGeometry data = FileReader.Read(pathToData + "face.poly");
             mesh.Triangulate(data);
-            imageWriter.WritePng(mesh, "face.png", 200);
+            imageWriter.Export(mesh, "face.png", 200);
 
             // Generate a conforming delaunay triangulation of the face polygon.
             mesh.SetOption(Options.ConformingDelaunay, true);
             mesh.Triangulate(data);
-            imageWriter.WritePng(mesh, "face-CDT.png", 200);
+            imageWriter.Export(mesh, "face-CDT.png", 200);
         }
 
         /// <summary>
@@ -57,7 +58,7 @@ namespace MeshExplorer
         /// </summary>
         public static void Example2()
         {
-            imageWriter.SetColorSchemeLight();
+            imageWriter.ColorScheme = RenderColors.LightScheme();
 
             // Create a mesh instance.
             Mesh mesh = new Mesh();
@@ -68,18 +69,18 @@ namespace MeshExplorer
             InputGeometry data = FileReader.ReadNodeFile(pathToData + "spiral.node");
             mesh.SetOption(Options.Quality, true);
             mesh.Triangulate(data);
-            imageWriter.WritePng(mesh, "spiral-Angle-20.png", 200);
+            imageWriter.Export(mesh, "spiral-Angle-20.png", 200);
 
             // Set a minimum angle of 30 degrees. 
             mesh.SetOption(Options.MinAngle, 35);
             mesh.Triangulate(data);
-            imageWriter.WritePng(mesh, "spiral-Angle-35.png", 200);
+            imageWriter.Export(mesh, "spiral-Angle-35.png", 200);
 
             // Reset the minimum angle and add a global area constraint.
             mesh.SetOption(Options.MinAngle, 20);
             mesh.SetOption(Options.MaxArea, 0.2);
             mesh.Triangulate(data);
-            imageWriter.WritePng(mesh, "spiral-Area.png", 200);
+            imageWriter.Export(mesh, "spiral-Area.png", 200);
         }
 
         /// <summary>
@@ -87,7 +88,7 @@ namespace MeshExplorer
         /// </summary>
         public static void Example3()
         {
-            imageWriter.SetColorSchemeLight();
+            imageWriter.ColorScheme = RenderColors.LightScheme();
 
             // Create a mesh instance.
             Mesh mesh = new Mesh();
@@ -97,7 +98,7 @@ namespace MeshExplorer
             mesh.SetOption(Options.Quality, true);
             mesh.SetOption(Options.Convex, true);
             mesh.Triangulate(pathToData + "box.poly");
-            imageWriter.WritePng(mesh, "box.png", 200);
+            imageWriter.Export(mesh, "box.png", 200);
 
             // Save the current mesh to .node and .ele files
             FileWriter.WriteNodes(mesh, "box.1.node");
@@ -105,11 +106,11 @@ namespace MeshExplorer
 
             // Refine the mesh by setting a global area constraint.
             mesh.Refine(0.2);
-            imageWriter.WritePng(mesh, "box-Refine-1.png", 200);
+            imageWriter.Export(mesh, "box-Refine-1.png", 200);
 
             // Refine again by setting a smaller area constraint.
             mesh.Refine(0.05);
-            imageWriter.WritePng(mesh, "box-Refine-2.png", 200);
+            imageWriter.Export(mesh, "box-Refine-2.png", 200);
 
             // Load the previously saved box.1 mesh. Since a box.1.area
             // file exist, the variable area constraint option is set
@@ -117,7 +118,7 @@ namespace MeshExplorer
             mesh.Load(pathToData + "box.1.node");
             mesh.SetOption(Options.MinAngle, 0);
             mesh.Refine();
-            imageWriter.WritePng(mesh, "box-Refine-3.png", 200);
+            imageWriter.Export(mesh, "box-Refine-3.png", 200);
         }
 
         /// <summary>

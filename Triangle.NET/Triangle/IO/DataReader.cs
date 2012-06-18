@@ -119,10 +119,13 @@ namespace TriangleNet.IO
             {
                 tri.triangle = item;
 
+                corner[0] = triangles[i].P0;
+                corner[1] = triangles[i].P1;
+                corner[2] = triangles[i].P2;
+
                 // Copy the triangle's three corners.
                 for (int j = 0; j < 3; j++)
                 {
-                    corner[j] = triangles[i][j];
                     if ((corner[j] < 0) || (corner[j] >= mesh.invertices))
                     {
                         SimpleLog.Instance.Error("Triangle has an invalid vertex index.", "MeshReader.Reconstruct()");
