@@ -181,7 +181,7 @@ namespace TriangleNet
                     // adjoining triangle whose pointer is larger (to ensure that
                     // each pair isn't tested twice).
                     shouldbedelaunay = (oppotri.triangle != Mesh.dummytri) &&
-                          !Otri.IsDead(oppotri.triangle) && //(triangleloop.tri < oppotri.tri) &&
+                          !Otri.IsDead(oppotri.triangle) && loop.triangle.id < oppotri.triangle.id &&
                           (triorg != mesh.infvertex1) && (triorg != mesh.infvertex2) &&
                           (triorg != mesh.infvertex3) &&
                           (tridest != mesh.infvertex1) && (tridest != mesh.infvertex2) &&
@@ -204,8 +204,8 @@ namespace TriangleNet
                     {
                         if (Primitives.NonRegular(triorg, tridest, triapex, oppoapex) > 0.0)
                         {
-                            logger.Warning("Non-regular pair of triangles found (ID " + loop.triangle.id + ").",
-                                "Quality.CheckDelaunay()");
+                            logger.Warning(String.Format("Non-regular pair of triangles found (IDs {0}+{1}).",
+                                loop.triangle.id, oppotri.triangle.id), "Quality.CheckDelaunay()");
                             horrors++;
                         }
                     }
@@ -1001,7 +1001,7 @@ namespace TriangleNet
 
                 logger.Warning("I ran out of Steiner points, but the mesh has encroached subsegments, "
                         + "and therefore might not be truly Delaunay. If the Delaunay property is important "
-                        + "to you, try increasing the number of Steiner points",
+                        + "to you, try increasing the number of Steiner points.",
                         "Quality.EnforceQuality()");
             }
         }

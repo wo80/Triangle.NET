@@ -181,18 +181,21 @@ namespace MeshExplorer
             btnMesh.Text = "Triangulate";
             btnSmooth.Enabled = false;
 
+            // Clear voronoi
+            menuViewVoronoi.Checked = false;
+            renderControl1.ShowVoronoi = false;
+
+            // Disable menu items
+            menuFileSave.Enabled = false;
+            menuFileExport.Enabled = false;
+            menuViewVoronoi.Enabled = false;
+            menuToolsCheck.Enabled = false;
+
             // Render input
             renderControl1.SetData(input);
 
             // Update window caption
             this.Text = "Triangle.NET - Mesh Explorer - " + settings.CurrentFile;
-
-            // Disable menu items
-            viewMenuVoronoi.Enabled = false;
-
-            // Clear voronoi
-            viewMenuVoronoi.Checked = false;
-            renderControl1.ShowVoronoi = false;
         }
 
         private void HandleMeshChange()
@@ -221,7 +224,10 @@ namespace MeshExplorer
             lbAngleMax.Text = Util.AngleToString(stats.LargestAngle);
 
             // Enable menu items
-            viewMenuVoronoi.Enabled = true;
+            menuFileSave.Enabled = true;
+            menuFileExport.Enabled = true;
+            menuViewVoronoi.Enabled = true;
+            menuToolsCheck.Enabled = true;
 
             // Update quality
             if (quality == null)
@@ -242,6 +248,9 @@ namespace MeshExplorer
         {
             // Render mesh
             renderControl1.SetData(mesh, true);
+
+            // Update window caption
+            this.Text = "Triangle.NET - Mesh Explorer - " + settings.CurrentFile;
 
             // Previous mesh stats
             lbNumVert2.Text = "-";
@@ -264,7 +273,10 @@ namespace MeshExplorer
             lbAngleMax.Text = Util.AngleToString(stats.LargestAngle);
 
             // Enable menu items
-            viewMenuVoronoi.Enabled = true;
+            menuFileSave.Enabled = true;
+            menuFileExport.Enabled = true;
+            menuViewVoronoi.Enabled = true;
+            menuToolsCheck.Enabled = true;
 
             // Set refine mode
             btnMesh.Enabled = true;
@@ -318,12 +330,13 @@ namespace MeshExplorer
                             settings.CurrentFile = Path.GetFileName(ofd.FileName);
 
                             HandleMeshImport();
+                            btnSmooth.Enabled = true; // TODO: Remove
                         }
                         // else Message
 
                         // Update folder settings
                         settings.OfdFilterIndex = ofd.FilterIndex;
-                        settings.OfdDirectory = Path.GetFullPath(ofd.FileName);
+                        settings.OfdDirectory = Path.GetDirectoryName(ofd.FileName);
 
                         return;
                     }
@@ -342,7 +355,7 @@ namespace MeshExplorer
 
                 // Update folder settings
                 settings.OfdFilterIndex = ofd.FilterIndex;
-                settings.OfdDirectory = Path.GetFullPath(ofd.FileName);
+                settings.OfdDirectory = Path.GetDirectoryName(ofd.FileName);
             }
         }
 
@@ -405,6 +418,11 @@ namespace MeshExplorer
             //Stopwatch sw = new Stopwatch();
 
             mesh = new Mesh();
+
+            if (cbConformDel.Checked)
+            {
+                mesh.SetOption(Options.ConformingDelaunay, true);
+            }
 
             if (cbQuality.Checked)
             {
@@ -540,12 +558,12 @@ namespace MeshExplorer
 
         #region Menu Handler
 
-        private void fileMenuOpen_Click(object sender, EventArgs e)
+        private void menuFileOpen_Click(object sender, EventArgs e)
         {
             Open();
         }
 
-        private void fileMenuSave_Click(object sender, EventArgs ev)
+        private void menuFileSave_Click(object sender, EventArgs ev)
         {
             if (mesh != null)
             {
@@ -553,12 +571,12 @@ namespace MeshExplorer
             }
         }
 
-        private void viewMenuLog_Click(object sender, EventArgs e)
+        private void menuViewLog_Click(object sender, EventArgs e)
         {
             ShowLog();
         }
 
-        private void toolsMenuGenerator_Click(object sender, EventArgs e)
+        private void menuToolsGenerator_Click(object sender, EventArgs e)
         {
             if (frmGenerator == null || frmGenerator.IsDisposed)
             {
@@ -576,7 +594,7 @@ namespace MeshExplorer
             }
         }
 
-        private void toolsMenuCheck_Click(object sender, EventArgs e)
+        private void menuToolsCheck_Click(object sender, EventArgs e)
         {
             if (mesh != null)
             {
@@ -590,6 +608,17 @@ namespace MeshExplorer
             if (mesh != null)
             {
                 FormExport export = new FormExport();
+
+                string file = settings.OfdDirectory;
+
+                if (!file.EndsWith("\\"))
+                {
+                    file += "\\";
+                }
+
+                file += settings.CurrentFile;
+
+                export.ImageName = Path.ChangeExtension(file, ".png");
 
                 if (export.ShowDialog() == DialogResult.OK)
                 {
@@ -616,17 +645,17 @@ namespace MeshExplorer
             }
         }
 
-        private void viewMenuVoronoi_Click(object sender, EventArgs e)
+        private void menuViewVoronoi_Click(object sender, EventArgs e)
         {
-            viewMenuVoronoi.Checked = !viewMenuVoronoi.Checked;
-            renderControl1.ShowVoronoi = viewMenuVoronoi.Checked;
-        }
-
-        private void fileMenuQuit_Click(object sender, EventArgs e)
-        {
-            this.Close();
+            menuViewVoronoi.Checked = !menuViewVoronoi.Checked;
+            renderControl1.ShowVoronoi = menuViewVoronoi.Checked;
         }
 
         #endregion
+
+        private void menuFileQuit_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
     }
 }

@@ -218,6 +218,7 @@
             this.ShowInTaskbar = false;
             this.Text = "Input Generator";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormGenerator_FormClosing);
+            this.Load += new System.EventHandler(this.FormGenerator_Load);
             this.ResumeLayout(false);
 
         }

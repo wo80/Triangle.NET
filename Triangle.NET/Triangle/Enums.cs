@@ -91,4 +91,9 @@ namespace TriangleNet
     /// The type of the mesh vertex.
     /// </summary>
     public enum VertexType { InputVertex, SegmentVertex, FreeVertex, DeadVertex, UndeadVertex };
+
+    /// <summary>
+    /// Node renumbering algorithms.
+    /// </summary>
+    public enum NodeNumbering { Linear, CuthillMcKee };
 }

@@ -1,7 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="EpsImage.cs" company="">
-// John Burkardt, Florida State University
-// http://people.sc.fsu.edu/~jburkardt/m_src/fem2d_poisson/
+// Original Matlab code by John Burkardt, Florida State University
 // </copyright>
 // -----------------------------------------------------------------------
 

@@ -59,7 +59,8 @@ namespace TriangleNet.Tools
 
             foreach (var v in mesh.vertices.Values)
             {
-                if (v.type == VertexType.FreeVertex)
+                // TODO: Need a reliable way to check if a vertex is on a segment
+                if (v.type == VertexType.FreeVertex || v.Boundary == 0)
                 {
                     voronoi.Add(ConstructBvdCell(v));
                 }
@@ -70,6 +71,13 @@ namespace TriangleNet.Tools
             }
         }
 
+        /// <summary>
+        /// Tag all blind triangles.
+        /// </summary>
+        /// <remarks>
+        /// A triangle is said to be blind if the triangle and its circumcenter
+        /// lie on two different sides of a constrained edge.
+        /// </remarks>
         private void TagBlindTriangles()
         {
             int blinded = 0;
@@ -153,6 +161,12 @@ namespace TriangleNet.Tools
             blinded = 0;
         }
 
+        /// <summary>
+        /// Check if given triangle is blinded by given segment.
+        /// </summary>
+        /// <param name="tri">Triangle.</param>
+        /// <param name="seg">Segments</param>
+        /// <returns>Returns true, if the triangle is blinded.</returns>
         private bool TriangleIsBlinded(ref Otri tri, ref Osub seg)
         {
             Point cc, pt = new Point();

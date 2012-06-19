@@ -11,6 +11,7 @@ namespace MeshExplorer.Controls
     using System.Text;
     using System.Drawing;
     using System.Drawing.Drawing2D;
+    using System.Drawing.Text;
     using System.Windows.Forms;
 
     /// <summary>
@@ -56,7 +57,7 @@ namespace MeshExplorer.Controls
         enum eButtonState { Normal, MouseOver, Down }
         eButtonState m_State = eButtonState.Normal;
 
-        // make sure the control is invalidated(repainted) when the text is changed
+        // Make sure the control is invalidated when the text is changed.
         public override string Text
         {
             get { return base.Text; }
@@ -72,14 +73,17 @@ namespace MeshExplorer.Controls
             set { isChecked = value; this.Invalidate(); }
         }
 
-        //--------------------------------------------------------------------------------
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         public DarkCheckBox()
         {
             this.BackColor = Color.FromArgb(76, 76, 76);
             InitializeComponent();
         }
+        
+        #region Control overrides
 
-        //--------------------------------------------------------------------------------
         protected override void OnPaint(PaintEventArgs e)
         {
             //base.OnPaint(e);
@@ -146,17 +150,17 @@ namespace MeshExplorer.Controls
                 e.Graphics.DrawRectangle(brushBorder, newRect);
             }
 
-            e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
-            e.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
-
-            if (this.isChecked)
-            {
-                e.Graphics.DrawLine(checkMark, 4, newRect.Bottom - boxSize / 2, newRect.Left + boxSize / 2.5f, newRect.Bottom - 2);
-                e.Graphics.DrawLine(checkMark, newRect.Left + boxSize / 2.6f, newRect.Bottom - 2, newRect.Right, newRect.Top);
-            }
+            e.Graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
 
             SizeF szL = e.Graphics.MeasureString(this.Text, base.Font, this.Width);
             e.Graphics.DrawString(this.Text, base.Font, new SolidBrush(text_color), boxSize + 4, (this.Height - szL.Height) / 2);
+
+            if (this.isChecked)
+            {
+                e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
+                e.Graphics.DrawLine(checkMark, 4, newRect.Bottom - boxSize / 2, newRect.Left + boxSize / 2.5f, newRect.Bottom - 2);
+                e.Graphics.DrawLine(checkMark, newRect.Left + boxSize / 2.6f, newRect.Bottom - 2, newRect.Right, newRect.Top);
+            }
 
             if (brushOuter != null) brushOuter.Dispose();
             if (brushInner != null) brushInner.Dispose();
@@ -164,7 +168,6 @@ namespace MeshExplorer.Controls
             if (checkMark != null) checkMark.Dispose();
         }
 
-        //--------------------------------------------------------------------------------
         protected override void OnMouseLeave(System.EventArgs e)
         {
             m_State = eButtonState.Normal;
@@ -172,7 +175,6 @@ namespace MeshExplorer.Controls
             base.OnMouseLeave(e);
         }
 
-        //--------------------------------------------------------------------------------
         protected override void OnMouseEnter(System.EventArgs e)
         {
             m_State = eButtonState.MouseOver;
@@ -180,7 +182,6 @@ namespace MeshExplorer.Controls
             base.OnMouseEnter(e);
         }
 
-        //--------------------------------------------------------------------------------
         protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e)
         {
             m_State = eButtonState.MouseOver;
@@ -188,7 +189,6 @@ namespace MeshExplorer.Controls
             base.OnMouseUp(e);
         }
 
-        //--------------------------------------------------------------------------------
         protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e)
         {
             m_State = eButtonState.Down;
@@ -202,5 +202,7 @@ namespace MeshExplorer.Controls
             this.Invalidate();
             base.OnClick(e);
         }
+
+        #endregion
     }
 }

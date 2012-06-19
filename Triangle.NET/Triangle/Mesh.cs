@@ -470,12 +470,37 @@ namespace TriangleNet
         /// </summary>
         public void Renumber()
         {
-            int id = 0;
-            foreach (var item in this.vertices.Values)
+            this.Renumber(NodeNumbering.Linear);
+        }
+
+        /// <summary>
+        /// Renumber vertex and triangle id's.
+        /// </summary>
+        public void Renumber(NodeNumbering num)
+        {
+            int id;
+
+            if (num == NodeNumbering.Linear)
             {
-                item.id = id++;
+                id = 0;
+                foreach (var item in this.vertices.Values)
+                {
+                    item.id = id++;
+                }
+            }
+            else
+            {
+                //CuthillMcKee rcm = new CuthillMcKee();
+                //int[] perm_inv = rcm.Renumber(this);
+
+                //// Permute the node indices.
+                //foreach (var node in this.vertices.Values)
+                //{
+                //    node.id = perm_inv[node.id];
+                //}
             }
 
+            // Triangles will always be numbered from 0..n
             id = 0;
             foreach (var item in this.triangles.Values)
             {

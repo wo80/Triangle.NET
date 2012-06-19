@@ -37,6 +37,7 @@ namespace MeshExplorer
         public string ImageName
         {
             get { return darkTextBox1.Text; }
+            set { darkTextBox1.Text = value; }
         }
 
         protected override void OnPaint(PaintEventArgs e)

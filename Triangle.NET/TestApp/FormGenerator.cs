@@ -15,11 +15,6 @@ namespace MeshExplorer
         public FormGenerator()
         {
             InitializeComponent();
-
-            darkListBox1.Items.Add(new RandomPoints());
-            darkListBox1.Items.Add(new RandomPointsCircle());
-            darkListBox1.Items.Add(new StarInBox());
-            darkListBox1.Items.Add(new RingPolygon());
         }
 
         private void UpdateControls()
@@ -131,6 +126,16 @@ namespace MeshExplorer
             {
                 lbParam3Val.Text = currentGenerator.ParameterDescription(3, sliderParam3.Value);
             }
+        }
+
+        private void FormGenerator_Load(object sender, EventArgs e)
+        {
+            darkListBox1.Items.Add(new RandomPoints());
+            darkListBox1.Items.Add(new RandomPointsCircle());
+            darkListBox1.Items.Add(new StarInBox());
+            darkListBox1.Items.Add(new RingPolygon());
+
+            darkListBox1.SelectedIndex = 0;
         }
     }
 }

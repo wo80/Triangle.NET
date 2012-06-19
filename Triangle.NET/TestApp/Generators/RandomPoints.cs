@@ -29,7 +29,7 @@ namespace MeshExplorer.Generators
 
         public int ParameterCount
         {
-            get { return 1; }
+            get { return 3; }
         }
 
         public string ParameterDescription(int paramIndex)
@@ -39,7 +39,12 @@ namespace MeshExplorer.Generators
                 return "Number of points:";
             }
 
-            return "";
+            if (paramIndex == 2)
+            {
+                return "Width:";
+            }
+
+            return "Height:";
         }
 
         public string ParameterDescription(int paramIndex, double paramValue)
@@ -53,6 +58,13 @@ namespace MeshExplorer.Generators
                 {
                     numPoints = 5;
                 }
+
+                return numPoints.ToString();
+            }
+
+            if (paramIndex == 2 || paramIndex == 3)
+            {
+                int numPoints = (int)paramValue + 100;
 
                 return numPoints.ToString();
             }
@@ -72,8 +84,8 @@ namespace MeshExplorer.Generators
 
             InputGeometry input = new InputGeometry(numPoints);
 
-            int width = Util.Random.Next(100, 200);
-            int height = Util.Random.Next(100, 200);
+            int width = (int)param2 + 100;
+            int height = (int)param3 + 100;
 
             for (int i = 0; i < numPoints; i++)
             {

@@ -67,6 +67,8 @@ namespace MeshExplorer.Rendering
 
             this.Triangles = mesh.Triangles;
 
+            this.Segments = null;
+
             int n = mesh.NumberOfVertices;
 
             // Convert points to float
@@ -75,16 +77,19 @@ namespace MeshExplorer.Rendering
             SetPoints(mesh.Vertices);
 
             // Get segments
-            var segs = mesh.Segments;
-
-            List<Edge> segList = new List<Edge>(mesh.NumberOfSegments);
-
-            foreach (var seg in segs)
+            if (mesh.IsPolygon)
             {
-                segList.Add(new Edge(seg.P0, seg.P1));
-            }
+                var segs = mesh.Segments;
 
-            this.Segments = segList.ToArray();
+                List<Edge> segList = new List<Edge>(mesh.NumberOfSegments);
+
+                foreach (var seg in segs)
+                {
+                    segList.Add(new Edge(seg.P0, seg.P1));
+                }
+
+                this.Segments = segList.ToArray();
+            }
 
             // Get edges (more efficient than rendering triangles)
             EdgeEnumerator e = new EdgeEnumerator(mesh);
