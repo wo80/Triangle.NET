@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="MeshDataInternal.cs" company="">
-// TODO: Update copyright text.
+// <copyright file="RenderData.cs" company="">
+// Christian Woltering, Triangle.NET, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -16,6 +16,9 @@ namespace MeshExplorer.Rendering
     using TriangleNet.Data;
     using TriangleNet.Geometry;
 
+    /// <summary>
+    /// Stores the current mesh in GDI friendly data structure.
+    /// </summary>
     public class RenderData
     {
         public PointF[] Points;
@@ -27,6 +30,9 @@ namespace MeshExplorer.Rendering
         public int NumberOfInputPoints;
         public RectangleF Bounds;
 
+        /// <summary>
+        /// Update input geometry data.
+        /// </summary>
         public void SetData(InputGeometry data)
         {
             int n = data.Count;
@@ -55,10 +61,8 @@ namespace MeshExplorer.Rendering
         }
 
         /// <summary>
-        /// 
+        /// Update mesh data.
         /// </summary>
-        /// <param name="mesh"></param>
-        /// <remarks>This methods assumes that the mesh.Renumber() has been called.</remarks>
         public void SetData(Mesh mesh)
         {
             mesh.Renumber();

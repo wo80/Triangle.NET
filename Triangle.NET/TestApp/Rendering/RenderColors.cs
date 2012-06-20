@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="RenderColors.cs" company="">
-// TODO: Update copyright text.
+// Christian Woltering, Triangle.NET, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 

@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="ITriangle.cs" company="">
-// TODO: Update copyright text.
+// Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -34,10 +34,13 @@ namespace TriangleNet.Geometry
         /// Third vertex id of the triangle.
         /// </summary>
         int P2 { get; }
+
         /// <summary>
-        /// Gets the vertex at specified index.
+        /// Gets a triangles vertex.
         /// </summary>
-        Vertex this[int index] { get; }
+        /// <param name="index">The vertex index (0, 1 or 2).</param>
+        /// <returns>The vertex of the specified corner index.</returns>
+        Vertex GetVertex(int index);
 
         /// <summary>
         /// True if the triangle implementation contains neighbor information.
@@ -56,6 +59,13 @@ namespace TriangleNet.Geometry
         /// Third neighbor.
         /// </summary>
         int N2 { get; }
+
+        /// <summary>
+        /// Gets a triangles neighbor.
+        /// </summary>
+        /// <param name="index">The neighbor index (0, 1 or 2).</param>
+        /// <returns>The triangles' neigbbor.</returns>
+        ITriangle GetNeighbor(int index);
 
         /// <summary>
         /// Triangle area constraint.

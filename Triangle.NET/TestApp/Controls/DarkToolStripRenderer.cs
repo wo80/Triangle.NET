@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="DarkToolStripRenderer.cs" company="">
-// TODO: Update copyright text.
+// Christian Woltering, Triangle.NET, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -15,7 +15,7 @@ namespace MeshExplorer.Controls
     using System.Drawing.Drawing2D;
 
     /// <summary>
-    /// TODO: Update summary.
+    /// Toolstrip render for dark menu.
     /// </summary>
     public class DarkToolStripRenderer : ToolStripRenderer
     {

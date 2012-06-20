@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="Bbox_2.cs" company="">
-// TODO: Update copyright text.
+// <copyright file="BoundingBox.cs" company="">
+// Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 

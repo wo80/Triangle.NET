@@ -1,15 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows.Forms;
-using System.Drawing;
+﻿// -----------------------------------------------------------------------
+// <copyright file="DarkListBox.cs" company="">
+// Christian Woltering, Triangle.NET, http://triangle.codeplex.com/
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace MeshExplorer.Controls
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Text;
+    using System.Windows.Forms;
+    using System.Drawing;
+
+    /// <summary>
+    /// Dark listbox control.
+    /// </summary>
     public class DarkListBox : ListBox
     {
         Font _boldFont;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DarkListBox" /> control.
+        /// </summary>
         public DarkListBox()
         {
             _boldFont = new Font(base.Font.FontFamily, base.Font.Size, FontStyle.Bold);

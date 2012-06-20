@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="StarInBox.cs" company="">
-// TODO: Update copyright text.
+// Christian Woltering, Triangle.NET, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -13,7 +13,7 @@ namespace MeshExplorer.Generators
     using TriangleNet.Geometry;
 
     /// <summary>
-    /// TODO: Update summary.
+    /// Generates a star contained in a box.
     /// </summary>
     public class StarInBox : IGenerator
     {

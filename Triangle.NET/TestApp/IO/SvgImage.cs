@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="SvgImage.cs" company="">
-// TODO: Update copyright text.
+// Christian Woltering, Triangle.NET, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -13,6 +13,8 @@ namespace MeshExplorer.IO
     using MeshExplorer.Rendering;
     using System.IO;
     using TriangleNet;
+    using TriangleNet.Data;
+    using TriangleNet.Geometry;
 
     /// <summary>
     /// Writes a mesh to an SVG file.
@@ -21,9 +23,12 @@ namespace MeshExplorer.IO
     {
         float scale = 1f;
 
-        int x_offset = 0;
-        int y_offset = 0;
-
+        /// <summary>
+        /// Export the mesh to SVG format.
+        /// </summary>
+        /// <param name="mesh">The current mesh.</param>
+        /// <param name="filename">The SVG filename.</param>
+        /// <param name="width">The desired width of the image.</param>
         public void Export(Mesh mesh, string filename, int width)
         {
             // Check file name
@@ -45,11 +50,11 @@ namespace MeshExplorer.IO
             var bounds = mesh.Bounds;
 
             float margin = 0.05f * (float)bounds.Width;
-            
+
             scale = width / ((float)bounds.Width + 2 * margin);
 
-            x_offset = -(int)((bounds.Xmin - margin) * scale);
-            y_offset = (int)((bounds.Ymax + margin) * scale);
+            int x_offset = -(int)((bounds.Xmin - margin) * scale);
+            int y_offset = (int)((bounds.Ymax + margin) * scale);
 
             int height = (int)((bounds.Height + 2 * margin) * scale);
 
@@ -79,16 +84,21 @@ namespace MeshExplorer.IO
 
             StringBuilder labels = new StringBuilder();
 
+            Vertex v1, v2, v3;
             double x1, y1, x2, y2, x3, y3, xa, ya;
 
             foreach (var tri in mesh.Triangles)
             {
-                x1 = scale * tri[0].X;
-                y1 = scale * tri[0].Y;
-                x2 = scale * tri[1].X;
-                y2 = scale * tri[1].Y;
-                x3 = scale * tri[2].X;
-                y3 = scale * tri[2].Y;
+                v1 = tri.GetVertex(0);
+                v2 = tri.GetVertex(1);
+                v3 = tri.GetVertex(2);
+
+                x1 = scale * v1.X;
+                y1 = scale * v1.Y;
+                x2 = scale * v2.X;
+                y2 = scale * v2.Y;
+                x3 = scale * v3.X;
+                y3 = scale * v3.Y;
 
                 svg.Write("M {0},{1} L {2},{3} {4},{5} Z ",
                     x1.ToString("0.0", Util.Nfi), y1.ToString("0.0", Util.Nfi),
@@ -128,10 +138,10 @@ namespace MeshExplorer.IO
 
             foreach (var seg in mesh.Segments)
             {
-                x1 = scale * seg[0].X;
-                y1 = scale * seg[0].Y;
-                x2 = scale * seg[1].X;
-                y2 = scale * seg[1].Y;
+                x1 = scale * seg.GetVertex(0).X;
+                y1 = scale * seg.GetVertex(0).Y;
+                x2 = scale * seg.GetVertex(1).X;
+                y2 = scale * seg.GetVertex(1).Y;
 
                 svg.Write("M {0},{1} L {2},{3} ",
                     x1.ToString("0.0", Util.Nfi), y1.ToString("0.0", Util.Nfi),
@@ -159,7 +169,7 @@ namespace MeshExplorer.IO
             {
                 circle_size = 2;
             }
-            
+
             svg.WriteLine("    <g style=\"fill: #006400\">");
 
             double x, y;

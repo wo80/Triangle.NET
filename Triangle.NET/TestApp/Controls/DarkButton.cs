@@ -1,14 +1,18 @@
-﻿
+﻿// -----------------------------------------------------------------------
+// <copyright file="DarkButton.cs" company="">
+// Christian Woltering, Triangle.NET, http://triangle.codeplex.com/
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace MeshExplorer.Controls
 {
-	using System;
-	using System.Collections.Generic;
-	using System.ComponentModel;
-	using System.Drawing;
-	using System.Drawing.Drawing2D;
-	using System.Text;
-	using System.Windows.Forms;
+    using System;
+    using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Drawing;
+    using System.Drawing.Drawing2D;
+    using System.Text;
+    using System.Windows.Forms;
 
     public class DarkButton : Button
     {
@@ -50,20 +54,23 @@ namespace MeshExplorer.Controls
         enum eButtonState { Normal, MouseOver, Down }
         eButtonState m_State = eButtonState.Normal;
 
-        // make sure the control is invalidated(repainted) when the text is changed
+        // Make sure the control is invalidated when the text is changed.
         public override string Text
         {
             get { return base.Text; }
             set { base.Text = value; this.Invalidate(); }
         }
 
-        //--------------------------------------------------------------------------------
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DarkButton" /> control.
+        /// </summary>
         public DarkButton()
         {
             InitializeComponent();
         }
 
-        //--------------------------------------------------------------------------------
+        #region Control overrides
+
         protected override void OnPaint(PaintEventArgs e)
         {
             e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
@@ -150,7 +157,6 @@ namespace MeshExplorer.Controls
             brushBorder.Dispose();
         }
 
-        //--------------------------------------------------------------------------------
         protected override void OnMouseLeave(System.EventArgs e)
         {
             m_State = eButtonState.Normal;
@@ -158,7 +164,6 @@ namespace MeshExplorer.Controls
             base.OnMouseLeave(e);
         }
 
-        //--------------------------------------------------------------------------------
         protected override void OnMouseEnter(System.EventArgs e)
         {
             m_State = eButtonState.MouseOver;
@@ -166,7 +171,6 @@ namespace MeshExplorer.Controls
             base.OnMouseEnter(e);
         }
 
-        //--------------------------------------------------------------------------------
         protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e)
         {
             m_State = eButtonState.MouseOver;
@@ -174,12 +178,13 @@ namespace MeshExplorer.Controls
             base.OnMouseUp(e);
         }
 
-        //--------------------------------------------------------------------------------
         protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e)
         {
             m_State = eButtonState.Down;
             this.Invalidate();
             base.OnMouseDown(e);
         }
+
+        #endregion
     }
 }

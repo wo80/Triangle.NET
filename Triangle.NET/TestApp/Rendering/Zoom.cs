@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="Zoom.cs" company="">
-// TODO: Update copyright text.
+// Christian Woltering, Triangle.NET, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -13,30 +13,45 @@ namespace MeshExplorer.Rendering
     using System.Drawing;
 
     /// <summary>
-    /// Manages the current world to screen transformation
+    /// Manages the current world to screen transformation.
     /// </summary>
     public class Zoom
     {
-        // The complete mesh
+        /// <summary>
+        /// Gets the screen dimensions (render control).
+        /// </summary>
         Rectangle Screen { get; set; }
 
-        // The complete mesh
+        /// <summary>
+        /// Gets the world dimensions (mesh).
+        /// </summary>
         RectangleF World { get; set; }
 
-        // The current viewport (visible mesh)
-        public RectangleF Viewport { get; set; }
+        /// <summary>
+        /// Gets the current viewport (visible mesh).
+        /// </summary>
+        public RectangleF Viewport { get; private set; }
 
-        // Current scale (zoom level)
-        public int Level { get; set; }
+        /// <summary>
+        /// Gets the current scale (zoom level)
+        /// </summary>
+        public int Level { get; private set; }
 
-        // Add a margin to clip region (5% of viewport width on each side)
-        public float ClipMargin { get; set; }
+        public float ClipMargin { get; private set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Zoom" /> class.
+        /// </summary>
         public Zoom()
         {
             Level = -1;
         }
 
+        /// <summary>
+        /// Initialize the zoom.
+        /// </summary>
+        /// <param name="screen">The screen dimensions.</param>
+        /// <param name="world">The world dimensions.</param>
         public void Initialize(Rectangle screen, RectangleF world)
         {
             this.Screen = screen;
@@ -74,45 +89,15 @@ namespace MeshExplorer.Rendering
 
         public void Resize(Rectangle screen, RectangleF world)
         {
-            this.Screen = screen;
-
-            this.World = world;
-            this.Level = 1;
-
-            // Add a margin so there's some space around the border
-            float worldMargin = (World.Width < World.Height) ? World.Height * 0.05f : World.Width * 0.05f;
-
-            // Get the initial viewport (complete mesh centered on the screen)
-            float screenRatio = screen.Width / (float)screen.Height;
-            float worldRatio = World.Width / World.Height;
-
-            float scale = (World.Width + worldMargin) / screen.Width;
-
-            if (screenRatio > worldRatio)
-            {
-                scale = (World.Height + worldMargin) / screen.Height;
-            }
-
-            float centerX = World.X + World.Width / 2;
-            float centerY = World.Y + World.Height / 2;
-
-            // TODO: Add initial margin
-            this.Viewport = new RectangleF(centerX - screen.Width * scale / 2,
-                centerY - screen.Height * scale / 2,
-                screen.Width * scale,
-                screen.Height * scale);
-
-            this.ClipMargin = this.Viewport.Width * 0.05f;
-
-            this.World = this.Viewport;
+            this.Initialize(screen, world);
         }
 
         /// <summary>
         /// Zoom in or out of the viewport.
         /// </summary>
         /// <param name="amount">Zoom amount</param>
-        /// <param name="focusX">Relative x point position</param>
-        /// <param name="focusY">Relative y point position</param>
+        /// <param name="focusX">Relative x point position (between 0 and 1)</param>
+        /// <param name="focusY">Relative y point position (between 0 and 1)</param>
         public bool Update(int amount, float focusX, float focusY)
         {
             float width, height;
@@ -180,6 +165,9 @@ namespace MeshExplorer.Rendering
             return true;
         }
 
+        /// <summary>
+        /// Check current point (world coordinates) lies inside the viewport.
+        /// </summary>
         public bool ViewportContains(PointF pt)
         {
             return (pt.X > Viewport.X && pt.X < Viewport.Right

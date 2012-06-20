@@ -1,7 +1,7 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="Quality.cs">
 // Original Triangle code by Jonathan Richard Shewchuk, http://www.cs.cmu.edu/~quake/triangle.html
-// Triangle.NET code by Christian Woltering, http://home.edo.tu-dortmund.de/~woltering/triangle/
+// Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -204,7 +204,7 @@ namespace TriangleNet
                     {
                         if (Primitives.NonRegular(triorg, tridest, triapex, oppoapex) > 0.0)
                         {
-                            logger.Warning(String.Format("Non-regular pair of triangles found (IDs {0}+{1}).",
+                            logger.Warning(String.Format("Non-regular pair of triangles found (IDs {0}/{1}).",
                                 loop.triangle.id, oppotri.triangle.id), "Quality.CheckDelaunay()");
                             horrors++;
                         }

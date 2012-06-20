@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="Settings.cs" company="">
-// TODO: Update copyright text.
+// Christian Woltering, Triangle.NET, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -14,7 +14,7 @@ namespace MeshExplorer
     using System.Windows.Forms;
 
     /// <summary>
-    /// TODO: Update summary.
+    /// Stores some of the data used in the main application.
     /// </summary>
     public class Settings
     {

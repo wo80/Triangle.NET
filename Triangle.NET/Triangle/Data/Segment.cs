@@ -1,7 +1,7 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="Subseg.cs" company="">
+// <copyright file="Segment.cs" company="">
 // Original Triangle code by Jonathan Richard Shewchuk, http://www.cs.cmu.edu/~quake/triangle.html
-// Triangle.NET code by Christian Woltering, http://home.edo.tu-dortmund.de/~woltering/triangle/
+// Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -11,6 +11,7 @@ namespace TriangleNet.Data
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
+    using TriangleNet.Geometry;
 
     /// <summary>
     /// The subsegment data structure.
@@ -71,9 +72,9 @@ namespace TriangleNet.Data
         /// <summary>
         /// Gets the segments endpoint.
         /// </summary>
-        public Vertex this[int index]
+        public Vertex GetVertex(int index)
         {
-            get { return this.vertices[index]; } // TODO: Check range?
+            return this.vertices[index]; // TODO: Check range?
         }
 
         /// <summary>

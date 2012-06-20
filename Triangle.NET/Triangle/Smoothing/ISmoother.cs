@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="ISmoother.cs" company="">
-// TODO: Update copyright text.
+// <copyright file="ISmoother.cs">
+// Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -12,7 +12,7 @@ namespace TriangleNet.Smoothing
     using System.Text;
 
     /// <summary>
-    /// TODO: Update summary.
+    /// Interface for mesh smoothers.
     /// </summary>
     public interface ISmoother
     {

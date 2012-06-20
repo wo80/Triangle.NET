@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="ImageWriter.cs" company="">
-// TODO: Update copyright text.
+// <copyright file="RasterImage.cs" company="">
+// Christian Woltering, Triangle.NET, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -31,11 +31,11 @@ namespace MeshExplorer.IO
         }
 
         /// <summary>
-        /// Draws the mesh and writes the image file.
+        /// Export the mesh to PNG format.
         /// </summary>
-        /// <param name="mesh">The mesh to visualize.</param>
-        /// <param name="filename">The filename (only PNG supported).</param>
-        /// <param name="width">The target width of the image (pixel).</param>
+        /// <param name="mesh">The current mesh.</param>
+        /// <param name="filename">The PNG filename.</param>
+        /// <param name="width">The desired width (pixel) of the image.</param>
         public void Export(Mesh mesh, string filename, int width)
         {
             // Get mesh data -- TODO: Use RenderControl's RenderData

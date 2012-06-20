@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="ColorScheme.cs" company="">
-// TODO: Update copyright text.
+// Christian Woltering, Triangle.NET, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -13,7 +13,7 @@ namespace MeshExplorer.Controls
     using System.Drawing;
 
     /// <summary>
-    /// TODO: Update summary.
+    /// Dark user interface color scheme.
     /// </summary>
     public static class ColorScheme
     {

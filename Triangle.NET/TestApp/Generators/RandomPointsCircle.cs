@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="RandomPoints.cs" company="">
-// TODO: Update copyright text.
+// <copyright file="RandomPointsCircle.cs" company="">
+// Christian Woltering, Triangle.NET, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -13,7 +13,7 @@ namespace MeshExplorer.Generators
     using TriangleNet.Geometry;
 
     /// <summary>
-    /// Simple random points generator.
+    /// Simple random points generator (points distributed in a circle).
     /// </summary>
     public class RandomPointsCircle : IGenerator
     {

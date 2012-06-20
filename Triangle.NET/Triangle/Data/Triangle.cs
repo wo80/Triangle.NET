@@ -1,7 +1,7 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="Triangle.cs" company="">
 // Original Triangle code by Jonathan Richard Shewchuk, http://www.cs.cmu.edu/~quake/triangle.html
-// Triangle.NET code by Christian Woltering, http://home.edo.tu-dortmund.de/~woltering/triangle/
+// Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -98,11 +98,11 @@ namespace TriangleNet.Data
         }
 
         /// <summary>
-        /// Gets the specified corners vertex id.
+        /// Gets the specified corners vertex.
         /// </summary>
-        public Vertex this[int index]
+        public Vertex GetVertex(int index)
         {
-            get { return this.vertices[index]; } // TODO: Check range?
+            return this.vertices[index]; // TODO: Check range?
         }
 
         /// <summary>
@@ -140,6 +140,16 @@ namespace TriangleNet.Data
         public int N2
         {
             get { return this.neighbors[2].triangle.id; }
+        }
+
+        /// <summary>
+        /// Gets a triangles' neighbor.
+        /// </summary>
+        /// <param name="index">The neighbor index (0, 1 or 2).</param>
+        /// <returns>The triangles' neigbbor.</returns>
+        public ITriangle GetNeighbor(int index)
+        {
+            return neighbors[index].triangle == Mesh.dummytri ? null : neighbors[index].triangle;
         }
 
         /// <summary>

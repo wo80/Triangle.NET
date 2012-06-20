@@ -1,5 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="EpsImage.cs" company="">
+// Christian Woltering, Triangle.NET, http://triangle.codeplex.com/
 // Original Matlab code by John Burkardt, Florida State University
 // </copyright>
 // -----------------------------------------------------------------------
@@ -14,6 +15,7 @@ namespace MeshExplorer.IO
     using System.IO;
     using TriangleNet;
     using TriangleNet.Geometry;
+    using TriangleNet.Data;
 
     /// <summary>
     /// Writes a mesh to an EPS file.
@@ -35,6 +37,12 @@ namespace MeshExplorer.IO
         double y_max, y_min;
         double x_scale, y_scale;
 
+        /// <summary>
+        /// Export the mesh to EPS format.
+        /// </summary>
+        /// <param name="mesh">The current mesh.</param>
+        /// <param name="filename">The EPS filename.</param>
+        /// <param name="width">The desired width of the image (currently ignored).</param>
         public void Export(Mesh mesh, string filename, int width)
         {
             // Check file name
@@ -150,6 +158,7 @@ namespace MeshExplorer.IO
 
             StringBuilder labels = new StringBuilder();
 
+            Vertex v1, v2, v3;
             double x1, y1, x2, y2, x3, y3, xa, ya;
             int x_ps, y_ps;
 
@@ -157,22 +166,26 @@ namespace MeshExplorer.IO
             {
                 eps.WriteLine("newpath");
 
-                x1 = tri[0].X; y1 = tri[0].Y;
-                x2 = tri[1].X; y2 = tri[1].Y;
-                x3 = tri[2].X; y3 = tri[2].Y;
+                v1 = tri.GetVertex(0);
+                v2 = tri.GetVertex(1);
+                v3 = tri.GetVertex(2);
+
+                x1 = v1.X; y1 = v1.Y;
+                x2 = v2.X; y2 = v2.Y;
+                x3 = v3.X; y3 = v3.Y;
 
                 x_ps = (int)Math.Floor(((x_max - x1) * x_ps_min + (x1 - x_min) * x_ps_max) / (x_max - x_min));
                 y_ps = (int)Math.Floor(((y_max - y1) * y_ps_min + (y1 - y_min) * y_ps_max) / (y_max - y_min));
                 eps.WriteLine("  {0}  {1}  moveto", x_ps, y_ps);
-                
+
                 x_ps = (int)Math.Floor(((x_max - x2) * x_ps_min + (x2 - x_min) * x_ps_max) / (x_max - x_min));
                 y_ps = (int)Math.Floor(((y_max - y2) * y_ps_min + (y2 - y_min) * y_ps_max) / (y_max - y_min));
                 eps.WriteLine("  {0}  {1}  lineto", x_ps, y_ps);
-                
+
                 x_ps = (int)Math.Floor(((x_max - x3) * x_ps_min + (x3 - x_min) * x_ps_max) / (x_max - x_min));
                 y_ps = (int)Math.Floor(((y_max - y3) * y_ps_min + (y3 - y_min) * y_ps_max) / (y_max - y_min));
                 eps.WriteLine("  {0}  {1}  lineto", x_ps, y_ps);
-                
+
                 x_ps = (int)Math.Floor(((x_max - x1) * x_ps_min + (x1 - x_min) * x_ps_max) / (x_max - x_min));
                 y_ps = (int)Math.Floor(((y_max - y1) * y_ps_min + (y1 - y_min) * y_ps_max) / (y_max - y_min));
                 eps.WriteLine("  {0}  {1}  lineto", x_ps, y_ps);
@@ -230,8 +243,8 @@ namespace MeshExplorer.IO
             {
                 eps.WriteLine("newpath");
 
-                x1 = seg[0].X; y1 = seg[0].Y;
-                x2 = seg[1].X; y2 = seg[1].Y;
+                x1 = seg.GetVertex(0).X; y1 = seg.GetVertex(0).Y;
+                x2 = seg.GetVertex(1).X; y2 = seg.GetVertex(1).Y;
 
                 x_ps = (int)Math.Floor(((x_max - x1) * x_ps_min + (x1 - x_min) * x_ps_max) / (x_max - x_min));
                 y_ps = (int)Math.Floor(((y_max - y1) * y_ps_min + (y1 - y_min) * y_ps_max) / (y_max - y_min));

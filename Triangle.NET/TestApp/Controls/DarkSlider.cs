@@ -1,6 +1,7 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="SliderDark.cs" company="">
-// TODO: Update copyright text.
+// <copyright file="DarkSlider.cs" company="">
+// Christian Woltering, Triangle.NET, http://triangle.codeplex.com/
+// Original code on CodeProject: Owner-drawn trackbar (slider), Michal Brylka
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -13,8 +14,6 @@ namespace MeshExplorer.Controls
     using System.Windows.Forms;
     using System.Drawing;
     using System.Drawing.Drawing2D;
-
-    // CodeProject: Owner-drawn trackbar (slider), Michal Brylka
 
     /// <summary>
     /// Encapsulates control that visualy displays certain integer value and allows user to change 
@@ -194,7 +193,7 @@ namespace MeshExplorer.Controls
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ColorSlider"/> class.
+        /// Initializes a new instance of the <see cref="ColorSlider"/> control.
         /// </summary>
         public DarkSlider()
         {

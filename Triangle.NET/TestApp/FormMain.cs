@@ -73,6 +73,7 @@ namespace MeshExplorer
 
             if (input != null)
             {
+                settings.CurrentFile = "GEN";
                 HandleNewInput();
             }
         }
@@ -175,6 +176,22 @@ namespace MeshExplorer
             lbNumVert.Text = input.Count.ToString();
             lbNumSeg.Text = input.Segments.Count().ToString();
             lbNumTri.Text = "0"; //input.Triangles == null ? "0" : input.Triangles.Length.ToString();
+
+            // Statistics labels
+            lbAreaMin.Text = "-";
+            lbAreaMax.Text = "-";
+            lbEdgeMin.Text = "-";
+            lbEdgeMax.Text = "-";
+            lbAngleMin.Text = "-";
+            lbAngleMax.Text = "-";
+
+            // Quality labels
+            lbQualAlphaMin.Text = "-";
+            lbQualAlphaAve.Text = "-";
+            lbQualAspectMin.Text = "-";
+            lbQualAspectAve.Text = "-";
+
+            angleHistogram1.SetData(null, null);
 
             // Reset buttons
             btnMesh.Enabled = true;
@@ -402,7 +419,7 @@ namespace MeshExplorer
                 if (cbQuality.Checked)
                 {
                     btnMesh.Text = "Refine";
-                    btnSmooth.Enabled = true;
+                    //btnSmooth.Enabled = true;
                 }
             }
             else if (cbQuality.Checked)

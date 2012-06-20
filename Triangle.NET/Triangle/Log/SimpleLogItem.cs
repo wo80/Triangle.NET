@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="SimpleLogItem.cs" company="">
-// TODO: Update copyright text.
+// Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -12,7 +12,7 @@ namespace TriangleNet.Log
     using System.Text;
 
     /// <summary>
-    /// TODO: Update summary.
+    /// Represents an item stored in the log.
     /// </summary>
     public class SimpleLogItem : ILogItem
     {

@@ -26,11 +26,8 @@ namespace MeshExplorer
         {
             get
             {
-                string s = lbSize.Text;
-                s = s.Substring(0, s.Length - 3);
-                int size = 0;
-                int.TryParse(s, out size);
-                return size;
+                int size = (int)darkSlider1.Value;
+                return 18 * size + 200;
             }
         }
 

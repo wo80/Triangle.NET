@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="QualityMeasure.cs" company="">
-// TODO: Update copyright text.
+// Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -248,11 +248,11 @@ namespace TriangleNet.Tools
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    gi = tri[j].id;
+                    gi = tri.GetVertex(j).id;
 
                     for (int k = 0; k < 3; k++)
                     {
-                        gj = tri[k].id;
+                        gj = tri.GetVertex(k).id;
 
                         mu = Math.Max(mu, gj - gi);
                         ml = Math.Max(ml, gi - gj);

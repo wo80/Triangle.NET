@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="VoronoiRenderer.cs" company="">
-// Christian Woltering, http://home.edo.tu-dortmund.de/~woltering/triangle/
+// Christian Woltering, Triangle.NET, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -24,6 +24,9 @@ namespace MeshExplorer.Rendering
         BoundedVoronoi boundedVoro;
         RenderColors renderColors;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="VoronoiRenderer" /> class.
+        /// </summary>
         public VoronoiRenderer(Mesh mesh)
         {
             this.mesh = mesh;
@@ -39,6 +42,9 @@ namespace MeshExplorer.Rendering
             }
         }
 
+        /// <summary>
+        /// Regenerates the voronoi diagram.
+        /// </summary>
         public void Update()
         {
             if (simpleVoro != null)
@@ -52,12 +58,18 @@ namespace MeshExplorer.Rendering
             }
         }
 
+        /// <summary>
+        /// Resets the voronoi display.
+        /// </summary>
         public void Reset()
         {
             simpleVoro = null;
             boundedVoro = null;
         }
 
+        /// <summary>
+        /// Renders the voronoi diagram.
+        /// </summary>
         public void Render(Graphics g, Zoom zoom, RenderColors renderColors)
         {
             this.renderColors = renderColors;

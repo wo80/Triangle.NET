@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="TriangleFile.cs" company="">
-// TODO: Update copyright text.
+// Christian Woltering, Triangle.NET, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -16,7 +16,7 @@ namespace MeshExplorer.IO.Formats
     using TriangleNet;
 
     /// <summary>
-    /// TODO: Update summary.
+    /// Read and write files defined in classic Triangle format.
     /// </summary>
     public class TriangleFile : IMeshFile
     {

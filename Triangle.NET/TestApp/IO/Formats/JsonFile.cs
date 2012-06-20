@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="UcdFile.cs" company="">
-// TODO: Update copyright text.
+// <copyright file="JsonFile.cs" company="">
+// Christian Woltering, Triangle.NET, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 

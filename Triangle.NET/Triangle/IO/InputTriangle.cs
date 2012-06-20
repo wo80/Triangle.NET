@@ -1,7 +1,7 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="Triangle.cs" company="">
 // Original Triangle code by Jonathan Richard Shewchuk, http://www.cs.cmu.edu/~quake/triangle.html
-// Triangle.NET code by Christian Woltering, http://home.edo.tu-dortmund.de/~woltering/triangle/
+// Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -60,11 +60,11 @@ namespace TriangleNet.IO
         }
 
         /// <summary>
-        /// Gets the specified corners vertex id.
+        /// Gets the specified corners vertex.
         /// </summary>
-        public Vertex this[int index]
+        public Vertex GetVertex(int index)
         {
-            get { return null; } // TODO: throw NotSupportedException?
+            return null; // TODO: throw NotSupportedException?
         }
 
         public bool SupportsNeighbors
@@ -85,6 +85,11 @@ namespace TriangleNet.IO
         public int N2
         {
             get { return -1; }
+        }
+
+        public ITriangle GetNeighbor(int index)
+        {
+            return null;
         }
 
         /// <summary>

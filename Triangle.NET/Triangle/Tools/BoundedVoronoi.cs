@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="BoundedVoronoi.cs" company="">
-// Triangle.NET code by Christian Woltering, http://home.edo.tu-dortmund.de/~woltering/index.html
+// Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 

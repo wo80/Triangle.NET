@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="CheckBoxDark.cs" company="">
-// TODO: Update copyright text.
+// <copyright file="DarkCheckBox.cs" company="">
+// Christian Woltering, Triangle.NET, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -11,11 +11,11 @@ namespace MeshExplorer.Controls
     using System.Text;
     using System.Drawing;
     using System.Drawing.Drawing2D;
-    using System.Drawing.Text;
     using System.Windows.Forms;
+    using System.Drawing.Text;
 
     /// <summary>
-    /// TODO: Update summary.
+    /// Dark checkbox control.
     /// </summary>
     public class DarkCheckBox : ButtonBase
     {
@@ -74,14 +74,14 @@ namespace MeshExplorer.Controls
         }
 
         /// <summary>
-        /// Constructor.
+        /// Initializes a new instance of the <see cref="DarkCheckBox" /> control.
         /// </summary>
         public DarkCheckBox()
         {
             this.BackColor = Color.FromArgb(76, 76, 76);
             InitializeComponent();
         }
-        
+
         #region Control overrides
 
         protected override void OnPaint(PaintEventArgs e)
@@ -158,6 +158,7 @@ namespace MeshExplorer.Controls
             if (this.isChecked)
             {
                 e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
+
                 e.Graphics.DrawLine(checkMark, 4, newRect.Bottom - boxSize / 2, newRect.Left + boxSize / 2.5f, newRect.Bottom - 2);
                 e.Graphics.DrawLine(checkMark, newRect.Left + boxSize / 2.6f, newRect.Bottom - 2, newRect.Right, newRect.Top);
             }

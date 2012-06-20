@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="CheckBoxDark.cs" company="">
-// TODO: Update copyright text.
+// <copyright file="DarkTextBox.cs" company="">
+// Christian Woltering, Triangle.NET, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -13,9 +13,11 @@ namespace MeshExplorer.Controls
     using System.Drawing.Drawing2D;
     using System.Windows.Forms;
 
+    /// <summary>
+    /// Dark textbox control.
+    /// </summary>
     public class DarkTextBox : Control
     {
-
         #region Designer
 
         /// <summary>
@@ -73,6 +75,9 @@ namespace MeshExplorer.Controls
 
         TextBox textBox;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DarkTextBox" /> control.
+        /// </summary>
         public DarkTextBox()
         {
             InitializeComponent();

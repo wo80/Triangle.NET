@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="MeshRenderer.cs" company="">
-// TODO: Update copyright text.
+// Christian Woltering, Triangle.NET, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -22,9 +22,77 @@ namespace MeshExplorer.Rendering
         RenderData data;
         RenderColors renderColors;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MeshRenderer" /> class.
+        /// </summary>
         public MeshRenderer(RenderData data)
         {
             this.data = data;
+        }
+
+        /// <summary>
+        /// Renders the mesh.
+        /// </summary>
+        public void Render(Graphics g, Zoom zoom, RenderColors renderColors)
+        {
+            this.renderColors = renderColors;
+            this.zoom = zoom;
+
+            if (data.Edges != null)
+            {
+                this.RenderEdges(g);
+            }
+            else if (data.Triangles != null)
+            {
+                this.RenderTriangles(g);
+            }
+
+            if (data.Segments != null)
+            {
+                this.RenderSegments(g);
+            }
+
+            if (data.Points != null)
+            {
+                this.RenderPoints(g);
+            }
+        }
+
+        /// <summary>
+        /// Renders only the mesh edges (no points or segments).
+        /// </summary>
+        public void RenderMesh(Graphics g, Zoom zoom, RenderColors renderColors)
+        {
+            this.renderColors = renderColors;
+            this.zoom = zoom;
+
+            if (data.Edges != null)
+            {
+                this.RenderEdges(g);
+            }
+            else if (data.Triangles != null)
+            {
+                this.RenderTriangles(g);
+            }
+        }
+
+        /// <summary>
+        /// Renders only points and segments (no mesh triangles).
+        /// </summary>
+        public void RenderGeometry(Graphics g, Zoom zoom, RenderColors renderColors)
+        {
+            this.renderColors = renderColors;
+            this.zoom = zoom;
+
+            if (data.Segments != null)
+            {
+                this.RenderSegments(g);
+            }
+
+            if (data.Points != null)
+            {
+                this.RenderPoints(g);
+            }
         }
 
         private void RenderPoints(Graphics g)
@@ -119,68 +187,6 @@ namespace MeshExplorer.Rendering
 
                     g.DrawLine(renderColors.Segment, p0, p1);
                 }
-            }
-        }
-
-        public void Render(Graphics g, Zoom zoom, RenderColors renderColors)
-        {
-            this.renderColors = renderColors;
-            this.zoom = zoom;
-
-            if (data.Edges != null)
-            {
-                this.RenderEdges(g);
-            }
-            else if (data.Triangles != null)
-            {
-                this.RenderTriangles(g);
-            }
-
-            if (data.Segments != null)
-            {
-                this.RenderSegments(g);
-            }
-
-            if (data.Points != null)
-            {
-                this.RenderPoints(g);
-            }
-        }
-
-        /// <summary>
-        /// Renders only the mesh edges (no points or segments).
-        /// </summary>
-        public void RenderMesh(Graphics g, Zoom zoom, RenderColors renderColors)
-        {
-            this.renderColors = renderColors;
-            this.zoom = zoom;
-
-            if (data.Edges != null)
-            {
-                this.RenderEdges(g);
-            }
-            else if (data.Triangles != null)
-            {
-                this.RenderTriangles(g);
-            }
-        }
-
-        /// <summary>
-        /// Renders only points and segments (no mesh triangles).
-        /// </summary>
-        public void RenderGeometry(Graphics g, Zoom zoom, RenderColors renderColors)
-        {
-            this.renderColors = renderColors;
-            this.zoom = zoom;
-
-            if (data.Segments != null)
-            {
-                this.RenderSegments(g);
-            }
-
-            if (data.Points != null)
-            {
-                this.RenderPoints(g);
             }
         }
     }

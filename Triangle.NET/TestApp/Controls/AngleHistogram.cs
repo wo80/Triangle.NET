@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="CheckBoxDark.cs" company="">
-// TODO: Update copyright text.
+// <copyright file="AngleHistogram.cs" company="">
+// Christian Woltering, Triangle.NET, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -18,9 +18,9 @@ namespace MeshExplorer.Controls
     /// Displays an angle histogram.
     /// </summary>
     /// <remarks>
-    /// The angle histogram is divided into two parts:
-    /// the minimum angles on the left side (0 to 60 degrees) and
-    /// the maximum angles on the right (60 to 180 degrees)
+    /// The angle histogram is divided into two parts: the minimum angles
+    /// on the left side (0 to 60 degrees) and the maximum angles on the
+    /// right (60 to 180 degrees).
     /// </remarks>
     public class AngleHistogram : Control
     {
@@ -70,12 +70,18 @@ namespace MeshExplorer.Controls
         // The maximum number of angles
         int maxAngleCount = 0;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AngleHistogram" /> control.
+        /// </summary>
         public AngleHistogram()
         {
             this.BackColor = ColorScheme.ColorGray78;
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Updates the histogram data and invalidates the control.
+        /// </summary>
         public void SetData(int[] dataMin, int[] dataMax)
         {
             maxAngleCount = 0;
@@ -89,7 +95,6 @@ namespace MeshExplorer.Controls
             if (maxAngleCount == 0)
             {
                 this.maxAngles = null;
-                return;
             }
 
             this.Invalidate();
@@ -144,7 +149,9 @@ namespace MeshExplorer.Controls
             }
         }
 
-
+        /// <summary>
+        /// Draws the labels on the bottom.
+        /// </summary>
         private void DrawStrings(Graphics g, SizeF fSize, int size, int middle)
         {
             int fHeight = (int)(fSize.Height + 2);

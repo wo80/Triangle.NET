@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="FileProcessor.cs" company="">
-// TODO: Update copyright text.
+// Christian Woltering, Triangle.NET, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -21,6 +21,11 @@ namespace MeshExplorer.IO
     {
         static Dictionary<string, IMeshFile> container = new Dictionary<string, IMeshFile>();
 
+        /// <summary>
+        /// Returns true, if the given file contains mesh information.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public static bool ContainsMeshData(string path)
         {
             IMeshFile provider = GetProviderInstance(path);
@@ -28,6 +33,9 @@ namespace MeshExplorer.IO
             return provider.ContainsMeshData(path);
         }
 
+        /// <summary>
+        /// Read an input geometry from given file.
+        /// </summary>
         public static InputGeometry Read(string path)
         {
             IMeshFile provider = GetProviderInstance(path);
@@ -35,6 +43,11 @@ namespace MeshExplorer.IO
             return provider.Read(path);
         }
 
+        /// <summary>
+        /// Read a mesh from given file.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public static Mesh Import(string path)
         {
             IMeshFile provider = GetProviderInstance(path);
@@ -42,6 +55,9 @@ namespace MeshExplorer.IO
             return provider.Import(path);
         }
 
+        /// <summary>
+        /// Save the current mesh to given file.
+        /// </summary>
         public static void Save(string path, Mesh mesh)
         {
             IMeshFile provider = GetProviderInstance(path);

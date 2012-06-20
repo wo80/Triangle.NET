@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="MeshRenderer.cs" company="">
-// TODO: Update copyright text.
+// <copyright file="RendererControl.cs" company="">
+// Christian Woltering, Triangle.NET, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -42,7 +42,17 @@ namespace MeshExplorer.Controls
 
         Timer timer;
 
-        public RenderData Data { get { return data; } }
+        /// <summary>
+        /// Gets the currently displayed <see cref="RenderData"/>.
+        /// </summary>
+        public RenderData Data
+        {
+            get { return data; }
+        }
+
+        /// <summary>
+        /// Indicates whether to show the voronoi diagram or not.
+        /// </summary>
         public bool ShowVoronoi
         {
             get { return showVoronoi; }
@@ -59,6 +69,9 @@ namespace MeshExplorer.Controls
             }
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RendererControl" /> class.
+        /// </summary>
         public RendererControl()
         {
             SetStyle(ControlStyles.ResizeRedraw, true);
@@ -81,6 +94,9 @@ namespace MeshExplorer.Controls
             };
         }
 
+        /// <summary>
+        /// Initialize the graphics buffer (should be called in the forms load event).
+        /// </summary>
         public void Initialize()
         {
             zoom.Initialize(this.ClientRectangle, this.ClientRectangle);
@@ -91,9 +107,12 @@ namespace MeshExplorer.Controls
             this.Invalidate();
         }
 
-        public void SetData(InputGeometry mesh)
+        /// <summary>
+        /// Updates the displayed input data.
+        /// </summary>
+        public void SetData(InputGeometry geometry)
         {
-            data.SetData(mesh);
+            data.SetData(geometry);
 
             meshRenderer = new MeshRenderer(data);
 
@@ -105,6 +124,10 @@ namespace MeshExplorer.Controls
             this.Render();
         }
 
+        /// <summary>
+        /// Updates the displayed mesh data.
+        /// </summary>
+        /// <param name="initZoom">If true, the zoom will be reset.</param>
         public void SetData(Mesh mesh, bool initZoom)
         {
             data.SetData(mesh);
@@ -128,11 +151,19 @@ namespace MeshExplorer.Controls
             this.Render();
         }
 
+        /// <summary>
+        /// Updates the displayed input data.
+        /// </summary>
         public void SetData(Mesh mesh)
         {
             SetData(mesh, false);
         }
 
+        /// <summary>
+        /// Zoom to the given location.
+        /// </summary>
+        /// <param name="location">The zoom focus.</param>
+        /// <param name="delta">Indicates whether to zoom in or out.</param>
         public void Zoom(PointF location, int delta)
         {
             if (!initialized) return;
@@ -144,6 +175,9 @@ namespace MeshExplorer.Controls
             }
         }
 
+        /// <summary>
+        /// Update graphics buffer and zoom after a resize.
+        /// </summary>
         public void HandleResize()
         {
             zoom.Resize(this.ClientRectangle, data.Bounds);

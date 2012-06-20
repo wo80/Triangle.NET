@@ -1,16 +1,21 @@
-using System;
-using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
-using System.Drawing.Text;
-
-// CodeProject: A .NET Flat TabControl (CustomDraw), Oscar Londono
+// -----------------------------------------------------------------------
+// <copyright file="DarkTabControl.cs" company="">
+// Christian Woltering, Triangle.NET, http://triangle.codeplex.com/
+// Original code on CodeProject: A .NET Flat TabControl (CustomDraw), Oscar Londono
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace MeshExplorer.Controls
 {
-	/// <summary>
-	/// Summary description for FlatTabControl.
-	/// </summary>
+    using System;
+    using System.ComponentModel;
+    using System.Drawing;
+    using System.Windows.Forms;
+    using System.Drawing.Text;
+
+    /// <summary>
+    /// Summary description for FlatTabControl.
+    /// </summary>
 	public class DarkTabControl : System.Windows.Forms.TabControl
     {
         #region Designer
@@ -51,6 +56,9 @@ namespace MeshExplorer.Controls
         private const int margin = 5;
         private Color backColor = ColorScheme.ColorGray68;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DarkTabControl" /> control.
+        /// </summary>
 		public DarkTabControl()
 		{
 			// This call is required by the Windows.Forms Form Designer.

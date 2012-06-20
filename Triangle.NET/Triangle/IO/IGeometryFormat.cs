@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="IMeshFormat.cs" company="">
-// TODO: Update copyright text.
+// <copyright file="IGeometryFormat.cs" company="">
+// Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 

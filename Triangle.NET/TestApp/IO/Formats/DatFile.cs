@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="DatFile.cs" company="">
-// TODO: Update copyright text.
+// Christian Woltering, Triangle.NET, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -17,7 +17,7 @@ namespace MeshExplorer.IO.Formats
     using TriangleNet;
 
     /// <summary>
-    /// TODO: Update summary.
+    /// Read a polygon from DAT file (used by poly2tri).
     /// </summary>
     public class DatFile : IMeshFile
     {
