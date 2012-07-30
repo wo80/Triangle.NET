@@ -57,7 +57,7 @@ namespace MeshExplorer.IO.Formats
 
         public void Write(Mesh mesh, string filename)
         {
-            if (mesh.NumberOfVertices > 0)
+            if (mesh.Vertices.Count > 0)
             {
                 format.Write(mesh, filename);
             }

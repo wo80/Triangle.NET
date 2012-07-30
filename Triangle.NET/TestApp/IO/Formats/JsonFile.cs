@@ -16,6 +16,7 @@ namespace MeshExplorer.IO.Formats
     using TriangleNet.Geometry;
     using TriangleNet;
     using System.Collections;
+    using TriangleNet.Data;
 
     /// <summary>
     /// Read and write JSON files.
@@ -101,10 +102,10 @@ namespace MeshExplorer.IO.Formats
         {
             using (StreamWriter writer = new StreamWriter(filename))
             {
-                int nv = mesh.NumberOfVertices;
-                int ns = mesh.NumberOfSegments;
+                int nv = mesh.Vertices.Count;
+                int ns = mesh.Segments.Count;
                 int nh = mesh.Holes.Count;
-                int ne = mesh.NumberOfTriangles;
+                int ne = mesh.Triangles.Count;
 
                 writer.Write("{");
 
@@ -114,6 +115,11 @@ namespace MeshExplorer.IO.Formats
                 writer.Write("\"type\":\"{0}\",", ne > 0 ? "mesh" : (ns > 0 ? "poly" : "points"));
                 writer.Write("\"dim\":2");
                 writer.Write("}");
+
+                if (mesh.CurrentNumbering == NodeNumbering.None)
+                {
+                    mesh.Renumber(NodeNumbering.Linear);
+                }
 
                 // Write the coordinates
                 if (nv > 0)
@@ -397,17 +403,47 @@ namespace MeshExplorer.IO.Formats
 
         #region Write helpers
 
-        private void WritePoints(Mesh data, StreamWriter writer, int nv)
+        private void WritePoints(Mesh mesh, StreamWriter writer, int nv)
         {
-            int i = 0;
-
-            StringBuilder markers = new StringBuilder();
             bool useMarkers = false;
 
-            string seperator;
+            StringBuilder markers;
 
             writer.Write("\"points\":{\"data\":[");
-            foreach (var item in data.Vertices)
+
+            if (mesh.CurrentNumbering == NodeNumbering.Linear)
+            {
+                markers = WritePoints(writer, mesh.Vertices, nv, useMarkers);
+            }
+            else
+            {
+                Vertex[] nodes = new Vertex[mesh.Vertices.Count];
+
+                foreach (var node in mesh.Vertices)
+                {
+                    nodes[node.ID] = node;
+                }
+
+                markers = WritePoints(writer, nodes, nv, useMarkers);
+            }
+
+            writer.Write("]");
+            if (useMarkers)
+            {
+                writer.Write(",\"markers\":[" + markers.ToString() + "]");
+            }
+
+            // TODO: writer.Write(",\"attributes\":[]");
+            writer.Write("}");
+        }
+
+        private static StringBuilder WritePoints(StreamWriter writer, IEnumerable<Vertex> nodes, int nv, bool useMarkers)
+        {
+            StringBuilder markers = new StringBuilder();
+
+            int i = 0;
+            string seperator;
+            foreach (var item in nodes)
             {
                 seperator = (i == nv - 1) ? String.Empty : ", ";
 
@@ -424,13 +460,8 @@ namespace MeshExplorer.IO.Formats
 
                 i++;
             }
-            writer.Write("]");
-            if (useMarkers)
-            {
-                writer.Write(",\"markers\":[" + markers.ToString() + "]");
-            }
-            //writer.Write(",\"attributes\":[]");
-            writer.Write("}");
+
+            return markers;
         }
 
         private void WriteHoles(Mesh data, StreamWriter writer, int nh)

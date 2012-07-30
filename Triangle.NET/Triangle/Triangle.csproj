@@ -82,6 +82,7 @@
     <Compile Include="Sampler.cs" />
     <Compile Include="Smoothing\ISmoother.cs" />
     <Compile Include="Tools\BoundedVoronoi.cs" />
+    <Compile Include="Tools\CuthillMcKee.cs" />
     <Compile Include="Tools\QualityMeasure.cs" />
     <Compile Include="Tools\Statistic.cs" />
     <Compile Include="Algorithm\SweepLine.cs" />

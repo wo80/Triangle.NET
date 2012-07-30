@@ -107,7 +107,6 @@
     <Compile Include="Generators\StarInBox.cs" />
     <Compile Include="IO\EpsImage.cs" />
     <Compile Include="IO\FileProcessor.cs" />
-    <Compile Include="IO\Formats\DatFile.cs" />
     <Compile Include="IO\Formats\JsonFile.cs" />
     <Compile Include="IO\Formats\TriangleFile.cs" />
     <Compile Include="IO\IMeshFile.cs" />

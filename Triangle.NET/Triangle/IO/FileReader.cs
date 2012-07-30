@@ -57,30 +57,31 @@ namespace TriangleNet.IO
         /// <param name="data">The input geometry.</param>
         /// <param name="index">The current vertex index.</param>
         /// <param name="line">The current line.</param>
-        /// <param name="n">Number of point attributes</param>
-        static void ReadVertex(InputGeometry data, int index, string[] line, int n)
+        /// <param name="attributes">Number of point attributes</param>
+        /// <param name="marks">Number of point markers (0 or 1)</param>
+        static void ReadVertex(InputGeometry data, int index, string[] line, int attributes, int marks)
         {
             double x = double.Parse(line[1], nfi);
             double y = double.Parse(line[2], nfi);
             int mark = 0;
+            double[] attribs = attributes == 0 ? null : new double[attributes];
 
             // Read the vertex attributes.
-            for (int j = 0; j < n; j++)
+            for (int j = 0; j < attributes; j++)
             {
                 if (line.Length > 3 + j)
                 {
-                    // TODO:
-                    //vertex.attributes[j] = double.Parse(line[3 + j]);
+                    attribs[j] = double.Parse(line[3 + j]);
                 }
             }
 
             // Read a vertex marker.
-            if (line.Length > 3 + n)
+            if (marks > 0 && line.Length > 3 + attributes)
             {
-                mark = int.Parse(line[3 + n]);
+                mark = int.Parse(line[3 + attributes]);
             }
 
-            data.AddPoint(x, y, mark);
+            data.AddPoint(x, y, mark, attribs);
         }
 
         #endregion
@@ -218,7 +219,7 @@ namespace TriangleNet.IO
                             startIndex = int.Parse(line[0], nfi);
                         }
 
-                        ReadVertex(data, i, line, attributes);
+                        ReadVertex(data, i, line, attributes, nodemarkers);
                     }
                 }
             }
@@ -325,7 +326,7 @@ namespace TriangleNet.IO
                             startIndex = int.Parse(line[0], nfi);
                         }
 
-                        ReadVertex(data, i, line, attributes);
+                        ReadVertex(data, i, line, attributes, nodemarkers);
                     }
                 }
                 else

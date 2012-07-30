@@ -51,13 +51,13 @@ namespace MeshExplorer.IO
             Bitmap bitmap;
 
             // Check if the specified width is reasonable
-            if (width < 2 * Math.Sqrt(mesh.NumberOfVertices))
+            if (width < 2 * Math.Sqrt(mesh.Vertices.Count))
             {
                 bitmap = new Bitmap(400, 200);
                 Graphics g = Graphics.FromImage(bitmap);
                 g.Clear(colors.Background);
 
-                string message = String.Format("Sorry, I won't render {0} points on such a small image!", mesh.NumberOfVertices);
+                string message = String.Format("Sorry, I won't render {0} points on such a small image!", mesh.Vertices.Count);
 
                 SizeF sz = g.MeasureString(message, SystemFonts.DefaultFont);
 

@@ -73,7 +73,7 @@ namespace MeshExplorer.Rendering
 
             this.Segments = null;
 
-            int n = mesh.NumberOfVertices;
+            int n = mesh.Vertices.Count;
 
             // Convert points to float
             this.Points = new PointF[n];
@@ -85,7 +85,7 @@ namespace MeshExplorer.Rendering
             {
                 var segs = mesh.Segments;
 
-                List<Edge> segList = new List<Edge>(mesh.NumberOfSegments);
+                List<Edge> segList = new List<Edge>(mesh.Segments.Count);
 
                 foreach (var seg in segs)
                 {

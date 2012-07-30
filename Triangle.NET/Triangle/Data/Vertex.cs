@@ -27,18 +27,51 @@ namespace TriangleNet.Data
         internal VertexType type;
         internal Otri tri;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Vertex" /> class.
+        /// </summary>
         public Vertex()
-            : this(0, 0, 0)
-        { }
+            : this(0, 0, 0, 0)
+        {
+        }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Vertex" /> class.
+        /// </summary>
+        /// <param name="x">The x coordinate of the vertex.</param>
+        /// <param name="y">The y coordinate of the vertex.</param>
         public Vertex(double x, double y)
-            : this(x, y, 0)
-        { }
+            : this(x, y, 0, 0)
+        {
+        }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Vertex" /> class.
+        /// </summary>
+        /// <param name="x">The x coordinate of the vertex.</param>
+        /// <param name="y">The y coordinate of the vertex.</param>
+        /// <param name="mark">The boundary mark.</param>
         public Vertex(double x, double y, int mark)
+            : this(x, y, mark, 0)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Vertex" /> class.
+        /// </summary>
+        /// <param name="x">The x coordinate of the vertex.</param>
+        /// <param name="y">The y coordinate of the vertex.</param>
+        /// <param name="mark">The boundary mark.</param>
+        /// <param name="attribs">The number of point attributes.</param>
+        public Vertex(double x, double y, int mark, int attribs)
             : base(x, y, mark)
         {
             this.type = VertexType.InputVertex;
+
+            if (attribs > 0)
+            {
+                this.attributes = new double[attribs];
+            }
         }
 
         #region Public properties

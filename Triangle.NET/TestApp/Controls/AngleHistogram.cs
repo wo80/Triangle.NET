@@ -95,6 +95,7 @@ namespace MeshExplorer.Controls
             if (maxAngleCount == 0)
             {
                 this.maxAngles = null;
+                return;
             }
 
             this.Invalidate();

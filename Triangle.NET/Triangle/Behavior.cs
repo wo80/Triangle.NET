@@ -12,7 +12,7 @@ namespace TriangleNet
     /// <summary>
     /// Controls the behavior of the meshing software.
     /// </summary>
-    class Behavior
+    public class Behavior
     {
         /// <summary>
         /// Load behavior defaults.

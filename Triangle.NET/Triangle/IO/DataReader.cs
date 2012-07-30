@@ -92,7 +92,7 @@ namespace TriangleNet.IO
                 // Create the subsegments.
                 for (i = 0; i < mesh.insegments; i++)
                 {
-                    mesh.MakeSubseg(ref subseg);
+                    mesh.MakeSegment(ref subseg);
                     // Mark the subsegment as living.
                     //subseg.ss.subsegs[0].ss = subseg.ss;
                 }

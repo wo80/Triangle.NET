@@ -19,10 +19,9 @@ namespace TriangleNet
     {
         static double splitter;       // Used to split double factors for exact multiplication.
         static double epsilon;        // Floating-point machine epsilon.
-        static double resulterrbound;
-        static double ccwerrboundA, ccwerrboundB, ccwerrboundC;
-        static double iccerrboundA, iccerrboundB, iccerrboundC;
-        static double o3derrboundA, o3derrboundB, o3derrboundC;
+        //static double resulterrbound;
+        static double ccwerrboundA; // ccwerrboundB, ccwerrboundC;
+        static double iccerrboundA; // iccerrboundB, iccerrboundC;
 
         /// <summary>
         /// Initialize the variables used for exact arithmetic.
@@ -69,16 +68,13 @@ namespace TriangleNet
             } while ((check != 1.0) && (check != lastcheck));
             splitter += 1.0;
             // Error bounds for orientation and incircle tests.
-            resulterrbound = (3.0 + 8.0 * epsilon) * epsilon;
+            //resulterrbound = (3.0 + 8.0 * epsilon) * epsilon;
             ccwerrboundA = (3.0 + 16.0 * epsilon) * epsilon;
-            ccwerrboundB = (2.0 + 12.0 * epsilon) * epsilon;
-            ccwerrboundC = (9.0 + 64.0 * epsilon) * epsilon * epsilon;
+            //ccwerrboundB = (2.0 + 12.0 * epsilon) * epsilon;
+            //ccwerrboundC = (9.0 + 64.0 * epsilon) * epsilon * epsilon;
             iccerrboundA = (10.0 + 96.0 * epsilon) * epsilon;
-            iccerrboundB = (4.0 + 48.0 * epsilon) * epsilon;
-            iccerrboundC = (44.0 + 576.0 * epsilon) * epsilon * epsilon;
-            o3derrboundA = (7.0 + 56.0 * epsilon) * epsilon;
-            o3derrboundB = (3.0 + 28.0 * epsilon) * epsilon;
-            o3derrboundC = (26.0 + 288.0 * epsilon) * epsilon * epsilon;
+            //iccerrboundB = (4.0 + 48.0 * epsilon) * epsilon;
+            //iccerrboundC = (44.0 + 576.0 * epsilon) * epsilon * epsilon;
         }
 
         /// <summary>
@@ -386,7 +382,7 @@ namespace TriangleNet
                               ref double xi, ref double eta)
         {
             double xdo, ydo, xao, yao;
-            double dodist, aodist, dadist;
+            double dodist, aodist;
             double denominator;
             double dx, dy;
 
@@ -399,8 +395,6 @@ namespace TriangleNet
             yao = tapex.y - torg.y;
             dodist = xdo * xdo + ydo * ydo;
             aodist = xao * xao + yao * yao;
-            dadist = (tdest.x - tapex.x) * (tdest.x - tapex.x) +
-                     (tdest.y - tapex.y) * (tdest.y - tapex.y);
 
             if (Behavior.NoExact)
             {

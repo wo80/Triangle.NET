@@ -82,6 +82,37 @@ namespace MeshExplorer.Controls
             InitializeComponent();
         }
 
+        private void DrawText(Graphics g, Color forecolor, Point location)
+        {
+            if (this.UseCompatibleTextRendering)
+            {
+                //using (StringFormat stringFormat = this.CreateStringFormat())
+                {
+                    if (this.Enabled)
+                    {
+                        g.DrawString(this.Text, base.Font, new SolidBrush(forecolor), location.X, location.Y);
+                    }
+                    else
+                    {
+                        g.DrawString(this.Text, base.Font, new SolidBrush(forecolor), location.X, location.Y);
+                    }
+                }
+            }
+            else
+            {
+                //TextFormatFlags textFormatFlags = this.CreateTextFormatFlags();
+                if (this.Enabled)
+                {
+                    TextRenderer.DrawText((IDeviceContext)g, this.Text, this.Font, location, forecolor);
+                }
+                else
+                {
+                    //forecolor = TextRenderer.DisabledTextColor(this.BackColor);
+                    TextRenderer.DrawText((IDeviceContext)g, this.Text, this.Font, location, forecolor);
+                }
+            }
+        }
+
         #region Control overrides
 
         protected override void OnPaint(PaintEventArgs e)
@@ -153,7 +184,7 @@ namespace MeshExplorer.Controls
             e.Graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
 
             SizeF szL = e.Graphics.MeasureString(this.Text, base.Font, this.Width);
-            e.Graphics.DrawString(this.Text, base.Font, new SolidBrush(text_color), boxSize + 4, (this.Height - szL.Height) / 2);
+            DrawText(e.Graphics, text_color, new Point(boxSize + 4, (int)((this.Height - szL.Height) / 2) + 1));
 
             if (this.isChecked)
             {

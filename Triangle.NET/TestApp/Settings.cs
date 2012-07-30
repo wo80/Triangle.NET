@@ -59,7 +59,7 @@ namespace MeshExplorer
             SfdFilterIndex = 1;
 
             OfdFilter = SfdFilter;
-            OfdFilter += "|Polygon data (*.dat)|*.dat";
+            //OfdFilter += "|Polygon data (*.dat)|*.dat";
             //OfdFilter += "|COMSOL mesh (*.mphtxt)|*.mphtxt";
             //OfdFilter += "|AVS UCD data (*.ucd)|*.ucd";
             //OfdFilter += "|VTK data (*.vtk)|*.vtk";

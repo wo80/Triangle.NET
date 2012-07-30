@@ -97,10 +97,6 @@ namespace MeshExplorer.IO
             {
                 provider = new JsonFile();
             }
-            else if (ext == ".dat")
-            {
-                provider = new DatFile();
-            }
 
             if (provider == null)
             {

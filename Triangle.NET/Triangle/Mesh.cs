@@ -32,7 +32,6 @@ namespace TriangleNet
 
         // Stack that maintains a list of recently flipped triangles.
         Stack<Otri> flipstack;
-        //FlipStacker lastflip;
 
         // TODO: Check if custom hashmap implementation could be faster.
 
@@ -69,12 +68,11 @@ namespace TriangleNet
         // Triangular bounding box vertices.
         internal Vertex infvertex1, infvertex2, infvertex3;
 
-        // The 'triangle' that occupies all of "outer space."
+        // The 'triangle' that occupies all of 'outer space'.
         internal static Triangle dummytri;
 
-        // The omnipresent subsegment. Referenced by any triangle or
-        // subsegment that isn't really connected to a subsegment at
-        // that location.
+        // The omnipresent subsegment. Referenced by any triangle or subsegment
+        // that isn't really connected to a subsegment at that location.
         internal static Segment dummysub;
 
         // Pointer to a recently visited triangle. Improves point location if
@@ -83,6 +81,9 @@ namespace TriangleNet
 
         // Controls the behavior of the mesh instance.
         internal Behavior behavior;
+
+        // The current node numbering
+        internal NodeNumbering numbering;
 
         #endregion
 
@@ -99,7 +100,7 @@ namespace TriangleNet
         /// <summary>
         /// Gets the mesh vertices.
         /// </summary>
-        public IEnumerable<Vertex> Vertices
+        public ICollection<Vertex> Vertices
         {
             get { return this.vertices.Values; }
         }
@@ -115,7 +116,7 @@ namespace TriangleNet
         /// <summary>
         /// Gets the mesh triangles.
         /// </summary>
-        public IEnumerable<Triangle> Triangles
+        public ICollection<Triangle> Triangles
         {
             get { return this.triangles.Values; }
         }
@@ -123,7 +124,7 @@ namespace TriangleNet
         /// <summary>
         /// Gets the mesh segments.
         /// </summary>
-        public IEnumerable<Segment> Segments
+        public ICollection<Segment> Segments
         {
             get { return this.subsegs.Values; }
         }
@@ -134,21 +135,6 @@ namespace TriangleNet
         public int NumberOfInputPoints { get { return invertices; } }
 
         /// <summary>
-        /// Gets the number of mesh vertices.
-        /// </summary>
-        public int NumberOfVertices { get { return this.vertices.Count; } }
-
-        /// <summary>
-        /// Gets the number of mesh triangles.
-        /// </summary>
-        public int NumberOfTriangles { get { return this.triangles.Count; } }
-
-        /// <summary>
-        /// Gets the number of mesh segments.
-        /// </summary>
-        public int NumberOfSegments { get { return this.subsegs.Count; } }
-
-        /// <summary>
         /// Gets the number of mesh edges.
         /// </summary>
         public int NumberOfEdges { get { return this.edges; } }
@@ -157,6 +143,14 @@ namespace TriangleNet
         /// Indicates whether the input is a PSLG or a point set.
         /// </summary>
         public bool IsPolygon { get { return this.insegments > 0; } }
+
+        /// <summary>
+        /// Gets the current node numbering.
+        /// </summary>
+        public NodeNumbering CurrentNumbering
+        {
+            get { return numbering; }
+        }
 
         #endregion
 
@@ -461,6 +455,8 @@ namespace TriangleNet
         /// </summary>
         public void Smooth()
         {
+            numbering = NodeNumbering.None;
+
             //ISmoother smoother = new CvdSmoother(this);
             //smoother.Smooth();
         }
@@ -478,29 +474,38 @@ namespace TriangleNet
         /// </summary>
         public void Renumber(NodeNumbering num)
         {
+            // Don't need to do anything if the nodes are already numbered.
+            if (num == this.numbering)
+            {
+                return;
+            }
+
             int id;
 
             if (num == NodeNumbering.Linear)
             {
                 id = 0;
-                foreach (var item in this.vertices.Values)
+                foreach (var node in this.vertices.Values)
                 {
-                    item.id = id++;
+                    node.id = id++;
                 }
             }
-            else
+            else if (num == NodeNumbering.CuthillMcKee)
             {
-                //CuthillMcKee rcm = new CuthillMcKee();
-                //int[] perm_inv = rcm.Renumber(this);
+                CuthillMcKee rcm = new CuthillMcKee();
+                int[] perm_inv = rcm.Renumber(this);
 
-                //// Permute the node indices.
-                //foreach (var node in this.vertices.Values)
-                //{
-                //    node.id = perm_inv[node.id];
-                //}
+                // Permute the node indices.
+                foreach (var node in this.vertices.Values)
+                {
+                    node.id = perm_inv[node.id];
+                }
             }
 
-            // Triangles will always be numbered from 0..n
+            // Remember the current numbering.
+            numbering = num;
+
+            // Triangles will always be numbered from 0 to n-1
             id = 0;
             foreach (var item in this.triangles.Values)
             {
@@ -723,6 +728,8 @@ namespace TriangleNet
         /// </summary>
         private void Reset()
         {
+            numbering = NodeNumbering.None;
+
             recenttri.triangle = null; // No triangle has been visited yet.
             undeads = 0;               // No eliminated input vertices yet.
             checksegments = false;     // There are no segments in the triangulation yet.
@@ -816,13 +823,10 @@ namespace TriangleNet
                 throw new Exception("Input must have at least three input vertices.");
             }
 
-            this.nextras = 0; // TODO: points[0].Attributes == null ? 0 : points[0].Attributes.Length;
+            this.nextras = points[0].attributes == null ? 0 : points[0].attributes.Length;
 
             foreach (Vertex vertex in points)
             {
-                // TODO: Set vertex attributes.
-                //vertex.attribs = points[i].Attributes;
-
                 vertex.hash = this.hash_vtx++;
                 vertex.id = vertex.hash;
 
@@ -856,7 +860,7 @@ namespace TriangleNet
         /// Create a new subsegment with orientation zero.
         /// </summary>
         /// <param name="newsubseg">Reference to the new subseg.</param>
-        internal void MakeSubseg(ref Osub newsubseg)
+        internal void MakeSegment(ref Osub newsubseg)
         {
             Segment seg = new Segment();
             seg.hash = this.hash_seg++;
@@ -866,6 +870,7 @@ namespace TriangleNet
 
             subsegs.Add(seg.hash, seg);
         }
+
         #endregion
 
         #region Manipulation
@@ -1485,7 +1490,7 @@ namespace TriangleNet
             if (newsubseg.seg == dummysub)
             {
                 // Make new subsegment and initialize its vertices.
-                MakeSubseg(ref newsubseg);
+                MakeSegment(ref newsubseg);
                 newsubseg.SetOrg(tridest);
                 newsubseg.SetDest(triorg);
                 newsubseg.SetSegOrg(tridest);
@@ -2510,7 +2515,7 @@ namespace TriangleNet
             Vertex leftvertex, rightvertex;
             Vertex newvertex;
             InsertVertexResult success;
-            FindDirectionResult collinear;
+
             double ex, ey;
             double tx, ty;
             double etx, ety;
@@ -2535,13 +2540,23 @@ namespace TriangleNet
                 throw new Exception("Attempt to find intersection of parallel segments.");
             }
             split = (ey * etx - ex * ety) / denom;
+
             // Create the new vertex.
-            newvertex = new Vertex(torg.x + split * (tdest.x - torg.x),
-                torg.y + split * (tdest.y - torg.y), splitsubseg.seg.boundary);
+            newvertex = new Vertex(
+                torg.x + split * (tdest.x - torg.x),
+                torg.y + split * (tdest.y - torg.y),
+                splitsubseg.seg.boundary,
+                this.nextras);
+
             newvertex.hash = this.hash_vtx++;
             newvertex.id = newvertex.hash;
-            // TODO: nextras //(vertex) poolalloc(&m.vertices);
+
             // Interpolate its attributes.
+            for (int i = 0; i < nextras; i++)
+            {
+                newvertex.attributes[i] = torg.attributes[i] + split * (tdest.attributes[i] - torg.attributes[i]);
+            }
+
             vertices.Add(newvertex.hash, newvertex);
 
             // Insert the intersection vertex.  This should always succeed.
@@ -2576,7 +2591,8 @@ namespace TriangleNet
 
             // Inserting the vertex may have caused edge flips.  We wish to rediscover
             // the edge connecting endpoint1 to the new intersection vertex.
-            collinear = FindDirection(ref splittri, endpoint1);
+            FindDirection(ref splittri, endpoint1);
+
             rightvertex = splittri.Dest();
             leftvertex = splittri.Apex();
             if ((leftvertex.x == endpoint1.x) && (leftvertex.y == endpoint1.y))

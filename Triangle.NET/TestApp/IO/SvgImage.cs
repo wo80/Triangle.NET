@@ -153,7 +153,7 @@ namespace MeshExplorer.IO
 
         private void DrawPoints(StreamWriter svg, Mesh mesh, bool label)
         {
-            int n = mesh.NumberOfVertices;
+            int n = mesh.Vertices.Count;
 
             int circle_size = 1;
 

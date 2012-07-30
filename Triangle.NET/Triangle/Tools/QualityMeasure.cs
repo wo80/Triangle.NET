@@ -1,5 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="QualityMeasure.cs" company="">
+// Original Matlab code by John Burkardt, Florida State University
 // Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
@@ -239,6 +240,8 @@ namespace TriangleNet.Tools
         /// </remarks>
         public int Bandwidth()
         {
+            if (mesh == null) return 0;
+
             // Lower and upper bandwidth of the matrix
             int ml = 0, mu = 0;
 

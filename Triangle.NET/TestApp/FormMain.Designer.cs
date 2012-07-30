@@ -101,6 +101,8 @@
             this.menuTools = new System.Windows.Forms.ToolStripMenuItem();
             this.menuToolsGen = new System.Windows.Forms.ToolStripMenuItem();
             this.menuToolsCheck = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuToolsRcm = new System.Windows.Forms.ToolStripMenuItem();
             this.btnMesh = new MeshExplorer.Controls.DarkButton();
             this.renderControl1 = new MeshExplorer.Controls.RendererControl();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -755,7 +757,7 @@
             this.label19.Name = "label19";
             this.label19.Size = new System.Drawing.Size(134, 40);
             this.label19.TabIndex = 0;
-            this.label19.Text = "Beta 2 (2012-06-20)\r\nChristian Woltering\r\nMIT";
+            this.label19.Text = "Beta 2 (2012-07-30)\r\nChristian Woltering\r\nMIT";
             // 
             // label18
             // 
@@ -894,7 +896,9 @@
             // 
             this.menuTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuToolsGen,
-            this.menuToolsCheck});
+            this.menuToolsCheck,
+            this.toolStripSeparator4,
+            this.menuToolsRcm});
             this.menuTools.Name = "menuTools";
             this.menuTools.Size = new System.Drawing.Size(46, 24);
             this.menuTools.Text = "Tools";
@@ -902,7 +906,7 @@
             // menuToolsGen
             // 
             this.menuToolsGen.Name = "menuToolsGen";
-            this.menuToolsGen.Size = new System.Drawing.Size(157, 22);
+            this.menuToolsGen.Size = new System.Drawing.Size(195, 22);
             this.menuToolsGen.Text = "Input Generator";
             this.menuToolsGen.Click += new System.EventHandler(this.menuToolsGenerator_Click);
             // 
@@ -910,9 +914,21 @@
             // 
             this.menuToolsCheck.Enabled = false;
             this.menuToolsCheck.Name = "menuToolsCheck";
-            this.menuToolsCheck.Size = new System.Drawing.Size(157, 22);
+            this.menuToolsCheck.Size = new System.Drawing.Size(195, 22);
             this.menuToolsCheck.Text = "Check Mesh";
             this.menuToolsCheck.Click += new System.EventHandler(this.menuToolsCheck_Click);
+            // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(192, 6);
+            // 
+            // menuToolsRcm
+            // 
+            this.menuToolsRcm.Name = "menuToolsRcm";
+            this.menuToolsRcm.Size = new System.Drawing.Size(195, 22);
+            this.menuToolsRcm.Text = "Renumber nodes (RCM)";
+            this.menuToolsRcm.Click += new System.EventHandler(this.menuToolsRcm_Click);
             // 
             // btnMesh
             // 
@@ -1050,6 +1066,8 @@
         private System.Windows.Forms.Label lbNumVert2;
         private System.Windows.Forms.Label label23;
         private Controls.DarkCheckBox cbConformDel;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.ToolStripMenuItem menuToolsRcm;
 
     }
 }

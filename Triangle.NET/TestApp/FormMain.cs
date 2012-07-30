@@ -387,8 +387,6 @@ namespace MeshExplorer
 
             if (sfd.ShowDialog() == DialogResult.OK)
             {
-                mesh.Renumber();
-
                 FileProcessor.Save(sfd.FileName, mesh);
             }
         }
@@ -521,6 +519,19 @@ namespace MeshExplorer
             }
 
             UpdateLog();
+        }
+
+        private void Renumber()
+        {
+            if (mesh == null || settings.ExceptionThrown) return;
+
+            bool tmp = Behavior.Verbose;
+            Behavior.Verbose = true;
+
+            mesh.Renumber(NodeNumbering.CuthillMcKee);
+            ShowLog();
+
+            Behavior.Verbose = tmp;
         }
 
         private void Smooth()
@@ -673,6 +684,11 @@ namespace MeshExplorer
         private void menuFileQuit_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void menuToolsRcm_Click(object sender, EventArgs e)
+        {
+            Renumber();
         }
     }
 }

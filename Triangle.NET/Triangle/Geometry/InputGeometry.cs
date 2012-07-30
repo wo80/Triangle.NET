@@ -23,6 +23,9 @@ namespace TriangleNet.Geometry
 
         BoundingBox bounds;
 
+        // Used to check consitent use of point attributes.
+        private int pointAttributes = -1;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="InputGeometry" /> class.
         /// </summary>
@@ -44,6 +47,8 @@ namespace TriangleNet.Geometry
             regions = new List<RegionPointer>();
 
             bounds = new BoundingBox();
+
+            pointAttributes = -1;
         }
 
         /// <summary>
@@ -55,7 +60,7 @@ namespace TriangleNet.Geometry
         }
 
         /// <summary>
-        /// Gets a value indicating whether the geometry should be treated as a PLSG.
+        /// Indicates, whether the geometry should be treated as a PSLG.
         /// </summary>
         public bool HasSegments
         {
@@ -95,7 +100,7 @@ namespace TriangleNet.Geometry
         }
 
         /// <summary>
-        /// Gets the list of input holes.
+        /// Gets the list of regions.
         /// </summary>
         public IEnumerable<RegionPointer> Regions
         {
@@ -111,6 +116,8 @@ namespace TriangleNet.Geometry
             segments.Clear();
             holes.Clear();
             regions.Clear();
+
+            pointAttributes = -1;
         }
 
         /// <summary>
@@ -132,6 +139,45 @@ namespace TriangleNet.Geometry
         public void AddPoint(double x, double y, int boundary)
         {
             points.Add(new Vertex(x, y, boundary));
+
+            bounds.Update(x, y);
+        }
+
+        /// <summary>
+        /// Adds a point to the geometry.
+        /// </summary>
+        /// <param name="x">X coordinate.</param>
+        /// <param name="y">Y coordinate.</param>
+        /// <param name="boundary">Boundary marker.</param>
+        /// <param name="attribute">Point attribute.</param>
+        public void AddPoint(double x, double y, int boundary, double attribute)
+        {
+            AddPoint(x, y, 0, new double[] { attribute });
+        }
+
+        /// <summary>
+        /// Adds a point to the geometry.
+        /// </summary>
+        /// <param name="x">X coordinate.</param>
+        /// <param name="y">Y coordinate.</param>
+        /// <param name="boundary">Boundary marker.</param>
+        /// <param name="attribs">Point attributes.</param>
+        public void AddPoint(double x, double y, int boundary, double[] attribs)
+        {
+            if (pointAttributes < 0)
+            {
+                pointAttributes = attribs == null ? 0 : attribs.Length;
+            }
+            else if (attribs == null && pointAttributes > 0)
+            {
+                throw new ArgumentException("Inconsitent use of point attributes.");
+            }
+            else if (attribs != null && pointAttributes != attribs.Length)
+            {
+                throw new ArgumentException("Inconsitent use of point attributes.");
+            }
+
+            points.Add(new Vertex(x, y, boundary) { attributes = attribs });
 
             bounds.Update(x, y);
         }

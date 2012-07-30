@@ -95,5 +95,5 @@ namespace TriangleNet
     /// <summary>
     /// Node renumbering algorithms.
     /// </summary>
-    public enum NodeNumbering { Linear, CuthillMcKee };
+    public enum NodeNumbering { None, Linear, CuthillMcKee };
 }

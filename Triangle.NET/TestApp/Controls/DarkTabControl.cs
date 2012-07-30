@@ -16,7 +16,7 @@ namespace MeshExplorer.Controls
     /// <summary>
     /// Summary description for FlatTabControl.
     /// </summary>
-	public class DarkTabControl : System.Windows.Forms.TabControl
+    public class DarkTabControl : System.Windows.Forms.TabControl
     {
         #region Designer
 

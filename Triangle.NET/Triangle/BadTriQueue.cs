@@ -162,10 +162,6 @@ namespace TriangleNet
             newbad.triangorg = enqorg;
             newbad.triangdest = enqdest;
 
-            Vertex org = enqtri.Org();
-            Vertex dest = enqtri.Dest();
-            Vertex apex = enqtri.Apex();
-
             Enqueue(newbad);
         }
 

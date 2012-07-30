@@ -373,7 +373,7 @@ namespace TriangleNet
             double area;
             double dist1, dist2;
 
-            double maxedge, maxangle;
+            double maxangle;
 
             torg = testtri.Org();
             tdest = testtri.Dest();
@@ -463,21 +463,21 @@ namespace TriangleNet
             if ((apexlen > orglen) && (apexlen > destlen))
             {
                 // The edge opposite the apex is longest.
-                maxedge = apexlen;
+                // maxedge = apexlen;
                 // Find the cosine of the angle at the apex.
                 maxangle = (orglen + destlen - apexlen) / (2 * Math.Sqrt(orglen) * Math.Sqrt(destlen));
             }
             else if (orglen > destlen)
             {
                 // The edge opposite the origin is longest.
-                maxedge = orglen;
+                // maxedge = orglen;
                 // Find the cosine of the angle at the origin.
                 maxangle = (apexlen + destlen - orglen) / (2 * Math.Sqrt(apexlen) * Math.Sqrt(destlen));
             }
             else
             {
                 // The edge opposite the destination is longest.
-                maxedge = destlen;
+                // maxedge = destlen;
                 // Find the cosine of the angle at the destination.
                 maxangle = (apexlen + orglen - destlen) / (2 * Math.Sqrt(apexlen) * Math.Sqrt(orglen));
             }
@@ -600,7 +600,6 @@ namespace TriangleNet
             double split;
             double multiplier, divisor;
             bool acuteorg, acuteorg2, acutedest, acutedest2;
-            int dummy;
 
             // Note that steinerleft == -1 if an unlimited number
             // of Steiner points is allowed.
@@ -727,7 +726,13 @@ namespace TriangleNet
                     }
 
                     // Create the new vertex.
-                    newvertex = new Vertex(); // TODO: mesh.nextras
+                    newvertex = new Vertex(
+                        eorg.x + split * (edest.x - eorg.x),
+                        eorg.y + split * (edest.y - eorg.y),
+                        currentenc.Mark(),
+                        mesh.nextras);
+
+                    newvertex.type = VertexType.SegmentVertex;
 
                     newvertex.hash = mesh.hash_vtx++;
                     newvertex.id = newvertex.hash;
@@ -740,9 +745,6 @@ namespace TriangleNet
                         newvertex.attributes[i] = eorg.attributes[i]
                             + split * (edest.attributes[i] - eorg.attributes[i]);
                     }
-
-                    newvertex.x = eorg.x + split * (edest.x - eorg.x);
-                    newvertex.y = eorg.y + split * (edest.y - eorg.y);
 
                     if (!Behavior.NoExact)
                     {
@@ -763,9 +765,6 @@ namespace TriangleNet
                             }
                         }
                     }
-
-                    newvertex.mark = currentenc.Mark();
-                    newvertex.type = VertexType.SegmentVertex;
 
                     // Check whether the new vertex lies on an endpoint.
                     if (((newvertex.x == eorg.x) && (newvertex.y == eorg.y)) ||
@@ -791,9 +790,9 @@ namespace TriangleNet
                         mesh.steinerleft--;
                     }
                     // Check the two new subsegments to see if they're encroached.
-                    dummy = CheckSeg4Encroach(ref currentenc);
+                    CheckSeg4Encroach(ref currentenc);
                     currentenc.NextSelf();
-                    dummy = CheckSeg4Encroach(ref currentenc);
+                    CheckSeg4Encroach(ref currentenc);
                 }
 
                 // Set subsegment's origin to NULL. This makes it possible to detect dead 
@@ -828,7 +827,7 @@ namespace TriangleNet
         {
             Otri badotri = default(Otri);
             Vertex borg, bdest, bapex;
-            Vertex newvertex;
+            Point newloc; // Location of the new vertex
             double xi = 0, eta = 0;
             InsertVertexResult success;
             bool errorflag;
@@ -846,7 +845,6 @@ namespace TriangleNet
             {
                 errorflag = false;
                 // Create a new vertex at the triangle's circumcenter.
-                newvertex = new Vertex(); // TODO: mesh.nextras
 
                 // Using the original (simpler) Steiner point location method
                 // for mesh refinement.
@@ -854,19 +852,17 @@ namespace TriangleNet
                 // reset VertexType?
                 if (behavior.FixedArea || behavior.VarArea)
                 {
-                    Point tmp = Primitives.FindCircumcenter(borg, bdest, bapex, ref xi, ref eta, behavior.Offconstant);
-                    newvertex.x = tmp.x;
-                    newvertex.y = tmp.y;
+                    newloc = Primitives.FindCircumcenter(borg, bdest, bapex, ref xi, ref eta, behavior.Offconstant);
                 }
                 else
                 {
-                    newLocation.FindLocation(borg, bdest, bapex, newvertex, ref xi, ref eta, true, badotri);
+                    newloc = newLocation.FindLocation(borg, bdest, bapex, ref xi, ref eta, true, badotri);
                 }
 
                 // Check whether the new vertex lies on a triangle vertex.
-                if (((newvertex.x == borg.x) && (newvertex.y == borg.y)) ||
-                    ((newvertex.x == bdest.x) && (newvertex.y == bdest.y)) ||
-                    ((newvertex.x == bapex.x) && (newvertex.y == bapex.y)))
+                if (((newloc.x == borg.x) && (newloc.y == borg.y)) ||
+                    ((newloc.x == bdest.x) && (newloc.y == bdest.y)) ||
+                    ((newloc.x == bapex.x) && (newloc.y == bapex.y)))
                 {
                     if (Behavior.Verbose)
                     {
@@ -876,6 +872,11 @@ namespace TriangleNet
                 }
                 else
                 {
+                    // The new vertex must be in the interior, and therefore is a
+                    // free vertex with a marker of zero.
+                    Vertex newvertex = new Vertex(newloc.x, newloc.y, 0, mesh.nextras);
+                    newvertex.type = VertexType.FreeVertex;
+
                     for (int i = 0; i < mesh.nextras; i++)
                     {
                         // Interpolate the vertex attributes at the circumcenter.
@@ -883,10 +884,6 @@ namespace TriangleNet
                             + xi * (bdest.attributes[i] - borg.attributes[i])
                             + eta * (bapex.attributes[i] - borg.attributes[i]);
                     }
-                    // The new vertex must be in the interior, and therefore is a
-                    // free vertex with a marker of zero.
-                    newvertex.type = VertexType.FreeVertex;
-                    //newvertex.mark = 0;
 
                     // Ensure that the handle 'badotri' does not represent the longest
                     // edge of the triangle.  This ensures that the circumcenter must

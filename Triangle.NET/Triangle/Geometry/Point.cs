@@ -1,6 +1,5 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="Point.cs" company="">
-// Original Triangle code by Jonathan Richard Shewchuk, http://www.cs.cmu.edu/~quake/triangle.html
 // Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
@@ -142,6 +141,11 @@ namespace TriangleNet.Geometry
             }
 
             return (x < other.x || (x == other.x && y < other.y)) ? -1 : 1;
+        }
+
+        public override int GetHashCode()
+        {
+            return x.GetHashCode() ^ y.GetHashCode();
         }
 
         public override string ToString()

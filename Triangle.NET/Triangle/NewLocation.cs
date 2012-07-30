@@ -34,28 +34,25 @@ namespace TriangleNet
         /// <summary>
         /// Find a new location for a Steiner point.
         /// </summary>
-        /// <param name="mesh"></param>
         /// <param name="torg"></param>
         /// <param name="tdest"></param>
         /// <param name="tapex"></param>
-        /// <param name="circumcenter"></param>
         /// <param name="xi"></param>
         /// <param name="eta"></param>
         /// <param name="offcenter"></param>
         /// <param name="badotri"></param>
-        public void FindLocation(Vertex torg, Vertex tdest, Vertex tapex,
-                              Vertex circumcenter, ref double xi, ref double eta, bool offcenter, Otri badotri) // TODO: ref circumcenter???
+        /// <returns></returns>
+        public Point FindLocation(Vertex torg, Vertex tdest, Vertex tapex,
+            ref double xi, ref double eta, bool offcenter, Otri badotri)
         {
             // Based on using -U switch, call the corresponding function
             if (behavior.MaxAngle == 0.0)
             {
-                FindNewLocationWithoutMaxAngle(torg, tdest, tapex, circumcenter, ref xi, ref eta, true, badotri);
-            }
-            else
-            {
-                FindNewLocation(torg, tdest, tapex, circumcenter, ref xi, ref eta, true, badotri);
+                return FindNewLocationWithoutMaxAngle(torg, tdest, tapex, ref xi, ref eta, true, badotri);
             }
 
+            // With max angle
+            return FindNewLocation(torg, tdest, tapex, ref xi, ref eta, true, badotri);
         }
 
         /// <summary>
@@ -69,8 +66,8 @@ namespace TriangleNet
         /// <param name="eta"></param>
         /// <param name="offcenter"></param>
         /// <param name="badotri"></param>
-        private void FindNewLocationWithoutMaxAngle(Vertex torg, Vertex tdest, Vertex tapex,
-                              Vertex circumcenter, ref double xi, ref double eta, bool offcenter, Otri badotri)
+        private Point FindNewLocationWithoutMaxAngle(Vertex torg, Vertex tdest, Vertex tapex,
+            ref double xi, ref double eta, bool offcenter, Otri badotri)
         {
             double offconstant = behavior.Offconstant;
 
@@ -740,6 +737,8 @@ namespace TriangleNet
                 }// end of relocation				 
             }// end of almostGood	
 
+            Point circumcenter = new Point();
+
             if (relocated <= 0)
             {
                 circumcenter.x = torg.x + dx;
@@ -754,6 +753,7 @@ namespace TriangleNet
             xi = (yao * dx - xao * dy) * (2.0 * denominator);
             eta = (xdo * dy - ydo * dx) * (2.0 * denominator);
 
+            return circumcenter;
         }
 
         /// <summary>
@@ -767,8 +767,8 @@ namespace TriangleNet
         /// <param name="eta"></param>
         /// <param name="offcenter"></param>
         /// <param name="badotri"></param>
-        private void FindNewLocation(Vertex torg, Vertex tdest, Vertex tapex,
-                              Vertex circumcenter, ref double xi, ref double eta, bool offcenter, Otri badotri)
+        private Point FindNewLocation(Vertex torg, Vertex tdest, Vertex tapex,
+            ref double xi, ref double eta, bool offcenter, Otri badotri)
         {
             double offconstant = behavior.Offconstant;
 
@@ -1300,9 +1300,7 @@ namespace TriangleNet
                                         && (IsBadTriangleAngle(middleAngleCorner.x, middleAngleCorner.y, largestAngleCorner.x, largestAngleCorner.y, petal_slab_inter_x_first, petal_slab_inter_y_first))
                                         && MinDistanceToNeighbor(petal_slab_inter_x_first, petal_slab_inter_y_first, ref neighborotri) > MinDistanceToNeighbor(line_inter_x, line_inter_y, ref neighborotri))
                                     {
-                                        // 							
-                                        /// check the neighbor's vertices also, which one if better
-
+                                        // check the neighbor's vertices also, which one if better
                                         //slab and petal intersection is advised
                                         dxFirstSuggestion = petal_slab_inter_x_first - torg.x;
                                         dyFirstSuggestion = petal_slab_inter_y_first - torg.y;
@@ -1329,26 +1327,19 @@ namespace TriangleNet
                                                 // go back to circumcenter
                                                 dxFirstSuggestion = dx;
                                                 dyFirstSuggestion = dy;
-
-
                                             }
                                             else
                                             {
                                                 // intersection point is suggested
                                                 dxFirstSuggestion = line_inter_x - torg.x;
                                                 dyFirstSuggestion = line_inter_y - torg.y;
-
-
                                             }
-
-
                                         }
                                         else
                                         {// we are not creating a bad triangle
                                             // slab intersection is advised
                                             dxFirstSuggestion = line_result[2] - torg.x;
                                             dyFirstSuggestion = line_result[3] - torg.y;
-
                                         }
                                     }
                                     //------------------------------------------------------//
@@ -1361,8 +1352,6 @@ namespace TriangleNet
                                         // go back to circumcenter
                                         dxFirstSuggestion = dx;
                                         dyFirstSuggestion = dy;
-
-
                                     }
                                     else
                                     {
@@ -1370,11 +1359,8 @@ namespace TriangleNet
                                         // neighbor's circumcenter is suggested
                                         dxFirstSuggestion = voronoiOrInter[2] - torg.x;
                                         dyFirstSuggestion = voronoiOrInter[3] - torg.y;
-
-
                                     }
                                 }
-
                             }
                             else
                             { // there is no voronoi vertex between intersection point and circumcenter
@@ -1397,7 +1383,6 @@ namespace TriangleNet
                                         //slab and petal intersection is advised
                                         dxFirstSuggestion = petal_slab_inter_x_first - torg.x;
                                         dyFirstSuggestion = petal_slab_inter_y_first - torg.y;
-
                                     }
                                     else
                                     { // slab intersection point is further away							
@@ -1421,32 +1406,25 @@ namespace TriangleNet
                                                 // go back to circumcenter
                                                 dxFirstSuggestion = dx;
                                                 dyFirstSuggestion = dy;
-
                                             }
                                             else
                                             {
                                                 // intersection point is suggested
                                                 dxFirstSuggestion = line_inter_x - torg.x;
                                                 dyFirstSuggestion = line_inter_y - torg.y;
-
                                             }
-
-
                                         }
                                         else
                                         {// we are not creating a bad triangle
                                             // slab intersection is advised
                                             dxFirstSuggestion = line_result[2] - torg.x;
                                             dyFirstSuggestion = line_result[3] - torg.y;
-
                                         }
                                     }
                                     //------------------------------------------------------//
-
                                 }
                                 else
                                 {
-
                                     if (IsBadTriangleAngle(largestAngleCorner.x, largestAngleCorner.y, middleAngleCorner.x, middleAngleCorner.y, inter_x, inter_y))
                                     {
                                         //printf("testtriangle returned false! bad triangle\n");	
@@ -1469,16 +1447,12 @@ namespace TriangleNet
                                             // go back to circumcenter
                                             dxFirstSuggestion = dx;
                                             dyFirstSuggestion = dy;
-
-
-
                                         }
                                         else
                                         {
                                             // intersection point is suggested
                                             dxFirstSuggestion = inter_x - torg.x;
                                             dyFirstSuggestion = inter_y - torg.y;
-
                                         }
                                     }
                                     else
@@ -1486,7 +1460,6 @@ namespace TriangleNet
                                         // intersection point is suggested
                                         dxFirstSuggestion = inter_x - torg.x;
                                         dyFirstSuggestion = inter_y - torg.y;
-
                                     }
                                 }
                             }
@@ -1614,8 +1587,6 @@ namespace TriangleNet
                                         // slab and petal intersection is advised
                                         dxSecondSuggestion = petal_slab_inter_x_second - torg.x;
                                         dySecondSuggestion = petal_slab_inter_y_second - torg.y;
-
-
                                     }
                                     else
                                     { // slab intersection point is further away	
@@ -1639,8 +1610,6 @@ namespace TriangleNet
                                                 // go back to circumcenter
                                                 dxSecondSuggestion = dx;
                                                 dySecondSuggestion = dy;
-
-
                                             }
                                             else
                                             {
@@ -1649,15 +1618,12 @@ namespace TriangleNet
                                                 dySecondSuggestion = line_inter_y - torg.y;
 
                                             }
-
-
                                         }
                                         else
                                         {// we are not creating a bad triangle
                                             // slab intersection is advised
                                             dxSecondSuggestion = line_result[2] - torg.x;
                                             dySecondSuggestion = line_result[3] - torg.y;
-
                                         }
                                     }
                                     //------------------------------------------------------//
@@ -1669,16 +1635,12 @@ namespace TriangleNet
                                         // go back to circumcenter
                                         dxSecondSuggestion = dx;
                                         dySecondSuggestion = dy;
-
-
                                     }
                                     else
                                     { // we are not creating a bad triangle
                                         // neighbor's circumcenter is suggested
                                         dxSecondSuggestion = voronoiOrInter[2] - torg.x;
                                         dySecondSuggestion = voronoiOrInter[3] - torg.y;
-
-
                                     }
                                 }
                             }
@@ -1703,7 +1665,6 @@ namespace TriangleNet
                                         // slab and petal intersection is advised
                                         dxSecondSuggestion = petal_slab_inter_x_second - torg.x;
                                         dySecondSuggestion = petal_slab_inter_y_second - torg.y;
-
                                     }
                                     else
                                     { // slab intersection point is further away							;
@@ -1727,28 +1688,23 @@ namespace TriangleNet
                                                 // go back to circumcenter
                                                 dxSecondSuggestion = dx;
                                                 dySecondSuggestion = dy;
-
                                             }
                                             else
                                             {
                                                 // intersection point is suggested
                                                 dxSecondSuggestion = line_inter_x - torg.x;
                                                 dySecondSuggestion = line_inter_y - torg.y;
-
                                             }
-
-
                                         }
                                         else
-                                        {// we are not creating a bad triangle
+                                        {
+                                            // we are not creating a bad triangle
                                             // slab intersection is advised
                                             dxSecondSuggestion = line_result[2] - torg.x;
                                             dySecondSuggestion = line_result[3] - torg.y;
-
                                         }
                                     }
                                     //------------------------------------------------------//
-
                                 }
                                 else
                                 {
@@ -1773,24 +1729,19 @@ namespace TriangleNet
                                             // go back to circumcenter
                                             dxSecondSuggestion = dx;
                                             dySecondSuggestion = dy;
-
-
                                         }
                                         else
                                         {
                                             // intersection point is suggested
                                             dxSecondSuggestion = inter_x - torg.x;
                                             dySecondSuggestion = inter_y - torg.y;
-
                                         }
                                     }
                                     else
                                     {
-
                                         // intersection point is suggested
                                         dxSecondSuggestion = inter_x - torg.x;
                                         dySecondSuggestion = inter_y - torg.y;
-
                                     }
                                 }
                             }
@@ -1827,13 +1778,11 @@ namespace TriangleNet
                             {
                                 dx = dxSecondSuggestion;
                                 dy = dySecondSuggestion;
-
                             }
                             else
                             {
                                 dx = dxFirstSuggestion;
                                 dy = dyFirstSuggestion;
-
                             }
                         }
                         else if (neighborNotFound_first)
@@ -1850,13 +1799,11 @@ namespace TriangleNet
                             {
                                 dx = dxSecondSuggestion;
                                 dy = dySecondSuggestion;
-
                             }
                             else
                             {
                                 dx = dxFirstSuggestion;
                                 dy = dyFirstSuggestion;
-
                             }
                         }
                         else if (neighborNotFound_second)
@@ -1873,13 +1820,11 @@ namespace TriangleNet
                             {
                                 dx = dxSecondSuggestion;
                                 dy = dySecondSuggestion;
-
                             }
                             else
                             {
                                 dx = dxFirstSuggestion;
                                 dy = dyFirstSuggestion;
-
                             }
                         }
                         else
@@ -1896,16 +1841,13 @@ namespace TriangleNet
                             {
                                 dx = dxSecondSuggestion;
                                 dy = dySecondSuggestion;
-
                             }
                             else
                             {
                                 dx = dxFirstSuggestion;
                                 dy = dyFirstSuggestion;
-
                             }
                         }
-
                     }
                     else
                     { // acute : consider other direction
@@ -1923,13 +1865,11 @@ namespace TriangleNet
                             {
                                 dx = dxSecondSuggestion;
                                 dy = dySecondSuggestion;
-
                             }
                             else
                             {
                                 dx = dxFirstSuggestion;
                                 dy = dyFirstSuggestion;
-
                             }
                         }
                         else if (neighborNotFound_first)
@@ -1946,13 +1886,11 @@ namespace TriangleNet
                             {
                                 dx = dxSecondSuggestion;
                                 dy = dySecondSuggestion;
-
                             }
                             else
                             {
                                 dx = dxFirstSuggestion;
                                 dy = dyFirstSuggestion;
-
                             }
                         }
                         else if (neighborNotFound_second)
@@ -1969,13 +1907,11 @@ namespace TriangleNet
                             {
                                 dx = dxSecondSuggestion;
                                 dy = dySecondSuggestion;
-
                             }
                             else
                             {
                                 dx = dxFirstSuggestion;
                                 dy = dyFirstSuggestion;
-
                             }
                         }
                         else
@@ -1992,19 +1928,19 @@ namespace TriangleNet
                             {
                                 dx = dxSecondSuggestion;
                                 dy = dySecondSuggestion;
-
                             }
                             else
                             {
                                 dx = dxFirstSuggestion;
                                 dy = dyFirstSuggestion;
-
                             }
                         }
 
                     }// end if obtuse
                 }// end of relocation				 
             }// end of almostGood	
+
+            Point circumcenter = new Point();
 
             if (relocated <= 0)
             {
@@ -2019,6 +1955,7 @@ namespace TriangleNet
             xi = (yao * dx - xao * dy) * (2.0 * denominator);
             eta = (xdo * dy - ydo * dx) * (2.0 * denominator);
 
+            return circumcenter;
         }
 
         /// <summary>
