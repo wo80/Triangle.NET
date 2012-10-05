@@ -86,7 +86,7 @@ namespace TriangleNet.Geometry
         /// <summary>
         /// Gets the list of input segments.
         /// </summary>
-        public IEnumerable<Edge> Segments
+        public ICollection<Edge> Segments
         {
             get { return segments; }
         }
@@ -94,7 +94,7 @@ namespace TriangleNet.Geometry
         /// <summary>
         /// Gets the list of input holes.
         /// </summary>
-        public IEnumerable<Point> Holes
+        public ICollection<Point> Holes
         {
             get { return holes; }
         }
@@ -102,7 +102,7 @@ namespace TriangleNet.Geometry
         /// <summary>
         /// Gets the list of regions.
         /// </summary>
-        public IEnumerable<RegionPointer> Regions
+        public ICollection<RegionPointer> Regions
         {
             get { return regions; }
         }

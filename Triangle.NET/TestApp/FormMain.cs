@@ -626,8 +626,13 @@ namespace MeshExplorer
         {
             if (mesh != null)
             {
-                mesh.Check();
-                ShowLog();
+                bool isConsistent, isDelaunay;
+                mesh.Check(out isConsistent, out isDelaunay);
+
+                if (!isConsistent || !isDelaunay)
+                {
+                    ShowLog();
+                }
             }
         }
 

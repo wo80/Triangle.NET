@@ -123,21 +123,20 @@ namespace TriangleNet
                 }
             }
 
-            if (horrors == 0)
+            if (horrors == 0 && Behavior.Verbose)
             {
-                if (Behavior.Verbose)
-                {
-                    logger.Info("In my studied opinion, the mesh appears to be consistent.");
-                }
+                logger.Info("Mesh topology appears to be consistent.");
+                //logger.Info("In my studied opinion, the mesh appears to be consistent.");
             }
-            else if (horrors == 1)
-            {
-                logger.Info("Precisely one festering wound discovered.");
-            }
-            else
-            {
-                logger.Info(horrors + " abominations witnessed.");
-            }
+            //else if (horrors == 1)
+            //{
+            //    logger.Info("Precisely one festering wound discovered.");
+            //}
+            //else
+            //{
+            //    logger.Info(horrors + " abominations witnessed.");
+            //}
+
             // Restore the status of exact arithmetic.
             Behavior.NoExact = saveexact;
 
@@ -212,21 +211,21 @@ namespace TriangleNet
                 }
 
             }
-            if (horrors == 0)
+
+            if (horrors == 0 && Behavior.Verbose)
             {
-                if (Behavior.Verbose)
-                {
-                    logger.Info("By virtue of my perceptive intelligence, I declare the mesh Delaunay.");
-                }
+                logger.Info("Mesh is Delaunay.");
+                //logger.Info("By virtue of my perceptive intelligence, I declare the mesh Delaunay.");
             }
-            else if (horrors == 1)
-            {
-                logger.Info("Precisely one terrifying transgression identified.");
-            }
-            else
-            {
-                logger.Info(horrors + " obscenities viewed with horror.");
-            }
+            //else if (horrors == 1)
+            //{
+            //    logger.Info("Precisely one terrifying transgression identified.");
+            //}
+            //else
+            //{
+            //    logger.Info(horrors + " obscenities viewed with horror.");
+            //}
+
             // Restore the status of exact arithmetic.
             Behavior.NoExact = saveexact;
 

@@ -22,7 +22,8 @@ namespace TriangleNet.Geometry
         /// </summary>
         public int P0
         {
-            get; private set;
+            get;
+            private set;
         }
 
         /// <summary>
@@ -30,7 +31,8 @@ namespace TriangleNet.Geometry
         /// </summary>
         public int P1
         {
-            get; private set;
+            get;
+            private set;
         }
 
         /// <summary>
@@ -38,7 +40,8 @@ namespace TriangleNet.Geometry
         /// </summary>
         public int Boundary
         {
-            get; private set;
+            get;
+            private set;
         }
 
         /// <summary>

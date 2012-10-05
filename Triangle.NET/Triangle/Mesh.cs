@@ -516,10 +516,12 @@ namespace TriangleNet
         /// <summary>
         /// Check mesh consistency and (constrained) Delaunay property.
         /// </summary>
-        public void Check()
+        /// <param name="isConsistent">Value indicating if mesh topology is consistent.</param>
+        /// <param name="isDelaunay">Value indicating if mesh is Delaunay.</param>
+        public void Check(out bool isConsistent, out bool isDelaunay)
         {
-            quality.CheckMesh();
-            quality.CheckDelaunay();
+            isConsistent = quality.CheckMesh();
+            isDelaunay = quality.CheckDelaunay();
         }
 
         #region Options

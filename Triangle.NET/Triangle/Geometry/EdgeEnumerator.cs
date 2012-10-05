@@ -20,6 +20,7 @@ namespace TriangleNet.Geometry
         IEnumerator<Triangle> triangles;
         Otri tri = default(Otri);
         Otri neighbor = default(Otri);
+        Osub sub = default(Osub);
         Edge current;
         Vertex p1, p2;
 
@@ -82,7 +83,10 @@ namespace TriangleNet.Geometry
                     p1 = tri.Org();
                     p2 = tri.Dest();
 
-                    current = new Edge(p1.id, p2.id);
+                    tri.SegPivot(ref sub);
+
+                    // Boundary mark of dummysub is 0, so we don't need to worry about that.
+                    current = new Edge(p1.id, p2.id, sub.seg.boundary);
                 }
 
                 tri.orient++;
