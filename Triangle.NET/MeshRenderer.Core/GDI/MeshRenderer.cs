@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace MeshExplorer.Rendering
+namespace MeshRenderer.Core.GDI
 {
     using System;
     using System.Collections.Generic;
@@ -20,7 +20,7 @@ namespace MeshExplorer.Rendering
     {
         Zoom zoom;
         RenderData data;
-        RenderColors renderColors;
+        ColorManager renderColors;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MeshRenderer" /> class.
@@ -33,12 +33,12 @@ namespace MeshExplorer.Rendering
         /// <summary>
         /// Renders the mesh.
         /// </summary>
-        public void Render(Graphics g, Zoom zoom, RenderColors renderColors)
+        public void Render(Graphics g, Zoom zoom, ColorManager renderColors)
         {
             this.renderColors = renderColors;
             this.zoom = zoom;
 
-            if (data.Edges != null)
+            if (data.MeshEdges != null)
             {
                 this.RenderEdges(g);
             }
@@ -61,12 +61,12 @@ namespace MeshExplorer.Rendering
         /// <summary>
         /// Renders only the mesh edges (no points or segments).
         /// </summary>
-        public void RenderMesh(Graphics g, Zoom zoom, RenderColors renderColors)
+        public void RenderMesh(Graphics g, Zoom zoom, ColorManager renderColors)
         {
             this.renderColors = renderColors;
             this.zoom = zoom;
 
-            if (data.Edges != null)
+            if (data.MeshEdges != null)
             {
                 this.RenderEdges(g);
             }
@@ -79,7 +79,7 @@ namespace MeshExplorer.Rendering
         /// <summary>
         /// Renders only points and segments (no mesh triangles).
         /// </summary>
-        public void RenderGeometry(Graphics g, Zoom zoom, RenderColors renderColors)
+        public void RenderGeometry(Graphics g, Zoom zoom, ColorManager renderColors)
         {
             this.renderColors = renderColors;
             this.zoom = zoom;
@@ -97,28 +97,30 @@ namespace MeshExplorer.Rendering
 
         private void RenderPoints(Graphics g)
         {
+            int i, k, n;
             PointF pt;
-            PointF[] pts = data.Points;
-            int i, n;
+            float[] pts = data.Points;
 
             // Draw input points
             n = data.NumberOfInputPoints;
             for (i = 0; i < n; i++)
             {
-                if (zoom.ViewportContains(pts[i]))
+                k = 2 * i;
+                if (zoom.ViewportContains(pts[k], pts[k + 1]))
                 {
-                    pt = zoom.WorldToScreen(pts[i]);
+                    pt = zoom.WorldToScreen(pts[k], pts[k + 1]);
                     g.FillEllipse(renderColors.Point, pt.X - 1.5f, pt.Y - 1.5f, 3, 3);
                 }
             }
 
             // Draw Steiner points
-            n = pts.Length;
+            n = pts.Length / 2;
             for (; i < n; i++)
             {
-                if (zoom.ViewportContains(pts[i]))
+                k = 2 * i;
+                if (zoom.ViewportContains(pts[k], pts[k + 1]))
                 {
-                    pt = zoom.WorldToScreen(pts[i]);
+                    pt = zoom.WorldToScreen(pts[k], pts[k + 1]);
                     g.FillEllipse(renderColors.SteinerPoint, pt.X - 1.5f, pt.Y - 1.5f, 3, 3);
                 }
             }
@@ -126,21 +128,25 @@ namespace MeshExplorer.Rendering
 
         private void RenderTriangles(Graphics g)
         {
+            int n = data.Triangles.Length / 3;
+            uint k0, k1, k2;
             PointF p0, p1, p2;
-            PointF[] pts = data.Points;
-
-            var triangles = data.Triangles;
+            float[] pts = data.Points;
 
             // Draw triangles
-            foreach (var tri in triangles)
+            for (int i = 0; i < n; i++)
             {
-                if (zoom.ViewportContains(pts[tri.P0]) ||
-                    zoom.ViewportContains(pts[tri.P1]) ||
-                    zoom.ViewportContains(pts[tri.P2]))
+                k0 = 2 * data.Triangles[3 * i];
+                k1 = 2 * data.Triangles[3 * i + 1];
+                k2 = 2 * data.Triangles[3 * i + 2];
+
+                if (zoom.ViewportContains(pts[k0], pts[k0 + 1]) ||
+                    zoom.ViewportContains(pts[k1], pts[k1 + 1]) ||
+                    zoom.ViewportContains(pts[k2], pts[k2 + 1]))
                 {
-                    p0 = zoom.WorldToScreen(pts[tri.P0]);
-                    p1 = zoom.WorldToScreen(pts[tri.P1]);
-                    p2 = zoom.WorldToScreen(pts[tri.P2]);
+                    p0 = zoom.WorldToScreen(pts[k0], pts[k0 + 1]);
+                    p1 = zoom.WorldToScreen(pts[k1], pts[k1 + 1]);
+                    p2 = zoom.WorldToScreen(pts[k2], pts[k2 + 1]);
 
                     g.DrawLine(renderColors.Line, p0, p1);
                     g.DrawLine(renderColors.Line, p1, p2);
@@ -151,19 +157,22 @@ namespace MeshExplorer.Rendering
 
         private void RenderEdges(Graphics g)
         {
+            int n = data.MeshEdges.Length / 2;
+            uint k0, k1;
             PointF p0, p1;
-            PointF[] pts = data.Points;
-
-            var edges = data.Edges;
+            float[] pts = data.Points;
 
             // Draw edges
-            foreach (var edge in edges)
+            for (int i = 0; i < n; i++)
             {
-                if (zoom.ViewportContains(pts[edge.P0]) ||
-                    zoom.ViewportContains(pts[edge.P1]))
+                k0 = 2 * data.MeshEdges[2 * i];
+                k1 = 2 * data.MeshEdges[2 * i + 1];
+
+                if (zoom.ViewportContains(pts[k0], pts[k0 + 1]) ||
+                    zoom.ViewportContains(pts[k1], pts[k1 + 1]))
                 {
-                    p0 = zoom.WorldToScreen(pts[edge.P0]);
-                    p1 = zoom.WorldToScreen(pts[edge.P1]);
+                    p0 = zoom.WorldToScreen(pts[k0], pts[k0 + 1]);
+                    p1 = zoom.WorldToScreen(pts[k1], pts[k1 + 1]);
 
                     g.DrawLine(renderColors.Line, p0, p1);
                 }
@@ -172,18 +181,22 @@ namespace MeshExplorer.Rendering
 
         private void RenderSegments(Graphics g)
         {
+            int n = data.Segments.Length / 2;
+            uint k0, k1;
             PointF p0, p1;
-            PointF[] pts = data.Points;
+            float[] pts = data.Points;
 
-            var segments = data.Segments;
-
-            foreach (var seg in segments)
+            // Draw edges
+            for (int i = 0; i < n; i++)
             {
-                if (zoom.ViewportContains(pts[seg.P0]) ||
-                    zoom.ViewportContains(pts[seg.P1]))
+                k0 = 2 * data.Segments[2 * i];
+                k1 = 2 * data.Segments[2 * i + 1];
+
+                if (zoom.ViewportContains(pts[k0], pts[k0 + 1]) ||
+                    zoom.ViewportContains(pts[k1], pts[k1 + 1]))
                 {
-                    p0 = zoom.WorldToScreen(pts[seg.P0]);
-                    p1 = zoom.WorldToScreen(pts[seg.P1]);
+                    p0 = zoom.WorldToScreen(pts[k0], pts[k0 + 1]);
+                    p1 = zoom.WorldToScreen(pts[k1], pts[k1 + 1]);
 
                     g.DrawLine(renderColors.Segment, p0, p1);
                 }

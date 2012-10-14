@@ -69,13 +69,9 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\DarkToolStripRenderer.cs" />
-    <Compile Include="Controls\RendererControl.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="DarkMessageBox.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Examples.cs" />
     <Compile Include="FormExport.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -115,13 +111,27 @@
     <Compile Include="IO\SvgImage.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Rendering\MeshRenderer.cs" />
-    <Compile Include="Rendering\RenderColors.cs" />
-    <Compile Include="Rendering\RenderData.cs" />
-    <Compile Include="Rendering\VoronoiRenderer.cs" />
-    <Compile Include="Rendering\Zoom.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Util.cs" />
+    <Compile Include="Views\AboutView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Views\AboutView.Designer.cs">
+      <DependentUpon>AboutView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\IView.cs" />
+    <Compile Include="Views\MeshControlView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Views\MeshControlView.Designer.cs">
+      <DependentUpon>MeshControlView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\StatisticView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Views\StatisticView.Designer.cs">
+      <DependentUpon>StatisticView.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="FormExport.resx">
       <DependentUpon>FormExport.cs</DependentUpon>
     </EmbeddedResource>
@@ -131,8 +141,21 @@
     <EmbeddedResource Include="FormMain.resx">
       <DependentUpon>FormMain.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Views\AboutView.resx">
+      <DependentUpon>AboutView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\MeshControlView.resx">
+      <DependentUpon>MeshControlView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\StatisticView.resx">
+      <DependentUpon>StatisticView.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MeshRenderer.Core\MeshRenderer.Core.csproj">
+      <Project>{9C5040DA-C739-43A1-8540-E6BD3ED6DB55}</Project>
+      <Name>MeshRenderer.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Triangle\Triangle.csproj">
       <Project>{F7907A0A-B75F-400B-9E78-BFAD00DB4D6B}</Project>
       <Name>Triangle</Name>

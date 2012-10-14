@@ -6,25 +6,23 @@
 
 namespace MeshExplorer.IO
 {
-    using MeshExplorer.Rendering;
     using System;
     using System.Drawing;
     using System.Drawing.Drawing2D;
     using System.Drawing.Imaging;
     using System.IO;
     using TriangleNet;
-    using TriangleNet.Data;
-    using TriangleNet.IO;
-    using TriangleNet.Tools;
+    using MeshRenderer.Core;
+    using MeshRenderer.Core.GDI;
 
     /// <summary>
     /// Writes an image of the mesh to disk.
     /// </summary>
     public class RasterImage
     {
-        RenderColors colors = RenderColors.Default();
+        ColorManager colors = ColorManager.Default();
 
-        public RenderColors ColorScheme
+        public ColorManager ColorScheme
         {
             get { return colors; }
             set { colors = value; }
@@ -40,7 +38,7 @@ namespace MeshExplorer.IO
         {
             // Get mesh data -- TODO: Use RenderControl's RenderData
             RenderData data = new RenderData();
-            data.SetData(mesh);
+            data.SetMesh(mesh);
 
             // Check file name
             if (String.IsNullOrWhiteSpace(filename))

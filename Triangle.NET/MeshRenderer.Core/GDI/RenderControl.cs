@@ -4,24 +4,20 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace MeshExplorer.Controls
+namespace MeshRenderer.Core.GDI
 {
     using System;
-    using System.Diagnostics;
     using System.Drawing;
     using System.Drawing.Drawing2D;
     using System.Drawing.Text;
     using System.Windows.Forms;
-    using MeshExplorer.Rendering;
     using TriangleNet;
-    using TriangleNet.IO;
-    using TriangleNet.Data;
     using TriangleNet.Geometry;
 
     /// <summary>
     /// Renders a mesh using GDI.
     /// </summary>
-    public class RendererControl : Control
+    public class RenderControl : Control, IMeshRenderer
     {
         // Rendering stuff
         private BufferedGraphics buffer;
@@ -33,7 +29,7 @@ namespace MeshExplorer.Controls
         MeshRenderer meshRenderer;
         VoronoiRenderer voronoiRenderer;
 
-        RenderColors renderColors;
+        ColorManager renderColors;
 
         bool initialized = false;
         bool showVoronoi = false;
@@ -51,36 +47,17 @@ namespace MeshExplorer.Controls
         }
 
         /// <summary>
-        /// Indicates whether to show the voronoi diagram or not.
+        /// Initializes a new instance of the <see cref="RenderControl" /> class.
         /// </summary>
-        public bool ShowVoronoi
-        {
-            get { return showVoronoi; }
-            set
-            {
-                showVoronoi = value;
-
-                if (voronoiRenderer != null && showVoronoi)
-                {
-                    voronoiRenderer.Update();
-                }
-
-                this.Render();
-            }
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RendererControl" /> class.
-        /// </summary>
-        public RendererControl()
+        public RenderControl()
         {
             SetStyle(ControlStyles.ResizeRedraw, true);
 
-            renderColors = RenderColors.Default();
+            renderColors = ColorManager.Default();
 
             this.BackColor = renderColors.Background;
 
-            zoom = new Zoom();
+            zoom = new Zoom(true);
             context = new BufferedGraphicsContext();
             data = new RenderData();
 
@@ -99,7 +76,7 @@ namespace MeshExplorer.Controls
         /// </summary>
         public void Initialize()
         {
-            zoom.Initialize(this.ClientRectangle, this.ClientRectangle);
+            zoom.Initialize(this.ClientRectangle);
             InitializeBuffer();
 
             initialized = true;
@@ -110,11 +87,18 @@ namespace MeshExplorer.Controls
         /// <summary>
         /// Updates the displayed input data.
         /// </summary>
-        public void SetData(InputGeometry geometry)
+        public void SetData(RenderData data)
         {
-            data.SetData(geometry);
+            this.data = data;
 
             meshRenderer = new MeshRenderer(data);
+
+            this.showVoronoi = data.VoronoiPoints != null;
+
+            if (showVoronoi)
+            {
+                voronoiRenderer = new VoronoiRenderer(data);
+            }
 
             // Reset the zoom on new data
             zoom.Initialize(this.ClientRectangle, data.Bounds);
@@ -125,50 +109,15 @@ namespace MeshExplorer.Controls
         }
 
         /// <summary>
-        /// Updates the displayed mesh data.
-        /// </summary>
-        /// <param name="initZoom">If true, the zoom will be reset.</param>
-        public void SetData(Mesh mesh, bool initZoom)
-        {
-            data.SetData(mesh);
-
-            if (initZoom)
-            {
-                // Reset the zoom on new data
-                zoom.Initialize(this.ClientRectangle, data.Bounds);
-            }
-
-            meshRenderer = new MeshRenderer(data);
-            voronoiRenderer = new VoronoiRenderer(mesh);
-
-            if (showVoronoi)
-            {
-                voronoiRenderer.Update();
-            }
-
-            initialized = true;
-
-            this.Render();
-        }
-
-        /// <summary>
-        /// Updates the displayed input data.
-        /// </summary>
-        public void SetData(Mesh mesh)
-        {
-            SetData(mesh, false);
-        }
-
-        /// <summary>
         /// Zoom to the given location.
         /// </summary>
         /// <param name="location">The zoom focus.</param>
         /// <param name="delta">Indicates whether to zoom in or out.</param>
-        public void Zoom(PointF location, int delta)
+        public void Zoom(float x, float y, int delta)
         {
             if (!initialized) return;
 
-            if (zoom.Update(delta, location.X / (float)this.Width, location.Y / (float)this.Height))
+            if (zoom.ZoomUpdate(delta, x, y))
             {
                 // Redraw
                 this.Render();
@@ -180,7 +129,7 @@ namespace MeshExplorer.Controls
         /// </summary>
         public void HandleResize()
         {
-            zoom.Resize(this.ClientRectangle, data.Bounds);
+            zoom.Initialize(this.ClientRectangle, data.Bounds);
             InitializeBuffer();
         }
 
@@ -270,11 +219,12 @@ namespace MeshExplorer.Controls
 
             if (e.Button == MouseButtons.Middle)
             {
-                zoom.Reset();
+                zoom.ZoomReset();
                 this.Render();
             }
             else if (e.Button == MouseButtons.Left)
             {
+                /*
                 // Just in case ...
                 timer.Stop();
 
@@ -286,6 +236,7 @@ namespace MeshExplorer.Controls
                 this.Invalidate();
 
                 timer.Start();
+                 * */
             }
 
             base.OnMouseClick(e);

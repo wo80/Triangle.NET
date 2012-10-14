@@ -1,10 +1,10 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="Zoom.cs" company="">
-// Christian Woltering, Triangle.NET, http://triangle.codeplex.com/
+// TODO: Update copyright text.
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace MeshExplorer.Rendering
+namespace MeshRenderer.Core
 {
     using System;
     using System.Collections.Generic;
@@ -13,50 +13,61 @@ namespace MeshExplorer.Rendering
     using System.Drawing;
 
     /// <summary>
-    /// Manages the current world to screen transformation.
+    /// Manages the current world to screen transformation
     /// </summary>
     public class Zoom
     {
-        /// <summary>
-        /// Gets the screen dimensions (render control).
-        /// </summary>
-        Rectangle Screen { get; set; }
+        // The complete mesh
+        Rectangle Screen;
 
-        /// <summary>
-        /// Gets the world dimensions (mesh).
-        /// </summary>
+        // The complete mesh
         RectangleF World { get; set; }
 
-        /// <summary>
-        /// Gets the current viewport (visible mesh).
-        /// </summary>
-        public RectangleF Viewport { get; private set; }
+        // The current viewport (visible mesh)
+        public RectangleF Viewport { get; set; }
 
-        /// <summary>
-        /// Gets the current scale (zoom level)
-        /// </summary>
-        public int Level { get; private set; }
-
-        public float ClipMargin { get; private set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Zoom" /> class.
-        /// </summary>
-        public Zoom()
+        // Current scale (zoom level)
+        public float Scale
         {
-            Level = -1;
+            get { return Screen.Width / Viewport.Width; }
         }
 
-        /// <summary>
-        /// Initialize the zoom.
-        /// </summary>
-        /// <param name="screen">The screen dimensions.</param>
-        /// <param name="world">The world dimensions.</param>
-        public void Initialize(Rectangle screen, RectangleF world)
+        // Current scale (zoom level)
+        public int Level { get; private set; }
+
+        // Add a margin to clip region (5% of viewport width on each side)
+        public float ClipMargin { get; set; }
+
+        bool invertY = false;
+
+        public Zoom()
+            : this(false)
+        {
+        }
+
+        public Zoom(bool invertY)
+        {
+            Level = -1;
+            this.invertY = invertY;
+        }
+
+        public void Initialize(Rectangle screen)
         {
             this.Screen = screen;
 
-            this.World = world;
+            this.Level = 1;
+
+            this.Viewport = screen;
+
+            this.ClipMargin = this.Viewport.Width * 0.05f;
+
+            this.World = screen;
+        }
+
+        public void Initialize(Rectangle screen, BoundingBox world)
+        {
+            this.Screen = screen;
+
             this.Level = 1;
 
             // Add a margin so there's some space around the border
@@ -73,8 +84,8 @@ namespace MeshExplorer.Rendering
                 scale = (world.Height + worldMargin) / screen.Height;
             }
 
-            float centerX = world.X + world.Width / 2;
-            float centerY = world.Y + world.Height / 2;
+            float centerX = world.Left + world.Width / 2;
+            float centerY = world.Bottom + world.Height / 2;
 
             // TODO: Add initial margin
             this.Viewport = new RectangleF(centerX - screen.Width * scale / 2,
@@ -87,20 +98,28 @@ namespace MeshExplorer.Rendering
             this.World = this.Viewport;
         }
 
-        public void Resize(Rectangle screen, RectangleF world)
+        public void Update(BoundingBox world)
         {
-            this.Initialize(screen, world);
+            if (this.Screen != null)
+            {
+                Initialize(this.Screen, world);
+            }
         }
 
         /// <summary>
         /// Zoom in or out of the viewport.
         /// </summary>
         /// <param name="amount">Zoom amount</param>
-        /// <param name="focusX">Relative x point position (between 0 and 1)</param>
-        /// <param name="focusY">Relative y point position (between 0 and 1)</param>
-        public bool Update(int amount, float focusX, float focusY)
+        /// <param name="focusX">Relative x point position</param>
+        /// <param name="focusY">Relative y point position</param>
+        public bool ZoomUpdate(int amount, float focusX, float focusY)
         {
             float width, height;
+
+            if (invertY)
+            {
+                focusY = 1 - focusY;
+            }
 
             if (amount > 0) // Zoom in
             {
@@ -132,11 +151,11 @@ namespace MeshExplorer.Rendering
 
             // Current focus on viewport
             float x = Viewport.X + Viewport.Width * focusX;
-            float y = Viewport.Y + Viewport.Height * (1 - focusY);
+            float y = Viewport.Y + Viewport.Height * focusY;
 
             // New left and top positions
             x = x - width * focusX;
-            y = y - height * (1 - focusY);
+            y = y - height * focusY;
 
             // Check if outside of world
             if (x < World.X)
@@ -165,31 +184,28 @@ namespace MeshExplorer.Rendering
             return true;
         }
 
-        /// <summary>
-        /// Check current point (world coordinates) lies inside the viewport.
-        /// </summary>
-        public bool ViewportContains(PointF pt)
-        {
-            return (pt.X > Viewport.X && pt.X < Viewport.Right
-                && pt.Y > Viewport.Y && pt.Y < Viewport.Bottom);
-        }
-
-        public PointF WorldToScreen(PointF pt)
-        {
-            return new PointF((pt.X - Viewport.X) / Viewport.Width * Screen.Width,
-                (1 - (pt.Y - Viewport.Y) / Viewport.Height) * Screen.Height);
-        }
-
-        public PointF ScreenToWorld(float ptX, float ptY)
-        {
-            return new PointF(Viewport.X + Viewport.Width * ptX,
-                Viewport.Y + Viewport.Height * (1 - ptY));
-        }
-
-        public void Reset()
+        public void ZoomReset()
         {
             this.Viewport = this.World;
             this.Level = 1;
+        }
+
+        public bool ViewportContains(float x, float y)
+        {
+            return (x > Viewport.X && x < Viewport.Right
+                && y > Viewport.Y && y < Viewport.Bottom);
+        }
+
+        public PointF WorldToScreen(float x, float y)
+        {
+            return new PointF((x - Viewport.X) / Viewport.Width * Screen.Width,
+                (1 - (y - Viewport.Y) / Viewport.Height) * Screen.Height);
+        }
+
+        public PointF ScreenToWorld(float x, float y)
+        {
+            return new PointF(Viewport.X + Viewport.Width * x,
+                Viewport.Y + Viewport.Height * (1 - y));
         }
     }
 }

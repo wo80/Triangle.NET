@@ -2,14 +2,13 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Windows.Forms;
 using MeshExplorer.Controls;
 using MeshExplorer.IO;
+using MeshRenderer.Core;
 using TriangleNet;
 using TriangleNet.Geometry;
 using TriangleNet.Tools;
-using MeshExplorer.Rendering;
 
 namespace MeshExplorer
 {
@@ -18,11 +17,12 @@ namespace MeshExplorer
         Settings settings;
         InputGeometry input;
         Mesh mesh;
-        Statistic stats;
-        QualityMeasure quality;
 
         FormLog frmLog;
         FormGenerator frmGenerator;
+
+        RenderManager renderManager;
+        RenderData renderData;
 
         public FormMain()
         {
@@ -37,9 +37,47 @@ namespace MeshExplorer
 
             settings = new Settings();
 
-            renderControl1.Initialize();
+            renderManager = new RenderManager();
+            renderManager.CreateDefaultControl();
 
-            stats = new Statistic();
+            /*
+            if (!renderManager.CreateControl("MeshRenderer.SharpGL2.dll", new string[] { "SharpGL.dll" }))
+            {
+                renderManager.CreateDefaultControl();
+
+                if (frmLog == null)
+                {
+                    frmLog = new FormLog();
+                }
+
+                frmLog.AddItem("Failed to initialize OpenGL.", true);
+            }
+            */
+
+            var control = renderManager.RenderControl;
+
+            if (control != null)
+            {
+                this.splitContainer1.Panel2.Controls.Add(control);
+
+                // Initialize control
+                control.BackColor = Color.Black;
+                control.Dock = DockStyle.Fill;
+                control.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(0)));
+                control.Location = new System.Drawing.Point(0, 0);
+                control.Name = "renderControl1";
+                control.Size = new Size(703, 612);
+                control.TabIndex = 0;
+                control.Text = "meshRenderer1";
+
+                renderManager.Initialize();
+            }
+            else
+            {
+                DarkMessageBox.Show("Ooops ...", "Failed to initialize renderer.");
+            }
+
+            renderData = new RenderData();
         }
 
         private void Form1_KeyUp(object sender, KeyEventArgs e)
@@ -47,7 +85,7 @@ namespace MeshExplorer
             switch (e.KeyCode)
             {
                 case Keys.F3:
-                    Open();
+                    OpenWithDialog();
                     break;
                 case Keys.F4:
                     Save();
@@ -88,39 +126,57 @@ namespace MeshExplorer
             Smooth();
         }
 
-        private void lbCodeplex_Clicked(object sender, EventArgs e)
+        #region Drag and drop
+
+        private void frmDragDrop(object sender, DragEventArgs e)
         {
-            try
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
-                ProcessStartInfo sInfo = new ProcessStartInfo("http://triangle.codeplex.com/");
-                Process.Start(sInfo);
+                string[] args = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+                Open(args[0]);
             }
-            catch (Exception)
-            { }
         }
 
-        private void slMinAngle_ValueChanging(object sender, EventArgs e)
+        private void frmDragOver(object sender, DragEventArgs e)
         {
-            // Between 0 and 40 (step 1)
-            int angle = (slMinAngle.Value * 40) / 100;
-            lbMinAngle.Text = angle.ToString();
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] args = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+                if (args.Length > 1)
+                {
+                    e.Effect = DragDropEffects.None;
+                    return;
+                }
+
+                string file = args[0].ToLower();
+
+                // Check if file extension is known
+                if (FileProcessor.CanHandleFile(file))
+                {
+                    e.Effect = DragDropEffects.Copy;
+                }
+            }
+            else
+            {
+                e.Effect = DragDropEffects.None;
+            }
         }
 
-        private void slMaxArea_ValueChanging(object sender, EventArgs e)
-        {
-            // Between 0 and 1 (step 0.01)
-            double area = slMaxArea.Value * 0.01;
-            lbMaxArea.Text = area.ToString(Util.Nfi);
-        }
+        #endregion
 
         protected override void OnMouseWheel(MouseEventArgs e)
         {
+            var container = this.splitContainer1.Panel2.ClientRectangle;
+
             System.Drawing.Point pt = e.Location;
             pt.Offset(-splitContainer1.SplitterDistance, 0);
 
-            if (renderControl1.ClientRectangle.Contains(pt))
+            if (container.Contains(pt))
             {
-                renderControl1.Zoom(pt, e.Delta);
+                renderManager.Zoom(((float)pt.X) / container.Width,
+                    ((float)pt.Y) / container.Height, e.Delta);
             }
             base.OnMouseWheel(e);
         }
@@ -135,7 +191,7 @@ namespace MeshExplorer
             // Handle window minimize and maximize
             if (!isResizing)
             {
-                renderControl1.HandleResize();
+                renderManager.HandleResize();
             }
         }
 
@@ -146,7 +202,7 @@ namespace MeshExplorer
             if (this.ClientSize != this.oldClientSize)
             {
                 this.oldClientSize = this.ClientSize;
-                renderControl1.HandleResize();
+                renderManager.HandleResize();
             }
         }
 
@@ -168,132 +224,45 @@ namespace MeshExplorer
             settings.RefineMode = false;
             settings.ExceptionThrown = false;
 
-            // Reset labels
-            lbNumVert2.Text = "-";
-            lbNumTri2.Text = "-";
-            lbNumSeg2.Text = "-";
-
-            lbNumVert.Text = input.Count.ToString();
-            lbNumSeg.Text = input.Segments.Count().ToString();
-            lbNumTri.Text = "0"; //input.Triangles == null ? "0" : input.Triangles.Length.ToString();
-
-            // Statistics labels
-            lbAreaMin.Text = "-";
-            lbAreaMax.Text = "-";
-            lbEdgeMin.Text = "-";
-            lbEdgeMax.Text = "-";
-            lbAngleMin.Text = "-";
-            lbAngleMax.Text = "-";
-
-            // Quality labels
-            lbQualAlphaMin.Text = "-";
-            lbQualAlphaAve.Text = "-";
-            lbQualAspectMin.Text = "-";
-            lbQualAspectAve.Text = "-";
-
-            angleHistogram1.SetData(null, null);
-
             // Reset buttons
             btnMesh.Enabled = true;
             btnMesh.Text = "Triangulate";
             btnSmooth.Enabled = false;
 
+            // Update Statistic view
+            statisticView.HandleNewInput(input);
+
             // Clear voronoi
             menuViewVoronoi.Checked = false;
-            renderControl1.ShowVoronoi = false;
+            //renderManager.ShowVoronoi = false;
 
             // Disable menu items
             menuFileSave.Enabled = false;
             menuFileExport.Enabled = false;
             menuViewVoronoi.Enabled = false;
             menuToolsCheck.Enabled = false;
+            menuToolsRcm.Enabled = false;
 
             // Render input
-            renderControl1.SetData(input);
+            renderData.SetInputGeometry(input);
+            renderManager.SetData(renderData);
 
             // Update window caption
             this.Text = "Triangle.NET - Mesh Explorer - " + settings.CurrentFile;
-        }
-
-        private void HandleMeshChange()
-        {
-            // Render mesh
-            renderControl1.SetData(mesh);
-
-            // Previous mesh stats
-            lbNumVert2.Text = lbNumVert.Text;
-            lbNumTri2.Text = lbNumTri.Text;
-            lbNumSeg2.Text = lbNumSeg.Text;
-
-            // New mesh stats
-            lbNumVert.Text = stats.Vertices.ToString();
-            lbNumSeg.Text = stats.ConstrainedEdges.ToString();
-            lbNumTri.Text = stats.Triangles.ToString();
-
-            // Update statistics tab
-            angleHistogram1.SetData(stats.MinAngleHistogram, stats.MaxAngleHistogram);
-
-            lbAreaMin.Text = Util.DoubleToString(stats.SmallestArea);
-            lbAreaMax.Text = Util.DoubleToString(stats.LargestArea);
-            lbEdgeMin.Text = Util.DoubleToString(stats.ShortestEdge);
-            lbEdgeMax.Text = Util.DoubleToString(stats.LongestEdge);
-            lbAngleMin.Text = Util.AngleToString(stats.SmallestAngle);
-            lbAngleMax.Text = Util.AngleToString(stats.LargestAngle);
-
-            // Enable menu items
-            menuFileSave.Enabled = true;
-            menuFileExport.Enabled = true;
-            menuViewVoronoi.Enabled = true;
-            menuToolsCheck.Enabled = true;
-
-            // Update quality
-            if (quality == null)
-            {
-                quality = new QualityMeasure();
-            }
-
-            quality.Update(this.mesh);
-
-            lbQualAlphaMin.Text = Util.DoubleToString(quality.AlphaMinimum);
-            lbQualAlphaAve.Text = Util.DoubleToString(quality.AlphaAverage);
-
-            lbQualAspectMin.Text = Util.DoubleToString(quality.Q_Minimum);
-            lbQualAspectAve.Text = Util.DoubleToString(quality.Q_Average);
         }
 
         private void HandleMeshImport()
         {
             // Render mesh
-            renderControl1.SetData(mesh, true);
+            renderData.SetMesh(mesh);
+            renderManager.SetData(renderData);
+            //renderManager.Initialize();
 
             // Update window caption
             this.Text = "Triangle.NET - Mesh Explorer - " + settings.CurrentFile;
 
-            // Previous mesh stats
-            lbNumVert2.Text = "-";
-            lbNumTri2.Text = "-";
-            lbNumSeg2.Text = "-";
-
-            // New mesh stats
-            lbNumVert.Text = stats.Vertices.ToString();
-            lbNumSeg.Text = stats.ConstrainedEdges.ToString();
-            lbNumTri.Text = stats.Triangles.ToString();
-
-            // Update statistics tab
-            angleHistogram1.SetData(stats.MinAngleHistogram, stats.MaxAngleHistogram);
-
-            lbAreaMin.Text = Util.DoubleToString(stats.SmallestArea);
-            lbAreaMax.Text = Util.DoubleToString(stats.LargestArea);
-            lbEdgeMin.Text = Util.DoubleToString(stats.ShortestEdge);
-            lbEdgeMax.Text = Util.DoubleToString(stats.LongestEdge);
-            lbAngleMin.Text = Util.AngleToString(stats.SmallestAngle);
-            lbAngleMax.Text = Util.AngleToString(stats.LargestAngle);
-
-            // Enable menu items
-            menuFileSave.Enabled = true;
-            menuFileExport.Enabled = true;
-            menuViewVoronoi.Enabled = true;
-            menuToolsCheck.Enabled = true;
+            // Update Statistic view
+            statisticView.HandleMeshImport(input, mesh);
 
             // Set refine mode
             btnMesh.Enabled = true;
@@ -301,26 +270,39 @@ namespace MeshExplorer
 
             settings.RefineMode = true;
 
-            // Update quality
-            if (quality == null)
-            {
-                quality = new QualityMeasure();
-            }
+            HandleMeshChange();
+        }
 
-            quality.Update(this.mesh);
+        private void HandleMeshUpdate()
+        {
+            // Render mesh
+            renderData.SetMesh(mesh);
+            renderManager.SetData(renderData);
 
-            lbQualAlphaMin.Text = Util.DoubleToString(quality.AlphaMinimum);
-            lbQualAlphaAve.Text = Util.DoubleToString(quality.AlphaAverage);
+            // Update Statistic view
+            statisticView.HandleMeshUpdate(mesh);
 
-            lbQualAspectMin.Text = Util.DoubleToString(quality.Q_Minimum);
-            lbQualAspectAve.Text = Util.DoubleToString(quality.Q_Average);
+            HandleMeshChange();
+        }
+
+        private void HandleMeshChange()
+        {
+            // Update Statistic view
+            statisticView.HandleMeshChange(mesh);
+
+            // Enable menu items
+            menuFileSave.Enabled = true;
+            menuFileExport.Enabled = true;
+            menuViewVoronoi.Enabled = true;
+            menuToolsCheck.Enabled = true;
+            menuToolsRcm.Enabled = true;
         }
 
         #endregion
 
         #region Commands
 
-        private void Open()
+        private void OpenWithDialog()
         {
             OpenFileDialog ofd = new OpenFileDialog();
 
@@ -331,49 +313,53 @@ namespace MeshExplorer
 
             if (ofd.ShowDialog() == DialogResult.OK)
             {
-                if (FileProcessor.ContainsMeshData(ofd.FileName))
+                if (Open(ofd.FileName))
                 {
-                    if (DarkMessageBox.Show("Import mesh", Settings.ImportString,
-                        "Do you want to import the mesh?", MessageBoxButtons.YesNo) == DialogResult.OK)
-                    {
-                        input = null;
-                        mesh = FileProcessor.Import(ofd.FileName);
-
-                        if (mesh != null)
-                        {
-                            stats.Update(mesh, 10);
-
-                            // Update settings
-                            settings.CurrentFile = Path.GetFileName(ofd.FileName);
-
-                            HandleMeshImport();
-                            btnSmooth.Enabled = true; // TODO: Remove
-                        }
-                        // else Message
-
-                        // Update folder settings
-                        settings.OfdFilterIndex = ofd.FilterIndex;
-                        settings.OfdDirectory = Path.GetDirectoryName(ofd.FileName);
-
-                        return;
-                    }
+                    // Update folder settings
+                    settings.OfdFilterIndex = ofd.FilterIndex;
+                    settings.OfdDirectory = Path.GetDirectoryName(ofd.FileName);
                 }
-
-                input = FileProcessor.Read(ofd.FileName);
-
-                if (input != null)
-                {
-                    // Update settings
-                    settings.CurrentFile = Path.GetFileName(ofd.FileName);
-
-                    HandleNewInput();
-                }
-                // else Message
-
-                // Update folder settings
-                settings.OfdFilterIndex = ofd.FilterIndex;
-                settings.OfdDirectory = Path.GetDirectoryName(ofd.FileName);
             }
+        }
+
+        private bool Open(string filename)
+        {
+            if (FileProcessor.ContainsMeshData(filename))
+            {
+                if (DarkMessageBox.Show("Import mesh", Settings.ImportString,
+                    "Do you want to import the mesh?", MessageBoxButtons.YesNo) == DialogResult.OK)
+                {
+                    input = null;
+                    mesh = FileProcessor.Import(filename);
+
+                    if (mesh != null)
+                    {
+                        statisticView.UpdateStatistic(mesh);
+
+                        // Update settings
+                        settings.CurrentFile = Path.GetFileName(filename);
+
+                        HandleMeshImport();
+                        btnSmooth.Enabled = true; // TODO: Remove
+                    }
+                    // else Message
+
+                    return true;
+                }
+            }
+
+            input = FileProcessor.Read(filename);
+
+            if (input != null)
+            {
+                // Update settings
+                settings.CurrentFile = Path.GetFileName(filename);
+
+                HandleNewInput();
+            }
+            // else Message
+
+            return true;
         }
 
         private void Save()
@@ -414,13 +400,13 @@ namespace MeshExplorer
             {
                 Triangulate();
 
-                if (cbQuality.Checked)
+                if (meshControlView.ParamQualityChecked)
                 {
                     btnMesh.Text = "Refine";
-                    //btnSmooth.Enabled = true;
+                    btnSmooth.Enabled = true;
                 }
             }
-            else if (cbQuality.Checked)
+            else if (meshControlView.ParamQualityChecked)
             {
                 Refine();
             }
@@ -434,17 +420,16 @@ namespace MeshExplorer
 
             mesh = new Mesh();
 
-            if (cbConformDel.Checked)
+            if (meshControlView.ParamConformDelChecked)
             {
                 mesh.SetOption(Options.ConformingDelaunay, true);
             }
 
-            if (cbQuality.Checked)
+            if (meshControlView.ParamQualityChecked)
             {
                 mesh.SetOption(Options.Quality, true);
 
-                int angle = (slMinAngle.Value * 40) / 100;
-                mesh.SetOption(Options.MinAngle, angle);
+                mesh.SetOption(Options.MinAngle, meshControlView.ParamMinAngleValue);
 
                 // Ignore area constraints on initial triangulation.
 
@@ -457,7 +442,7 @@ namespace MeshExplorer
                 //}
             }
 
-            if (cbConvex.Checked)
+            if (meshControlView.ParamConvexChecked)
             {
                 mesh.SetOption(Options.Convex, true);
             }
@@ -468,11 +453,11 @@ namespace MeshExplorer
                 mesh.Triangulate(input);
                 //sw.Stop();
 
-                stats.Update(mesh, 10);
+                statisticView.UpdateStatistic(mesh);
 
-                HandleMeshChange();
+                HandleMeshUpdate();
 
-                if (cbQuality.Checked)
+                if (meshControlView.ParamQualityChecked)
                 {
                     settings.RefineMode = true;
                 }
@@ -492,15 +477,14 @@ namespace MeshExplorer
 
             Stopwatch sw = new Stopwatch();
 
-            double area = slMaxArea.Value * 0.01;
+            double area = meshControlView.ParamMaxAreaValue;
 
             if (area > 0 && area < 1)
             {
-                mesh.SetOption(Options.MaxArea, area * stats.LargestArea);
+                mesh.SetOption(Options.MaxArea, area * statisticView.Statistic.LargestArea);
             }
 
-            int angle = (slMinAngle.Value * 40) / 100;
-            mesh.SetOption(Options.MinAngle, angle);
+            mesh.SetOption(Options.MinAngle, meshControlView.ParamMinAngleValue);
 
             try
             {
@@ -508,9 +492,9 @@ namespace MeshExplorer
                 mesh.Refine();
                 sw.Stop();
 
-                stats.Update(mesh, 10);
+                statisticView.UpdateStatistic(mesh);
 
-                HandleMeshChange();
+                HandleMeshUpdate();
             }
             catch (Exception ex)
             {
@@ -546,7 +530,7 @@ namespace MeshExplorer
                 mesh.Smooth();
                 sw.Stop();
 
-                stats.Update(mesh, 10);
+                statisticView.UpdateStatistic(mesh);
 
                 HandleMeshChange();
             }
@@ -588,7 +572,7 @@ namespace MeshExplorer
 
         private void menuFileOpen_Click(object sender, EventArgs e)
         {
-            Open();
+            OpenWithDialog();
         }
 
         private void menuFileSave_Click(object sender, EventArgs ev)
@@ -597,6 +581,59 @@ namespace MeshExplorer
             {
                 Save();
             }
+        }
+
+        private void menuFileExport_Click(object sender, EventArgs e)
+        {
+            if (mesh != null)
+            {
+                FormExport export = new FormExport();
+
+                string file = settings.OfdDirectory;
+
+                if (!file.EndsWith("\\"))
+                {
+                    file += "\\";
+                }
+
+                file += settings.CurrentFile;
+
+                export.ImageName = Path.ChangeExtension(file, ".png");
+
+                if (export.ShowDialog() == DialogResult.OK)
+                {
+                    int format = export.ImageFormat;
+                    int size = export.ImageSize;
+
+                    if (format == 1)
+                    {
+                        EpsImage eps = new EpsImage();
+                        eps.Export(this.mesh, export.ImageName, size);
+                    }
+                    else if (format == 2)
+                    {
+                        SvgImage svg = new SvgImage();
+                        svg.Export(this.mesh, export.ImageName, size);
+                    }
+                    else
+                    {
+                        RasterImage img = new RasterImage();
+                        img.ColorScheme = ColorManager.LightScheme();
+                        img.Export(this.mesh, export.ImageName, size);
+                    }
+                }
+            }
+        }
+
+        private void menuFileQuit_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void menuViewVoronoi_Click(object sender, EventArgs e)
+        {
+            menuViewVoronoi.Checked = !menuViewVoronoi.Checked;
+            //renderControl1.ShowVoronoi = menuViewVoronoi.Checked;
         }
 
         private void menuViewLog_Click(object sender, EventArgs e)
@@ -636,64 +673,11 @@ namespace MeshExplorer
             }
         }
 
-        private void menuFileExport_Click(object sender, EventArgs e)
-        {
-            if (mesh != null)
-            {
-                FormExport export = new FormExport();
-
-                string file = settings.OfdDirectory;
-
-                if (!file.EndsWith("\\"))
-                {
-                    file += "\\";
-                }
-
-                file += settings.CurrentFile;
-
-                export.ImageName = Path.ChangeExtension(file, ".png");
-
-                if (export.ShowDialog() == DialogResult.OK)
-                {
-                    int format = export.ImageFormat;
-                    int size = export.ImageSize;
-
-                    if (format == 1)
-                    {
-                        EpsImage eps = new EpsImage();
-                        eps.Export(this.mesh, export.ImageName, size);
-                    }
-                    else if (format == 2)
-                    {
-                        SvgImage svg = new SvgImage();
-                        svg.Export(this.mesh, export.ImageName, size);
-                    }
-                    else
-                    {
-                        RasterImage img = new RasterImage();
-                        img.ColorScheme = RenderColors.LightScheme();
-                        img.Export(this.mesh, export.ImageName, size);
-                    }
-                }
-            }
-        }
-
-        private void menuViewVoronoi_Click(object sender, EventArgs e)
-        {
-            menuViewVoronoi.Checked = !menuViewVoronoi.Checked;
-            renderControl1.ShowVoronoi = menuViewVoronoi.Checked;
-        }
-
-        #endregion
-
-        private void menuFileQuit_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-
         private void menuToolsRcm_Click(object sender, EventArgs e)
         {
             Renumber();
         }
+
+        #endregion
     }
 }

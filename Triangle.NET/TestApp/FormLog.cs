@@ -17,6 +17,20 @@ namespace MeshExplorer
             InitializeComponent();
         }
 
+        public void AddItem(string message, bool warning)
+        {
+            ILog<SimpleLogItem> log = SimpleLog.Instance;
+
+            if (warning)
+            {
+                log.Warning(message, "Mesh Explorer");
+            }
+            else
+            {
+                log.Info(message);
+            }
+        }
+
         public void UpdateItems()
         {
             listLog.Items.Clear();

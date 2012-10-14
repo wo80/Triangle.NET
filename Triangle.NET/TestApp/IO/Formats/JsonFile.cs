@@ -7,16 +7,14 @@
 namespace MeshExplorer.IO.Formats
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using TriangleNet.IO;
-    using System.IO;
-    using MeshExplorer.Rendering;
-    using TriangleNet.Geometry;
-    using TriangleNet;
     using System.Collections;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Text;
+    using TriangleNet;
     using TriangleNet.Data;
+    using TriangleNet.Geometry;
+    using TriangleNet.IO;
 
     /// <summary>
     /// Read and write JSON files.
@@ -132,21 +130,21 @@ namespace MeshExplorer.IO.Formats
                 if (ns > 0)
                 {
                     writer.Write(",");
-                    WriteSegments(mesh, writer, ns);
+                    WriteSegments(mesh.Segments, writer, ns);
                 }
 
                 // Write the holes
                 if (nh > 0)
                 {
                     writer.Write(",");
-                    WriteHoles(mesh, writer, nh);
+                    WriteHoles(mesh.Holes, writer, nh);
                 }
 
                 // Write the elements
                 if (ne > 0)
                 {
                     writer.Write(",");
-                    WriteTriangles(mesh, writer, ne);
+                    WriteTriangles(mesh.Triangles, writer, ne);
                 }
 
                 writer.Write("}");
@@ -413,7 +411,7 @@ namespace MeshExplorer.IO.Formats
 
             if (mesh.CurrentNumbering == NodeNumbering.Linear)
             {
-                markers = WritePoints(writer, mesh.Vertices, nv, useMarkers);
+                markers = WritePoints(mesh.Vertices, writer, nv, useMarkers);
             }
             else
             {
@@ -424,7 +422,7 @@ namespace MeshExplorer.IO.Formats
                     nodes[node.ID] = node;
                 }
 
-                markers = WritePoints(writer, nodes, nv, useMarkers);
+                markers = WritePoints(nodes, writer, nv, useMarkers);
             }
 
             writer.Write("]");
@@ -437,13 +435,13 @@ namespace MeshExplorer.IO.Formats
             writer.Write("}");
         }
 
-        private static StringBuilder WritePoints(StreamWriter writer, IEnumerable<Vertex> nodes, int nv, bool useMarkers)
+        private static StringBuilder WritePoints(IEnumerable<Point> data, StreamWriter writer, int nv, bool useMarkers)
         {
             StringBuilder markers = new StringBuilder();
 
             int i = 0;
             string seperator;
-            foreach (var item in nodes)
+            foreach (var item in data)
             {
                 seperator = (i == nv - 1) ? String.Empty : ", ";
 
@@ -464,12 +462,12 @@ namespace MeshExplorer.IO.Formats
             return markers;
         }
 
-        private void WriteHoles(Mesh data, StreamWriter writer, int nh)
+        private void WriteHoles(IEnumerable<Point> data, StreamWriter writer, int nh)
         {
             int i = 0;
 
             writer.Write("\"holes\":[");
-            foreach (var item in data.Holes)
+            foreach (var item in data)
             {
                 writer.Write("{0},{1}{2}",
                     item.X.ToString(Util.Nfi),
@@ -481,7 +479,7 @@ namespace MeshExplorer.IO.Formats
             writer.Write("]");
         }
 
-        private void WriteSegments(Mesh data, StreamWriter writer, int ns)
+        private void WriteSegments(IEnumerable<Segment> data, StreamWriter writer, int ns)
         {
             int i = 0;
 
@@ -491,7 +489,7 @@ namespace MeshExplorer.IO.Formats
             string seperator;
 
             writer.Write("\"segments\":{\"data\":[");
-            foreach (var item in data.Segments)
+            foreach (var item in data)
             {
                 seperator = (i == ns - 1) ? String.Empty : ", ";
 
@@ -518,7 +516,7 @@ namespace MeshExplorer.IO.Formats
             writer.Write("}");
         }
 
-        private void WriteTriangles(Mesh data, StreamWriter writer, int ne)
+        private void WriteTriangles(IEnumerable<Triangle> data, StreamWriter writer, int ne)
         {
             int i = 0;
 
@@ -527,7 +525,7 @@ namespace MeshExplorer.IO.Formats
             string seperator;
 
             writer.Write("\"triangles\":{\"data\":[");
-            foreach (var item in data.Triangles)
+            foreach (var item in data)
             {
                 seperator = (i == ne - 1) ? String.Empty : ", ";
 

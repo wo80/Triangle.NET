@@ -21,6 +21,21 @@ namespace MeshExplorer.IO
     {
         static Dictionary<string, IMeshFile> container = new Dictionary<string, IMeshFile>();
 
+        public static bool CanHandleFile(string path)
+        {
+            if (File.Exists(path))
+            {
+                var provider = GetProviderInstance(path);
+
+                if (provider != null)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         /// <summary>
         /// Returns true, if the given file contains mesh information.
         /// </summary>
@@ -69,7 +84,7 @@ namespace MeshExplorer.IO
         {
             string ext = Path.GetExtension(path);
 
-            IMeshFile provider;
+            IMeshFile provider = null;
 
             if (container.ContainsKey(ext))
             {

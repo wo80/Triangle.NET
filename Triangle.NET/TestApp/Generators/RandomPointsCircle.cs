@@ -91,12 +91,24 @@ namespace MeshExplorer.Generators
 
             InputGeometry input = new InputGeometry(numPoints);
 
-            double r, phi, radius = 100;
+            int i = 0, cNum = 2 * (int)Math.Floor(Math.Sqrt(numPoints));
 
-            for (int i = 0; i < numPoints; i++)
+            double r, phi, radius = 100, step = 2 * Math.PI / cNum;
+
+            // Distrubute points equally on circle border
+            for (; i < cNum; i++)
+            {
+                // Add a little error
+                r = Util.Random.NextDouble();
+
+                input.AddPoint((radius + r) * Math.Cos(i * step),
+                    (radius + r) * Math.Sin(i * step));
+            }
+
+            for (; i < numPoints; i++)
             {
                 // Use sqrt(rand) to get normal distribution right.
-                r = Math.Pow(Util.Random.NextDouble(), exp) * radius; 
+                r = Math.Pow(Util.Random.NextDouble(), exp) * radius;
                 phi = Util.Random.NextDouble() * Math.PI * 2;
 
                 input.AddPoint(r * Math.Cos(phi), r * Math.Sin(phi));
