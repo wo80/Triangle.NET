@@ -8,9 +8,7 @@ namespace MeshRenderer.Core
 {
     using System.Collections.Generic;
     using System.Linq;
-    using System.Drawing;
     using TriangleNet;
-    using TriangleNet.Data;
     using TriangleNet.Geometry;
     using TriangleNet.Tools;
 
@@ -156,6 +154,55 @@ namespace MeshRenderer.Core
         /// </summary>
         public void SetVoronoi(IVoronoi voro, int infCount)
         {
+
+            int i, n = voro.Points.Length;
+
+            // Copy points
+            this.VoronoiPoints = new float[2 * n + infCount];
+            foreach (var v in voro.Points)
+            {
+                if (v == null)
+                {
+                    continue;
+                }
+
+                i = v.ID;
+                this.VoronoiPoints[2 * i] = (float)v.X;
+                this.VoronoiPoints[2 * i + 1] = (float)v.Y;
+            }
+
+            // Copy edges
+            Point first, last;
+            var edges = new List<uint>(voro.Regions.Count * 4);
+            foreach (var region in voro.Regions)
+            {
+                first = null;
+                last = null;
+
+                foreach (var pt in region.Vertices)
+                {
+                    if (first == null)
+                    {
+                        first = pt;
+                        last = pt;
+                    }
+                    else
+                    {
+                        edges.Add((uint)last.ID);
+                        edges.Add((uint)pt.ID);
+
+                        last = pt;
+                    }
+                }
+
+                if (region.Bounded && first != null)
+                {
+                    edges.Add((uint)last.ID);
+                    edges.Add((uint)first.ID);
+                }
+            }
+            this.VoronoiEdges = edges.ToArray();
+
             /*
             int i, n = voro.VertexList.Count;
 

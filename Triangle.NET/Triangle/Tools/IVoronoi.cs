@@ -6,15 +6,24 @@
 
 namespace TriangleNet.Tools
 {
-    using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
+    using TriangleNet.Geometry;
 
     /// <summary>
     /// TODO: Update summary.
     /// </summary>
     public interface IVoronoi
     {
+        /// <summary>
+        /// Gets the list of Voronoi vertices.
+        /// </summary>
+        Point[] Points { get; }
+
+        /// <summary>
+        /// Gets the directions for infinite Voronoi edges.
+        /// </summary>
+        List<VoronoiRegion> Regions { get; }
+
+        void Generate();
     }
 }

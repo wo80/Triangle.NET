@@ -21,9 +21,6 @@ namespace TriangleNet.Data
         // Hash for dictionary. Will be set by mesh instance.
         internal int hash;
 
-        // The ID is only used for mesh output.
-        internal int id;
-
         internal VertexType type;
         internal Otri tri;
 
@@ -75,14 +72,6 @@ namespace TriangleNet.Data
         }
 
         #region Public properties
-
-        /// <summary>
-        /// Gets the vertex id.
-        /// </summary>
-        public int ID
-        {
-            get { return this.id; }
-        }
 
         /// <summary>
         /// Gets the vertex type.

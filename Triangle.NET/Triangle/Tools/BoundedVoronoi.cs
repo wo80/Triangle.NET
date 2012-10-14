@@ -20,11 +20,16 @@ namespace TriangleNet.Tools
     /// 2D Centroidal Voronoi Tessellations with Constraints, 2010,
     /// Jane Tournois, Pierre Alliez and Olivier Devillers
     /// </remarks>
-    public class BoundedVoronoi
+    public class BoundedVoronoi : IVoronoi
     {
         Mesh mesh;
+
+        Point[] points;
+        List<VoronoiRegion> regions;
+
+        int segIndex;
+
         Dictionary<int, Segment> subsegMap;
-        List<Point[]> voronoi;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BoundedVoronoi" /> class.
@@ -33,19 +38,22 @@ namespace TriangleNet.Tools
         public BoundedVoronoi(Mesh mesh)
         {
             this.mesh = mesh;
-            this.voronoi = new List<Point[]>();
-
-            // TODO: introduce isVertexMapValid in mesh and don't call
-            // MakeVertexMap() if not necessary.
-            this.mesh.MakeVertexMap();
         }
 
         /// <summary>
-        /// Gets the list of Voronoi cells.
+        /// Gets the list of Voronoi vertices.
         /// </summary>
-        public List<Point[]> Cells
+        public Point[] Points
         {
-            get { return voronoi; }
+            get { return points; }
+        }
+
+        /// <summary>
+        /// Gets the list of Voronoi regions.
+        /// </summary>
+        public List<VoronoiRegion> Regions
+        {
+            get { return regions; }
         }
 
         /// <summary>
@@ -53,7 +61,14 @@ namespace TriangleNet.Tools
         /// </summary>
         public void Generate()
         {
-            voronoi.Clear();
+            mesh.Renumber();
+            mesh.MakeVertexMap();
+
+            // Allocate space for voronoi diagram
+            this.points = new Point[mesh.triangles.Count + mesh.subsegs.Count * 5]; // This is an upper bound.
+            this.regions = new List<VoronoiRegion>(mesh.vertices.Count);
+
+            ComputeCircumCenters();
 
             TagBlindTriangles();
 
@@ -62,12 +77,30 @@ namespace TriangleNet.Tools
                 // TODO: Need a reliable way to check if a vertex is on a segment
                 if (v.type == VertexType.FreeVertex || v.Boundary == 0)
                 {
-                    voronoi.Add(ConstructBvdCell(v));
+                    ConstructBvdCell(v);
                 }
                 else
                 {
-                    voronoi.Add(ConstructBoundaryBvdCell(v));
+                    ConstructBoundaryBvdCell(v);
                 }
+            }
+        }
+
+        private void ComputeCircumCenters()
+        {
+            Otri tri = default(Otri);
+            double xi = 0, eta = 0;
+            Point pt;
+
+            // Compue triangle circumcenters
+            foreach (var item in mesh.triangles.Values)
+            {
+                tri.triangle = item;
+
+                pt = Primitives.FindCircumcenter(tri.Org(), tri.Dest(), tri.Apex(), ref xi, ref eta);
+                pt.id = item.id;
+
+                points[item.id] = pt;
             }
         }
 
@@ -169,26 +202,28 @@ namespace TriangleNet.Tools
         /// <returns>Returns true, if the triangle is blinded.</returns>
         private bool TriangleIsBlinded(ref Otri tri, ref Osub seg)
         {
-            Point cc, pt = new Point();
-            double xi = 0, eta = 0;
+            Point c, pt;
 
             Vertex torg = tri.Org();
             Vertex tdest = tri.Dest();
             Vertex tapex = tri.Apex();
 
-            cc = Primitives.FindCircumcenter(torg, tdest, tapex, ref xi, ref eta);
+            Vertex sorg = seg.Org();
+            Vertex sdest = seg.Dest();
 
-            if (SegmentsIntersect(ref seg, cc, torg, ref pt, true))
+            c = this.points[tri.triangle.id];
+
+            if (SegmentsIntersect(sorg, sdest, c, torg, out pt, true))
             {
                 return true;
             }
 
-            if (SegmentsIntersect(ref seg, cc, tdest, ref pt, true))
+            if (SegmentsIntersect(sorg, sdest, c, tdest, out pt, true))
             {
                 return true;
             }
 
-            if (SegmentsIntersect(ref seg, cc, tapex, ref pt, true))
+            if (SegmentsIntersect(sorg, sdest, c, tapex, out pt, true))
             {
                 return true;
             }
@@ -196,25 +231,28 @@ namespace TriangleNet.Tools
             return false;
         }
 
-        private Point[] ConstructBvdCell(Vertex x)
+        private void ConstructBvdCell(Vertex vertex)
         {
+            VoronoiRegion region = new VoronoiRegion(vertex);
+            regions.Add(region);
+
             Otri f = default(Otri);
             Otri f_init = default(Otri);
             Otri f_next = default(Otri);
             Osub sf = default(Osub);
             Osub sfn = default(Osub);
 
-            Vertex torg, tdest, tapex;
             Point cc_f, cc_f_next, p;
-            double xi = 0, eta = 0;
+
+            int n = mesh.triangles.Count;
 
             // Call P the polygon (cell) in construction
-            List<Point> P = new List<Point>();
+            List<Point> vpoints = new List<Point>();
 
             // Call f_init a triangle incident to x
-            x.tri.Copy(ref f_init);
+            vertex.tri.Copy(ref f_init);
 
-            if (f_init.Org() != x)
+            if (f_init.Org() != vertex)
             {
                 throw new Exception("ConstructBvdCell: inconsistent topology.");
             }
@@ -228,32 +266,28 @@ namespace TriangleNet.Tools
             do
             {
                 // Call Lffnext the line going through the circumcenters of f and f_next
-                torg = f.Org();
-                tdest = f.Dest();
-                tapex = f.Apex();
-                cc_f = Primitives.FindCircumcenter(torg, tdest, tapex, ref xi, ref eta);
-
-                torg = f_next.Org();
-                tdest = f_next.Dest();
-                tapex = f_next.Apex();
-                cc_f_next = Primitives.FindCircumcenter(torg, tdest, tapex, ref xi, ref eta);
+                cc_f = this.points[f.triangle.id];
+                cc_f_next = this.points[f_next.triangle.id];
 
                 // if f is tagged non-blind then
                 if (!f.triangle.infected)
                 {
                     // Insert the circumcenter of f into P
-                    P.Add(cc_f);
+                    vpoints.Add(cc_f);
 
                     if (f_next.triangle.infected)
                     {
                         // Call S_fnext the constrained edge blinding f_next
                         sfn.seg = subsegMap[f_next.triangle.hash];
 
-                        p = new Point();
                         // Insert point Lf,f_next /\ Sf_next into P
-                        if (SegmentsIntersect(ref sfn, cc_f, cc_f_next, ref p, true))
+                        if (SegmentsIntersect(sfn.SegOrg(), sfn.SegDest(), cc_f, cc_f_next, out p, true))
                         {
-                            P.Add(p);
+                            p.id = n + segIndex;
+                            points[n + segIndex] = p;
+                            segIndex++;
+
+                            vpoints.Add(p);
                         }
                     }
                 }
@@ -265,11 +299,14 @@ namespace TriangleNet.Tools
                     // if f_next is tagged non-blind then
                     if (!f_next.triangle.infected)
                     {
-                        p = new Point();
                         // Insert point Lf,f_next /\ Sf into P
-                        if (SegmentsIntersect(ref sf, cc_f, cc_f_next, ref p, true))
+                        if (SegmentsIntersect(sf.SegOrg(), sf.SegDest(), cc_f, cc_f_next, out p, true))
                         {
-                            P.Add(p);
+                            p.id = n + segIndex;
+                            points[n + segIndex] = p;
+                            segIndex++;
+
+                            vpoints.Add(p);
                         }
                     }
                     else
@@ -280,17 +317,23 @@ namespace TriangleNet.Tools
                         // if Sf != Sf_next then
                         if (!sf.Equal(sfn))
                         {
-                            p = new Point();
                             // Insert Lf,fnext /\ Sf and Lf,fnext /\ Sfnext into P
-                            if (SegmentsIntersect(ref sf, cc_f, cc_f_next, ref p, true))
+                            if (SegmentsIntersect(sf.SegOrg(), sf.SegDest(), cc_f, cc_f_next, out p, true))
                             {
-                                P.Add(p);
+                                p.id = n + segIndex;
+                                points[n + segIndex] = p;
+                                segIndex++;
+
+                                vpoints.Add(p);
                             }
 
-                            p = new Point();
-                            if (SegmentsIntersect(ref sfn, cc_f, cc_f_next, ref p, true))
+                            if (SegmentsIntersect(sfn.SegOrg(), sfn.SegDest(), cc_f, cc_f_next, out p, true))
                             {
-                                P.Add(p);
+                                p.id = n + segIndex;
+                                points[n + segIndex] = p;
+                                segIndex++;
+
+                                vpoints.Add(p);
                             }
                         }
                     }
@@ -305,11 +348,14 @@ namespace TriangleNet.Tools
             while (!f.Equal(f_init));
 
             // Output: Bounded Voronoi cell of x in counterclockwise order.
-            return P.ToArray();
+            region.Add(vpoints);
         }
 
-        private Point[] ConstructBoundaryBvdCell(Vertex x)
+        private void ConstructBoundaryBvdCell(Vertex vertex)
         {
+            VoronoiRegion region = new VoronoiRegion(vertex);
+            regions.Add(region);
+
             Otri f = default(Otri);
             Otri f_init = default(Otri);
             Otri f_next = default(Otri);
@@ -317,17 +363,18 @@ namespace TriangleNet.Tools
             Osub sf = default(Osub);
             Osub sfn = default(Osub);
 
-            Vertex torg, tdest, tapex;
+            Vertex torg, tdest, tapex, sorg, sdest;
             Point cc_f, cc_f_next, p;
-            double xi = 0, eta = 0;
+
+            int n = mesh.triangles.Count;
 
             // Call P the polygon (cell) in construction
-            List<Point> P = new List<Point>();
+            List<Point> vpoints = new List<Point>();
 
             // Call f_init a triangle incident to x
-            x.tri.Copy(ref f_init);
+            vertex.tri.Copy(ref f_init);
 
-            if (f_init.Org() != x)
+            if (f_init.Org() != vertex)
             {
                 throw new Exception("ConstructBoundaryBvdCell: inconsistent topology.");
             }
@@ -353,60 +400,72 @@ namespace TriangleNet.Tools
             }
 
             // Add vertex on border
-            P.Add(x);
+            p = new Point(vertex.x, vertex.y);
+            p.id = n + segIndex;
+            points[n + segIndex] = p;
+            segIndex++;
+
+            vpoints.Add(p);
 
             // Add midpoint of start triangles' edge.
             torg = f.Org();
             tdest = f.Dest();
-            P.Add(new Point((torg.X + tdest.X) / 2, (torg.Y + tdest.Y) / 2));
+            p = new Point((torg.X + tdest.X) / 2, (torg.Y + tdest.Y) / 2);
+            p.id = n + segIndex;
+            points[n + segIndex] = p;
+            segIndex++;
+
+            vpoints.Add(p);
 
             // repeat ... until f = f_init
             do
             {
                 // Call Lffnext the line going through the circumcenters of f and f_next
-                torg = f.Org();
-                tdest = f.Dest();
-                tapex = f.Apex();
-                cc_f = Primitives.FindCircumcenter(torg, tdest, tapex, ref xi, ref eta);
+                cc_f = this.points[f.triangle.id];
 
                 if (f_next.triangle == Mesh.dummytri)
                 {
                     if (!f.triangle.infected)
                     {
                         // Add last circumcenter
-                        P.Add(cc_f);
+                        vpoints.Add(cc_f);
                     }
 
                     // Add midpoint of last triangles' edge (chances are it has already
                     // been added, so post process cell to remove duplicates???)
                     torg = f.Org();
                     tapex = f.Apex();
-                    P.Add(new Point((torg.X + tapex.X) / 2, (torg.Y + tapex.Y) / 2));
+                    p = new Point((torg.X + tapex.X) / 2, (torg.Y + tapex.Y) / 2);
+                    p.id = n + segIndex;
+                    points[n + segIndex] = p;
+                    segIndex++;
+
+                    vpoints.Add(p);
 
                     break;
                 }
 
-                torg = f_next.Org();
-                tdest = f_next.Dest();
-                tapex = f_next.Apex();
-                cc_f_next = Primitives.FindCircumcenter(torg, tdest, tapex, ref xi, ref eta);
+                cc_f_next = this.points[f_next.triangle.id];
 
                 // if f is tagged non-blind then
                 if (!f.triangle.infected)
                 {
                     // Insert the circumcenter of f into P
-                    P.Add(cc_f);
+                    vpoints.Add(cc_f);
 
                     if (f_next.triangle.infected)
                     {
                         // Call S_fnext the constrained edge blinding f_next
                         sfn.seg = subsegMap[f_next.triangle.hash];
 
-                        p = new Point();
                         // Insert point Lf,f_next /\ Sf_next into P
-                        if (SegmentsIntersect(ref sfn, cc_f, cc_f_next, ref p, true))
+                        if (SegmentsIntersect(sfn.SegOrg(), sfn.SegDest(), cc_f, cc_f_next, out p, true))
                         {
-                            P.Add(p);
+                            p.id = n + segIndex;
+                            points[n + segIndex] = p;
+                            segIndex++;
+
+                            vpoints.Add(p);
                         }
                     }
                 }
@@ -414,6 +473,9 @@ namespace TriangleNet.Tools
                 {
                     // Call Sf the constrained edge blinding f
                     sf.seg = subsegMap[f.triangle.hash];
+
+                    sorg = sf.SegOrg();
+                    sdest = sf.SegDest();
 
                     // if f_next is tagged non-blind then
                     if (!f_next.triangle.infected)
@@ -423,24 +485,28 @@ namespace TriangleNet.Tools
 
                         // Both circumcenters lie on the blinded side, but we
                         // have to add the intersection with the segment.
-                        p = new Point();
 
                         // Center of f edge dest->apex
                         Point bisec = new Point((tdest.X + tapex.X) / 2, (tdest.Y + tapex.Y) / 2);
 
                         // Find intersection of seg with line through f's bisector and circumcenter
-                        if (SegmentsIntersect(ref sf, bisec, cc_f, ref p, false))
+                        if (SegmentsIntersect(sorg, sdest, bisec, cc_f, out p, false))
                         {
-                            P.Add(p);
+                            p.id = n + segIndex;
+                            points[n + segIndex] = p;
+                            segIndex++;
+
+                            vpoints.Add(p);
                         }
 
-
-
-                        p = new Point();
                         // Insert point Lf,f_next /\ Sf into P
-                        if (SegmentsIntersect(ref sf, cc_f, cc_f_next, ref p, true))
+                        if (SegmentsIntersect(sorg, sdest, cc_f, cc_f_next, out p, true))
                         {
-                            P.Add(p);
+                            p.id = n + segIndex;
+                            points[n + segIndex] = p;
+                            segIndex++;
+
+                            vpoints.Add(p);
                         }
                     }
                     else
@@ -451,32 +517,41 @@ namespace TriangleNet.Tools
                         // if Sf != Sf_next then
                         if (!sf.Equal(sfn))
                         {
-                            p = new Point();
                             // Insert Lf,fnext /\ Sf and Lf,fnext /\ Sfnext into P
-                            if (SegmentsIntersect(ref sf, cc_f, cc_f_next, ref p, true))
+                            if (SegmentsIntersect(sorg, sdest, cc_f, cc_f_next, out p, true))
                             {
-                                P.Add(p);
+                                p.id = n + segIndex;
+                                points[n + segIndex] = p;
+                                segIndex++;
+
+                                vpoints.Add(p);
                             }
 
-                            p = new Point();
-                            if (SegmentsIntersect(ref sfn, cc_f, cc_f_next, ref p, true))
+                            if (SegmentsIntersect(sfn.SegOrg(), sfn.SegDest(), cc_f, cc_f_next, out p, true))
                             {
-                                P.Add(p);
+                                p.id = n + segIndex;
+                                points[n + segIndex] = p;
+                                segIndex++;
+
+                                vpoints.Add(p);
                             }
                         }
                         else
                         {
                             // Both circumcenters lie on the blinded side, but we
                             // have to add the intersection with the segment.
-                            p = new Point();
 
                             // Center of f_next edge org->dest
                             Point bisec = new Point((torg.X + tdest.X) / 2, (torg.Y + tdest.Y) / 2);
 
                             // Find intersection of seg with line through f_next's bisector and circumcenter
-                            if (SegmentsIntersect(ref sf, bisec, cc_f_next, ref p, false))
+                            if (SegmentsIntersect(sorg, sdest, bisec, cc_f_next, out p, false))
                             {
-                                P.Add(p);
+                                p.id = n + segIndex;
+                                points[n + segIndex] = p;
+                                segIndex++;
+
+                                vpoints.Add(p);
                             }
                         }
                     }
@@ -491,7 +566,7 @@ namespace TriangleNet.Tools
             while (!f.Equal(f_init));
 
             // Output: Bounded Voronoi cell of x in counterclockwise order.
-            return P.ToArray();
+            region.Add(vpoints);
         }
 
         /// <summary>
@@ -507,15 +582,14 @@ namespace TriangleNet.Tools
         /// Returns false if there is no determinable intersection point, in which case X,Y will
         /// be unmodified.
         /// </returns>
-        private bool SegmentsIntersect(ref Osub seg, Point pc, Point pd, ref Point p, bool strictIntersect)
+        private bool SegmentsIntersect(Point p1, Point p2, Point p3, Point p4, out Point p, bool strictIntersect)
         {
-            Vertex s1 = seg.Org();
-            Vertex s2 = seg.Dest();
+            p = null;
 
-            double Ax = s1.X, Ay = s1.Y;
-            double Bx = s2.X, By = s2.Y;
-            double Cx = pc.X, Cy = pc.Y;
-            double Dx = pd.X, Dy = pd.Y;
+            double Ax = p1.X, Ay = p1.Y;
+            double Bx = p2.X, By = p2.Y;
+            double Cx = p3.X, Cy = p3.Y;
+            double Dx = p4.X, Dy = p4.Y;
 
             double distAB, theCos, theSin, newX, ABpos;
 
@@ -555,8 +629,7 @@ namespace TriangleNet.Tools
             if (ABpos < 0 || ABpos > distAB && strictIntersect) return false;
 
             //  (4) Apply the discovered position to line A-B in the original coordinate system.
-            p.x = Ax + ABpos * theCos;
-            p.y = Ay + ABpos * theSin;
+            p = new Point(Ax + ABpos * theCos, Ay + ABpos * theSin);
 
             //  Success.
             return true;

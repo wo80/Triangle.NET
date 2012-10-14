@@ -16,6 +16,7 @@ namespace TriangleNet.Geometry
     /// </summary>
     public class Point : IComparable<Point>, IEquatable<Point>
     {
+        internal int id;
         internal double x;
         internal double y;
         internal int mark;
@@ -39,6 +40,14 @@ namespace TriangleNet.Geometry
         }
 
         #region Public properties
+
+        /// <summary>
+        /// Gets the vertex id.
+        /// </summary>
+        public int ID
+        {
+            get { return this.id; }
+        }
 
         /// <summary>
         /// Gets the vertex x coordinate.

@@ -234,7 +234,6 @@ namespace MeshExplorer
 
             // Clear voronoi
             menuViewVoronoi.Checked = false;
-            //renderManager.ShowVoronoi = false;
 
             // Disable menu items
             menuFileSave.Enabled = false;
@@ -289,6 +288,9 @@ namespace MeshExplorer
         {
             // Update Statistic view
             statisticView.HandleMeshChange(mesh);
+
+            // TODO: Should the Voronoi diagram automaticaly update?
+            menuViewVoronoi.Checked = false;
 
             // Enable menu items
             menuFileSave.Enabled = true;
@@ -632,8 +634,28 @@ namespace MeshExplorer
 
         private void menuViewVoronoi_Click(object sender, EventArgs e)
         {
+            if (mesh == null)
+            {
+                return;
+            }
+
+            IVoronoi voronoi;
+
+            if (mesh.IsPolygon)
+            {
+                voronoi = new BoundedVoronoi(mesh);
+            }
+            else
+            {
+                voronoi = new Voronoi(mesh);
+            }
+
+            voronoi.Generate();
+
+            renderData.SetVoronoi(voronoi);
+            renderManager.SetData(renderData);
+
             menuViewVoronoi.Checked = !menuViewVoronoi.Checked;
-            //renderControl1.ShowVoronoi = menuViewVoronoi.Checked;
         }
 
         private void menuViewLog_Click(object sender, EventArgs e)
