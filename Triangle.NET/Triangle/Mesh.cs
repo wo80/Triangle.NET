@@ -130,6 +130,21 @@ namespace TriangleNet
         }
 
         /// <summary>
+        /// Gets the mesh edges.
+        /// </summary>
+        public IEnumerable<Edge> Edges
+        {
+            get
+            {
+                EdgeEnumerator e = new EdgeEnumerator(this);
+                while (e.MoveNext())
+                {
+                    yield return e.Current;
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets the number of input vertices.
         /// </summary>
         public int NumberOfInputPoints { get { return invertices; } }
@@ -457,8 +472,8 @@ namespace TriangleNet
         {
             numbering = NodeNumbering.None;
 
-            //ISmoother smoother = new CvdSmoother(this);
-            //smoother.Smooth();
+            ISmoother smoother = new SimpleSmoother(this);
+            smoother.Smooth();
         }
 
         /// <summary>

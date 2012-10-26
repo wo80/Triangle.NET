@@ -134,6 +134,7 @@ namespace MeshExplorer
             darkListBox1.Items.Add(new RandomPointsCircle());
             darkListBox1.Items.Add(new StarInBox());
             darkListBox1.Items.Add(new RingPolygon());
+            darkListBox1.Items.Add(new BoxWithHole());
 
             darkListBox1.SelectedIndex = 0;
         }

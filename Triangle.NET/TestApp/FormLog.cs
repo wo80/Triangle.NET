@@ -74,6 +74,18 @@ namespace MeshExplorer
             }
         }
 
+        private void listLog_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Delete)
+            {
+                if (ModifierKeys == Keys.Control)
+                {
+                    listLog.Items.Clear();
+                    SimpleLog.Instance.Clear();
+                }
+            }
+        }
+
         private void listLog_DoubleClick(object sender, EventArgs e)
         {
             StringBuilder sb = new StringBuilder();

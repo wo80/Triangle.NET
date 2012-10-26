@@ -31,13 +31,27 @@ namespace TriangleNet.Tools
 
         Dictionary<int, Segment> subsegMap;
 
+        bool includeBoundary = true;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="BoundedVoronoi" /> class.
         /// </summary>
         /// <param name="mesh">Mesh instance.</param>
         public BoundedVoronoi(Mesh mesh)
+            : this(mesh, true)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BoundedVoronoi" /> class.
+        /// </summary>
+        /// <param name="mesh">Mesh instance.</param>
+        public BoundedVoronoi(Mesh mesh, bool includeBoundary)
         {
             this.mesh = mesh;
+            this.includeBoundary = includeBoundary;
+
+            Generate();
         }
 
         /// <summary>
@@ -59,7 +73,7 @@ namespace TriangleNet.Tools
         /// <summary>
         /// Computes the bounded voronoi diagram.
         /// </summary>
-        public void Generate()
+        private void Generate()
         {
             mesh.Renumber();
             mesh.MakeVertexMap();
@@ -79,7 +93,7 @@ namespace TriangleNet.Tools
                 {
                     ConstructBvdCell(v);
                 }
-                else
+                else if (includeBoundary)
                 {
                     ConstructBoundaryBvdCell(v);
                 }

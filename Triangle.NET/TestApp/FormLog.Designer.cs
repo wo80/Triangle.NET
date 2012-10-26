@@ -51,6 +51,7 @@
             this.listLog.UseCompatibleStateImageBehavior = false;
             this.listLog.View = System.Windows.Forms.View.Details;
             this.listLog.DoubleClick += new System.EventHandler(this.listLog_DoubleClick);
+            this.listLog.KeyDown += new System.Windows.Forms.KeyEventHandler(this.listLog_KeyDown);
             // 
             // colMessage
             // 

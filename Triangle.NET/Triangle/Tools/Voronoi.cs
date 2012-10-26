@@ -34,6 +34,8 @@ namespace TriangleNet.Tools
         public Voronoi(Mesh mesh)
         {
             this.mesh = mesh;
+
+            Generate();
         }
 
         /// <summary>
@@ -63,7 +65,7 @@ namespace TriangleNet.Tools
         /// triangles, and the Voronoi edges are listed by traversing the Delaunay
         /// edges.
         ///</remarks>
-        public void Generate()
+        private void Generate()
         {
             mesh.Renumber();
             mesh.MakeVertexMap();

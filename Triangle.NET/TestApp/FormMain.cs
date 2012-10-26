@@ -289,7 +289,7 @@ namespace MeshExplorer
             // Update Statistic view
             statisticView.HandleMeshChange(mesh);
 
-            // TODO: Should the Voronoi diagram automaticaly update?
+            // TODO: Should the Voronoi diagram automatically update?
             menuViewVoronoi.Checked = false;
 
             // Enable menu items
@@ -534,7 +534,7 @@ namespace MeshExplorer
 
                 statisticView.UpdateStatistic(mesh);
 
-                HandleMeshChange();
+                HandleMeshUpdate();
             }
             catch (Exception ex)
             {
@@ -649,8 +649,6 @@ namespace MeshExplorer
             {
                 voronoi = new Voronoi(mesh);
             }
-
-            voronoi.Generate();
 
             renderData.SetVoronoi(voronoi);
             renderManager.SetData(renderData);

@@ -96,6 +96,7 @@
     <Compile Include="FormMain.Designer.cs">
       <DependentUpon>FormMain.cs</DependentUpon>
     </Compile>
+    <Compile Include="Generators\BoxWithHole.cs" />
     <Compile Include="Generators\IGenerator.cs" />
     <Compile Include="Generators\RandomPoints.cs" />
     <Compile Include="Generators\RandomPointsCircle.cs" />
@@ -137,6 +138,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormGenerator.resx">
       <DependentUpon>FormGenerator.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormLog.resx">
+      <DependentUpon>FormLog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormMain.resx">
       <DependentUpon>FormMain.cs</DependentUpon>

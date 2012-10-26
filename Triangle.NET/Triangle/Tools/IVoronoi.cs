@@ -20,10 +20,8 @@ namespace TriangleNet.Tools
         Point[] Points { get; }
 
         /// <summary>
-        /// Gets the directions for infinite Voronoi edges.
+        /// Gets the list of Voronoi regions.
         /// </summary>
         List<VoronoiRegion> Regions { get; }
-
-        void Generate();
     }
 }
