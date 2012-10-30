@@ -102,7 +102,7 @@ namespace MeshRenderer.Core
 
             // Copy segments
             n = mesh.Segments.Count;
-            if (n > 0)
+            if (n > 0 && mesh.IsPolygon)
             {
                 var segments = new List<uint>(2 * n);
                 foreach (var seg in mesh.Segments)

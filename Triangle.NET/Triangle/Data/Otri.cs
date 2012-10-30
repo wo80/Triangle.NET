@@ -16,7 +16,7 @@ namespace TriangleNet.Data
     /// An oriented triangle.
     /// </summary>
     /// <remarks>
-    /// Iincludes a pointer to a triangle and orientation.
+    /// Includes a pointer to a triangle and orientation.
     /// The orientation denotes an edge of the triangle. Hence, there are
     /// three possible orientations. By convention, each edge always points
     /// counterclockwise about the corresponding triangle.

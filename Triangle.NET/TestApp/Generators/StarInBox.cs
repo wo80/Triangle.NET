@@ -71,20 +71,20 @@ namespace MeshExplorer.Generators
                 x = r * Math.Cos(i * step + e);
                 y = r * Math.Sin(i * step + e);
 
-                input.AddPoint(x, y);
-                input.AddSegment(0, i + 1);
+                input.AddPoint(x, y, 2);
+                input.AddSegment(0, i + 1, 2);
             }
 
-            input.AddPoint(-1, -1); // Box
-            input.AddPoint(1, -1);
-            input.AddPoint(1, 1);
-            input.AddPoint(-1, 1);
+            input.AddPoint(-1, -1, 1); // Box
+            input.AddPoint(1, -1, 1);
+            input.AddPoint(1, 1, 1);
+            input.AddPoint(-1, 1, 1);
 
             numRays = input.Count;
-            input.AddSegment(numRays - 1, numRays - 2);
-            input.AddSegment(numRays - 2, numRays - 3);
-            input.AddSegment(numRays - 3, numRays - 4);
-            input.AddSegment(numRays - 4, numRays - 1);
+            input.AddSegment(numRays - 1, numRays - 2, 1);
+            input.AddSegment(numRays - 2, numRays - 3, 1);
+            input.AddSegment(numRays - 3, numRays - 4, 1);
+            input.AddSegment(numRays - 4, numRays - 1, 1);
 
             return input;
         }

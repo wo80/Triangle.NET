@@ -111,7 +111,7 @@ namespace MeshExplorer
 
             if (input != null)
             {
-                settings.CurrentFile = "GEN";
+                settings.CurrentFile = "tmp-" + DateTime.Now.ToString("HH-mm-ss");
                 HandleNewInput();
             }
         }
@@ -214,6 +214,20 @@ namespace MeshExplorer
         #endregion
 
         #region State changes
+
+        private void LockOnException()
+        {
+            btnMesh.Enabled = false;
+            btnSmooth.Enabled = false;
+
+            //menuFileSave.Enabled = false;
+            //menuFileExport.Enabled = false;
+            menuViewVoronoi.Enabled = false;
+            menuToolsCheck.Enabled = false;
+            menuToolsRcm.Enabled = false;
+
+            settings.ExceptionThrown = true;
+        }
 
         private void HandleNewInput()
         {
@@ -405,7 +419,7 @@ namespace MeshExplorer
                 if (meshControlView.ParamQualityChecked)
                 {
                     btnMesh.Text = "Refine";
-                    btnSmooth.Enabled = true;
+                    btnSmooth.Enabled = mesh.IsPolygon;
                 }
             }
             else if (meshControlView.ParamQualityChecked)
@@ -449,7 +463,7 @@ namespace MeshExplorer
                 mesh.SetOption(Options.Convex, true);
             }
 
-            //try
+            try
             {
                 //sw.Start();
                 mesh.Triangulate(input);
@@ -464,11 +478,11 @@ namespace MeshExplorer
                     settings.RefineMode = true;
                 }
             }
-            //catch (Exception ex)
-            //{
-            //    settings.ExceptionThrown = true;
-            //    DarkMessageBox.Show("Exception - Triangulate", ex.Message);
-            //}
+            catch (Exception ex)
+            {
+                LockOnException();
+                DarkMessageBox.Show("Exception - Triangulate", ex.Message, MessageBoxButtons.OK);
+            }
 
             UpdateLog();
         }
@@ -500,8 +514,8 @@ namespace MeshExplorer
             }
             catch (Exception ex)
             {
-                settings.ExceptionThrown = true;
-                DarkMessageBox.Show("Exception - Refine", ex.Message);
+                LockOnException();
+                DarkMessageBox.Show("Exception - Refine", ex.Message, MessageBoxButtons.OK);
             }
 
             UpdateLog();
@@ -524,6 +538,11 @@ namespace MeshExplorer
         {
             if (mesh == null || settings.ExceptionThrown) return;
 
+            if (!mesh.IsPolygon)
+            {
+                return;
+            }
+
             Stopwatch sw = new Stopwatch();
 
             try
@@ -538,8 +557,8 @@ namespace MeshExplorer
             }
             catch (Exception ex)
             {
-                settings.ExceptionThrown = true;
-                DarkMessageBox.Show("Exception - Smooth", ex.Message);
+                LockOnException();
+                DarkMessageBox.Show("Exception - Smooth", ex.Message, MessageBoxButtons.OK);
             }
 
             UpdateLog();

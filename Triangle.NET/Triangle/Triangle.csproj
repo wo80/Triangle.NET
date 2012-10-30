@@ -82,6 +82,7 @@
     <Compile Include="Sampler.cs" />
     <Compile Include="Smoothing\ISmoother.cs" />
     <Compile Include="Smoothing\SimpleSmoother.cs" />
+    <Compile Include="Tools\AdjacencyMatrix.cs" />
     <Compile Include="Tools\BoundedVoronoi.cs" />
     <Compile Include="Tools\CuthillMcKee.cs" />
     <Compile Include="Tools\IVoronoi.cs" />

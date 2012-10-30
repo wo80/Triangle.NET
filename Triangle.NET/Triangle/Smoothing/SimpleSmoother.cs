@@ -16,6 +16,10 @@ namespace TriangleNet.Smoothing
     /// <summary>
     /// Simple mesh smoother implementation.
     /// </summary>
+    /// <remarks>
+    /// Vertices wich should not move (e.g. segment vertices) MUST have a
+    /// boundary mark greater than 0.
+    /// </remarks>
     public class SimpleSmoother : ISmoother
     {
         Mesh mesh;

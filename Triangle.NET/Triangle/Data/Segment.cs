@@ -70,19 +70,19 @@ namespace TriangleNet.Data
         }
 
         /// <summary>
-        /// Gets the segments endpoint.
-        /// </summary>
-        public Vertex GetVertex(int index)
-        {
-            return this.vertices[index]; // TODO: Check range?
-        }
-
-        /// <summary>
         /// Gets the segment boundary mark.
         /// </summary>
         public int Boundary
         {
             get { return this.boundary; }
+        }
+
+        /// <summary>
+        /// Gets the segments endpoint.
+        /// </summary>
+        public Vertex GetVertex(int index)
+        {
+            return this.vertices[index]; // TODO: Check range?
         }
 
         #endregion
