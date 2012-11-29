@@ -63,9 +63,16 @@ namespace TriangleNet.Geometry
         /// <summary>
         /// Gets a triangles neighbor.
         /// </summary>
-        /// <param name="index">The neighbor index (0, 1 or 2).</param>
-        /// <returns>The triangles' neigbbor.</returns>
+        /// <param name="index">The vertex index (0, 1 or 2).</param>
+        /// <returns>The neigbbor opposite of vertex with given index.</returns>
         ITriangle GetNeighbor(int index);
+
+        /// <summary>
+        /// Gets a triangles segment.
+        /// </summary>
+        /// <param name="index">The vertex index (0, 1 or 2).</param>
+        /// <returns>The segment opposite of vertex with given index.</returns>
+        Segment GetSegment(int index);
 
         /// <summary>
         /// Triangle area constraint.

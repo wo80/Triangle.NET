@@ -92,6 +92,11 @@ namespace TriangleNet.IO
             return null;
         }
 
+        public Segment GetSegment(int index)
+        {
+            return null;
+        }
+
         /// <summary>
         /// Gets the triangle area constraint.
         /// </summary>

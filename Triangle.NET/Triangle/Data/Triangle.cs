@@ -146,10 +146,20 @@ namespace TriangleNet.Data
         /// Gets a triangles' neighbor.
         /// </summary>
         /// <param name="index">The neighbor index (0, 1 or 2).</param>
-        /// <returns>The triangles' neigbbor.</returns>
+        /// <returns>The neigbbor opposite of vertex with given index.</returns>
         public ITriangle GetNeighbor(int index)
         {
             return neighbors[index].triangle == Mesh.dummytri ? null : neighbors[index].triangle;
+        }
+
+        /// <summary>
+        /// Gets a triangles segment.
+        /// </summary>
+        /// <param name="index">The vertex index (0, 1 or 2).</param>
+        /// <returns>The segment opposite of vertex with given index.</returns>
+        public Segment GetSegment(int index)
+        {
+            return subsegs[index].seg == Mesh.dummysub ? null : subsegs[index].seg;
         }
 
         /// <summary>
