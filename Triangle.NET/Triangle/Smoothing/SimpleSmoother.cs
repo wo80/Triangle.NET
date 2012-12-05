@@ -31,6 +31,8 @@ namespace TriangleNet.Smoothing
 
         public void Smooth()
         {
+            mesh.SetOption(Options.Quality, false);
+
             // Take a few smoothing rounds.
             for (int i = 0; i < 5; i++)
             {
@@ -39,10 +41,7 @@ namespace TriangleNet.Smoothing
                 // Actually, we only want to rebuild, if mesh is no longer
                 // Delaunay. Flipping edges could be the right choice instead 
                 // of re-triangulating...
-                var geometry = Rebuild();
-
-                mesh.SetOption(Options.Quality, false);
-                mesh.Triangulate(geometry);
+                mesh.Triangulate(Rebuild());
             }
         }
 

@@ -20,7 +20,7 @@ namespace TriangleNet
     /// </remarks>
     class NewLocation
     {
-        const double EPS = 0.000000000000000000000000000000000000000000000000000000000000000000000000000000000000001;
+        const double EPS = 1e-50;
 
         Mesh mesh;
         Behavior behavior;
@@ -91,7 +91,7 @@ namespace TriangleNet
             // keeps the type of orientation if the triangle
             int orientation = 0;
             // keeps the coordinates of circumcenter of itself and neighbor triangle circumcenter	
-            Point myCircumcenter = default(Point), neighborCircumcenter = default(Point);
+            Point myCircumcenter, neighborCircumcenter;
 
             // keeps if bad triangle is almost good or not
             int almostGood = 0;
@@ -170,8 +170,7 @@ namespace TriangleNet
             dy = (xdo * aodist - xao * dodist) * denominator;
             // for debugging and for keeping circumcenter to use later
             // coordinate value of the circumcenter
-            myCircumcenter.x = torg.x + dx;
-            myCircumcenter.y = torg.y + dy;
+            myCircumcenter = new Point(torg.x + dx, torg.y + dy);
 
             delotri = badotri; // save for later
             ///////////////// FINDING THE ORIENTATION OF TRIANGLE //////////////////
