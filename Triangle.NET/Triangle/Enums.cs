@@ -47,7 +47,11 @@ namespace TriangleNet
         /// <summary>
         /// Create segments on the convex hull (boolean).
         /// </summary> 
-        Convex
+        Convex,
+        /// <summary>
+        /// Algorithm used for triangulation (TriangulationAlgorithm).
+        /// </summary> 
+        TriangulationAlgorithm
     };
 
     /// <summary>

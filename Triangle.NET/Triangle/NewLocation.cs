@@ -2500,9 +2500,9 @@ namespace TriangleNet
 
             //double p[5];
 
-            double[] petalx = new double[24];
-            double[] petaly = new double[24];
-            double[] petalr = new double[24];
+            double[] petalx = new double[2 * numpoints];
+            double[] petaly = new double[2 * numpoints];
+            double[] petalr = new double[2 * numpoints];
 
             double[] wedges = new double[2000];
             double xmid, ymid, dist, x3, y3;
@@ -2758,9 +2758,9 @@ namespace TriangleNet
 
             //double p[5];
 
-            double[] petalx = new double[100];
-            double[] petaly = new double[100];
-            double[] petalr = new double[100];
+            double[] petalx = new double[2 * numpoints];
+            double[] petaly = new double[2 * numpoints];
+            double[] petalr = new double[2 * numpoints];
 
             double[] wedges = new double[2000];
             double xmid, ymid, dist, x3, y3;

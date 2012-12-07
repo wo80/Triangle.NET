@@ -566,7 +566,7 @@ namespace TriangleNet
                 if (value)
                 {
                     behavior.MinAngle = 20.0;
-                    behavior.MaxAngle = 140.0;
+                    behavior.MaxAngle = 0.0;
                     UpdateOptions();
                 }
 
@@ -654,6 +654,22 @@ namespace TriangleNet
             }
 
             logger.Warning("Invalid option value.", "Mesh.SetOption(int)");
+        }
+
+        /// <summary>
+        /// Set options for mesh generation.
+        /// </summary>
+        /// <param name="option">Mesh gerneration option.</param>
+        /// <param name="value">New option value.</param>
+        public void SetOption(Options option, TriangulationAlgorithm value)
+        {
+            if (option == Options.TriangulationAlgorithm)
+            {
+                behavior.Algorithm = value;
+                return;
+            }
+
+            logger.Warning("Invalid option value.", "Mesh.SetOption(TriangulationAlgorithm)");
         }
 
         /// <summary>
