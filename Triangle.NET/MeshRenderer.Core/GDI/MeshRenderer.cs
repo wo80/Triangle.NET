@@ -22,12 +22,28 @@ namespace MeshRenderer.Core.GDI
         RenderData data;
         ColorManager renderColors;
 
+        // If true, even geometry parts outside of bounds will be rendered.
+        bool ignoreBounds;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="MeshRenderer" /> class.
         /// </summary>
         public MeshRenderer(RenderData data)
         {
             this.data = data;
+
+            int featureCount = data.Points.Length;
+
+            if (data.MeshEdges != null)
+            {
+                featureCount += data.MeshEdges.Length;
+            }
+            else if (data.Triangles != null)
+            {
+                featureCount += 2 * data.Triangles.Length;
+            }
+
+            this.ignoreBounds = featureCount < 1000;
         }
 
         /// <summary>
@@ -106,7 +122,7 @@ namespace MeshRenderer.Core.GDI
             for (i = 0; i < n; i++)
             {
                 k = 2 * i;
-                if (zoom.ViewportContains(pts[k], pts[k + 1]))
+                if (ignoreBounds || zoom.ViewportContains(pts[k], pts[k + 1]))
                 {
                     pt = zoom.WorldToScreen(pts[k], pts[k + 1]);
                     g.FillEllipse(renderColors.Point, pt.X - 1.5f, pt.Y - 1.5f, 3, 3);
@@ -118,7 +134,7 @@ namespace MeshRenderer.Core.GDI
             for (; i < n; i++)
             {
                 k = 2 * i;
-                if (zoom.ViewportContains(pts[k], pts[k + 1]))
+                if (ignoreBounds || zoom.ViewportContains(pts[k], pts[k + 1]))
                 {
                     pt = zoom.WorldToScreen(pts[k], pts[k + 1]);
                     g.FillEllipse(renderColors.SteinerPoint, pt.X - 1.5f, pt.Y - 1.5f, 3, 3);
@@ -140,9 +156,10 @@ namespace MeshRenderer.Core.GDI
                 k1 = 2 * data.Triangles[3 * i + 1];
                 k2 = 2 * data.Triangles[3 * i + 2];
 
-                if (zoom.ViewportContains(pts[k0], pts[k0 + 1]) ||
+                if (ignoreBounds ||
+                    (zoom.ViewportContains(pts[k0], pts[k0 + 1]) ||
                     zoom.ViewportContains(pts[k1], pts[k1 + 1]) ||
-                    zoom.ViewportContains(pts[k2], pts[k2 + 1]))
+                    zoom.ViewportContains(pts[k2], pts[k2 + 1])))
                 {
                     p0 = zoom.WorldToScreen(pts[k0], pts[k0 + 1]);
                     p1 = zoom.WorldToScreen(pts[k1], pts[k1 + 1]);
@@ -168,8 +185,9 @@ namespace MeshRenderer.Core.GDI
                 k0 = 2 * data.MeshEdges[2 * i];
                 k1 = 2 * data.MeshEdges[2 * i + 1];
 
-                if (zoom.ViewportContains(pts[k0], pts[k0 + 1]) ||
-                    zoom.ViewportContains(pts[k1], pts[k1 + 1]))
+                if (ignoreBounds ||
+                    (zoom.ViewportContains(pts[k0], pts[k0 + 1]) ||
+                    zoom.ViewportContains(pts[k1], pts[k1 + 1])))
                 {
                     p0 = zoom.WorldToScreen(pts[k0], pts[k0 + 1]);
                     p1 = zoom.WorldToScreen(pts[k1], pts[k1 + 1]);
@@ -192,8 +210,9 @@ namespace MeshRenderer.Core.GDI
                 k0 = 2 * data.Segments[2 * i];
                 k1 = 2 * data.Segments[2 * i + 1];
 
-                if (zoom.ViewportContains(pts[k0], pts[k0 + 1]) ||
-                    zoom.ViewportContains(pts[k1], pts[k1 + 1]))
+                if (ignoreBounds ||
+                    (zoom.ViewportContains(pts[k0], pts[k0 + 1]) ||
+                    zoom.ViewportContains(pts[k1], pts[k1 + 1])))
                 {
                     p0 = zoom.WorldToScreen(pts[k0], pts[k0 + 1]);
                     p1 = zoom.WorldToScreen(pts[k1], pts[k1 + 1]);

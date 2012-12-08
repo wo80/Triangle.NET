@@ -147,12 +147,42 @@ namespace TriangleNet
                 return det;
             }
 
-            return det;
-
-            // TODO: throw new Exception();
-            // return counterclockwiseadapt(pa, pb, pc, detsum);
+            return (double)CounterClockwiseDecimal(pa, pb, pc);
         }
 
+        private static decimal CounterClockwiseDecimal(Point pa, Point pb, Point pc)
+        {
+            decimal detleft, detright, det, detsum;
+
+            detleft = ((decimal)pa.x - (decimal)pc.x) * ((decimal)pb.y - (decimal)pc.y);
+            detright = ((decimal)pa.y - (decimal)pc.y) * ((decimal)pb.x - (decimal)pc.x);
+            det = detleft - detright;
+
+            if (detleft > 0.0m)
+            {
+                if (detright <= 0.0m)
+                {
+                    return det;
+                }
+                else
+                {
+                    detsum = detleft + detright;
+                }
+            }
+            else if (detleft < 0.0m)
+            {
+                if (detright >= 0.0m)
+                {
+                    return det;
+                }
+                else
+                {
+                    detsum = -detleft - detright;
+                }
+            }
+
+            return det;
+        }
 
         /// <summary>
         /// Check if the point pd lies inside the circle passing through pa, pb, and pc. The 
@@ -223,10 +253,37 @@ namespace TriangleNet
                 return det;
             }
 
-            return det;
+            return (double)InCircleDecimal(pa, pb, pc, pd);
+        }
 
-            // TODO: throw new Exception();
-            //return incircleadapt(pa, pb, pc, pd, permanent);
+        private static decimal InCircleDecimal(Point pa, Point pb, Point pc, Point pd)
+        {
+            decimal adx, bdx, cdx, ady, bdy, cdy;
+            decimal bdxcdy, cdxbdy, cdxady, adxcdy, adxbdy, bdxady;
+            decimal alift, blift, clift;
+
+            adx = (decimal)pa.x - (decimal)pd.x;
+            bdx = (decimal)pb.x - (decimal)pd.x;
+            cdx = (decimal)pc.x - (decimal)pd.x;
+            ady = (decimal)pa.y - (decimal)pd.y;
+            bdy = (decimal)pb.y - (decimal)pd.y;
+            cdy = (decimal)pc.y - (decimal)pd.y;
+
+            bdxcdy = bdx * cdy;
+            cdxbdy = cdx * bdy;
+            alift = adx * adx + ady * ady;
+
+            cdxady = cdx * ady;
+            adxcdy = adx * cdy;
+            blift = bdx * bdx + bdy * bdy;
+
+            adxbdy = adx * bdy;
+            bdxady = bdx * ady;
+            clift = cdx * cdx + cdy * cdy;
+
+            return alift * (bdxcdy - cdxbdy)
+                + blift * (cdxady - adxcdy)
+                + clift * (adxbdy - bdxady);
         }
 
         /// <summary>

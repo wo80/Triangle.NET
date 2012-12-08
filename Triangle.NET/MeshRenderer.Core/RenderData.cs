@@ -154,7 +154,6 @@ namespace MeshRenderer.Core
         /// </summary>
         public void SetVoronoi(IVoronoi voro, int infCount)
         {
-
             int i, n = voro.Points.Length;
 
             // Copy points

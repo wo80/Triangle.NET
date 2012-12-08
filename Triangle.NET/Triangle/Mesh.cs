@@ -233,6 +233,8 @@ namespace TriangleNet
             if (input.HasSegments)
             {
                 behavior.Poly = true;
+
+                this.holes.AddRange(input.Holes);
             }
 
             //if (input.EdgeMarkers != null)
@@ -260,7 +262,6 @@ namespace TriangleNet
 
             // Read and reconstruct a mesh.
             hullsize = DataReader.Reconstruct(this, input, triangles.ToArray());
-
 
             // Calculate the number of edges.
             edges = (3 * triangles.Count + hullsize) / 2;

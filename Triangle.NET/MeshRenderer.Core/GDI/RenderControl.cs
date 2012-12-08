@@ -224,19 +224,18 @@ namespace MeshRenderer.Core.GDI
             }
             else if (e.Button == MouseButtons.Left)
             {
-                /*
-                // Just in case ...
                 timer.Stop();
+
+                var nfi = System.Globalization.CultureInfo.InvariantCulture.NumberFormat;
 
                 PointF c = zoom.ScreenToWorld((float)e.X / this.Width, (float)e.Y / this.Height);
                 coordinate = String.Format("X:{0} Y:{1}",
-                    c.X.ToString(Util.Nfi),
-                    c.Y.ToString(Util.Nfi));
+                    c.X.ToString(nfi),
+                    c.Y.ToString(nfi));
 
                 this.Invalidate();
 
                 timer.Start();
-                 * */
             }
 
             base.OnMouseClick(e);

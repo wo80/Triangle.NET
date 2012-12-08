@@ -441,6 +441,11 @@ namespace MeshExplorer
                 mesh.SetOption(Options.ConformingDelaunay, true);
             }
 
+            if (meshControlView.ParamSweeplineChecked)
+            {
+                mesh.SetOption(Options.TriangulationAlgorithm, TriangulationAlgorithm.SweepLine);
+            }
+
             if (meshControlView.ParamQualityChecked)
             {
                 mesh.SetOption(Options.Quality, true);
@@ -705,10 +710,7 @@ namespace MeshExplorer
                 bool isConsistent, isDelaunay;
                 mesh.Check(out isConsistent, out isDelaunay);
 
-                if (!isConsistent || !isDelaunay)
-                {
-                    ShowLog();
-                }
+                ShowLog();
             }
         }
 

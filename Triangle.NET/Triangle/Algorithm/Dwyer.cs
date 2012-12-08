@@ -53,7 +53,6 @@ namespace TriangleNet.Algorithm
         /// <summary>
         /// Sort an array of vertices by x-coordinate, using the y-coordinate as a secondary key.
         /// </summary>
-        /// <param name="sortarray"></param>
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <remarks>
@@ -137,7 +136,6 @@ namespace TriangleNet.Algorithm
         /// An order statistic algorithm, almost.  Shuffles an array of vertices so that 
         /// the first 'median' vertices occur lexicographically before the remaining vertices.
         /// </summary>
-        /// <param name="sortarray"></param>
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <param name="median"></param>
@@ -219,7 +217,6 @@ namespace TriangleNet.Algorithm
         /// Sorts the vertices as appropriate for the divide-and-conquer algorithm with 
         /// alternating cuts.
         /// </summary>
-        /// <param name="sortarray"></param>
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <param name="axis"></param>

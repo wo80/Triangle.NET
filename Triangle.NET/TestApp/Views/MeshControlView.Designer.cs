@@ -40,6 +40,8 @@
             this.cbConformDel = new MeshExplorer.Controls.DarkCheckBox();
             this.cbConvex = new MeshExplorer.Controls.DarkCheckBox();
             this.cbQuality = new MeshExplorer.Controls.DarkCheckBox();
+            this.cbSweepline = new MeshExplorer.Controls.DarkCheckBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // lbMaxArea
@@ -175,6 +177,27 @@
             this.cbQuality.Text = "Quality mesh";
             this.cbQuality.UseVisualStyleBackColor = false;
             // 
+            // cbSweepline
+            // 
+            this.cbSweepline.BackColor = System.Drawing.Color.DimGray;
+            this.cbSweepline.Checked = false;
+            this.cbSweepline.Location = new System.Drawing.Point(11, 260);
+            this.cbSweepline.Name = "cbSweepline";
+            this.cbSweepline.Size = new System.Drawing.Size(187, 17);
+            this.cbSweepline.TabIndex = 15;
+            this.cbSweepline.Text = "Use Sweepline algorithm";
+            this.cbSweepline.UseVisualStyleBackColor = false;
+            // 
+            // label1
+            // 
+            this.label1.BackColor = System.Drawing.Color.DimGray;
+            this.label1.ForeColor = System.Drawing.Color.DarkGray;
+            this.label1.Location = new System.Drawing.Point(8, 280);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(258, 33);
+            this.label1.TabIndex = 26;
+            this.label1.Text = "Use Sweepline algorithm for triangulation instead of default Divide && Conquer.";
+            // 
             // MeshControlView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -184,12 +207,14 @@
             this.Controls.Add(this.label6);
             this.Controls.Add(this.lbMinAngle);
             this.Controls.Add(this.label23);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.label9);
             this.Controls.Add(this.label8);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.slMaxArea);
             this.Controls.Add(this.slMinAngle);
             this.Controls.Add(this.cbConformDel);
+            this.Controls.Add(this.cbSweepline);
             this.Controls.Add(this.cbConvex);
             this.Controls.Add(this.cbQuality);
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -215,5 +240,7 @@
         private Controls.DarkCheckBox cbConformDel;
         private Controls.DarkCheckBox cbConvex;
         private Controls.DarkCheckBox cbQuality;
+        private Controls.DarkCheckBox cbSweepline;
+        private System.Windows.Forms.Label label1;
     }
 }

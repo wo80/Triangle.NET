@@ -33,6 +33,11 @@ namespace MeshExplorer.Views
             get { return cbConformDel.Checked; }
         }
 
+        public bool ParamSweeplineChecked
+        {
+            get { return cbSweepline.Checked; }
+        }
+
         public int ParamMinAngleValue
         {
             get { return (slMinAngle.Value * 40) / 100; }
