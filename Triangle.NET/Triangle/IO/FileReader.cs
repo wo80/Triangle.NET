@@ -447,19 +447,17 @@ namespace TriangleNet.IO
                                 throw new Exception("Can't read input file (region).");
                             }
 
-                            if (line.Length < 5)
+                            if (line.Length < 4)
                             {
-                                throw new Exception("Invalid region.");
+                                throw new Exception("Invalid region attributes.");
                             }
 
                             data.AddRegion(
                                 // Region x and y
-                                double.Parse(line[1]),
-                                double.Parse(line[2]),
-                                // Region attribute
-                                double.Parse(line[3]),
-                                // Region area constraint
-                                double.Parse(line[4]));
+                                double.Parse(line[1], nfi),
+                                double.Parse(line[2], nfi),
+                                // Region id
+                                int.Parse(line[3]));
                         }
                     }
                 }
@@ -504,6 +502,7 @@ namespace TriangleNet.IO
             {
                 // Read number of elements and number of attributes.
                 string[] line;
+                bool validRegion = false;
 
                 if (!TryReadLine(reader, out line))
                 {
@@ -517,6 +516,12 @@ namespace TriangleNet.IO
                 if (line.Length > 2)
                 {
                     attributes = int.Parse(line[2]);
+                    validRegion = true;
+                }
+
+                if (attributes > 1)
+                {
+                    SimpleLog.Instance.Warning("Triangle attributes not supported.", "FileReader.Read");
                 }
 
                 triangles = new List<ITriangle>(intriangles);
@@ -542,18 +547,12 @@ namespace TriangleNet.IO
                         int.Parse(line[2]) - startIndex,
                         int.Parse(line[3]) - startIndex);
 
-                    // Read triangle attributes
-                    if (attributes > 0)
+                    // Read triangle region
+                    if (attributes > 0 && validRegion)
                     {
-                        for (int j = 0; j < attributes; j++)
-                        {
-                            tri.attributes = new double[attributes];
-
-                            if (line.Length > 4 + j)
-                            {
-                                tri.attributes[j] = double.Parse(line[4 + j]);
-                            }
-                        }
+                        int region = 0;
+                        validRegion = int.TryParse(line[4], out region);
+                        tri.region = region;
                     }
 
                     triangles.Add(tri);

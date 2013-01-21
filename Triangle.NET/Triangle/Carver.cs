@@ -11,6 +11,7 @@ namespace TriangleNet
     using System;
     using TriangleNet.Geometry;
     using System.Collections.Generic;
+    using TriangleNet.Tools;
 
     /// <summary>
     /// Carves holes into the triangulation.
@@ -18,10 +19,12 @@ namespace TriangleNet
     class Carver
     {
         Mesh mesh;
+        List<Triangle> viri;
 
         public Carver(Mesh mesh)
         {
             this.mesh = mesh;
+            this.viri = new List<Triangle>();
         }
 
         /// <summary>
@@ -57,7 +60,7 @@ namespace TriangleNet
                         if (!hulltri.IsInfected())
                         {
                             hulltri.Infect();
-                            mesh.viri.Add(hulltri.triangle);
+                            viri.Add(hulltri.triangle);
                         }
                     }
                     else
@@ -118,11 +121,11 @@ namespace TriangleNet
 
             // Loop through all the infected triangles, spreading the virus to
             // their neighbors, then to their neighbors' neighbors.
-            for (int i = 0; i < mesh.viri.Count; i++)
+            for (int i = 0; i < viri.Count; i++)
             {
                 // WARNING: Don't use foreach, mesh.viri list may get modified.
 
-                testtri.triangle = mesh.viri[i];
+                testtri.triangle = viri[i];
                 // A triangle is marked as infected by messing with one of its pointers
                 // to subsegments, setting it to an illegal value.  Hence, we have to
                 // temporarily uninfect this triangle so that we can examine its
@@ -164,7 +167,7 @@ namespace TriangleNet
                             // the neighbor becomes infected.
                             neighbor.Infect();
                             // Ensure that the neighbor's neighbors will be infected.
-                            mesh.viri.Add(neighbor.triangle);
+                            viri.Add(neighbor.triangle);
                         }
                         else
                         {
@@ -194,7 +197,7 @@ namespace TriangleNet
                 testtri.Infect();
             }
 
-            foreach (var virus in mesh.viri)
+            foreach (var virus in viri)
             {
                 testtri.triangle = virus;
 
@@ -286,90 +289,9 @@ namespace TriangleNet
             }
 
             // Empty the virus pool.
-            mesh.viri.Clear();
+            viri.Clear();
         }
 
-        /// <summary>
-        /// Spread regional attributes and/or area constraints (from a .poly file) 
-        /// throughout the mesh.
-        /// </summary>
-        /// <param name="attribute"></param>
-        /// <param name="area"></param>
-        /// <remarks>
-        /// This procedure operates in two phases. The first phase spreads an
-        /// attribute and/or an area constraint through a (segment-bounded) region.
-        /// The triangles are marked to ensure that each triangle is added to the
-        /// virus pool only once, so the procedure will terminate.
-        ///
-        /// The second phase uninfects all infected triangles, returning them to
-        /// normal.
-        /// </remarks>
-        void RegionPlague(double attribute, double area)
-        {
-            Otri testtri = default(Otri);
-            Otri neighbor = default(Otri);
-            Osub neighborsubseg = default(Osub);
-
-            Behavior behavior = mesh.behavior;
-
-            // Loop through all the infected triangles, spreading the attribute
-            // and/or area constraint to their neighbors, then to their neighbors'
-            // neighbors.
-            for (int i = 0; i < mesh.viri.Count; i++)
-            {
-                // WARNING: Don't use foreach, mesh.viri list may get modified.
-
-                testtri.triangle = mesh.viri[i];
-                // A triangle is marked as infected by messing with one of its pointers
-                // to subsegments, setting it to an illegal value.  Hence, we have to
-                // temporarily uninfect this triangle so that we can examine its
-                // adjacent subsegments.
-                // TODO: Not true in the C# version (so we could skip this).
-                testtri.Uninfect();
-                if (behavior.RegionAttrib)
-                {
-                    // Set an attribute (Note: the attributes array was resized before).
-                    testtri.triangle.attributes[mesh.eextras] = attribute;
-                }
-                if (behavior.VarArea)
-                {
-                    // Set an area constraint.
-                    testtri.triangle.area = area;
-                }
-
-                // Check each of the triangle's three neighbors.
-                for (testtri.orient = 0; testtri.orient < 3; testtri.orient++)
-                {
-                    // Find the neighbor.
-                    testtri.Sym(ref neighbor);
-                    // Check for a subsegment between the triangle and its neighbor.
-                    testtri.SegPivot(ref neighborsubseg);
-                    // Make sure the neighbor exists, is not already infected, and
-                    //  isn't protected by a subsegment.
-                    if ((neighbor.triangle != Mesh.dummytri) && !neighbor.IsInfected()
-                        && (neighborsubseg.seg == Mesh.dummysub))
-                    {
-                        // Infect the neighbor.
-                        neighbor.Infect();
-                        // Ensure that the neighbor's neighbors will be infected.
-                        mesh.viri.Add(neighbor.triangle);
-                    }
-                }
-                // Remark the triangle as infected, so it doesn't get added to the
-                // virus pool again.
-                testtri.Infect();
-            }
-
-            // Uninfect all triangles.
-            foreach (var virus in mesh.viri)
-            {
-                testtri.triangle = virus;
-                testtri.Uninfect();
-            }
-
-            // Empty the virus pool.
-            mesh.viri.Clear();
-        }
         /// <summary>
         /// Find the holes and infect them. Find the area constraints and infect 
         /// them. Infect the convex hull. Spread the infection and kill triangles. 
@@ -378,11 +300,10 @@ namespace TriangleNet
         public void CarveHoles()
         {
             Otri searchtri = default(Otri);
-            Otri tri = default(Otri);
             Vertex searchorg, searchdest;
             LocateResult intersect;
 
-            Otri[] regionTris = null;
+            Triangle[] regionTris = null;
 
             if (!mesh.behavior.Convex)
             {
@@ -417,7 +338,7 @@ namespace TriangleNet
                                 // Infect the triangle. This is done by marking the triangle
                                 // as infected and including the triangle in the virus pool.
                                 searchtri.Infect();
-                                mesh.viri.Add(searchtri.triangle);
+                                viri.Add(searchtri.triangle);
                             }
                         }
                     }
@@ -430,14 +351,14 @@ namespace TriangleNet
             // which might not be convex; they can only be used with a freshly triangulated PSLG.)
             if (mesh.regions.Count > 0)
             {
-                regionTris = new Otri[mesh.regions.Count];
-
                 int i = 0;
+
+                regionTris = new Triangle[mesh.regions.Count];
 
                 // Find the starting triangle for each region.
                 foreach (var region in mesh.regions)
                 {
-                    regionTris[i].triangle = Mesh.dummytri;
+                    regionTris[i] = Mesh.dummytri;
                     // Ignore region points that aren't within the bounds of the mesh.
                     if (mesh.bounds.Contains(region.point))
                     {
@@ -458,7 +379,8 @@ namespace TriangleNet
                             {
                                 // Record the triangle for processing after the
                                 // holes have been carved.
-                                searchtri.Copy(ref regionTris[i]);
+                                regionTris[i] = searchtri.triangle;
+                                regionTris[i].region = region.id;
                             }
                         }
                     }
@@ -467,57 +389,33 @@ namespace TriangleNet
                 }
             }
 
-            if (mesh.viri.Count > 0)
+            if (viri.Count > 0)
             {
                 // Carve the holes and concavities.
                 Plague();
             }
-            // The virus pool should be empty now.
 
             if (regionTris != null)
             {
-                if (mesh.behavior.RegionAttrib)
-                {
-                    // Make the triangle's attributes larger.
-                    double[] attributes = new double[mesh.eextras + 1];
-
-                    // Assign every triangle a regional attribute of zero.
-                    tri.orient = 0;
-                    foreach (var t in mesh.triangles.Values)
-                    {
-                        Array.Copy(tri.triangle.attributes, attributes, mesh.eextras);
-                        tri.triangle = t;
-                        tri.triangle.attributes = attributes;
-                    }
-                }
+                var iterator = new RegionIterator(mesh);
 
                 for (int i = 0; i < regionTris.Length; i++)
                 {
-                    if (regionTris[i].triangle != Mesh.dummytri)
+                    if (regionTris[i] != Mesh.dummytri)
                     {
                         // Make sure the triangle under consideration still exists.
                         // It may have been eaten by the virus.
-                        if (!Otri.IsDead(regionTris[i].triangle))
+                        if (!Otri.IsDead(regionTris[i]))
                         {
-                            // Put one triangle in the virus pool.
-                            regionTris[i].Infect();
-                            mesh.viri.Add(regionTris[i].triangle);
                             // Apply one region's attribute and/or area constraint.
-                            RegionPlague(mesh.regions[i].Attribute, mesh.regions[i].Area);
-                            // The virus pool should be empty now.
+                            iterator.Process(regionTris[i]);
                         }
                     }
-                }
-
-                if (mesh.behavior.RegionAttrib)
-                {
-                    // Note the fact that each triangle has an additional attribute.
-                    mesh.eextras++;
                 }
             }
 
             // Free up memory (virus pool should be empty anyway).
-            mesh.viri.Clear();
+            viri.Clear();
         }
     }
 }

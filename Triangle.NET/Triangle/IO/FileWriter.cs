@@ -142,6 +142,7 @@ namespace TriangleNet.IO
         {
             Otri tri = default(Otri);
             Vertex p1, p2, p3;
+            bool regions = mesh.behavior.UseRegions;
 
             int j = 0;
 
@@ -150,7 +151,7 @@ namespace TriangleNet.IO
             using (StreamWriter writer = new StreamWriter(filename))
             {
                 // Number of triangles, vertices per triangle, attributes per triangle.
-                writer.WriteLine("{0} 3 {1}", mesh.triangles.Count, mesh.eextras);
+                writer.WriteLine("{0} 3 {1}", mesh.triangles.Count, regions ? 1 : 0);
 
                 foreach (var item in mesh.triangles.Values)
                 {
@@ -163,9 +164,9 @@ namespace TriangleNet.IO
                     // Triangle number, indices for three vertices.
                     writer.Write("{0} {1} {2} {3}", j, p1.id, p2.id, p3.id);
 
-                    for (int i = 0; i < mesh.eextras; i++)
+                    if (regions)
                     {
-                        writer.Write(" {0}", tri.triangle.attributes[i].ToString(nfi));
+                        writer.Write(" {0}", tri.triangle.region);
                     }
 
                     writer.WriteLine();
@@ -260,9 +261,8 @@ namespace TriangleNet.IO
                     writer.WriteLine("{0}", mesh.regions.Count);
                     foreach (var region in mesh.regions)
                     {
-                        writer.WriteLine("{0} {1} {2} {3} {4}", j, region.point.X.ToString(nfi),
-                            region.point.Y.ToString(nfi), region.attribute.ToString(nfi),
-                            region.area.ToString(nfi));
+                        writer.WriteLine("{0} {1} {2} {3}", j, region.point.X.ToString(nfi),
+                            region.point.Y.ToString(nfi), region.id);
 
                         j++;
                     }

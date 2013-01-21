@@ -87,6 +87,7 @@
     <Compile Include="Tools\CuthillMcKee.cs" />
     <Compile Include="Tools\IVoronoi.cs" />
     <Compile Include="Tools\QualityMeasure.cs" />
+    <Compile Include="Tools\RegionIterator.cs" />
     <Compile Include="Tools\Statistic.cs" />
     <Compile Include="Algorithm\SweepLine.cs" />
     <Compile Include="Tools\Voronoi.cs" />

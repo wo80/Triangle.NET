@@ -17,7 +17,7 @@ namespace TriangleNet.IO
     public class InputTriangle : ITriangle
     {
         internal int[] vertices;
-        internal double[] attributes;
+        internal int region;
         internal double area;
 
         public InputTriangle(int p0, int p1, int p2)
@@ -106,11 +106,12 @@ namespace TriangleNet.IO
         }
 
         /// <summary>
-        /// Gets the triangle attributes.
+        /// Region ID the triangle belongs to.
         /// </summary>
-        public double[] Attributes
+        public int Region
         {
-            get { return null; }
+            get { return region; }
+            set { region = value; }
         }
 
         #endregion

@@ -599,7 +599,6 @@ namespace TriangleNet.Algorithm
         /// <summary>
         /// Recursively form a Delaunay triangulation by the divide-and-conquer method.
         /// </summary>
-        /// <param name="sortarray"></param>
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <param name="axis"></param>

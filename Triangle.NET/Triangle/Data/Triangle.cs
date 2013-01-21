@@ -33,11 +33,11 @@ namespace TriangleNet.Data
         internal Otri[] neighbors;
         internal Vertex[] vertices;
         internal Osub[] subsegs;
-        internal double[] attributes;
+        internal int region;
         internal double area;
         internal bool infected;
 
-        public Triangle(int numAttributes)
+        public Triangle()
         {
             // Initialize the three adjoining triangles to be "outer space".
             neighbors = new Otri[3];
@@ -58,18 +58,12 @@ namespace TriangleNet.Data
                 subsegs[2].seg = Mesh.dummysub;
             }
 
-            if (numAttributes > 0)
-            {
-                attributes = new double[numAttributes];
-            }
-
             // TODO:
             //if (Behavior.VarArea)
             //{
             //    area = -1.0;
             //}
         }
-
 
         #region Public properties
 
@@ -171,11 +165,11 @@ namespace TriangleNet.Data
         }
 
         /// <summary>
-        /// Gets the triangle attributes.
+        /// Region ID the triangle belongs to.
         /// </summary>
-        public double[] Attributes
+        public int Region
         {
-            get { return this.attributes; }
+            get { return this.region; }
         }
 
         #endregion

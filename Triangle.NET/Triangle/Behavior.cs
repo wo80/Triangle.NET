@@ -24,7 +24,7 @@ namespace TriangleNet
             VarArea = false;
             FixedArea = false;
             Usertest = false;
-            RegionAttrib = false;
+            UseRegions = false;
             Convex = false;
             Jettison = false;
             UseBoundaryMarkers = true;
@@ -84,9 +84,9 @@ namespace TriangleNet
         /// </summary>
         public bool Usertest { get; set; }
         /// <summary>
-        /// Apply attributes to identify triangles in certain regions.
+        /// Identify triangles in certain regions.
         /// </summary>
-        public bool RegionAttrib { get; set; }
+        public bool UseRegions { get; set; }
         /// <summary>
         /// Enclose the convex hull with segments.
         /// </summary>

@@ -724,7 +724,7 @@ namespace TriangleNet
                         split = 0.5;
                     }
 
-                    // Create the new vertex.
+                    // Create the new vertex (interpolate coordinates).
                     newvertex = new Vertex(
                         eorg.x + split * (edest.x - eorg.x),
                         eorg.y + split * (edest.y - eorg.y),
@@ -738,7 +738,7 @@ namespace TriangleNet
 
                     mesh.vertices.Add(newvertex.hash, newvertex);
 
-                    // Interpolate its coordinate and attributes.
+                    // Interpolate attributes.
                     for (int i = 0; i < mesh.nextras; i++)
                     {
                         newvertex.attributes[i] = eorg.attributes[i]

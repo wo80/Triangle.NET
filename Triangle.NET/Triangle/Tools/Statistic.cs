@@ -23,11 +23,13 @@ namespace TriangleNet.Tools
         /// Number of incircle tests performed.
         /// </summary>
         public static long InCircleCount = 0;
+        public static long InCircleCountDecimal = 0;
 
         /// <summary>
         /// Number of counterclockwise tests performed.
         /// </summary>
         public static long CounterClockwiseCount = 0;
+        public static long CounterClockwiseCountDecimal = 0;
 
         /// <summary>
         /// Number of 3D orientation tests performed.

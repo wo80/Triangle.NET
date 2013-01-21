@@ -75,7 +75,6 @@ namespace TriangleNet.IO
             int numberofsegments = input.segments.Count;
 
             mesh.inelements = elements;
-            mesh.eextras = triangles[0].Attributes != null ? triangles[0].Attributes.Length : 0;
 
             // Create the triangles.
             for (i = 0; i < mesh.inelements; i++)
@@ -134,9 +133,9 @@ namespace TriangleNet.IO
                 }
 
                 // Read the triangle's attributes.
-                tri.triangle.attributes = triangles[i].Attributes;
+                tri.triangle.region = triangles[i].Region;
 
-                // TODO
+                // TODO: VarArea
                 if (mesh.behavior.VarArea)
                 {
                     tri.triangle.area = triangles[i].Area;

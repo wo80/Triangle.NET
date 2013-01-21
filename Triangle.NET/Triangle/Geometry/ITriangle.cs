@@ -80,8 +80,8 @@ namespace TriangleNet.Geometry
         double Area { get; }
 
         /// <summary>
-        /// Triangle atributes.
+        /// Region ID the triangle belongs to.
         /// </summary>
-        double[] Attributes { get; }
+        int Region { get; }
     }
 }

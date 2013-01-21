@@ -63,10 +63,17 @@ namespace MeshExplorer
         {
             if (currentGenerator != null && InputGenerated != null)
             {
-                InputGeometry input = currentGenerator.Generate(sliderParam1.Value, 
-                    sliderParam2.Value, sliderParam3.Value);
+                try
+                {
+                    InputGeometry input = currentGenerator.Generate(sliderParam1.Value,
+                        sliderParam2.Value, sliderParam3.Value);
 
-                InputGenerated(input, EventArgs.Empty);
+                    InputGenerated(input, EventArgs.Empty);
+                }
+                catch (Exception ex)
+                {
+                    DarkMessageBox.Show("Exception", ex.Message);
+                }
             }
         }
 
@@ -135,6 +142,7 @@ namespace MeshExplorer
             darkListBox1.Items.Add(new StarInBox());
             darkListBox1.Items.Add(new RingPolygon());
             darkListBox1.Items.Add(new BoxWithHole());
+            darkListBox1.Items.Add(new CircleWithHole());
 
             darkListBox1.SelectedIndex = 0;
         }

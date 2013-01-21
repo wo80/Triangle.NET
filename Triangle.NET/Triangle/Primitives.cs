@@ -152,6 +152,8 @@ namespace TriangleNet
 
         private static decimal CounterClockwiseDecimal(Point pa, Point pb, Point pc)
         {
+            Statistic.CounterClockwiseCountDecimal++;
+
             decimal detleft, detright, det, detsum;
 
             detleft = ((decimal)pa.x - (decimal)pc.x) * ((decimal)pb.y - (decimal)pc.y);
@@ -258,6 +260,8 @@ namespace TriangleNet
 
         private static decimal InCircleDecimal(Point pa, Point pb, Point pc, Point pd)
         {
+            Statistic.InCircleCountDecimal++;
+
             decimal adx, bdx, cdx, ady, bdy, cdy;
             decimal bdxcdy, cdxbdy, cdxady, adxcdy, adxbdy, bdxady;
             decimal alift, blift, clift;

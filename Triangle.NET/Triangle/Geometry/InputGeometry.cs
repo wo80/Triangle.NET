@@ -197,11 +197,10 @@ namespace TriangleNet.Geometry
         /// </summary>
         /// <param name="x">X coordinate of the hole.</param>
         /// <param name="y">Y coordinate of the hole.</param>
-        /// <param name="area">The regions area constraint.</param>
-        /// <param name="attribute">Region attribute.</param>
-        public void AddRegion(double x, double y, double area, double attribute)
+        /// <param name="id">The region id.</param>
+        public void AddRegion(double x, double y, int id)
         {
-            regions.Add(new RegionPointer(x, y, area, attribute));
+            regions.Add(new RegionPointer(x, y, id));
         }
 
         /// <summary>

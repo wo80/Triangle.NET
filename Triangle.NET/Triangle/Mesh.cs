@@ -48,8 +48,6 @@ namespace TriangleNet
         internal List<Point> holes;
         internal List<RegionPointer> regions;
 
-        internal List<Triangle> viri;
-
         // Other variables.
         internal BoundingBox bounds; // x and y bounds.
         internal int invertices;     // Number of input vertices.
@@ -59,7 +57,7 @@ namespace TriangleNet
         internal int edges;          // Number of output edges.
         internal int mesh_dim;       // Dimension (ought to be 2).
         internal int nextras;        // Number of attributes per vertex.
-        internal int eextras;        // Number of attributes per triangle.
+        //internal int eextras;        // Number of attributes per triangle.
         internal int hullsize;       // Number of edges in convex hull.
         internal int steinerleft;    // Number of Steiner points not yet used.
         internal bool checksegments; // Are there segments in the triangulation yet?
@@ -182,7 +180,6 @@ namespace TriangleNet
             triangles = new Dictionary<int, Triangle>();
             subsegs = new Dictionary<int, Segment>();
 
-            viri = new List<Triangle>();
             flipstack = new Stack<Otri>();
 
             holes = new List<Point>();
@@ -247,6 +244,7 @@ namespace TriangleNet
             //    behavior.VarArea = true;
             //}
 
+            // TODO: remove
             if (!behavior.Poly)
             {
                 // Be careful not to allocate space for element area constraints that
@@ -255,8 +253,10 @@ namespace TriangleNet
 
                 // Be careful not to add an extra attribute to each element unless the
                 // input supports it (PSLG in, but not refining a preexisting mesh).
-                behavior.RegionAttrib = false;
+                behavior.UseRegions = false;
             }
+
+            behavior.UseRegions = input.Regions.Count > 0;
 
             TransferNodes(input);
 
@@ -296,6 +296,7 @@ namespace TriangleNet
             //    behavior.UseBoundaryMarkers = true;
             //}
 
+            // TODO: remove
             if (!behavior.Poly)
             {
                 // Be careful not to allocate space for element area constraints that
@@ -304,8 +305,10 @@ namespace TriangleNet
 
                 // Be careful not to add an extra attribute to each element unless the
                 // input supports it (PSLG in, but not refining a preexisting mesh).
-                behavior.RegionAttrib = false;
+                behavior.UseRegions = false;
             }
+
+            behavior.UseRegions = input.Regions.Count > 0;
 
             steinerleft = behavior.Steiner;
 
@@ -706,8 +709,6 @@ namespace TriangleNet
         {
             int hulledges = 0;
 
-            eextras = 0;
-
             if (behavior.Algorithm == TriangulationAlgorithm.Dwyer)
             {
                 Dwyer alg = new Dwyer();
@@ -746,7 +747,6 @@ namespace TriangleNet
             this.hash_seg = 0;
             this.hash_tri = 0;
 
-            viri.Clear();
             flipstack.Clear();
 
             hullsize = 0;
@@ -771,6 +771,8 @@ namespace TriangleNet
 
             Statistic.InCircleCount = 0;
             Statistic.CounterClockwiseCount = 0;
+            Statistic.InCircleCountDecimal = 0;
+            Statistic.CounterClockwiseCountDecimal = 0;
             Statistic.Orient3dCount = 0;
             Statistic.HyperbolaCount = 0;
             Statistic.CircleTopCount = 0;
@@ -805,7 +807,7 @@ namespace TriangleNet
         private void DummyInit()
         {
             // Set up 'dummytri', the 'triangle' that occupies "outer space."
-            dummytri = new Triangle(0);
+            dummytri = new Triangle();
             dummytri.hash = -1;
             dummytri.id = -1;
 
@@ -880,7 +882,7 @@ namespace TriangleNet
         /// <param name="newotri">Reference to the new triangle.</param>
         internal void MakeTriangle(ref Otri newotri)
         {
-            Triangle tri = new Triangle(eextras);
+            Triangle tri = new Triangle();
             tri.hash = this.hash_tri++;
             tri.id = tri.hash;
 
@@ -981,14 +983,13 @@ namespace TriangleNet
             Vertex first;
             Vertex leftvertex, rightvertex, botvertex, topvertex, farvertex;
             Vertex segmentorg, segmentdest;
-            double attrib;
+            int region;
             double area;
             InsertVertexResult success;
             LocateResult intersect;
             bool doflip;
             bool mirrorflag;
             bool enq;
-            int i;
 
             if (splitseg.seg == null)
             {
@@ -1094,11 +1095,8 @@ namespace TriangleNet
                 newbotright.SetApex(newvertex);
                 horiz.SetOrg(newvertex);
 
-                for (i = 0; i < eextras; i++)
-                {
-                    // Set the element attributes of a new triangle.
-                    newbotright.triangle.attributes[i] = botright.triangle.attributes[i];
-                }
+                // Set the region of a new triangle.
+                newbotright.triangle.region = botright.triangle.region;
 
                 if (behavior.VarArea)
                 {
@@ -1114,11 +1112,8 @@ namespace TriangleNet
                     newtopright.SetApex(newvertex);
                     topright.SetOrg(newvertex);
 
-                    for (i = 0; i < eextras; i++)
-                    {
-                        // Set the element attributes of another new triangle.
-                        newtopright.triangle.attributes[i] = topright.triangle.attributes[i];
-                    }
+                    // Set the region of another new triangle.
+                    newtopright.triangle.region = topright.triangle.region;
 
                     if (behavior.VarArea)
                     {
@@ -1223,13 +1218,9 @@ namespace TriangleNet
                 newbotright.SetApex(newvertex);
                 horiz.SetApex(newvertex);
 
-                for (i = 0; i < eextras; i++)
-                {
-                    // Set the element attributes of the new triangles.
-                    attrib = horiz.triangle.attributes[i];
-                    newbotleft.triangle.attributes[i] = attrib;
-                    newbotright.triangle.attributes[i] = attrib;
-                }
+                // Set the region of the new triangles.
+                newbotleft.triangle.region = horiz.triangle.region;
+                newbotright.triangle.region = horiz.triangle.region;
 
                 if (behavior.VarArea)
                 {
@@ -1426,13 +1417,11 @@ namespace TriangleNet
                             top.SetDest(farvertex);
                             top.SetApex(leftvertex);
 
-                            for (i = 0; i < eextras; i++)
-                            {
-                                // Take the average of the two triangles' attributes.
-                                attrib = 0.5 * (top.triangle.attributes[i] + horiz.triangle.attributes[i]);
-                                top.triangle.attributes[i] = attrib;
-                                horiz.triangle.attributes[i] = attrib;
-                            }
+                            // Assign region.
+                            // TODO: check region ok (no Math.Min necessary)
+                            region = Math.Min(top.triangle.region, horiz.triangle.region);
+                            top.triangle.region = region;
+                            horiz.triangle.region = region;
 
                             if (behavior.VarArea)
                             {
