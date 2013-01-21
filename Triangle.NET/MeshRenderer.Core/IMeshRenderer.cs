@@ -13,6 +13,9 @@ namespace MeshRenderer.Core
     /// </summary>
     public interface IMeshRenderer
     {
+        bool ShowVoronoi { get; set; }
+        bool ShowRegions { get; set; }
+
         void Zoom(float x, float y, int delta);
         void HandleResize();
 

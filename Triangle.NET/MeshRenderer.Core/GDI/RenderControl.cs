@@ -33,6 +33,7 @@ namespace MeshRenderer.Core.GDI
 
         bool initialized = false;
         bool showVoronoi = false;
+        bool showRegions = true;
 
         string coordinate = String.Empty;
 
@@ -71,6 +72,32 @@ namespace MeshRenderer.Core.GDI
             };
         }
 
+        public bool ShowVoronoi
+        {
+            get { return showVoronoi; }
+            set
+            {
+                if (showVoronoi != value)
+                {
+                    this.Render();
+                }
+                showVoronoi = value;
+            }
+        }
+
+        public bool ShowRegions
+        {
+            get { return showRegions; }
+            set
+            {
+                if (showRegions != value)
+                {
+                    this.Render();
+                }
+                showRegions = value;
+            }
+        }
+
         /// <summary>
         /// Initialize the graphics buffer (should be called in the forms load event).
         /// </summary>
@@ -91,7 +118,7 @@ namespace MeshRenderer.Core.GDI
         {
             this.data = data;
 
-            meshRenderer = new MeshRenderer(data);
+            meshRenderer = new MeshRenderer(data, renderColors);
 
             this.showVoronoi = data.VoronoiPoints != null;
 
@@ -181,13 +208,13 @@ namespace MeshRenderer.Core.GDI
 
             if (voronoiRenderer != null && this.showVoronoi)
             {
-                meshRenderer.RenderMesh(g, zoom, renderColors);
+                meshRenderer.RenderMesh(g, zoom);
                 voronoiRenderer.Render(g, zoom, renderColors);
-                meshRenderer.RenderGeometry(g, zoom, renderColors);
+                meshRenderer.RenderGeometry(g, zoom);
             }
             else if (meshRenderer != null)
             {
-                meshRenderer.Render(g, zoom, renderColors);
+                meshRenderer.Render(g, zoom, showRegions);
             }
 
             this.Invalidate();

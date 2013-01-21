@@ -28,9 +28,10 @@ namespace MeshRenderer.Core.GDI
         /// <summary>
         /// Initializes a new instance of the <see cref="MeshRenderer" /> class.
         /// </summary>
-        public MeshRenderer(RenderData data)
+        public MeshRenderer(RenderData data, ColorManager renderColors)
         {
             this.data = data;
+            this.renderColors = renderColors;
 
             int featureCount = data.Points.Length;
 
@@ -44,23 +45,36 @@ namespace MeshRenderer.Core.GDI
             }
 
             this.ignoreBounds = featureCount < 1000;
+
+            if (data.Triangles != null && data.NumberOfRegions > 0)
+            {
+                renderColors.MakeRegionMap(data.TrianglePartition, data.NumberOfRegions);
+            }
         }
 
         /// <summary>
         /// Renders the mesh.
         /// </summary>
-        public void Render(Graphics g, Zoom zoom, ColorManager renderColors)
+        public void Render(Graphics g, Zoom zoom)
         {
-            this.renderColors = renderColors;
+            Render(g, zoom, false);
+        }
+
+        /// <summary>
+        /// Renders the mesh.
+        /// </summary>
+        public void Render(Graphics g, Zoom zoom, bool fillTriangles)
+        {
             this.zoom = zoom;
 
-            if (data.MeshEdges != null)
+            if (data.MeshEdges != null && !fillTriangles)
             {
                 this.RenderEdges(g);
             }
-            else if (data.Triangles != null)
+
+            if (fillTriangles && data.Triangles != null)
             {
-                this.RenderTriangles(g);
+                this.RenderTriangles(g, fillTriangles && (data.NumberOfRegions > 0));
             }
 
             if (data.Segments != null)
@@ -77,9 +91,8 @@ namespace MeshRenderer.Core.GDI
         /// <summary>
         /// Renders only the mesh edges (no points or segments).
         /// </summary>
-        public void RenderMesh(Graphics g, Zoom zoom, ColorManager renderColors)
+        public void RenderMesh(Graphics g, Zoom zoom)
         {
-            this.renderColors = renderColors;
             this.zoom = zoom;
 
             if (data.MeshEdges != null)
@@ -88,16 +101,15 @@ namespace MeshRenderer.Core.GDI
             }
             else if (data.Triangles != null)
             {
-                this.RenderTriangles(g);
+                this.RenderTriangles(g, false);
             }
         }
 
         /// <summary>
         /// Renders only points and segments (no mesh triangles).
         /// </summary>
-        public void RenderGeometry(Graphics g, Zoom zoom, ColorManager renderColors)
+        public void RenderGeometry(Graphics g, Zoom zoom)
         {
-            this.renderColors = renderColors;
             this.zoom = zoom;
 
             if (data.Segments != null)
@@ -142,11 +154,11 @@ namespace MeshRenderer.Core.GDI
             }
         }
 
-        private void RenderTriangles(Graphics g)
+        private void RenderTriangles(Graphics g, bool fillTriangles)
         {
             int n = data.Triangles.Length / 3;
             uint k0, k1, k2;
-            PointF p0, p1, p2;
+            PointF[] tri = new PointF[3];
             float[] pts = data.Points;
 
             // Draw triangles
@@ -161,13 +173,16 @@ namespace MeshRenderer.Core.GDI
                     zoom.ViewportContains(pts[k1], pts[k1 + 1]) ||
                     zoom.ViewportContains(pts[k2], pts[k2 + 1])))
                 {
-                    p0 = zoom.WorldToScreen(pts[k0], pts[k0 + 1]);
-                    p1 = zoom.WorldToScreen(pts[k1], pts[k1 + 1]);
-                    p2 = zoom.WorldToScreen(pts[k2], pts[k2 + 1]);
+                    tri[0] = zoom.WorldToScreen(pts[k0], pts[k0 + 1]);
+                    tri[1] = zoom.WorldToScreen(pts[k1], pts[k1 + 1]);
+                    tri[2] = zoom.WorldToScreen(pts[k2], pts[k2 + 1]);
 
-                    g.DrawLine(renderColors.Line, p0, p1);
-                    g.DrawLine(renderColors.Line, p1, p2);
-                    g.DrawLine(renderColors.Line, p2, p0);
+                    g.DrawPolygon(renderColors.Line, tri);
+
+                    if (fillTriangles)
+                    {
+                        g.FillPolygon(renderColors.GetRegionBrush(data.TrianglePartition[i]), tri);
+                    }
                 }
             }
         }

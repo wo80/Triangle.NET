@@ -84,8 +84,8 @@ namespace MeshExplorer.IO
 
                 g.SmoothingMode = SmoothingMode.HighQuality;
 
-                MeshRenderer meshRenderer = new MeshRenderer(data);
-                meshRenderer.Render(g, zoom, colors);
+                MeshRenderer meshRenderer = new MeshRenderer(data, colors);
+                meshRenderer.Render(g, zoom);
 
                 g.Dispose();
             }

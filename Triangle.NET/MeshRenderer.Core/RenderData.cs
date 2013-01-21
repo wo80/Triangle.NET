@@ -7,7 +7,6 @@
 namespace MeshRenderer.Core
 {
     using System.Collections.Generic;
-    using System.Linq;
     using TriangleNet;
     using TriangleNet.Geometry;
     using TriangleNet.Tools;
@@ -23,7 +22,9 @@ namespace MeshRenderer.Core
         public uint[] MeshEdges;
         public float[] VoronoiPoints;
         public uint[] VoronoiEdges;
+        public int[] TrianglePartition;
 
+        public int NumberOfRegions;
         public int NumberOfInputPoints;
         public BoundingBox Bounds;
 
@@ -42,6 +43,7 @@ namespace MeshRenderer.Core
             int n = data.Count;
             int i = 0;
 
+            this.NumberOfRegions = data.Regions.Count;
             this.NumberOfInputPoints = n;
 
             // Copy points
@@ -124,6 +126,14 @@ namespace MeshRenderer.Core
             }
             this.MeshEdges = edges.ToArray();
 
+
+            if (this.NumberOfRegions > 0)
+            {
+                this.TrianglePartition = new int[mesh.Triangles.Count];
+            }
+
+            i = 0;
+
             // Copy Triangles
             var triangles = new List<uint>(3 * mesh.Triangles.Count);
             foreach (var tri in mesh.Triangles)
@@ -131,6 +141,11 @@ namespace MeshRenderer.Core
                 triangles.Add((uint)tri.P0);
                 triangles.Add((uint)tri.P1);
                 triangles.Add((uint)tri.P2);
+
+                if (this.NumberOfRegions > 0)
+                {
+                    this.TrianglePartition[i++] = tri.Region;
+                }
             }
             this.Triangles = triangles.ToArray();
 

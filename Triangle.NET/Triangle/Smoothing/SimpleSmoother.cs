@@ -95,6 +95,11 @@ namespace TriangleNet.Smoothing
                 geometry.AddHole(hole.x, hole.y);
             }
 
+            foreach (var region in mesh.regions)
+            {
+                geometry.AddRegion(region.point.x, region.point.y, region.id);
+            }
+
             return geometry;
         }
     }

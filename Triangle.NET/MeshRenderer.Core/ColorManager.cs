@@ -6,6 +6,14 @@ namespace MeshRenderer.Core
 {
     public class ColorManager
     {
+        // Change or add as many colors as you like...
+        private static Color[] regionColors = {
+            Color.FromArgb(20,   0, 255,   0),
+            Color.FromArgb(20, 255, 255,   0),
+            Color.FromArgb(20, 255,   0,   0),
+            Color.FromArgb(20,   0,   0, 255)
+        };
+
         /// <summary>
         /// Gets a color scheme with black background.
         /// </summary>
@@ -49,6 +57,70 @@ namespace MeshRenderer.Core
         internal Pen line;
         internal Pen segment;
         internal Pen voronoiLine;
+
+        internal SolidBrush[] regions;
+        internal Dictionary<int, int> regionMap;
+
+        #region Public methods
+
+        /// <summary>
+        /// Setup a region map.
+        /// </summary>
+        /// <param name="partition">Mesh partition (size = number of triangles in mesh)</param>
+        /// <param name="size">Number of partitions / regions.</param>
+        public void MakeRegionMap(int[] partition, int size)
+        {
+            if (regions == null || regions.Length != size)
+            {
+                int n = regionColors.Length;
+
+                regions = new SolidBrush[size];
+
+                for (int j = 0; j < size; j++)
+                {
+                    regions[j] = new SolidBrush(regionColors[j % n]);
+                }
+            }
+
+            if (regionMap == null)
+            {
+                regionMap = new Dictionary<int, int>(size);
+            }
+            else
+            {
+                regionMap.Clear();
+            }
+
+            int k = 0;
+            for (int i = 0; i < partition.Length; i++)
+            {
+                if (!regionMap.ContainsKey(partition[i]))
+                {
+                    regionMap.Add(partition[i], k++);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get the color defined for given region.
+        /// </summary>
+        public Brush GetRegionBrush(int region)
+        {
+            if (regionMap == null)
+            {
+                return triangle;
+            }
+
+            int k;
+            if (regionMap.TryGetValue(region, out k))
+            {
+                return regions[k];
+            }
+
+            return triangle;
+        }
+
+        #endregion
 
         #region Public properties
 

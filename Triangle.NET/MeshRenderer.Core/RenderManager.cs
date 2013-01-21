@@ -31,6 +31,18 @@ namespace MeshRenderer.Core
             }
         }
 
+        public bool ShowVoronoi
+        {
+            get { return renderer.ShowVoronoi; }
+            set { renderer.ShowVoronoi = value; }
+        }
+
+        public bool ShowRegions
+        {
+            get { return renderer.ShowRegions; }
+            set { renderer.ShowRegions = value; }
+        }
+
         public void Initialize()
         {
             renderer.Initialize();
