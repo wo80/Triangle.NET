@@ -464,21 +464,21 @@ namespace TriangleNet
                 // The edge opposite the apex is longest.
                 // maxedge = apexlen;
                 // Find the cosine of the angle at the apex.
-                maxangle = (orglen + destlen - apexlen) / (2 * Math.Sqrt(orglen) * Math.Sqrt(destlen));
+                maxangle = (orglen + destlen - apexlen) / (2 * Math.Sqrt(orglen * destlen));
             }
             else if (orglen > destlen)
             {
                 // The edge opposite the origin is longest.
                 // maxedge = orglen;
                 // Find the cosine of the angle at the origin.
-                maxangle = (apexlen + destlen - orglen) / (2 * Math.Sqrt(apexlen) * Math.Sqrt(destlen));
+                maxangle = (apexlen + destlen - orglen) / (2 * Math.Sqrt(apexlen * destlen));
             }
             else
             {
                 // The edge opposite the destination is longest.
                 // maxedge = destlen;
                 // Find the cosine of the angle at the destination.
-                maxangle = (apexlen + orglen - destlen) / (2 * Math.Sqrt(apexlen) * Math.Sqrt(orglen));
+                maxangle = (apexlen + orglen - destlen) / (2 * Math.Sqrt(apexlen * orglen));
             }
 
             // Check whether the angle is smaller than permitted.
