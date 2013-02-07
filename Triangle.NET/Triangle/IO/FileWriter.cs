@@ -142,7 +142,7 @@ namespace TriangleNet.IO
         {
             Otri tri = default(Otri);
             Vertex p1, p2, p3;
-            bool regions = mesh.behavior.UseRegions;
+            bool regions = mesh.behavior.useRegions;
 
             int j = 0;
 
@@ -311,7 +311,7 @@ namespace TriangleNet.IO
                             {
                                 // Edge number, indices of two endpoints, and a boundary marker.
                                 // If there's no subsegment, the boundary marker is zero.
-                                if (behavior.UseSegments)
+                                if (behavior.useSegments)
                                 {
                                     tri.SegPivot(ref checkmark);
 

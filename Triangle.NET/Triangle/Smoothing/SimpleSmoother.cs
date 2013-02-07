@@ -31,7 +31,7 @@ namespace TriangleNet.Smoothing
 
         public void Smooth()
         {
-            mesh.SetOption(Options.Quality, false);
+            mesh.behavior.Quality = false;
 
             // Take a few smoothing rounds.
             for (int i = 0; i < 5; i++)

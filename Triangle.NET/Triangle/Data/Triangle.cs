@@ -162,6 +162,7 @@ namespace TriangleNet.Data
         public double Area
         {
             get { return this.area; }
+            set { this.area = value; }
         }
 
         /// <summary>

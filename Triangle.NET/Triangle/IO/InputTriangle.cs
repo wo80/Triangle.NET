@@ -102,7 +102,8 @@ namespace TriangleNet.IO
         /// </summary>
         public double Area
         {
-            get { return -1; }
+            get { return area; }
+            set { area = value; }
         }
 
         /// <summary>

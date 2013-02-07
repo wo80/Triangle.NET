@@ -69,7 +69,7 @@ namespace TriangleNet
         private Point FindNewLocationWithoutMaxAngle(Vertex torg, Vertex tdest, Vertex tapex,
             ref double xi, ref double eta, bool offcenter, Otri badotri)
         {
-            double offconstant = behavior.Offconstant;
+            double offconstant = behavior.offconstant;
 
             // for calculating the distances of the edges
             double xdo, ydo, xao, yao, xda, yda;
@@ -769,7 +769,7 @@ namespace TriangleNet
         private Point FindNewLocation(Vertex torg, Vertex tdest, Vertex tapex,
             ref double xi, ref double eta, bool offcenter, Otri badotri)
         {
-            double offconstant = behavior.Offconstant;
+            double offconstant = behavior.offconstant;
 
             // for calculating the distances of the edges
             double xdo, ydo, xao, yao, xda, yda;
@@ -2530,7 +2530,7 @@ namespace TriangleNet
             // minimum angle
             alpha = behavior.MinAngle * Math.PI / 180.0;
             // initialize the constants
-            if (behavior.GoodAngle == 1.0)
+            if (behavior.goodAngle == 1.0)
             {
                 petalcenterconstant = 0;
                 petalradiusconstant = 0;
@@ -2701,7 +2701,7 @@ namespace TriangleNet
                 /// IF THERE IS A FEASIBLE INTERSECTION POLYGON, FIND ITS CENTROID AS THE NEW LOCATION
                 FindPolyCentroid(numpolypoints, initialConvexPoly, ref newloc);
 
-                if (behavior.FixedArea)
+                if (behavior.fixedArea)
                 {
                     // 		numBadTriangle = 0;
                     // 		for(j= 0; j < numpoints *2-2; j = j+2){
@@ -2800,7 +2800,7 @@ namespace TriangleNet
             cosBeta = Math.Cos(beta);
 
             // initialize the constants
-            if (behavior.GoodAngle == 1.0)
+            if (behavior.goodAngle == 1.0)
             {
                 petalcenterconstant = 0;
                 petalradiusconstant = 0;
@@ -3293,7 +3293,7 @@ namespace TriangleNet
             cosAngle = (dist12 + dist23 - dist31) / (2 * Math.Sqrt(dist12) * Math.Sqrt(dist23));
             // Check whether the angle is smaller than permitted which is 2*minangle!!!  
             //printf("angle: %f 2*minangle = %f\n",acos(cosAngle)*180/PI, 2*acos(Math.Sqrt(b.goodangle))*180/PI);
-            if (Math.Acos(cosAngle) < 2 * Math.Acos(Math.Sqrt(behavior.GoodAngle)))
+            if (Math.Acos(cosAngle) < 2 * Math.Acos(Math.Sqrt(behavior.goodAngle)))
             {
                 return true;// it is a BAD triangle
             }
@@ -4018,7 +4018,7 @@ namespace TriangleNet
 
 
             // Check whether the angle is smaller than permitted.
-            if ((angle > behavior.GoodAngle) || (behavior.MaxAngle != 0.00 && maxangle < behavior.MaxGoodAngle))
+            if ((angle > behavior.goodAngle) || (behavior.MaxAngle != 0.00 && maxangle < behavior.maxGoodAngle))
             {
                 return true;// it is a bad triangle
             }

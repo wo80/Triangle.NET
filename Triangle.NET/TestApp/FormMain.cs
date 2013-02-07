@@ -79,7 +79,7 @@ namespace MeshExplorer
 
             renderData = new RenderData();
         }
-
+        
         private void Form1_KeyUp(object sender, KeyEventArgs e)
         {
             switch (e.KeyCode)
@@ -438,19 +438,19 @@ namespace MeshExplorer
 
             if (meshControlView.ParamConformDelChecked)
             {
-                mesh.SetOption(Options.ConformingDelaunay, true);
+                mesh.Behavior.ConformingDelaunay = true;
             }
 
             if (meshControlView.ParamSweeplineChecked)
             {
-                mesh.SetOption(Options.TriangulationAlgorithm, TriangulationAlgorithm.SweepLine);
+                mesh.Behavior.Algorithm = TriangulationAlgorithm.SweepLine;
             }
 
             if (meshControlView.ParamQualityChecked)
             {
-                mesh.SetOption(Options.Quality, true);
+                mesh.Behavior.Quality = true;
 
-                mesh.SetOption(Options.MinAngle, meshControlView.ParamMinAngleValue);
+                mesh.Behavior.MinAngle = meshControlView.ParamMinAngleValue;
 
                 // Ignore area constraints on initial triangulation.
 
@@ -459,13 +459,13 @@ namespace MeshExplorer
                 //{
                 //    var size = input.Bounds;
                 //    double min = Math.Min(size.Width, size.Height);
-                //    mesh.SetOption(Options.MaxArea, area * min);
+                //    mesh.Behavior.MaxArea, area * min);
                 //}
             }
 
             if (meshControlView.ParamConvexChecked)
             {
-                mesh.SetOption(Options.Convex, true);
+                mesh.Behavior.Convex = true;
             }
 
             try
@@ -502,10 +502,10 @@ namespace MeshExplorer
 
             if (area > 0 && area < 1)
             {
-                mesh.SetOption(Options.MaxArea, area * statisticView.Statistic.LargestArea);
+                mesh.Behavior.MaxArea = area * statisticView.Statistic.LargestArea;
             }
 
-            mesh.SetOption(Options.MinAngle, meshControlView.ParamMinAngleValue);
+            mesh.Behavior.MinAngle = meshControlView.ParamMinAngleValue;
 
             try
             {

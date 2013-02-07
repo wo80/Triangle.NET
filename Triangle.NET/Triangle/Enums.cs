@@ -8,53 +8,6 @@
 namespace TriangleNet
 {
     /// <summary>
-    /// Mesh generation options.
-    /// </summary>
-    public enum Options
-    {
-        /// <summary>
-        /// Minimum angle constraint (numeric).
-        /// </summary>
-        MinAngle,
-        /// <summary>
-        /// Maximum angle constraint (numeric).
-        /// </summary>
-        MaxAngle,
-        /// <summary>
-        /// Global maximum area constraint (numeric).
-        /// </summary> 
-        MaxArea,
-        /// <summary>
-        /// Maximum number of Steiner points (interger).
-        /// </summary> 
-        SteinerPoints,
-        /// <summary>
-        /// No new vertices on the boundary (interger).
-        /// </summary> 
-        NoBisect,
-        /// <summary>
-        /// Generate conforming Delaunay triangulations (boolean).
-        /// </summary> 
-        ConformingDelaunay,
-        /// <summary>
-        /// Use boundary markers (boolean).
-        /// </summary> 
-        BoundaryMarkers,
-        /// <summary>
-        /// Set default values for quality mesh generation (boolean).
-        /// </summary> 
-        Quality,
-        /// <summary>
-        /// Create segments on the convex hull (boolean).
-        /// </summary> 
-        Convex,
-        /// <summary>
-        /// Algorithm used for triangulation (TriangulationAlgorithm).
-        /// </summary> 
-        TriangulationAlgorithm
-    };
-
-    /// <summary>
     /// Implemented triangulation algorithms.
     /// </summary>
     public enum TriangulationAlgorithm

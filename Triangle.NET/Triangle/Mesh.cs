@@ -88,6 +88,14 @@ namespace TriangleNet
         #region Public properties
 
         /// <summary>
+        /// Gets the mesh behavior instance.
+        /// </summary>
+        public Behavior Behavior
+        {
+            get { return this.behavior; }
+        }
+
+        /// <summary>
         /// Gets the mesh bounding box.
         /// </summary>
         public BoundingBox Bounds
@@ -166,12 +174,22 @@ namespace TriangleNet
         }
 
         #endregion
-
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="Mesh" /> class.
         /// </summary>
         public Mesh()
+            : this(new Behavior())
         {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Mesh" /> class.
+        /// </summary>
+        public Mesh(Behavior behavior)
+        {
+            this.behavior = behavior;
+
             logger = SimpleLog.Instance;
 
             behavior = new Behavior();
@@ -253,10 +271,10 @@ namespace TriangleNet
 
                 // Be careful not to add an extra attribute to each element unless the
                 // input supports it (PSLG in, but not refining a preexisting mesh).
-                behavior.UseRegions = false;
+                behavior.useRegions = false;
             }
 
-            behavior.UseRegions = input.Regions.Count > 0;
+            behavior.useRegions = input.Regions.Count > 0;
 
             TransferNodes(input);
 
@@ -286,10 +304,8 @@ namespace TriangleNet
         {
             ResetData();
 
-            if (input.HasSegments)
-            {
-                behavior.Poly = true;
-            }
+            behavior.Poly = input.HasSegments;
+            //behavior.useSegments = input.HasSegments;
 
             //if (input.EdgeMarkers != null)
             //{
@@ -305,12 +321,12 @@ namespace TriangleNet
 
                 // Be careful not to add an extra attribute to each element unless the
                 // input supports it (PSLG in, but not refining a preexisting mesh).
-                behavior.UseRegions = false;
+                behavior.useRegions = false;
             }
 
-            behavior.UseRegions = input.Regions.Count > 0;
+            behavior.useRegions = input.Regions.Count > 0;
 
-            steinerleft = behavior.Steiner;
+            steinerleft = behavior.SteinerPoints;
 
             TransferNodes(input);
 
@@ -322,7 +338,7 @@ namespace TriangleNet
             infvertex2 = null;
             infvertex3 = null;
 
-            if (behavior.UseSegments)
+            if (behavior.useSegments)
             {
                 // Segments will be introduced next.
                 checksegments = true;
@@ -364,7 +380,7 @@ namespace TriangleNet
 
             if (behavior.Quality && (triangles.Count > 0))
             {
-                quality.EnforceQuality();           // Enforce angle and area constraints.
+                quality.EnforceQuality(); // Enforce angle and area constraints.
             }
 
             // Calculate the number of edges.
@@ -408,13 +424,13 @@ namespace TriangleNet
         /// <param name="areaConstraint">Global area constraint.</param>
         public void Refine(double areaConstraint)
         {
-            behavior.FixedArea = true;
+            behavior.fixedArea = true;
             behavior.MaxArea = areaConstraint;
 
             this.Refine();
 
             // Reset option for sanity
-            behavior.FixedArea = false;
+            behavior.fixedArea = false;
             behavior.MaxArea = -1.0;
         }
 
@@ -430,7 +446,7 @@ namespace TriangleNet
 
             if (behavior.Poly)
             {
-                if (behavior.UseSegments)
+                if (behavior.useSegments)
                 {
                     insegments = subsegs.Count;
                 }
@@ -442,7 +458,7 @@ namespace TriangleNet
 
             Reset();
 
-            steinerleft = behavior.Steiner;
+            steinerleft = behavior.SteinerPoints;
 
             // Ensure that no vertex can be mistaken for a triangular bounding
             // box vertex in insertvertex().
@@ -450,7 +466,7 @@ namespace TriangleNet
             infvertex2 = null;
             infvertex3 = null;
 
-            if (behavior.UseSegments)
+            if (behavior.useSegments)
             {
                 checksegments = true;
             }
@@ -542,162 +558,6 @@ namespace TriangleNet
             isConsistent = quality.CheckMesh();
             isDelaunay = quality.CheckDelaunay();
         }
-
-        #region Options
-
-        /// <summary>
-        /// Set options for mesh generation.
-        /// </summary>
-        /// <param name="option">Mesh gerneration option.</param>
-        /// <param name="value">New option value.</param>
-        public void SetOption(Options option, bool value)
-        {
-            if (option == Options.ConformingDelaunay)
-            {
-                behavior.ConformDel = value;
-                behavior.Quality = value; // TODO: ok?
-                return;
-            }
-            else if (option == Options.BoundaryMarkers)
-            {
-                behavior.UseBoundaryMarkers = value;
-                return;
-            }
-            else if (option == Options.Quality)
-            {
-                behavior.Quality = value;
-
-                if (value)
-                {
-                    behavior.MinAngle = 20.0;
-                    behavior.MaxAngle = 0.0;
-                    UpdateOptions();
-                }
-
-                return;
-            }
-            else if (option == Options.Convex)
-            {
-                behavior.Convex = value;
-                return;
-            }
-
-            logger.Warning("Invalid option value.", "Mesh.SetOption(bool)");
-        }
-
-        /// <summary>
-        /// Set options for mesh generation.
-        /// </summary>
-        /// <param name="option">Mesh gerneration option.</param>
-        /// <param name="value">New option value.</param>
-        public void SetOption(Options option, double value)
-        {
-
-            if (option == Options.MinAngle)
-            {
-                behavior.MinAngle = value;
-                behavior.Quality = (value >= 0); // TODO: ok?
-                UpdateOptions();
-                return;
-            }
-            else if (option == Options.MaxAngle)
-            {
-                behavior.MaxAngle = value;
-                behavior.Quality = (value >= 0); // TODO: ok?
-                UpdateOptions();
-                return;
-            }
-            else if (option == Options.MaxArea)
-            {
-                behavior.MaxArea = value;
-                behavior.FixedArea = true;
-                behavior.Quality = (value >= 0); // TODO: ok?
-                return;
-            }
-
-            logger.Warning("Invalid option value.", "Mesh.SetOption(double)");
-        }
-
-        /// <summary>
-        /// Set options for mesh generation.
-        /// </summary>
-        /// <param name="option">Mesh gerneration option.</param>
-        /// <param name="value">New option value.</param>
-        public void SetOption(Options option, int value)
-        {
-            if (option == Options.NoBisect)
-            {
-                behavior.NoBisect = value;
-                return;
-            }
-            else if (option == Options.SteinerPoints)
-            {
-                behavior.Steiner = value;
-                return;
-            }
-            else if (option == Options.MinAngle)
-            {
-                behavior.MinAngle = value;
-                behavior.Quality = (value >= 0); // TODO: ok?
-                UpdateOptions();
-                return;
-            }
-            else if (option == Options.MaxAngle)
-            {
-                behavior.MaxAngle = value;
-                behavior.Quality = (value >= 0); // TODO: ok?
-                UpdateOptions();
-                return;
-            }
-            else if (option == Options.MaxArea)
-            {
-                behavior.MaxArea = value;
-                behavior.Quality = (value >= 0); // TODO: ok?
-                behavior.FixedArea = true;
-                return;
-            }
-
-            logger.Warning("Invalid option value.", "Mesh.SetOption(int)");
-        }
-
-        /// <summary>
-        /// Set options for mesh generation.
-        /// </summary>
-        /// <param name="option">Mesh gerneration option.</param>
-        /// <param name="value">New option value.</param>
-        public void SetOption(Options option, TriangulationAlgorithm value)
-        {
-            if (option == Options.TriangulationAlgorithm)
-            {
-                behavior.Algorithm = value;
-                return;
-            }
-
-            logger.Warning("Invalid option value.", "Mesh.SetOption(TriangulationAlgorithm)");
-        }
-
-        /// <summary>
-        /// Keeps options synchronized.
-        /// </summary>
-        private void UpdateOptions()
-        {
-            behavior.UseSegments = behavior.Poly || behavior.Quality || behavior.Convex;
-            behavior.GoodAngle = Math.Cos(behavior.MinAngle * Math.PI / 180.0);
-            behavior.MaxGoodAngle = Math.Cos(behavior.MaxAngle * Math.PI / 180.0);
-
-            if (behavior.GoodAngle == 1.0)
-            {
-                behavior.Offconstant = 0.0;
-            }
-            else
-            {
-                behavior.Offconstant = 0.475 * Math.Sqrt((1.0 + behavior.GoodAngle) / (1.0 - behavior.GoodAngle));
-            }
-
-            behavior.GoodAngle *= behavior.GoodAngle;
-        }
-
-        #endregion
 
         #region Misc
 
@@ -819,7 +679,7 @@ namespace TriangleNet
             dummytri.neighbors[1].triangle = dummytri;
             dummytri.neighbors[2].triangle = dummytri;
 
-            if (behavior.UseSegments)
+            if (behavior.useSegments)
             {
                 // Set up 'dummysub', the omnipresent subsegment pointed to by any
                 // triangle side or subsegment end that isn't attached to a real
@@ -870,6 +730,34 @@ namespace TriangleNet
             }
 
             this.bounds = data.Bounds;
+        }
+
+        /// <summary>
+        /// Construct a mapping from vertices to triangles to improve the speed of 
+        /// point location for segment insertion.
+        /// </summary>
+        /// <remarks>
+        /// Traverses all the triangles, and provides each corner of each triangle
+        /// with a pointer to that triangle. Of course, pointers will be overwritten
+        /// by other pointers because (almost) each vertex is a corner of several
+        /// triangles, but in the end every vertex will point to some triangle
+        /// that contains it.
+        /// </remarks>
+        internal void MakeVertexMap()
+        {
+            Otri tri = default(Otri);
+            Vertex triorg;
+
+            foreach (var t in this.triangles.Values)
+            {
+                tri.triangle = t;
+                // Check all three vertices of the triangle.
+                for (tri.orient = 0; tri.orient < 3; tri.orient++)
+                {
+                    triorg = tri.Org();
+                    triorg.tri = tri;
+                }
+            }
         }
 
         #endregion
@@ -2095,34 +1983,6 @@ namespace TriangleNet
         #endregion
 
         #region Location
-
-        /// <summary>
-        /// Construct a mapping from vertices to triangles to improve the speed of 
-        /// point location for segment insertion.
-        /// </summary>
-        /// <remarks>
-        /// Traverses all the triangles, and provides each corner of each triangle
-        /// with a pointer to that triangle. Of course, pointers will be overwritten
-        /// by other pointers because (almost) each vertex is a corner of several
-        /// triangles, but in the end every vertex will point to some triangle
-        /// that contains it.
-        /// </remarks>
-        internal void MakeVertexMap()
-        {
-            Otri tri = default(Otri);
-            Vertex triorg;
-
-            foreach (var t in this.triangles.Values)
-            {
-                tri.triangle = t;
-                // Check all three vertices of the triangle.
-                for (tri.orient = 0; tri.orient < 3; tri.orient++)
-                {
-                    triorg = tri.Org();
-                    triorg.tri = tri;
-                }
-            }
-        }
 
         /// <summary>
         /// Find a triangle or edge containing a given point.
