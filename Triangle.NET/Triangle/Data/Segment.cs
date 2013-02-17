@@ -92,7 +92,7 @@ namespace TriangleNet.Data
         /// </summary>
         public ITriangle GetTriangle(int index)
         {
-            return triangles[index].triangle;
+            return triangles[index].triangle == Mesh.dummytri ? null : triangles[index].triangle;
         }
 
         public override int GetHashCode()
