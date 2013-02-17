@@ -60,6 +60,7 @@
     <Compile Include="Geometry\ITriangle.cs" />
     <Compile Include="Geometry\Point.cs" />
     <Compile Include="Geometry\RegionPointer.cs" />
+    <Compile Include="Geometry\ISegment.cs" />
     <Compile Include="IO\DataReader.cs" />
     <Compile Include="IO\DebugWriter.cs" />
     <Compile Include="IO\FileWriter.cs" />

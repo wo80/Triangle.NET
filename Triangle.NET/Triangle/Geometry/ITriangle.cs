@@ -6,10 +6,6 @@
 
 namespace TriangleNet.Geometry
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using TriangleNet.Data;
 
     /// <summary>
@@ -72,7 +68,7 @@ namespace TriangleNet.Geometry
         /// </summary>
         /// <param name="index">The vertex index (0, 1 or 2).</param>
         /// <returns>The segment opposite of vertex with given index.</returns>
-        Segment GetSegment(int index);
+        ISegment GetSegment(int index);
 
         /// <summary>
         /// Triangle area constraint.

@@ -8,9 +8,6 @@
 namespace TriangleNet.Data
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using TriangleNet.Geometry;
 
     /// <summary>
@@ -151,7 +148,7 @@ namespace TriangleNet.Data
         /// </summary>
         /// <param name="index">The vertex index (0, 1 or 2).</param>
         /// <returns>The segment opposite of vertex with given index.</returns>
-        public Segment GetSegment(int index)
+        public ISegment GetSegment(int index)
         {
             return subsegs[index].seg == Mesh.dummysub ? null : subsegs[index].seg;
         }

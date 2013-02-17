@@ -21,7 +21,7 @@ namespace TriangleNet.Data
     /// four pointers to vertices, plus two pointers to adjoining triangles,
     /// plus one boundary marker.
     /// </remarks>
-    public class Segment
+    public class Segment : ISegment
     {
         // Hash for dictionary. Will be set by mesh instance.
         internal int hash;
@@ -77,6 +77,8 @@ namespace TriangleNet.Data
             get { return this.boundary; }
         }
 
+        #endregion
+
         /// <summary>
         /// Gets the segments endpoint.
         /// </summary>
@@ -85,7 +87,13 @@ namespace TriangleNet.Data
             return this.vertices[index]; // TODO: Check range?
         }
 
-        #endregion
+        /// <summary>
+        /// Gets an adjoining triangle.
+        /// </summary>
+        public ITriangle GetTriangle(int index)
+        {
+            return triangles[index].triangle;
+        }
 
         public override int GetHashCode()
         {

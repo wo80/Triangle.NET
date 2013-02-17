@@ -1,15 +1,13 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="Triangle.cs" company="">
-// Original Triangle code by Jonathan Richard Shewchuk, http://www.cs.cmu.edu/~quake/triangle.html
 // Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 
 namespace TriangleNet.IO
 {
-    using System;
-    using TriangleNet.Geometry;
     using TriangleNet.Data;
+    using TriangleNet.Geometry;
 
     /// <summary>
     /// Simple triangle class for input.
@@ -92,7 +90,7 @@ namespace TriangleNet.IO
             return null;
         }
 
-        public Segment GetSegment(int index)
+        public ISegment GetSegment(int index)
         {
             return null;
         }
