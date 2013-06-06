@@ -77,11 +77,8 @@ namespace MeshRenderer.Core.GDI
             get { return showVoronoi; }
             set
             {
-                if (showVoronoi != value)
-                {
-                    this.Render();
-                }
                 showVoronoi = value;
+                this.Render();
             }
         }
 
@@ -90,11 +87,8 @@ namespace MeshRenderer.Core.GDI
             get { return showRegions; }
             set
             {
-                if (showRegions != value)
-                {
-                    this.Render();
-                }
                 showRegions = value;
+                this.Render();
             }
         }
 

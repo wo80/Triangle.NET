@@ -5,9 +5,10 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
 using TriangleNet.Data;
 using TriangleNet.Geometry;
-using System.Collections.Generic;
 
 namespace TriangleNet.Tools
 {
@@ -21,8 +22,12 @@ namespace TriangleNet.Tools
         Point[] points;
         List<VoronoiRegion> regions;
 
+        // Stores the endpoints of rays of infinite Voronoi cells
         Dictionary<int, Point> rayPoints;
         int rayIndex;
+
+        // Bounding box of the triangles circumcenters.
+        BoundingBox bounds;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Voronoi" /> class.
@@ -74,10 +79,13 @@ namespace TriangleNet.Tools
             this.points = new Point[mesh.triangles.Count + mesh.hullsize];
             this.regions = new List<VoronoiRegion>(mesh.vertices.Count);
 
-            ComputeCircumCenters();
-
             rayPoints = new Dictionary<int, Point>();
             rayIndex = 0;
+
+            bounds = new BoundingBox();
+
+            // Compute triangles circumcenters and setup bounding box
+            ComputeCircumCenters();
 
             // Loop over the mesh vertices (Voronoi generators).
             foreach (var item in mesh.vertices.Values)
@@ -104,11 +112,16 @@ namespace TriangleNet.Tools
                 pt.id = item.id;
 
                 points[item.id] = pt;
+
+                bounds.Update(pt.x, pt.y);
             }
+
+            double ds = Math.Max(bounds.Width, bounds.Height);
+            bounds.Scale(ds, ds);
         }
 
         /// <summary>
-        /// 
+        /// Construct Voronoi region for given vertex.
         /// </summary>
         /// <param name="vertex"></param>
         /// <returns>The circumcenter indices which make up the cell.</returns>
@@ -132,6 +145,7 @@ namespace TriangleNet.Tools
             f_init.Copy(ref f);
             f_init.Onext(ref f_next);
 
+            // Check if f_init lies on the boundary of the triangulation.
             if (f_next.triangle == Mesh.dummytri)
             {
                 f_init.Oprev(ref f_prev);
@@ -216,9 +230,6 @@ namespace TriangleNet.Tools
             f.SegPivot(ref sub);
             sid = sub.seg.hash;
             
-            // Last valid f lies at the boundary. Add the circumcenter.
-            vpoints.Add(points[f.triangle.id]);
-
             if (rayPoints.ContainsKey(sid))
             {
                 vpoints.Add(rayPoints[sid]);
@@ -254,16 +265,11 @@ namespace TriangleNet.Tools
 
             double t1, x1, y1, t2, x2, y2;
 
-            // Bounding box (50% enlarged)
-            var box = mesh.Bounds;
-
-            double dw = box.Width * 0.5f;
-            double dh = box.Height * 0.5f;
-
-            double minX = box.Xmin - dw;
-            double maxX = box.Xmax + dw;
-            double minY = box.Ymin - dh;
-            double maxY = box.Ymax + dh;
+            // Bounding box
+            double minX = bounds.Xmin;
+            double maxX = bounds.Xmax;
+            double minY = bounds.Ymin;
+            double maxY = bounds.Ymax;
 
             // Check if point is inside the bounds
             if (x < minX || x > maxX || y < minY || y > maxY)

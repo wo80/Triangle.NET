@@ -413,13 +413,17 @@ namespace TriangleNet.Tools
                 f.Onext(ref f_next);
             }
 
-            // Add vertex on border
-            p = new Point(vertex.x, vertex.y);
-            p.id = n + segIndex;
-            points[n + segIndex] = p;
-            segIndex++;
+            if (f_prev.triangle == Mesh.dummytri)
+            {
+                // For vertices on the domain boundaray, add the vertex. For 
+                // internal boundaries don't add it.
+                p = new Point(vertex.x, vertex.y);
+                p.id = n + segIndex;
+                points[n + segIndex] = p;
+                segIndex++;
 
-            vpoints.Add(p);
+                vpoints.Add(p);
+            }
 
             // Add midpoint of start triangles' edge.
             torg = f.Org();

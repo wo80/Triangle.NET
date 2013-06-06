@@ -15,89 +15,32 @@ namespace MeshExplorer.Generators
     /// <summary>
     /// Generates a star contained in a box.
     /// </summary>
-    public class BoxWithHole : IGenerator
+    public class BoxWithHole : BaseGenerator
     {
-        public string Name
+        public BoxWithHole()
         {
-            get { return "Box with Hole"; }
+            name = "Box with Hole";
+            description = "";
+            parameter = 3;
+
+            descriptions[0] = "Points on box sides:";
+            descriptions[1] = "Points on hole:";
+            descriptions[2] = "Radius:";
+
+            ranges[0] = new int[] { 5, 50 };
+            ranges[1] = new int[] { 10, 200 };
+            ranges[2] = new int[] { 5, 20 };
         }
 
-        public string Description
+        public override InputGeometry Generate(double param0, double param1, double param2)
         {
-            get { return ""; }
-        }
-
-        public int ParameterCount
-        {
-            get { return 3; }
-        }
-
-        public string ParameterDescription(int paramIndex)
-        {
-            if (paramIndex == 1)
-            {
-                return "Points on box sides:";
-            }
-
-            if (paramIndex == 2)
-            {
-                return "Points on hole:";
-            }
-
-            if (paramIndex == 3)
-            {
-                return "Radius:";
-            }
-
-            return "";
-        }
-
-        public string ParameterDescription(int paramIndex, double paramValue)
-        {
-            if (paramIndex == 1)
-            {
-                int numPoints = (int)((50.0 - 5.0) / 100.0 * paramValue + 5.0);
-
-                if (numPoints < 5)
-                {
-                    numPoints = 5;
-                }
-
-                return numPoints.ToString();
-            }
-
-            if (paramIndex == 2)
-            {
-                int numPoints = (int)((100.0 - 10.0) / 100.0 * paramValue + 10.0);
-                numPoints = (numPoints / 5) * 5;
-
-                if (numPoints < 10)
-                {
-                    numPoints = 10;
-                }
-
-                return numPoints.ToString();
-            }
-
-            if (paramIndex == 3)
-            {
-                int radius = (int)((20.0 - 5.0) / 100.0 * paramValue + 5.0);
-
-                return radius.ToString();
-            }
-
-            return "";
-        }
-
-        public InputGeometry Generate(double param1, double param2, double param3)
-        {
-            int numPoints = (int)((100.0 - 10.0) / 100.0 * param2 + 10.0);
+            int numPoints = GetParamValueInt(1, param1);
 
             InputGeometry input = new InputGeometry(numPoints + 4);
 
             double x, y, step = 2 * Math.PI / numPoints;
 
-            double r = (int)((20.0 - 5.0) / 100.0 * param3 + 5.0);
+            double r = GetParamValueInt(2, param2);
 
             // Generate circle
             for (int i = 0; i < numPoints; i++)
@@ -111,7 +54,7 @@ namespace MeshExplorer.Generators
 
             numPoints = input.Count;
 
-            int numPointsB = (int)((50.0 - 5.0) / 100.0 * param1 + 5.0);
+            int numPointsB = GetParamValueInt(0, param0);
 
             // Box sides are 100 units long
             step = 100.0 / numPointsB;
@@ -153,11 +96,6 @@ namespace MeshExplorer.Generators
             input.AddHole(0, 0);
 
             return input;
-        }
-
-        public override string ToString()
-        {
-            return this.Name;
         }
     }
 }

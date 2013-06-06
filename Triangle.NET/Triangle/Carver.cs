@@ -332,7 +332,7 @@ namespace TriangleNet
                         if (Primitives.CounterClockwise(searchorg, searchdest, hole) > 0.0)
                         {
                             // Find a triangle that contains the hole.
-                            intersect = mesh.Locate(hole, ref searchtri);
+                            intersect = mesh.locator.Locate(hole, ref searchtri);
                             if ((intersect != LocateResult.Outside) && (!searchtri.IsInfected()))
                             {
                                 // Infect the triangle. This is done by marking the triangle
@@ -374,7 +374,7 @@ namespace TriangleNet
                         if (Primitives.CounterClockwise(searchorg, searchdest, region.point) > 0.0)
                         {
                             // Find a triangle that contains the region point.
-                            intersect = mesh.Locate(region.point, ref searchtri);
+                            intersect = mesh.locator.Locate(region.point, ref searchtri);
                             if ((intersect != LocateResult.Outside) && (!searchtri.IsInfected()))
                             {
                                 // Record the triangle for processing after the

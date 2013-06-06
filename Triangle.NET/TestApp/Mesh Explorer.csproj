@@ -96,6 +96,7 @@
     <Compile Include="FormMain.Designer.cs">
       <DependentUpon>FormMain.cs</DependentUpon>
     </Compile>
+    <Compile Include="Generators\BaseGenerator.cs" />
     <Compile Include="Generators\BoxWithHole.cs" />
     <Compile Include="Generators\CircleWithHole.cs" />
     <Compile Include="Generators\IGenerator.cs" />

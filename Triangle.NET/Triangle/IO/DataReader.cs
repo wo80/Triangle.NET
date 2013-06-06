@@ -75,6 +75,7 @@ namespace TriangleNet.IO
             int numberofsegments = input.segments.Count;
 
             mesh.inelements = elements;
+            mesh.regions.AddRange(input.regions);
 
             // Create the triangles.
             for (i = 0; i < mesh.inelements; i++)

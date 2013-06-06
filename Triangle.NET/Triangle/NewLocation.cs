@@ -4079,7 +4079,7 @@ namespace TriangleNet
                     //   edge specified by 'searchtri'.
                     searchtri.SymSelf();
                     searchtri.Copy(ref horiz);
-                    intersect = mesh.PreciseLocate(newvertex, ref horiz, false);
+                    intersect = mesh.locator.PreciseLocate(newvertex, ref horiz, false);
                 }
                 else if (ahead == 0.0)
                 {
@@ -4095,7 +4095,7 @@ namespace TriangleNet
                 else
                 {
                     searchtri.Copy(ref horiz);
-                    intersect = mesh.PreciseLocate(newvertex, ref horiz, false);
+                    intersect = mesh.locator.PreciseLocate(newvertex, ref horiz, false);
                 }
             }
             if (intersect == LocateResult.OnVertex || intersect == LocateResult.Outside)

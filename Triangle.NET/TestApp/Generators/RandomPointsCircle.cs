@@ -15,43 +15,26 @@ namespace MeshExplorer.Generators
     /// <summary>
     /// Simple random points generator (points distributed in a circle).
     /// </summary>
-    public class RandomPointsCircle : IGenerator
+    public class RandomPointsCircle : BaseGenerator
     {
-        public string Name
+        public RandomPointsCircle()
         {
-            get { return "Random Points (Circle)"; }
+            name = "Random Points (Circle)";
+            description = "";
+            parameter = 2;
+
+            descriptions[0] = "Number of points:";
+            descriptions[1] = "Distribution:";
+
+            ranges[0] = new int[] { 5, 5000 };
+            ranges[1] = new int[] { 0, 1 };
         }
 
-        public string Description
+        public override string ParameterDescription(int paramIndex, double paramValue)
         {
-            get { return ""; }
-        }
-
-        public int ParameterCount
-        {
-            get { return 2; }
-        }
-
-        public string ParameterDescription(int paramIndex)
-        {
-            if (paramIndex == 1)
+            if (paramIndex == 0)
             {
-                return "Number of points:";
-            }
-
-            if (paramIndex == 2)
-            {
-                return "Distribution:";
-            }
-
-            return "";
-        }
-
-        public string ParameterDescription(int paramIndex, double paramValue)
-        {
-            if (paramIndex == 1)
-            {
-                int numPoints = (int)((5000.0 - 5.0) / 100.0 * paramValue + 5.0);
+                int numPoints = GetParamValueInt(paramIndex, paramValue);
                 numPoints = (numPoints / 10) * 10;
 
                 if (numPoints < 5)
@@ -62,7 +45,7 @@ namespace MeshExplorer.Generators
                 return numPoints.ToString();
             }
 
-            if (paramIndex == 2)
+            if (paramIndex == 1)
             {
                 double exp = (paramValue + 10) / 100;
 
@@ -77,9 +60,9 @@ namespace MeshExplorer.Generators
             return "";
         }
 
-        public InputGeometry Generate(double param1, double param2, double param3)
+        public override InputGeometry Generate(double param0, double param1, double param2)
         {
-            int numPoints = (int)((5000.0 - 5.0) / 100.0 * param1 + 5.0);
+            int numPoints = GetParamValueInt(0, param0);
             numPoints = (numPoints / 10) * 10;
 
             if (numPoints < 5)
@@ -87,7 +70,7 @@ namespace MeshExplorer.Generators
                 numPoints = 5;
             }
 
-            double exp = (param2 + 10) / 100;
+            double exp = (param1 + 10) / 100;
 
             InputGeometry input = new InputGeometry(numPoints);
 
@@ -115,11 +98,6 @@ namespace MeshExplorer.Generators
             }
 
             return input;
-        }
-
-        public override string ToString()
-        {
-            return this.Name;
         }
     }
 }

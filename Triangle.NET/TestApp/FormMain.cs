@@ -663,6 +663,13 @@ namespace MeshExplorer
                 return;
             }
 
+            if (menuViewVoronoi.Checked)
+            {
+                renderManager.ShowVoronoi = false;
+                menuViewVoronoi.Checked = false;
+                return;
+            }
+
             IVoronoi voronoi;
 
             if (mesh.IsPolygon)
@@ -677,7 +684,7 @@ namespace MeshExplorer
             renderData.SetVoronoi(voronoi);
             renderManager.SetData(renderData);
 
-            menuViewVoronoi.Checked = !menuViewVoronoi.Checked;
+            menuViewVoronoi.Checked = true;
         }
 
         private void menuViewLog_Click(object sender, EventArgs e)

@@ -756,13 +756,13 @@ namespace TriangleNet.Algorithm
                 divider = vertices >> 1;
                 // Recursively triangulate each half.
                 DivconqRecurse(left, left + divider - 1, 1 - axis, ref farleft, ref innerleft);
-                ///dbgWriter.Write();
+                //DebugWriter.Session.Write(mesh, true);
                 DivconqRecurse(left + divider, right, 1 - axis, ref innerright, ref farright);
-                ///dbgWriter.Write();
+                //DebugWriter.Session.Write(mesh, true);
 
                 // Merge the two triangulations into one.
                 MergeHulls(ref farleft, ref innerleft, ref innerright, ref farright, axis);
-                ///dbgWriter.Write();
+                //DebugWriter.Session.Write(mesh, true);
             }
         }
 
@@ -838,6 +838,8 @@ namespace TriangleNet.Algorithm
 
             this.mesh = m;
 
+            //DebugWriter.Session.Start("test-dbg");
+
             // Allocate an array of pointers to vertices for sorting.
             // TODO: use ToArray
             this.sortarray = new Vertex[m.invertices];
@@ -888,7 +890,9 @@ namespace TriangleNet.Algorithm
 
             // Form the Delaunay triangulation.
             DivconqRecurse(0, i-1, 0, ref hullleft, ref hullright);
-            //trifree((VOID*)sortarray);
+
+            //DebugWriter.Session.Write(mesh);
+            //DebugWriter.Session.Finish();
 
             return RemoveGhosts(ref hullleft);
         }

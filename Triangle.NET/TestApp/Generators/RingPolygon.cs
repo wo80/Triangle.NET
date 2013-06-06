@@ -15,60 +15,41 @@ namespace MeshExplorer.Generators
     /// <summary>
     /// Generates a ring polygon.
     /// </summary>
-    public class RingPolygon : IGenerator
+    public class RingPolygon : BaseGenerator
     {
-        public string Name
+        public RingPolygon()
         {
-            get { return "Ring"; }
+            name = "Ring";
+            description = "";
+            parameter = 2;
+
+            descriptions[0] = "Number of points:";
+            descriptions[1] = "Variation:";
+
+            ranges[0] = new int[] { 50, 250 };
+            ranges[1] = new int[] { 0, 1 };
         }
 
-        public string Description
+        public override string ParameterDescription(int paramIndex, double paramValue)
         {
-            get { return ""; }
-        }
-
-        public int ParameterCount
-        {
-            get { return 2; }
-        }
-
-        public string ParameterDescription(int paramIndex)
-        {
-            if (paramIndex == 1)
+            if (paramIndex == 0)
             {
-                return "Number of points:";
-            }
-
-            if (paramIndex == 2)
-            {
-                return "Variation:";
-            }
-
-            return "";
-        }
-
-        public string ParameterDescription(int paramIndex, double paramValue)
-        {
-            if (paramIndex == 1)
-            {
-                int numRays = (int)((250.0 - 50.0) / 100.0 * paramValue + 50.0);
-
+                int numRays = GetParamValueInt(paramIndex, paramValue);
                 return numRays.ToString();
             }
 
-            if (paramIndex == 2)
+            if (paramIndex == 1)
             {
-                double variation = (paramValue + 1) / 100;
-
+                double variation = GetParamValueDouble(paramIndex, paramValue);
                 return variation.ToString("0.0", Util.Nfi);
             }
 
             return "";
         }
 
-        public InputGeometry Generate(double param1, double param2, double param3)
+        public override InputGeometry Generate(double param0, double param1, double param2)
         {
-            int n = (int)((250.0 - 50.0) / 100.0 * param1 + 50.0);
+            int n = GetParamValueInt(0, param0);
             int m = n / 2;
 
             InputGeometry input = new InputGeometry(n + 1);
@@ -96,7 +77,7 @@ namespace MeshExplorer.Generators
 
                 if (i % 2 == 0)
                 {
-                    ro = r + r * Util.Random.NextDouble() * (param2 / 100);
+                    ro = r + r * Util.Random.NextDouble() * (param1 / 100);
                 }
 
                 input.AddPoint(ro * Math.Cos(i * step + offset), ro * Math.Sin(i * step + offset));

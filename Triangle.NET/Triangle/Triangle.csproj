@@ -93,6 +93,7 @@
     <Compile Include="Algorithm\SweepLine.cs" />
     <Compile Include="Tools\Voronoi.cs" />
     <Compile Include="Tools\VoronoiRegion.cs" />
+    <Compile Include="TriangleLocator.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

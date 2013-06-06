@@ -7,9 +7,12 @@
 namespace TriangleNet.IO
 {
     using System;
-    using System.IO;
     using System.Globalization;
+    using System.IO;
+    using System.IO.Compression;
+    using System.Text;
     using TriangleNet.Data;
+    using TriangleNet.Geometry;
 
     /// <summary>
     /// Writes a the current mesh into a text file.
@@ -18,146 +21,242 @@ namespace TriangleNet.IO
     /// File format:
     /// 
     /// num_nodes
-    /// nid_1 nx ny mark
+    /// id_1 nx ny mark
     /// ...
-    /// nid_n nx ny mark
+    /// id_n nx ny mark
     /// 
     /// num_segs
-    /// sid_1 p1 p2 mark
+    /// id_1 p1 p2 mark
     /// ...
-    /// sid_n p1 p2 mark
+    /// id_n p1 p2 mark
     /// 
     /// num_tris
-    /// tid_1 p1 p2 p3 n1 n2 n3
+    /// id_1 p1 p2 p3 n1 n2 n3
     /// ...
-    /// tid_n p1 p2 p3 n1 n2 n3
+    /// id_n p1 p2 p3 n1 n2 n3
     /// </remarks>
     class DebugWriter
     {
         static NumberFormatInfo nfi = CultureInfo.InvariantCulture.NumberFormat;
 
-        Mesh mesh;
         int iteration;
-        string name;
+        string session;
+        StreamWriter stream;
+        string tmpFile;
+        int[] vertices;
+        int triangles;
 
-        public DebugWriter(Mesh mesh)
+        #region Singleton pattern
+
+        private static readonly DebugWriter instance = new DebugWriter();
+
+        // Explicit static constructor to tell C# compiler
+        // not to mark type as beforefieldinit
+        static DebugWriter() { }
+
+        private DebugWriter() { }
+
+        public static DebugWriter Session
         {
-            this.mesh = mesh;
-
-            this.iteration = 0;
-            this.name = "debug-{0}.mesh";
+            get
+            {
+                return instance;
+            }
         }
+
+        #endregion
 
         /// <summary>
         /// Start a new session with given name.
         /// </summary>
         /// <param name="name">Name of the session (and output files).</param>
-        public void NewSession(string name)
+        public void Start(string session)
         {
             this.iteration = 0;
-            this.name = name + "-{0}.mesh";
+            this.session = session;
+
+            if (this.stream != null)
+            {
+                throw new Exception("A session is active. Finish before starting a new.");
+            }
+
+            this.tmpFile = Path.GetTempFileName();
+            this.stream = new StreamWriter(tmpFile);
         }
-        
+
         /// <summary>
-        /// Write complete mesh to a .mesh file.
+        /// Write complete mesh to file.
         /// </summary>
-        public void Write()
+        public void Write(Mesh mesh, bool skip = false)
         {
+            this.WriteMesh(mesh, skip);
+
+            this.triangles = mesh.Triangles.Count;
+        }
+
+        /// <summary>
+        /// Finish this session.
+        /// </summary>
+        public void Finish()
+        {
+            this.Finish(session + ".mshx");
+        }
+
+        private void Finish(string path)
+        {
+            if (stream != null)
+            {
+                stream.Flush();
+                stream.Dispose();
+                stream = null;
+
+                string header = "#!N" + this.iteration + Environment.NewLine;
+
+                using (var gzFile = new FileStream(path, FileMode.Create))
+                {
+                    using (var gzStream = new GZipStream(gzFile, CompressionMode.Compress, false))
+                    {
+                        byte[] bytes = Encoding.UTF8.GetBytes(header);
+                        gzStream.Write(bytes, 0, bytes.Length);
+
+                        // TODO: read with stream
+                        bytes = File.ReadAllBytes(tmpFile);
+                        gzStream.Write(bytes, 0, bytes.Length);
+                    }
+                }
+
+                File.Delete(this.tmpFile);
+            }
+        }
+
+        private void WriteGeometry(InputGeometry geometry)
+        {
+            stream.WriteLine("#!G{0}", this.iteration++);
+        }
+
+        private void WriteMesh(Mesh mesh, bool skip)
+        {
+            // Mesh may have changed, but we choose to skip
+            if (triangles == mesh.triangles.Count && skip)
+            {
+                return;
+            }
+
+            // Header line
+            stream.WriteLine("#!M{0}", this.iteration++);
+
             Vertex p1, p2, p3;
 
-            string file = String.Format(name, iteration++);
-
-            using (StreamWriter writer = new StreamWriter(file))
+            if (VerticesChanged(mesh))
             {
+                HashVertices(mesh);
+
                 // Number of vertices.
-                writer.WriteLine("{0}", mesh.vertices.Count);
+                stream.WriteLine("{0}", mesh.vertices.Count);
 
                 foreach (var v in mesh.vertices.Values)
                 {
                     // Vertex number, x and y coordinates and marker.
-                    writer.WriteLine("{0} {1} {2} {3}", v.hash, v.x.ToString(nfi), v.y.ToString(nfi), v.mark);
+                    stream.WriteLine("{0} {1} {2} {3}", v.hash, v.x.ToString(nfi), v.y.ToString(nfi), v.mark);
                 }
+            }
+            else
+            {
+                stream.WriteLine("0");
+            }
 
-                // Number of segments.
-                writer.WriteLine("{0}", mesh.subsegs.Count);
+            // Number of segments.
+            stream.WriteLine("{0}", mesh.subsegs.Count);
 
-                Osub subseg = default(Osub);
-                subseg.orient = 0;
+            Osub subseg = default(Osub);
+            subseg.orient = 0;
 
-                foreach (var item in mesh.subsegs.Values)
+            foreach (var item in mesh.subsegs.Values)
+            {
+                if (item.hash <= 0)
                 {
-                    if (item.hash <= 0)
-                    {
-                        continue;
-                    }
-
-                    subseg.seg = item;
-
-                    p1 = subseg.Org();
-                    p2 = subseg.Dest();
-
-                    // Segment number, indices of its two endpoints, and marker.
-                    writer.WriteLine("{0} {1} {2} {3}", subseg.seg.hash, p1.hash, p2.hash, subseg.seg.boundary);
+                    continue;
                 }
 
-                Otri tri = default(Otri), trisym = default(Otri);
+                subseg.seg = item;
+
+                p1 = subseg.Org();
+                p2 = subseg.Dest();
+
+                // Segment number, indices of its two endpoints, and marker.
+                stream.WriteLine("{0} {1} {2} {3}", subseg.seg.hash, p1.hash, p2.hash, subseg.seg.boundary);
+            }
+
+            Otri tri = default(Otri), trisym = default(Otri);
+            tri.orient = 0;
+
+            int n1, n2, n3, h1, h2, h3;
+
+            // Number of triangles.
+            stream.WriteLine("{0}", mesh.triangles.Count);
+
+            foreach (var item in mesh.triangles.Values)
+            {
+                tri.triangle = item;
+
+                p1 = tri.Org();
+                p2 = tri.Dest();
+                p3 = tri.Apex();
+
+                h1 = (p1 == null) ? -1 : p1.hash;
+                h2 = (p2 == null) ? -1 : p2.hash;
+                h3 = (p3 == null) ? -1 : p3.hash;
+
+                // Triangle number, indices for three vertices.
+                stream.Write("{0} {1} {2} {3}", tri.triangle.hash, h1, h2, h3);
+
+                tri.orient = 1;
+                tri.Sym(ref trisym);
+                n1 = trisym.triangle.hash;
+
+                tri.orient = 2;
+                tri.Sym(ref trisym);
+                n2 = trisym.triangle.hash;
+
                 tri.orient = 0;
+                tri.Sym(ref trisym);
+                n3 = trisym.triangle.hash;
 
-                int n1, n2, n3, hash3;
+                // Neighboring triangle numbers.
+                stream.WriteLine(" {0} {1} {2}", n1, n2, n3);
+            }
+        }
 
-                // Number of triangles.
-                writer.WriteLine("{0}", mesh.triangles.Count);
+        private bool VerticesChanged(Mesh mesh)
+        {
+            if (vertices == null || mesh.Vertices.Count != vertices.Length)
+            {
+                return true;
+            }
 
-                foreach (var item in mesh.triangles.Values)
+            int i = 0;
+            foreach (var v in mesh.Vertices)
+            {
+                if (v.id != vertices[i++])
                 {
-                    if (item.hash <= 0)
-                    {
-                        continue;
-                    }
-
-                    tri.triangle = item;
-
-                    p1 = tri.Org();
-                    p2 = tri.Dest();
-                    p3 = tri.Apex();
-
-                    if (p3 == null)
-                    {
-                        if (p1 == null || p2 == null)
-                        {
-                            continue;
-                        }
-
-                        hash3 = -1;
-                    }
-                    else
-                    {
-                        hash3 = p3.hash;
-                    }
-                    
-                    if (p1 == null || p2 == null)
-                    {
-                        continue;
-                    }
-
-                    // Triangle number, indices for three vertices.
-                    writer.Write("{0} {1} {2} {3}", tri.triangle.hash, p1.hash, p2.hash, hash3);
-
-                    tri.orient = 1;
-                    tri.Sym(ref trisym);
-                    n1 = trisym.triangle.hash;
-
-                    tri.orient = 2;
-                    tri.Sym(ref trisym);
-                    n2 = trisym.triangle.hash;
-
-                    tri.orient = 0;
-                    tri.Sym(ref trisym);
-                    n3 = trisym.triangle.hash;
-
-                    // Neighboring triangle numbers.
-                    writer.WriteLine(" {0} {1} {2}", n1, n2, n3);
+                    return true;
                 }
+            }
+
+            return false;
+        }
+
+        private void HashVertices(Mesh mesh)
+        {
+            if (vertices == null || mesh.Vertices.Count != vertices.Length)
+            {
+                vertices = new int[mesh.Vertices.Count];
+            }
+
+            int i = 0;
+            foreach (var v in mesh.Vertices)
+            {
+                vertices[i++] = v.id;
             }
         }
     }

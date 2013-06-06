@@ -15,66 +15,26 @@ namespace MeshExplorer.Generators
     /// <summary>
     /// Simple random points generator.
     /// </summary>
-    public class RandomPoints : IGenerator
+    public class RandomPoints : BaseGenerator
     {
-        public string Name
+        public RandomPoints()
         {
-            get { return "Random Points"; }
+            name = "Random Points";
+            description = "";
+            parameter = 3;
+
+            descriptions[0] = "Number of points:";
+            descriptions[1] = "Width:";
+            descriptions[2] = "Height:";
+
+            ranges[0] = new int[] { 5, 5000 };
+            ranges[1] = new int[] { 10, 200 };
+            ranges[2] = new int[] { 10, 200 };
         }
 
-        public string Description
+        public override InputGeometry Generate(double param0, double param1, double param2)
         {
-            get { return ""; }
-        }
-
-        public int ParameterCount
-        {
-            get { return 3; }
-        }
-
-        public string ParameterDescription(int paramIndex)
-        {
-            if (paramIndex == 1)
-            {
-                return "Number of points:";
-            }
-
-            if (paramIndex == 2)
-            {
-                return "Width:";
-            }
-
-            return "Height:";
-        }
-
-        public string ParameterDescription(int paramIndex, double paramValue)
-        {
-            if (paramIndex == 1)
-            {
-                int numPoints = (int)((5000.0 - 5.0) / 100.0 * paramValue + 5.0);
-                numPoints = (numPoints / 10) * 10;
-
-                if (numPoints < 5)
-                {
-                    numPoints = 5;
-                }
-
-                return numPoints.ToString();
-            }
-
-            if (paramIndex == 2 || paramIndex == 3)
-            {
-                int numPoints = (int)paramValue + 100;
-
-                return numPoints.ToString();
-            }
-
-            return "";
-        }
-
-        public InputGeometry Generate(double param1, double param2, double param3)
-        {
-            int numPoints = (int)((5000.0 - 5.0) / 100.0 * param1 + 5.0);
+            int numPoints = GetParamValueInt(0, param0);
             numPoints = (numPoints / 10) * 10;
 
             if (numPoints < 5)
@@ -84,8 +44,8 @@ namespace MeshExplorer.Generators
 
             InputGeometry input = new InputGeometry(numPoints);
 
-            int width = (int)param2 + 100;
-            int height = (int)param3 + 100;
+            int width = GetParamValueInt(1, param1);
+            int height = GetParamValueInt(2, param2);
 
             for (int i = 0; i < numPoints; i++)
             {
@@ -94,11 +54,6 @@ namespace MeshExplorer.Generators
             }
 
             return input;
-        }
-
-        public override string ToString()
-        {
-            return this.Name;
         }
     }
 }

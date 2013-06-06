@@ -123,6 +123,17 @@ namespace TriangleNet
                 }
             }
 
+            // Check for unconnected vertices
+            mesh.MakeVertexMap();
+            foreach (var v in mesh.vertices.Values)
+            {
+                if (v.tri.triangle == null)
+                {
+                    logger.Warning("Vertex (ID " + v.id + ") not connected to mesh (duplicate input vertex?)",
+                                "Quality.CheckMesh()");
+                }
+            }
+
             if (horrors == 0) // && Behavior.Verbose
             {
                 logger.Info("Mesh topology appears to be consistent.");

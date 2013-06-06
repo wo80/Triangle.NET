@@ -15,68 +15,28 @@ namespace MeshExplorer.Generators
     /// <summary>
     /// Generates a ring polygon.
     /// </summary>
-    public class CircleWithHole : IGenerator
+    public class CircleWithHole : BaseGenerator
     {
-        // Parameters range
-        double[] range1 = { 100, 250 };
-        double[] range2 = { 2, 15 };
-
-        public string Name
+        public CircleWithHole()
         {
-            get { return "Circle with Hole"; }
+            name = "Circle with Hole";
+            description = "";
+            parameter = 2;
+
+            descriptions[0] = "Number of points:";
+            descriptions[1] = "Outer radius:";
+
+            ranges[0] = new int[] { 100, 250 };
+            ranges[1] = new int[] { 2, 15 };
         }
 
-        public string Description
-        {
-            get { return ""; }
-        }
-
-        public int ParameterCount
-        {
-            get { return 2; }
-        }
-
-        public string ParameterDescription(int paramIndex)
-        {
-            if (paramIndex == 1)
-            {
-                return "Number of points:";
-            }
-
-            if (paramIndex == 2)
-            {
-                return "Outer radius:";
-            }
-
-            return "";
-        }
-
-        public string ParameterDescription(int paramIndex, double paramValue)
-        {
-            if (paramIndex == 1)
-            {
-                int num = (int)((range1[1] - range1[0]) / 100.0 * paramValue + range1[0]);
-
-                return num.ToString();
-            }
-
-            if (paramIndex == 2)
-            {
-                int radius = (int)((range2[1] - range2[0]) / 100.0 * paramValue + range2[0]);
-
-                return radius.ToString();
-            }
-
-            return "";
-        }
-
-        public InputGeometry Generate(double param1, double param2, double param3)
+        public override InputGeometry Generate(double param0, double param1, double param2)
         {
             // Number of points on the outer circle
-            int n = (int)((range1[1] - range1[0]) / 100.0 * param1 + range1[0]);
+            int n = GetParamValueInt(0, param0);
             int count, npoints;
 
-            double radius = (int)((range2[1] - range2[0]) / 100.0 * param2 + range2[0]);
+            double radius = GetParamValueInt(1, param1);
 
             // Step size on the outer circle
             double h = 2 * Math.PI * radius / n;
@@ -122,18 +82,13 @@ namespace MeshExplorer.Generators
 
             input.AddHole(0, 0);
 
-            // Regions: |------|------|---|
+            // Regions: |++++++|++++++|---|
             //          r             1   0
 
             input.AddRegion((r + 3.0) / 4.0, 0, 1);
             input.AddRegion((3 * r + 1.0) / 4.0, 0, 2);
 
             return input;
-        }
-
-        public override string ToString()
-        {
-            return this.Name;
         }
     }
 }

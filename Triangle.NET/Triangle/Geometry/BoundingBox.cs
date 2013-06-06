@@ -104,6 +104,19 @@ namespace TriangleNet.Geometry
         }
 
         /// <summary>
+        /// Scale bounds.
+        /// </summary>
+        /// <param name="dx">Add dx to left and right bounds.</param>
+        /// <param name="dy">Add dy to top and bottom bounds.</param>
+        public void Scale(double dx, double dy)
+        {
+            xmin -= dx;
+            xmax += dx;
+            ymin -= dy;
+            ymax += dy;
+        }
+
+        /// <summary>
         /// Check if given point is inside bounding box.
         /// </summary>
         /// <param name="pt">Point to check.</param>

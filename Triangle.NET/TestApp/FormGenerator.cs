@@ -22,8 +22,8 @@ namespace MeshExplorer
             if (currentGenerator.ParameterCount > 0)
             {
                 sliderParam1.Enabled = true;
-                lbParam1.Text = currentGenerator.ParameterDescription(1);
-                lbParam1Val.Text = currentGenerator.ParameterDescription(1, sliderParam1.Value);
+                lbParam1.Text = currentGenerator.ParameterDescription(0);
+                lbParam1Val.Text = currentGenerator.ParameterDescription(0, sliderParam1.Value);
             }
             else
             {
@@ -35,8 +35,8 @@ namespace MeshExplorer
             if (currentGenerator.ParameterCount > 1)
             {
                 sliderParam2.Enabled = true;
-                lbParam2.Text = currentGenerator.ParameterDescription(2);
-                lbParam2Val.Text = currentGenerator.ParameterDescription(2, sliderParam2.Value);
+                lbParam2.Text = currentGenerator.ParameterDescription(1);
+                lbParam2Val.Text = currentGenerator.ParameterDescription(1, sliderParam2.Value);
             }
             else
             {
@@ -48,8 +48,8 @@ namespace MeshExplorer
             if (currentGenerator.ParameterCount > 2)
             {
                 sliderParam3.Enabled = true;
-                lbParam3.Text = currentGenerator.ParameterDescription(3);
-                lbParam3Val.Text = currentGenerator.ParameterDescription(3, sliderParam3.Value);
+                lbParam3.Text = currentGenerator.ParameterDescription(2);
+                lbParam3Val.Text = currentGenerator.ParameterDescription(2, sliderParam3.Value);
             }
             else
             {
@@ -115,7 +115,7 @@ namespace MeshExplorer
         {
             if (currentGenerator != null)
             {
-                lbParam1Val.Text = currentGenerator.ParameterDescription(1, sliderParam1.Value);
+                lbParam1Val.Text = currentGenerator.ParameterDescription(0, sliderParam1.Value);
             }
         }
 
@@ -123,7 +123,7 @@ namespace MeshExplorer
         {
             if (currentGenerator != null)
             {
-                lbParam2Val.Text = currentGenerator.ParameterDescription(2, sliderParam2.Value);
+                lbParam2Val.Text = currentGenerator.ParameterDescription(1, sliderParam2.Value);
             }
         }
 
@@ -131,7 +131,7 @@ namespace MeshExplorer
         {
             if (currentGenerator != null)
             {
-                lbParam3Val.Text = currentGenerator.ParameterDescription(3, sliderParam3.Value);
+                lbParam3Val.Text = currentGenerator.ParameterDescription(2, sliderParam3.Value);
             }
         }
 

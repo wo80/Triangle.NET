@@ -15,48 +15,22 @@ namespace MeshExplorer.Generators
     /// <summary>
     /// Generates a star contained in a box.
     /// </summary>
-    public class StarInBox : IGenerator
+    public class StarInBox : BaseGenerator
     {
-        public string Name
+        public StarInBox()
         {
-            get { return "Star in Box"; }
+            name = "Star in Box";
+            description = "";
+            parameter = 1;
+
+            descriptions[0] = "Number of rays:";
+
+            ranges[0] = new int[] { 3, 61 };
         }
 
-        public string Description
+        public override InputGeometry Generate(double param0, double param1, double param2)
         {
-            get { return ""; }
-        }
-
-        public int ParameterCount
-        {
-            get { return 1; }
-        }
-
-        public string ParameterDescription(int paramIndex)
-        {
-            if (paramIndex == 1)
-            {
-                return "Number of rays:";
-            }
-
-            return "";
-        }
-
-        public string ParameterDescription(int paramIndex, double paramValue)
-        {
-            if (paramIndex == 1)
-            {
-                int numRays = (int)((61.0 - 3.0) / 100.0 * paramValue + 3.0);
-
-                return numRays.ToString();
-            }
-
-            return "";
-        }
-
-        public InputGeometry Generate(double param1, double param2, double param3)
-        {
-            int numRays = (int)((61.0 - 3.0) / 100.0 * param1 + 3.0);
+            int numRays = GetParamValueInt(0, param0);
 
             InputGeometry input = new InputGeometry(numRays + 4);
 
@@ -87,11 +61,6 @@ namespace MeshExplorer.Generators
             input.AddSegment(numRays - 4, numRays - 1, 1);
 
             return input;
-        }
-
-        public override string ToString()
-        {
-            return this.Name;
         }
     }
 }
