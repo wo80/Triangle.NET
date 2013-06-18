@@ -35,20 +35,23 @@
             this.label9 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.lbMaxAngle = new System.Windows.Forms.Label();
+            this.cbSweepline = new MeshExplorer.Controls.DarkCheckBox();
+            this.slMaxAngle = new MeshExplorer.Controls.DarkSlider();
             this.slMaxArea = new MeshExplorer.Controls.DarkSlider();
             this.slMinAngle = new MeshExplorer.Controls.DarkSlider();
             this.cbConformDel = new MeshExplorer.Controls.DarkCheckBox();
             this.cbConvex = new MeshExplorer.Controls.DarkCheckBox();
             this.cbQuality = new MeshExplorer.Controls.DarkCheckBox();
-            this.cbSweepline = new MeshExplorer.Controls.DarkCheckBox();
-            this.label1 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // lbMaxArea
             // 
             this.lbMaxArea.AutoSize = true;
             this.lbMaxArea.ForeColor = System.Drawing.Color.White;
-            this.lbMaxArea.Location = new System.Drawing.Point(227, 65);
+            this.lbMaxArea.Location = new System.Drawing.Point(227, 87);
             this.lbMaxArea.Name = "lbMaxArea";
             this.lbMaxArea.Size = new System.Drawing.Size(13, 13);
             this.lbMaxArea.TabIndex = 20;
@@ -58,7 +61,7 @@
             // 
             this.label6.AutoSize = true;
             this.label6.ForeColor = System.Drawing.Color.White;
-            this.label6.Location = new System.Drawing.Point(8, 64);
+            this.label6.Location = new System.Drawing.Point(8, 86);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(81, 13);
             this.label6.TabIndex = 23;
@@ -78,7 +81,7 @@
             // 
             this.label23.BackColor = System.Drawing.Color.DimGray;
             this.label23.ForeColor = System.Drawing.Color.DarkGray;
-            this.label23.Location = new System.Drawing.Point(8, 151);
+            this.label23.Location = new System.Drawing.Point(8, 173);
             this.label23.Name = "label23";
             this.label23.Size = new System.Drawing.Size(251, 33);
             this.label23.TabIndex = 24;
@@ -89,7 +92,7 @@
             // 
             this.label9.BackColor = System.Drawing.Color.DimGray;
             this.label9.ForeColor = System.Drawing.Color.DarkGray;
-            this.label9.Location = new System.Drawing.Point(8, 215);
+            this.label9.Location = new System.Drawing.Point(8, 237);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(258, 33);
             this.label9.TabIndex = 26;
@@ -99,7 +102,7 @@
             // 
             this.label8.BackColor = System.Drawing.Color.DimGray;
             this.label8.ForeColor = System.Drawing.Color.DarkGray;
-            this.label8.Location = new System.Drawing.Point(8, 88);
+            this.label8.Location = new System.Drawing.Point(8, 110);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(258, 33);
             this.label8.TabIndex = 25;
@@ -116,11 +119,66 @@
             this.label5.TabIndex = 21;
             this.label5.Text = "Minimum angle";
             // 
+            // label1
+            // 
+            this.label1.BackColor = System.Drawing.Color.DimGray;
+            this.label1.ForeColor = System.Drawing.Color.DarkGray;
+            this.label1.Location = new System.Drawing.Point(8, 304);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(258, 33);
+            this.label1.TabIndex = 26;
+            this.label1.Text = "Use Sweepline algorithm for triangulation instead of default Divide && Conquer.";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.ForeColor = System.Drawing.Color.White;
+            this.label2.Location = new System.Drawing.Point(8, 64);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(88, 13);
+            this.label2.TabIndex = 21;
+            this.label2.Text = "Maximum angle";
+            // 
+            // lbMaxAngle
+            // 
+            this.lbMaxAngle.AutoSize = true;
+            this.lbMaxAngle.ForeColor = System.Drawing.Color.White;
+            this.lbMaxAngle.Location = new System.Drawing.Point(227, 65);
+            this.lbMaxAngle.Name = "lbMaxAngle";
+            this.lbMaxAngle.Size = new System.Drawing.Size(25, 13);
+            this.lbMaxAngle.TabIndex = 22;
+            this.lbMaxAngle.Text = "180";
+            // 
+            // cbSweepline
+            // 
+            this.cbSweepline.BackColor = System.Drawing.Color.DimGray;
+            this.cbSweepline.Checked = false;
+            this.cbSweepline.Location = new System.Drawing.Point(11, 278);
+            this.cbSweepline.Name = "cbSweepline";
+            this.cbSweepline.Size = new System.Drawing.Size(181, 23);
+            this.cbSweepline.TabIndex = 27;
+            this.cbSweepline.Text = "Use Sweepline algorithm";
+            this.cbSweepline.UseVisualStyleBackColor = false;
+            // 
+            // slMaxAngle
+            // 
+            this.slMaxAngle.BackColor = System.Drawing.Color.Transparent;
+            this.slMaxAngle.CriticalPercent = ((uint)(89u));
+            this.slMaxAngle.Location = new System.Drawing.Point(102, 61);
+            this.slMaxAngle.Maximum = 100;
+            this.slMaxAngle.Minimum = 0;
+            this.slMaxAngle.Name = "slMaxAngle";
+            this.slMaxAngle.Size = new System.Drawing.Size(119, 18);
+            this.slMaxAngle.TabIndex = 18;
+            this.slMaxAngle.Text = "darkSlider1";
+            this.slMaxAngle.Value = 0;
+            this.slMaxAngle.ValueChanging += new System.EventHandler(this.slMaxAngle_ValueChanging);
+            // 
             // slMaxArea
             // 
             this.slMaxArea.BackColor = System.Drawing.Color.Transparent;
             this.slMaxArea.CriticalPercent = ((uint)(0u));
-            this.slMaxArea.Location = new System.Drawing.Point(102, 61);
+            this.slMaxArea.Location = new System.Drawing.Point(102, 83);
             this.slMaxArea.Maximum = 100;
             this.slMaxArea.Minimum = 0;
             this.slMaxArea.Name = "slMaxArea";
@@ -148,7 +206,7 @@
             // 
             this.cbConformDel.BackColor = System.Drawing.Color.DimGray;
             this.cbConformDel.Checked = false;
-            this.cbConformDel.Location = new System.Drawing.Point(11, 131);
+            this.cbConformDel.Location = new System.Drawing.Point(11, 153);
             this.cbConformDel.Name = "cbConformDel";
             this.cbConformDel.Size = new System.Drawing.Size(142, 17);
             this.cbConformDel.TabIndex = 16;
@@ -159,7 +217,7 @@
             // 
             this.cbConvex.BackColor = System.Drawing.Color.DimGray;
             this.cbConvex.Checked = false;
-            this.cbConvex.Location = new System.Drawing.Point(11, 195);
+            this.cbConvex.Location = new System.Drawing.Point(11, 217);
             this.cbConvex.Name = "cbConvex";
             this.cbConvex.Size = new System.Drawing.Size(115, 17);
             this.cbConvex.TabIndex = 15;
@@ -177,44 +235,26 @@
             this.cbQuality.Text = "Quality mesh";
             this.cbQuality.UseVisualStyleBackColor = false;
             // 
-            // cbSweepline
-            // 
-            this.cbSweepline.BackColor = System.Drawing.Color.DimGray;
-            this.cbSweepline.Checked = false;
-            this.cbSweepline.Location = new System.Drawing.Point(11, 260);
-            this.cbSweepline.Name = "cbSweepline";
-            this.cbSweepline.Size = new System.Drawing.Size(187, 17);
-            this.cbSweepline.TabIndex = 15;
-            this.cbSweepline.Text = "Use Sweepline algorithm";
-            this.cbSweepline.UseVisualStyleBackColor = false;
-            // 
-            // label1
-            // 
-            this.label1.BackColor = System.Drawing.Color.DimGray;
-            this.label1.ForeColor = System.Drawing.Color.DarkGray;
-            this.label1.Location = new System.Drawing.Point(8, 280);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(258, 33);
-            this.label1.TabIndex = 26;
-            this.label1.Text = "Use Sweepline algorithm for triangulation instead of default Divide && Conquer.";
-            // 
             // MeshControlView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.DimGray;
+            this.Controls.Add(this.cbSweepline);
             this.Controls.Add(this.lbMaxArea);
             this.Controls.Add(this.label6);
+            this.Controls.Add(this.lbMaxAngle);
             this.Controls.Add(this.lbMinAngle);
             this.Controls.Add(this.label23);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.label9);
             this.Controls.Add(this.label8);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.label5);
+            this.Controls.Add(this.slMaxAngle);
             this.Controls.Add(this.slMaxArea);
             this.Controls.Add(this.slMinAngle);
             this.Controls.Add(this.cbConformDel);
-            this.Controls.Add(this.cbSweepline);
             this.Controls.Add(this.cbConvex);
             this.Controls.Add(this.cbQuality);
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -242,5 +282,8 @@
         private Controls.DarkCheckBox cbQuality;
         private Controls.DarkCheckBox cbSweepline;
         private System.Windows.Forms.Label label1;
+        private Controls.DarkSlider slMaxAngle;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label lbMaxAngle;
     }
 }

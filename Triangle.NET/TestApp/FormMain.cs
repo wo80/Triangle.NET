@@ -452,6 +452,13 @@ namespace MeshExplorer
 
                 mesh.Behavior.MinAngle = meshControlView.ParamMinAngleValue;
 
+                double maxAngle = meshControlView.ParamMaxAngleValue;
+
+                if (maxAngle < 180)
+                {
+                    mesh.Behavior.MaxAngle = maxAngle;
+                }
+
                 // Ignore area constraints on initial triangulation.
 
                 //double area = slMaxArea.Value * 0.01;
@@ -506,6 +513,13 @@ namespace MeshExplorer
             }
 
             mesh.Behavior.MinAngle = meshControlView.ParamMinAngleValue;
+
+            double maxAngle = meshControlView.ParamMaxAngleValue;
+
+            if (maxAngle < 180)
+            {
+                mesh.Behavior.MaxAngle = maxAngle;
+            }
 
             try
             {
@@ -715,7 +729,10 @@ namespace MeshExplorer
             if (mesh != null)
             {
                 bool isConsistent, isDelaunay;
+
+                Behavior.Verbose = true;
                 mesh.Check(out isConsistent, out isDelaunay);
+                Behavior.Verbose = false;
 
                 ShowLog();
             }

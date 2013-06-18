@@ -43,6 +43,11 @@ namespace MeshExplorer.Views
             get { return (slMinAngle.Value * 40) / 100; }
         }
 
+        public int ParamMaxAngleValue
+        {
+            get { return 80 + (100 - slMaxAngle.Value); }
+        }
+
         public double ParamMaxAreaValue
         {
             get { return slMaxArea.Value * 0.01; }
@@ -53,6 +58,13 @@ namespace MeshExplorer.Views
             // Between 0 and 40 (step 1)
             int angle = (slMinAngle.Value * 40) / 100;
             lbMinAngle.Text = angle.ToString();
+        }
+
+        private void slMaxAngle_ValueChanging(object sender, EventArgs e)
+        {
+            // Between 180 and 80 (step 1)
+            int angle = 80 + (100 - slMaxAngle.Value);
+            lbMaxAngle.Text = angle.ToString();
         }
 
         private void slMaxArea_ValueChanging(object sender, EventArgs e)
