@@ -25,6 +25,12 @@ namespace TriangleNet
         Mesh mesh;
         Behavior behavior;
 
+        // Work arrays for wegde intersection
+        double[] petalx = new double[20];
+        double[] petaly = new double[20];
+        double[] petalr = new double[20];
+        double[] wedges = new double[500];
+
         public NewLocation(Mesh mesh)
         {
             this.mesh = mesh;
@@ -2500,11 +2506,20 @@ namespace TriangleNet
 
             //double p[5];
 
-            double[] petalx = new double[2 * numpoints];
-            double[] petaly = new double[2 * numpoints];
-            double[] petalr = new double[2 * numpoints];
+            // Resize work arrays
+            if (2 * numpoints > petalx.Length)
+            {
+                petalx = new double[2 * numpoints];
+                petaly = new double[2 * numpoints];
+                petalr = new double[2 * numpoints];
+                wedges = new double[2 * numpoints * 16 + 36];
 
-            double[] wedges = new double[2000];
+                if (Behavior.Verbose)
+                {
+                    Log.SimpleLog.Instance.Info("NewLocation: resized work arrays (" + 2 * numpoints + ")");
+                }
+            }
+
             double xmid, ymid, dist, x3, y3;
             double x_1, y_1, x_2, y_2, x_3, y_3, x_4, y_4, tempx, tempy;
             double ux, uy;
@@ -2758,11 +2773,20 @@ namespace TriangleNet
 
             //double p[5];
 
-            double[] petalx = new double[2 * numpoints];
-            double[] petaly = new double[2 * numpoints];
-            double[] petalr = new double[2 * numpoints];
+            // Resize work arrays
+            if (2 * numpoints > petalx.Length)
+            {
+                petalx = new double[2 * numpoints];
+                petaly = new double[2 * numpoints];
+                petalr = new double[2 * numpoints];
+                wedges = new double[2 * numpoints * 20 + 40];
 
-            double[] wedges = new double[2000];
+                if (Behavior.Verbose)
+                {
+                    Log.SimpleLog.Instance.Info("NewLocation: resized work arrays (" + 2 * numpoints + ")");
+                }
+            }
+
             double xmid, ymid, dist, x3, y3;
             double x_1, y_1, x_2, y_2, x_3, y_3, x_4, y_4, tempx, tempy, x_5, y_5, x_6, y_6;
             double ux, uy;
