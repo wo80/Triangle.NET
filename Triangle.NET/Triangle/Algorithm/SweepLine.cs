@@ -31,7 +31,7 @@ namespace TriangleNet.Algorithm
         }
 
         Mesh mesh;
-        double xminextreme;      // Nonexistent x value used as a flag in sweepline.
+        double xminextreme; // Nonexistent x value used as a flag in sweepline.
         List<SplayNode> splaynodes;
 
         #region Heap
@@ -177,7 +177,6 @@ namespace TriangleNet.Algorithm
                 evt.xkey = thisvertex.x;
                 evt.ykey = thisvertex.y;
                 HeapInsert(eventheap, i++, evt);
-                
             }
         }
 
@@ -357,7 +356,23 @@ namespace TriangleNet.Algorithm
             return newsplaynode;
         }
 
-        #endregion
+        SplayNode FrontLocate(SplayNode splayroot, Otri bottommost, Vertex searchvertex,
+                              ref Otri searchtri, ref bool farright)
+        {
+            bool farrightflag;
+
+            bottommost.Copy(ref searchtri);
+            splayroot = Splay(splayroot, searchvertex, ref searchtri);
+
+            farrightflag = false;
+            while (!farrightflag && RightOfHyperbola(ref searchtri, searchvertex))
+            {
+                searchtri.OnextSelf();
+                farrightflag = searchtri.Equal(bottommost);
+            }
+            farright = farrightflag;
+            return splayroot;
+        }
 
         SplayNode CircleTopInsert(SplayNode splayroot, Otri newkey,
                                   Vertex pa, Vertex pb, Vertex pc, double topy)
@@ -379,6 +394,8 @@ namespace TriangleNet.Algorithm
             searchpoint.y = topy;
             return SplayInsert(Splay(splayroot, searchpoint, ref dummytri), newkey, searchpoint);
         }
+
+        #endregion
 
         bool RightOfHyperbola(ref Otri fronttri, Point newsite)
         {
@@ -447,24 +464,6 @@ namespace TriangleNet.Algorithm
                 heapsize--;
                 checktri.SetOrg(null);
             }
-        }
-
-        SplayNode FrontLocate(SplayNode splayroot, Otri bottommost, Vertex searchvertex,
-                              ref Otri searchtri, ref bool farright)
-        {
-            bool farrightflag;
-
-            bottommost.Copy(ref searchtri);
-            splayroot = Splay(splayroot, searchvertex, ref searchtri);
-
-            farrightflag = false;
-            while (!farrightflag && RightOfHyperbola(ref searchtri, searchvertex))
-            {
-                searchtri.OnextSelf();
-                farrightflag = searchtri.Equal(bottommost);
-            }
-            farright = farrightflag;
-            return splayroot;
         }
 
         /// <summary>
@@ -574,7 +573,7 @@ namespace TriangleNet.Algorithm
             {
                 if (heapsize == 0)
                 {
-                    SimpleLog.Instance.Error("Input vertices are all identical.", "SweepLine.SweepLineDelaunay()");
+                    SimpleLog.Instance.Error("Input vertices are all identical.", "SweepLine.Triangulate()");
                     throw new Exception("Input vertices are all identical.");
                 }
                 secondvertex = eventheap[0].vertexEvent;
@@ -585,8 +584,8 @@ namespace TriangleNet.Algorithm
                 {
                     if (Behavior.Verbose)
                     {
-                        SimpleLog.Instance.Warning("A duplicate vertex appeared and was ignored.", 
-                            "SweepLine.SweepLineDelaunay().1");
+                        SimpleLog.Instance.Warning("A duplicate vertex appeared and was ignored (ID " + secondvertex.id + ").",
+                            "SweepLine.Triangulate().1");
                     }
                     secondvertex.type = VertexType.UndeadVertex;
                     mesh.undeads++;
@@ -641,8 +640,8 @@ namespace TriangleNet.Algorithm
                     {
                         if (Behavior.Verbose)
                         {
-                            SimpleLog.Instance.Warning("A duplicate vertex appeared and was ignored.", 
-                                "SweepLine.SweepLineDelaunay().2");
+                            SimpleLog.Instance.Warning("A duplicate vertex appeared and was ignored (ID " + nextvertex.id + ").",
+                                "SweepLine.Triangulate().2");
                         }
                         nextvertex.type = VertexType.UndeadVertex;
                         mesh.undeads++;
@@ -652,17 +651,15 @@ namespace TriangleNet.Algorithm
                     {
                         lastvertex = nextvertex;
 
-                        splayroot = FrontLocate(splayroot, bottommost, nextvertex,
-                                                ref searchtri, ref farrightflag);
-                        //
-                        bottommost.Copy(ref searchtri);
-                        farrightflag = false;
-                        while (!farrightflag && RightOfHyperbola(ref searchtri, nextvertex))
-                        {
-                            searchtri.OnextSelf();
-                            farrightflag = searchtri.Equal(bottommost);
-                        }
+                        splayroot = FrontLocate(splayroot, bottommost, nextvertex, ref searchtri, ref farrightflag);
 
+                        //bottommost.Copy(ref searchtri);
+                        //farrightflag = false;
+                        //while (!farrightflag && RightOfHyperbola(ref searchtri, nextvertex))
+                        //{
+                        //    searchtri.OnextSelf();
+                        //    farrightflag = searchtri.Equal(bottommost);
+                        //}
 
                         Check4DeadEvent(ref searchtri, eventheap, ref heapsize);
 

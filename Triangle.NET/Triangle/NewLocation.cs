@@ -4100,7 +4100,7 @@ namespace TriangleNet
                 if (ahead < 0.0)
                 {
                     // Turn around so that 'searchpoint' is to the left of the
-                    //   edge specified by 'searchtri'.
+                    // edge specified by 'searchtri'.
                     searchtri.SymSelf();
                     searchtri.Copy(ref horiz);
                     intersect = mesh.locator.PreciseLocate(newvertex, ref horiz, false);

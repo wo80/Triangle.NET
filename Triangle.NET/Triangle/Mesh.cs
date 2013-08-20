@@ -2705,7 +2705,8 @@ namespace TriangleNet
                         {
                             if (Behavior.Verbose)
                             {
-                                logger.Warning("Endpoints of segments are coincident.", "Mesh.FormSkeleton()");
+                                logger.Warning("Endpoints of segment (IDs " + end1 + "/" + end2 + ") are coincident.",
+                                    "Mesh.FormSkeleton()");
                             }
                         }
                         else
