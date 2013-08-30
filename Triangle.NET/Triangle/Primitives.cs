@@ -419,7 +419,7 @@ namespace TriangleNet
         /// <param name="h"></param>
         /// <returns></returns>
         /// <remarks>
-        /// Sets h = e + f.  See my Robust Predicates paper for details.
+        /// Sets h = e + f.  See the Robust Predicates paper for details.
         /// 
         /// If round-to-even is used (as with IEEE 754), maintains the strongly nonoverlapping
         /// property.  (That is, if e is strongly nonoverlapping, h will be also.) Does NOT
@@ -639,10 +639,13 @@ namespace TriangleNet
             double detleft, detright;
             double detlefttail, detrighttail;
             double det, errbound;
-            double[] B = new double[4], C1 = new double[8], C2 = new double[12], D = new double[16];
+            // Edited to work around index out of range exceptions (changed array length from 4 to 5).
+            // See unsafe indexing in FastExpansionSumZeroElim.
+            double[] B = new double[5], u = new double[5];
+            double[] C1 = new double[8], C2 = new double[12], D = new double[16];
             double B3;
             int C1length, C2length, Dlength;
-            double[] u = new double[4];
+            
             double u3;
             double s1, t1;
             double s0, t0;
@@ -762,10 +765,8 @@ namespace TriangleNet
             double aa3, bb3, cc3;
             double ti1, tj1;
             double ti0, tj0;
-            // Edited to work around rare index out of range exceptions (changed array length from 4 to 5)
-            // Reason: see loops in FastExpansionSumZeroElim
-            //     while (eindex < elen) { [...] enow = e[++eindex]; [...] }
-            // Definitely not safe, but Triangle C code doesn't crash!?
+            // Edited to work around index out of range exceptions (changed array length from 4 to 5).
+            // See unsafe indexing in FastExpansionSumZeroElim.
             double[] u = new double[5], v = new double[5];
             double u3, v3;
             double[] temp8 = new double[8], temp16a = new double[16], temp16b = new double[16], temp16c = new double[16];
