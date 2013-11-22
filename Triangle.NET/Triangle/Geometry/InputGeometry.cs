@@ -139,7 +139,6 @@ namespace TriangleNet.Geometry
         public void AddPoint(double x, double y, int boundary)
         {
             points.Add(new Vertex(x, y, boundary));
-
             bounds.Update(x, y);
         }
 
@@ -178,8 +177,32 @@ namespace TriangleNet.Geometry
             }
 
             points.Add(new Vertex(x, y, boundary) { attributes = attribs });
-
             bounds.Update(x, y);
+        }
+
+        /// <summary>
+        /// Adds a vertex to the geometry.
+        /// </summary>
+        /// <param name="v">Vertex instance.</param>
+        public void AddPoint(Vertex v)
+        {
+            var attribs = v.attributes;
+
+            if (pointAttributes < 0)
+            {
+                pointAttributes = attribs == null ? 0 : attribs.Length;
+            }
+            else if (attribs == null && pointAttributes > 0)
+            {
+                throw new ArgumentException("Inconsitent use of point attributes.");
+            }
+            else if (attribs != null && pointAttributes != attribs.Length)
+            {
+                throw new ArgumentException("Inconsitent use of point attributes.");
+            }
+
+            points.Add(v);
+            bounds.Update(v.x, v.y);
         }
 
         /// <summary>
