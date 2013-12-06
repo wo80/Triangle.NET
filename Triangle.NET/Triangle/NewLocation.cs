@@ -30,6 +30,17 @@ namespace TriangleNet
         double[] petaly = new double[20];
         double[] petalr = new double[20];
         double[] wedges = new double[500];
+        double[] initialConvexPoly = new double[500];
+
+        // Work arrays for smoothing
+        double[] points_p = new double[500];
+        double[] points_q = new double[500];
+        double[] points_r = new double[500];
+
+        // Work arrays for convex polygon split
+        double[] poly1 = new double[100];
+        double[] poly2 = new double[100];
+        double[][] polys = new double[3][];
 
         public NewLocation(Mesh mesh)
         {
@@ -2050,10 +2061,6 @@ namespace TriangleNet
             int flag1 = 0, flag2 = 0, flag3 = 0;
             bool newLocFound = false;
 
-            double[] points_p = new double[500];// keeps the points in a star of point p, q, r
-            double[] points_q = new double[500];
-            double[] points_r = new double[500];
-
             //vertex v1, v2, v3;	// for ccw test
             //double p1[2], p2[2], p3[2];
             //double temp[2];
@@ -2525,7 +2532,7 @@ namespace TriangleNet
             double ux, uy;
             double alpha;
             double[] p1 = new double[3];
-            double[] initialConvexPoly = new double[500];
+
             //double poly_points;
             int numpolypoints = 0;
 
@@ -2790,8 +2797,12 @@ namespace TriangleNet
             double xmid, ymid, dist, x3, y3;
             double x_1, y_1, x_2, y_2, x_3, y_3, x_4, y_4, tempx, tempy, x_5, y_5, x_6, y_6;
             double ux, uy;
-            double[] p1 = new double[3], p2 = new double[3], p3 = new double[3], p4 = new double[3];
-            double[] initialConvexPoly = new double[500];
+
+            double[] p1 = new double[3];
+            double[] p2 = new double[3];
+            double[] p3 = new double[3];
+            double[] p4 = new double[3];
+
             //double poly_points;
             int numpolypoints = 0;
             int howManyPoints = 0;	// keeps the number of points used for representing the wedge
@@ -3402,11 +3413,6 @@ namespace TriangleNet
             double z, min, max;
             int i, j;
 
-            double[][] polys = new double[3][];
-            polys[0] = new double[2];
-            polys[1] = new double[2];
-            polys[2] = new double[2];
-
             int numpolys;
             double[] res = null;
             int count = 0;
@@ -3482,11 +3488,7 @@ namespace TriangleNet
 
             int state = 0;
             double[] p = new double[3];
-            // poly1 is constructed in states 0 and 2
-            double[] poly1 = new double[100];
             int poly1counter = 0;
-            // poly2 is constructed in state 1
-            double[] poly2 = new double[100];
             int poly2counter = 0;
             int numpolys;
             int i;
@@ -3626,10 +3628,11 @@ namespace TriangleNet
             // (depending whether the polygon was splitted or not)
             if (state != 0 && state != 2)
             {
-                // 		printf("there is something wrong state: %d\n", state);
-                // 		printf("polygon might not be convex!!\n");
-                // 		printf("case1: %d\ncase2: %d\ncase3: %d\ncase31: %d case311: %d case3111: %d\ncase32: %d\ncase33: %d\n", case1, case2, case3, case31, case311, case3111, case32, case33);
-                // 		printf("numvertices %d\n=============\n", numvertices);
+                // printf("there is something wrong state: %d\n", state);
+                // printf("polygon might not be convex!!\n");
+                // printf("case1: %d\ncase2: %d\ncase3: %d\ncase31: %d case311: %d case3111: %d\ncase32: %d\ncase33: %d\n", case1, case2, case3, case31, case311, case3111, case32, case33);
+                // printf("numvertices %d\n=============\n", numvertices);
+
                 // if there is something wrong with the intersection, just ignore this one				
                 numpolys = 3;
             }

@@ -9,11 +9,9 @@ namespace TriangleNet.Algorithm
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using TriangleNet.Data;
-    using TriangleNet.Log;
     using TriangleNet.Geometry;
+    using TriangleNet.Log;
     using TriangleNet.Tools;
 
     /// <summary>

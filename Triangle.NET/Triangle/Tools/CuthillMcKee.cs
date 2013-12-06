@@ -17,10 +17,6 @@ namespace TriangleNet.Tools
     /// Applies the Cuthill and McKee renumbering algorithm to reduce the bandwidth of
     /// the adjacency matrix associated with the mesh.
     /// </summary>
-    /// <remarks>
-    /// Some useful slides:
-    /// http://bobbyness.net/NerdyStuff/node%20ordering/node_ordering.html
-    /// </remarks>
     public class CuthillMcKee
     {
         // Number of nodes in the mesh.
