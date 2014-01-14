@@ -738,6 +738,11 @@ namespace MeshExplorer
             }
         }
 
+        private void menuToolsTopology_Click(object sender, EventArgs e)
+        {
+            (new FormTopology()).ShowDialog(this);
+        }
+
         private void menuToolsRcm_Click(object sender, EventArgs e)
         {
             Renumber();

@@ -55,6 +55,8 @@
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.menuToolsRcm = new System.Windows.Forms.ToolStripMenuItem();
             this.btnMesh = new MeshExplorer.Controls.DarkButton();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuToolsTopology = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.SuspendLayout();
@@ -285,6 +287,8 @@
             this.menuTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuToolsGen,
             this.menuToolsCheck,
+            this.toolStripSeparator5,
+            this.menuToolsTopology,
             this.toolStripSeparator4,
             this.menuToolsRcm});
             this.menuTools.Name = "menuTools";
@@ -329,6 +333,18 @@
             this.btnMesh.Text = "Triangulate";
             this.btnMesh.UseVisualStyleBackColor = true;
             this.btnMesh.Click += new System.EventHandler(this.btnMesh_Click);
+            // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(192, 6);
+            // 
+            // menuToolsTopology
+            // 
+            this.menuToolsTopology.Name = "menuToolsTopology";
+            this.menuToolsTopology.Size = new System.Drawing.Size(195, 22);
+            this.menuToolsTopology.Text = "Topology Explorer";
+            this.menuToolsTopology.Click += new System.EventHandler(this.menuToolsTopology_Click);
             // 
             // FormMain
             // 
@@ -394,6 +410,8 @@
         private Views.MeshControlView meshControlView;
         private Views.StatisticView statisticView;
         private Views.AboutView aboutView;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
+        private System.Windows.Forms.ToolStripMenuItem menuToolsTopology;
 
     }
 }
