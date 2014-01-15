@@ -27,8 +27,10 @@ namespace MeshExplorer.Topology
         /// </summary>
         public void Sym()
         {
-            //this = tri.triangles[Orientation];
-            // decode(ptr, otri);
+            if (this.Triangle == null)
+            {
+                return;
+            }
 
             var org = this.Org();
             Triangle = Triangle.GetNeighbor(Orientation);

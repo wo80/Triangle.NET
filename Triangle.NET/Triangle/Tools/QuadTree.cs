@@ -18,7 +18,7 @@ namespace TriangleNet.Tools
     {
         QuadNode root;
 
-        internal Dictionary<int, ITriangle> triangles;
+        internal ITriangle[] triangles;
 
         internal int sizeBound;
         internal int maxDepth;
@@ -42,12 +42,7 @@ namespace TriangleNet.Tools
             this.maxDepth = maxDepth;
             this.sizeBound = sizeBound;
 
-            triangles = new Dictionary<int, ITriangle>();
-
-            foreach (var tri in mesh.Triangles)
-            {
-                triangles.Add(tri.id, tri);
-            }
+            triangles = mesh.Triangles.ToArray();
 
             int currentDepth = 0;
 
@@ -165,12 +160,14 @@ namespace TriangleNet.Tools
 
             if (init)
             {
-                // Allocate memory upfront
-                triangles.Capacity = tree.triangles.Count;
+                int count = tree.triangles.Length;
 
-                foreach (var id in tree.triangles.Keys)
+                // Allocate memory upfront
+                triangles.Capacity = count;
+
+                for (int i = 0; i < count; i++)
                 {
-                    triangles.Add(id);
+                    triangles.Add(i);
                 }
             }
         }
@@ -214,13 +211,15 @@ namespace TriangleNet.Tools
             Point[] triangle = new Point[3];
 
             // Find region for every triangle vertex
-            foreach (var tri in tree.triangles.Values)
+            foreach (var index in triangles)
             {
+                ITriangle tri = tree.triangles[index];
+
                 triangle[0] = tri.GetVertex(0);
                 triangle[1] = tri.GetVertex(1);
                 triangle[2] = tri.GetVertex(2);
 
-                AddTriangleToRegion(triangle, tri.ID);
+                AddTriangleToRegion(triangle, index);
             }
 
             for (int i = 0; i < 4; i++)
