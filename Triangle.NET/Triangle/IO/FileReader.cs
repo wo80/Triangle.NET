@@ -71,7 +71,7 @@ namespace TriangleNet.IO
             {
                 if (line.Length > 3 + j)
                 {
-                    attribs[j] = double.Parse(line[3 + j]);
+                    attribs[j] = double.Parse(line[3 + j], nfi);
                 }
             }
 

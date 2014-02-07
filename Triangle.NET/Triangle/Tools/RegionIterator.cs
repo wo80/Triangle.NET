@@ -30,20 +30,9 @@ namespace TriangleNet.Tools
         }
 
         /// <summary>
-        /// Spread regional attributes and/or area constraints (from a .poly file) 
-        /// throughout the mesh.
+        /// Apply given action to each triangle of selected region.
         /// </summary>
-        /// <param name="attribute"></param>
-        /// <param name="area"></param>
-        /// <remarks>
-        /// This procedure operates in two phases. The first phase spreads an
-        /// attribute and/or an area constraint through a (segment-bounded) region.
-        /// The triangles are marked to ensure that each triangle is added to the
-        /// virus pool only once, so the procedure will terminate.
-        ///
-        /// The second phase uninfects all infected triangles, returning them to
-        /// normal.
-        /// </remarks>
+        /// <param name="func"></param>
         void ProcessRegion(Action<Triangle> func)
         {
             Otri testtri = default(Otri);
