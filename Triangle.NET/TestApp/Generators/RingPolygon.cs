@@ -61,7 +61,7 @@ namespace MeshExplorer.Generators
             for (int i = 0; i < m; i++)
             {
                 input.AddPoint(r * Math.Cos(i * step), r * Math.Sin(i * step));
-                input.AddSegment(i, (i + 1) % m);
+                input.AddSegment(i, (i + 1) % m, 1);
             }
 
             r = 1.5 * r;
@@ -81,7 +81,7 @@ namespace MeshExplorer.Generators
                 }
 
                 input.AddPoint(ro * Math.Cos(i * step + offset), ro * Math.Sin(i * step + offset));
-                input.AddSegment(m + i, m + ((i + 1) % n));
+                input.AddSegment(m + i, m + ((i + 1) % n), 2);
             }
 
             input.AddHole(0, 0);

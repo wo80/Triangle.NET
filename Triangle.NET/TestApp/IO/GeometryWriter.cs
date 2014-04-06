@@ -6,10 +6,9 @@
 
 namespace MeshExplorer.IO
 {
-    using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.IO;
+    using System.Linq;
     using TriangleNet.Geometry;
 
     /// <summary>
@@ -17,8 +16,18 @@ namespace MeshExplorer.IO
     /// </summary>
     public static class GeometryWriter
     {
-        public static void Write(InputGeometry geometry, string filename)
+        private static int OFFSET = 0;
+
+        /// <summary>
+        /// Writes an InputGeometry to a Triangle format .poly file.
+        /// </summary>
+        /// <param name="geometry">The InputGeometry to write.</param>
+        /// <param name="filename">The filename.</param>
+        /// <param name="compatibleMode">If true, indices will start at 1 (compatible with original C code).</param>
+        public static void Write(InputGeometry geometry, string filename, bool compatibleMode = false)
         {
+            OFFSET = compatibleMode ? 1 : 0;
+
             using (StreamWriter writer = new StreamWriter(filename))
             {
                 WritePoints(writer, geometry.Points, geometry.Count);
@@ -29,7 +38,7 @@ namespace MeshExplorer.IO
 
         private static void WritePoints(StreamWriter writer, IEnumerable<Point> points, int count)
         {
-            int attributes = 0, index = 0;
+            int attributes = 0, index = OFFSET;
 
             var first = points.FirstOrDefault();
 
@@ -60,13 +69,13 @@ namespace MeshExplorer.IO
 
         private static void WriteSegments(StreamWriter writer, IEnumerable<Edge> edges)
         {
-            int index = 0;
+            int index = OFFSET;
 
             writer.WriteLine("{0} {1}", edges.Count(), 1);
 
             foreach (var item in edges)
             {
-                writer.WriteLine("{0} {1} {2} {3}", index, item.P0, item.P1, item.Boundary);
+                writer.WriteLine("{0} {1} {2} {3}", index, item.P0 + OFFSET, item.P1 + OFFSET, item.Boundary);
 
                 index++;
             }
@@ -74,7 +83,7 @@ namespace MeshExplorer.IO
 
         private static void WriteHoles(StreamWriter writer, IEnumerable<Point> holes)
         {
-            int index = 0;
+            int index = OFFSET;
 
             writer.WriteLine("{0}", holes.Count());
 

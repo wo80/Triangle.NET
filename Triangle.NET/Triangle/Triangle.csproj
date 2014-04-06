@@ -45,6 +45,7 @@
     <Compile Include="BadTriQueue.cs" />
     <Compile Include="Behavior.cs" />
     <Compile Include="Carver.cs" />
+    <Compile Include="ConstraintMesher.cs" />
     <Compile Include="Data\BadSubseg.cs" />
     <Compile Include="Data\BadTriangle.cs" />
     <Compile Include="Data\Osub.cs" />
@@ -73,6 +74,7 @@
     <Compile Include="Log\ILogItem.cs" />
     <Compile Include="Log\SimpleLog.cs" />
     <Compile Include="Log\SimpleLogItem.cs" />
+    <Compile Include="MeshValidator.cs" />
     <Compile Include="NewLocation.cs" />
     <Compile Include="Quality.cs" />
     <Compile Include="Enums.cs" />

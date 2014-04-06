@@ -728,11 +728,14 @@ namespace MeshExplorer
         {
             if (mesh != null)
             {
-                bool isConsistent, isDelaunay;
+                bool save = Behavior.Verbose;
 
                 Behavior.Verbose = true;
-                mesh.Check(out isConsistent, out isDelaunay);
-                Behavior.Verbose = false;
+
+                bool isConsistent = MeshValidator.IsConsistent(mesh);
+                bool isDelaunay = MeshValidator.IsDelaunay(mesh);
+
+                Behavior.Verbose = save;
 
                 ShowLog();
             }

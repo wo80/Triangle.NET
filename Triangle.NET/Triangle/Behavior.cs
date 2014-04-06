@@ -8,6 +8,7 @@
 namespace TriangleNet
 {
     using System;
+    using TriangleNet.Geometry;
     using TriangleNet.Log;
 
     /// <summary>
@@ -20,13 +21,14 @@ namespace TriangleNet
         bool poly = false;
         bool quality = false;
         bool varArea = false;
-        bool usertest = false;
         bool convex = false;
         bool jettison = false;
         bool boundaryMarkers = true;
         bool noHoles = false;
         bool conformDel = false;
         TriangulationAlgorithm algorithm = TriangulationAlgorithm.Dwyer;
+
+        Func<ITriangle, double, bool> usertest;
 
         int noBisect = 0;
         int steiner = -1;
@@ -181,7 +183,7 @@ namespace TriangleNet
         /// <summary>
         /// Apply a user-defined triangle constraint.
         /// </summary>
-        public bool Usertest
+        public Func<ITriangle, double, bool> UserTest
         {
             get { return usertest; }
             set { usertest = value; }
