@@ -75,7 +75,7 @@
     <Compile Include="Log\SimpleLogItem.cs" />
     <Compile Include="MeshValidator.cs" />
     <Compile Include="NewLocation.cs" />
-    <Compile Include="Quality.cs" />
+    <Compile Include="QualityMesher.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="Algorithm\Incremental.cs" />
     <Compile Include="Mesh.cs" />

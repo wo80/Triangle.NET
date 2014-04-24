@@ -16,7 +16,7 @@ namespace TriangleNet
     /// <summary>
     /// Provides methods for mesh quality enforcement and testing.
     /// </summary>
-    class Quality
+    class QualityMesher
     {
         Queue<BadSubseg> badsubsegs;
         BadTriQueue queue;
@@ -27,7 +27,7 @@ namespace TriangleNet
 
         ILog<SimpleLogItem> logger;
 
-        public Quality(Mesh mesh)
+        public QualityMesher(Mesh mesh)
         {
             logger = SimpleLog.Instance;
 

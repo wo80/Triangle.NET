@@ -27,7 +27,7 @@ namespace TriangleNet
 
         ILog<SimpleLogItem> logger;
 
-        Quality quality;
+        QualityMesher quality;
 
         // Stack that maintains a list of recently flipped triangles.
         Stack<Otri> flipstack;
@@ -200,7 +200,7 @@ namespace TriangleNet
             holes = new List<Point>();
             regions = new List<RegionPointer>();
 
-            quality = new Quality(this);
+            quality = new QualityMesher(this);
 
             locator = new TriangleLocator(this);
 
@@ -377,7 +377,7 @@ namespace TriangleNet
                 regions.Clear();
             }
 
-            if (behavior.Quality && (triangles.Count > 0))
+            if ((behavior.Quality || behavior.ConformingDelaunay) && triangles.Count > 0)
             {
                 quality.EnforceQuality(); // Enforce angle and area constraints.
             }
