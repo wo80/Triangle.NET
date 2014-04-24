@@ -27,6 +27,8 @@ namespace TriangleNet.Tools
         Point[] points;
         List<VoronoiRegion> regions;
 
+        // Used for new points on segments.
+        List<Point> segPoints;
         int segIndex;
 
         Dictionary<int, Segment> subsegMap;
@@ -79,8 +81,10 @@ namespace TriangleNet.Tools
             mesh.MakeVertexMap();
 
             // Allocate space for voronoi diagram
-            this.points = new Point[mesh.triangles.Count + mesh.subsegs.Count * 5]; // This is an upper bound.
             this.regions = new List<VoronoiRegion>(mesh.vertices.Count);
+
+            this.points = new Point[mesh.triangles.Count];
+            this.segPoints = new List<Point>(mesh.subsegs.Count * 4);
 
             ComputeCircumCenters();
 
@@ -98,6 +102,19 @@ namespace TriangleNet.Tools
                     ConstructBoundaryBvdCell(v);
                 }
             }
+
+            // Add the new points on segments to the point array.
+            int length = points.Length;
+
+            Array.Resize<Point>(ref points, length + segPoints.Count);
+
+            for (int i = 0; i < segPoints.Count; i++)
+            {
+                points[length + i] = segPoints[i];
+            }
+
+            this.segPoints.Clear();
+            this.segPoints = null;
         }
 
         private void ComputeCircumCenters()
@@ -297,10 +314,8 @@ namespace TriangleNet.Tools
                         // Insert point Lf,f_next /\ Sf_next into P
                         if (SegmentsIntersect(sfn.SegOrg(), sfn.SegDest(), cc_f, cc_f_next, out p, true))
                         {
-                            p.id = n + segIndex;
-                            points[n + segIndex] = p;
-                            segIndex++;
-
+                            p.id = n + segIndex++;
+                            segPoints.Add(p);
                             vpoints.Add(p);
                         }
                     }
@@ -316,10 +331,8 @@ namespace TriangleNet.Tools
                         // Insert point Lf,f_next /\ Sf into P
                         if (SegmentsIntersect(sf.SegOrg(), sf.SegDest(), cc_f, cc_f_next, out p, true))
                         {
-                            p.id = n + segIndex;
-                            points[n + segIndex] = p;
-                            segIndex++;
-
+                            p.id = n + segIndex++;
+                            segPoints.Add(p);
                             vpoints.Add(p);
                         }
                     }
@@ -334,19 +347,15 @@ namespace TriangleNet.Tools
                             // Insert Lf,fnext /\ Sf and Lf,fnext /\ Sfnext into P
                             if (SegmentsIntersect(sf.SegOrg(), sf.SegDest(), cc_f, cc_f_next, out p, true))
                             {
-                                p.id = n + segIndex;
-                                points[n + segIndex] = p;
-                                segIndex++;
-
+                                p.id = n + segIndex++;
+                                segPoints.Add(p);
                                 vpoints.Add(p);
                             }
 
                             if (SegmentsIntersect(sfn.SegOrg(), sfn.SegDest(), cc_f, cc_f_next, out p, true))
                             {
-                                p.id = n + segIndex;
-                                points[n + segIndex] = p;
-                                segIndex++;
-
+                                p.id = n + segIndex++;
+                                segPoints.Add(p);
                                 vpoints.Add(p);
                             }
                         }
@@ -418,10 +427,9 @@ namespace TriangleNet.Tools
                 // For vertices on the domain boundaray, add the vertex. For 
                 // internal boundaries don't add it.
                 p = new Point(vertex.x, vertex.y);
-                p.id = n + segIndex;
-                points[n + segIndex] = p;
-                segIndex++;
 
+                p.id = n + segIndex++;
+                segPoints.Add(p);
                 vpoints.Add(p);
             }
 
@@ -429,10 +437,9 @@ namespace TriangleNet.Tools
             torg = f.Org();
             tdest = f.Dest();
             p = new Point((torg.X + tdest.X) / 2, (torg.Y + tdest.Y) / 2);
-            p.id = n + segIndex;
-            points[n + segIndex] = p;
-            segIndex++;
 
+            p.id = n + segIndex++;
+            segPoints.Add(p);
             vpoints.Add(p);
 
             // repeat ... until f = f_init
@@ -454,10 +461,9 @@ namespace TriangleNet.Tools
                     torg = f.Org();
                     tapex = f.Apex();
                     p = new Point((torg.X + tapex.X) / 2, (torg.Y + tapex.Y) / 2);
-                    p.id = n + segIndex;
-                    points[n + segIndex] = p;
-                    segIndex++;
 
+                    p.id = n + segIndex++;
+                    segPoints.Add(p);
                     vpoints.Add(p);
 
                     break;
@@ -479,10 +485,8 @@ namespace TriangleNet.Tools
                         // Insert point Lf,f_next /\ Sf_next into P
                         if (SegmentsIntersect(sfn.SegOrg(), sfn.SegDest(), cc_f, cc_f_next, out p, true))
                         {
-                            p.id = n + segIndex;
-                            points[n + segIndex] = p;
-                            segIndex++;
-
+                            p.id = n + segIndex++;
+                            segPoints.Add(p);
                             vpoints.Add(p);
                         }
                     }
@@ -510,20 +514,16 @@ namespace TriangleNet.Tools
                         // Find intersection of seg with line through f's bisector and circumcenter
                         if (SegmentsIntersect(sorg, sdest, bisec, cc_f, out p, false))
                         {
-                            p.id = n + segIndex;
-                            points[n + segIndex] = p;
-                            segIndex++;
-
+                            p.id = n + segIndex++;
+                            segPoints.Add(p);
                             vpoints.Add(p);
                         }
 
                         // Insert point Lf,f_next /\ Sf into P
                         if (SegmentsIntersect(sorg, sdest, cc_f, cc_f_next, out p, true))
                         {
-                            p.id = n + segIndex;
-                            points[n + segIndex] = p;
-                            segIndex++;
-
+                            p.id = n + segIndex++;
+                            segPoints.Add(p);
                             vpoints.Add(p);
                         }
                     }
@@ -538,19 +538,15 @@ namespace TriangleNet.Tools
                             // Insert Lf,fnext /\ Sf and Lf,fnext /\ Sfnext into P
                             if (SegmentsIntersect(sorg, sdest, cc_f, cc_f_next, out p, true))
                             {
-                                p.id = n + segIndex;
-                                points[n + segIndex] = p;
-                                segIndex++;
-
+                                p.id = n + segIndex++;
+                                segPoints.Add(p);
                                 vpoints.Add(p);
                             }
 
                             if (SegmentsIntersect(sfn.SegOrg(), sfn.SegDest(), cc_f, cc_f_next, out p, true))
                             {
-                                p.id = n + segIndex;
-                                points[n + segIndex] = p;
-                                segIndex++;
-
+                                p.id = n + segIndex++;
+                                segPoints.Add(p);
                                 vpoints.Add(p);
                             }
                         }
@@ -565,10 +561,8 @@ namespace TriangleNet.Tools
                             // Find intersection of seg with line through f_next's bisector and circumcenter
                             if (SegmentsIntersect(sorg, sdest, bisec, cc_f_next, out p, false))
                             {
-                                p.id = n + segIndex;
-                                points[n + segIndex] = p;
-                                segIndex++;
-
+                                p.id = n + segIndex++;
+                                segPoints.Add(p);
                                 vpoints.Add(p);
                             }
                         }

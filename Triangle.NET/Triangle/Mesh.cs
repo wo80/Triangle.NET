@@ -335,12 +335,13 @@ namespace TriangleNet
             infvertex2 = null;
             infvertex3 = null;
 
+            // Insert segments, carving holes.
+            var mesher = new ConstraintMesher(this);
+
             if (behavior.useSegments)
             {
                 // Segments will be introduced next.
                 checksegments = true;
-
-                var mesher = new ConstraintMesher(this);
 
                 // Insert PSLG segments and/or convex hull segments.
                 mesher.FormSkeleton(input);
@@ -363,8 +364,7 @@ namespace TriangleNet
                 //dummytri.neighbors[2].triangle = dummytri;
 
                 // Carve out holes and concavities.
-                Carver c = new Carver(this);
-                c.CarveHoles();
+                mesher.CarveHoles();
             }
             else
             {
@@ -618,8 +618,8 @@ namespace TriangleNet
 
             Statistic.InCircleCount = 0;
             Statistic.CounterClockwiseCount = 0;
-            Statistic.InCircleCountDecimal = 0;
-            Statistic.CounterClockwiseCountDecimal = 0;
+            Statistic.InCircleAdaptCount = 0;
+            Statistic.CounterClockwiseAdaptCount = 0;
             Statistic.Orient3dCount = 0;
             Statistic.HyperbolaCount = 0;
             Statistic.CircleTopCount = 0;

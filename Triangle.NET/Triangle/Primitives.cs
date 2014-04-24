@@ -147,6 +147,7 @@ namespace TriangleNet
                 return det;
             }
 
+            Statistic.CounterClockwiseAdaptCount++;
             return CounterClockwiseAdapt(pa, pb, pc, detsum);
         }
 
@@ -209,6 +210,7 @@ namespace TriangleNet
                 return det;
             }
 
+            Statistic.InCircleAdaptCount++;
             return InCircleAdapt(pa, pb, pc, pd, permanent);
         }
 

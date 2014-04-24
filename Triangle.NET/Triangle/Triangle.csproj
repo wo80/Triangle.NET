@@ -44,7 +44,6 @@
     <Compile Include="Algorithm\ITriangulator.cs" />
     <Compile Include="BadTriQueue.cs" />
     <Compile Include="Behavior.cs" />
-    <Compile Include="Carver.cs" />
     <Compile Include="ConstraintMesher.cs" />
     <Compile Include="Data\BadSubseg.cs" />
     <Compile Include="Data\BadTriangle.cs" />
