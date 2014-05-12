@@ -48,8 +48,8 @@ namespace MeshExplorer.Topology
             //zoom.ClipMargin = 10.0f;
 
             var b = mesh.Bounds;
-            zoom.Update(new BoundingBox((float)b.Xmin, (float)b.Xmax,
-                (float)b.Ymin, (float)b.Ymax));
+            zoom.Update(new BoundingBox((float)b.MinX, (float)b.MaxX,
+                (float)b.MinY, (float)b.MaxY));
 
             InitializeBuffer();
 

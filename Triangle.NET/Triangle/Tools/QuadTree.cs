@@ -150,8 +150,8 @@ namespace TriangleNet.Tools
         {
             this.tree = tree;
 
-            this.bounds = new BoundingBox(box.Xmin, box.Ymin, box.Xmax, box.Ymax);
-            this.pivot = new Point((box.Xmin + box.Xmax) / 2, (box.Ymin + box.Ymax) / 2);
+            this.bounds = new BoundingBox(box.MinX, box.MinY, box.MaxX, box.MaxY);
+            this.pivot = new Point((box.MinX + box.MaxX) / 2, (box.MinY + box.MaxY) / 2);
 
             this.bitRegions = 0;
 
@@ -193,19 +193,19 @@ namespace TriangleNet.Tools
             BoundingBox box;
 
             // 1. region south west
-            box = new BoundingBox(bounds.Xmin, bounds.Ymin, pivot.X, pivot.Y);
+            box = new BoundingBox(bounds.MinX, bounds.MinY, pivot.X, pivot.Y);
             regions[0] = new QuadNode(box, tree);
 
             // 2. region south east
-            box = new BoundingBox(pivot.X, bounds.Ymin, bounds.Xmax, pivot.Y);
+            box = new BoundingBox(pivot.X, bounds.MinY, bounds.MaxX, pivot.Y);
             regions[1] = new QuadNode(box, tree);
 
             // 3. region north west
-            box = new BoundingBox(bounds.Xmin, pivot.Y, pivot.X, bounds.Ymax);
+            box = new BoundingBox(bounds.MinX, pivot.Y, pivot.X, bounds.MaxY);
             regions[2] = new QuadNode(box, tree);
 
             // 4. region north east
-            box = new BoundingBox(pivot.X, pivot.Y, bounds.Xmax, bounds.Ymax);
+            box = new BoundingBox(pivot.X, pivot.Y, bounds.MaxX, bounds.MaxY);
             regions[3] = new QuadNode(box, tree);
 
             Point[] triangle = new Point[3];
@@ -295,12 +295,12 @@ namespace TriangleNet.Tools
                 // we have an intersection
                 double yComponent = triangle[k].Y + t * dy;
 
-                if (yComponent < pivot.Y && yComponent >= bounds.Ymin)
+                if (yComponent < pivot.Y && yComponent >= bounds.MinY)
                 {
                     AddToRegion(index, SW);
                     AddToRegion(index, SE);
                 }
-                else if (yComponent <= bounds.Ymax)
+                else if (yComponent <= bounds.MaxY)
                 {
                     AddToRegion(index, NW);
                     AddToRegion(index, NE);
@@ -308,34 +308,34 @@ namespace TriangleNet.Tools
             }
 
             // find intersection with plane x = m_boundingBox[0].dX
-            t = (bounds.Xmin - triangle[k].X) / dx;
+            t = (bounds.MinX - triangle[k].X) / dx;
             if (t < (1 + EPS) && t > -EPS)
             {
                 // we have an intersection
                 double yComponent = triangle[k].Y + t * dy;
 
-                if (yComponent < pivot.Y && yComponent >= bounds.Ymin)
+                if (yComponent < pivot.Y && yComponent >= bounds.MinY)
                 {
                     AddToRegion(index, SW);
                 }
-                else if (yComponent <= bounds.Ymax) // TODO: check && yComponent >= pivot.Y
+                else if (yComponent <= bounds.MaxY) // TODO: check && yComponent >= pivot.Y
                 {
                     AddToRegion(index, NW);
                 }
             }
 
             // find intersection with plane x = m_boundingBox[1].dX
-            t = (bounds.Xmax - triangle[k].X) / dx;
+            t = (bounds.MaxX - triangle[k].X) / dx;
             if (t < (1 + EPS) && t > -EPS)
             {
                 // we have an intersection
                 double yComponent = triangle[k].Y + t * dy;
 
-                if (yComponent < pivot.Y && yComponent >= bounds.Ymin)
+                if (yComponent < pivot.Y && yComponent >= bounds.MinY)
                 {
                     AddToRegion(index, SE);
                 }
-                else if (yComponent <= bounds.Ymax)
+                else if (yComponent <= bounds.MaxY)
                 {
                     AddToRegion(index, NE);
                 }
@@ -353,12 +353,12 @@ namespace TriangleNet.Tools
                 // we have an intersection
                 xComponent = triangle[k].X + t * dx;
 
-                if (xComponent > pivot.X && xComponent <= bounds.Xmax)
+                if (xComponent > pivot.X && xComponent <= bounds.MaxX)
                 {
                     AddToRegion(index, SE);
                     AddToRegion(index, NE);
                 }
-                else if (xComponent >= bounds.Xmin)
+                else if (xComponent >= bounds.MinX)
                 {
                     AddToRegion(index, SW);
                     AddToRegion(index, NW);
@@ -366,34 +366,34 @@ namespace TriangleNet.Tools
             }
 
             // find intersection with plane y = m_boundingBox[0].dY
-            t = (bounds.Ymin - triangle[k].Y) / dy;
+            t = (bounds.MinY - triangle[k].Y) / dy;
             if (t < (1 + EPS) && t > -EPS)
             {
                 // we have an intersection
                 xComponent = triangle[k].X + t * dx;
 
-                if (xComponent > pivot.X && xComponent <= bounds.Xmax)
+                if (xComponent > pivot.X && xComponent <= bounds.MaxX)
                 {
                     AddToRegion(index, SE);
                 }
-                else if (xComponent >= bounds.Xmin)
+                else if (xComponent >= bounds.MinX)
                 {
                     AddToRegion(index, SW);
                 }
             }
 
             // find intersection with plane y = m_boundingBox[1].dY
-            t = (bounds.Ymax - triangle[k].Y) / dy;
+            t = (bounds.MaxY - triangle[k].Y) / dy;
             if (t < (1 + EPS) && t > -EPS)
             {
                 // we have an intersection
                 xComponent = triangle[k].X + t * dx;
 
-                if (xComponent > pivot.X && xComponent <= bounds.Xmax)
+                if (xComponent > pivot.X && xComponent <= bounds.MaxX)
                 {
                     AddToRegion(index, NE);
                 }
-                else if (xComponent >= bounds.Xmin)
+                else if (xComponent >= bounds.MinX)
                 {
                     AddToRegion(index, NW);
                 }

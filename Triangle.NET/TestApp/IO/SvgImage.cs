@@ -49,8 +49,8 @@ namespace MeshExplorer.IO
 
             scale = width / ((float)bounds.Width + 2 * margin);
 
-            int x_offset = -(int)((bounds.Xmin - margin) * scale);
-            int y_offset = (int)((bounds.Ymax + margin) * scale);
+            int x_offset = -(int)((bounds.MinX - margin) * scale);
+            int y_offset = (int)((bounds.MaxY + margin) * scale);
 
             int height = (int)((bounds.Height + 2 * margin) * scale);
 

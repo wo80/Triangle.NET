@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="VoronoiRegion.cs" company="">
-// TODO: Update copyright text.
+// Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -8,10 +8,8 @@ namespace TriangleNet.Tools
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using TriangleNet.Geometry;
     using TriangleNet.Data;
+    using TriangleNet.Geometry;
 
     /// <summary>
     /// Represents a region in the Voronoi diagram.
@@ -22,6 +20,9 @@ namespace TriangleNet.Tools
         Point generator;
         List<Point> vertices;
         bool bounded;
+
+        // A map (vertex id) -> (neighbor across adjacent edge)
+        Dictionary<int, VoronoiRegion> neighbors;
 
         /// <summary>
         /// Gets the Voronoi region id (which is the same as the generators vertex id).
@@ -62,6 +63,8 @@ namespace TriangleNet.Tools
             this.generator = generator;
             this.vertices = new List<Point>();
             this.bounded = true;
+
+            this.neighbors = new Dictionary<int, VoronoiRegion>();
         }
 
         public void Add(Point point)
@@ -72,6 +75,32 @@ namespace TriangleNet.Tools
         public void Add(List<Point> points)
         {
             this.vertices.AddRange(points);
+        }
+
+        /// <summary>
+        /// Returns the neighbouring Voronoi region, that lies across the edge starting at
+        /// given vertex.
+        /// </summary>
+        /// <param name="p">Vertex defining an edge of the region.</param>
+        /// <returns>Neighbouring Voronoi region</returns>
+        /// <remarks>
+        /// The edge starting at p is well defined (vertices are ordered counterclockwise).
+        /// </remarks>
+        public VoronoiRegion GetNeighbor(Point p)
+        {
+            VoronoiRegion neighbor;
+
+            if (neighbors.TryGetValue(p.id, out neighbor))
+            {
+                return neighbor;
+            }
+
+            return null;
+        }
+
+        internal void AddNeighbor(int id, VoronoiRegion neighbor)
+        {
+            this.neighbors.Add(id, neighbor);
         }
 
         public override string ToString()

@@ -69,10 +69,10 @@ namespace MeshRenderer.Core
             }
 
             this.Bounds = new BoundingBox(
-                (float)data.Bounds.Xmin,
-                (float)data.Bounds.Xmax,
-                (float)data.Bounds.Ymin,
-                (float)data.Bounds.Ymax);
+                (float)data.Bounds.MinX,
+                (float)data.Bounds.MaxX,
+                (float)data.Bounds.MinY,
+                (float)data.Bounds.MaxY);
         }
 
         /// <summary>
@@ -150,10 +150,10 @@ namespace MeshRenderer.Core
             this.Triangles = triangles.ToArray();
 
             this.Bounds = new BoundingBox(
-                (float)mesh.Bounds.Xmin,
-                (float)mesh.Bounds.Xmax,
-                (float)mesh.Bounds.Ymin,
-                (float)mesh.Bounds.Ymax);
+                (float)mesh.Bounds.MinX,
+                (float)mesh.Bounds.MaxX,
+                (float)mesh.Bounds.MinY,
+                (float)mesh.Bounds.MaxY);
         }
 
         /// <summary>

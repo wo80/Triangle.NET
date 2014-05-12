@@ -10,7 +10,7 @@ namespace TriangleNet.Tools
     using TriangleNet.Geometry;
 
     /// <summary>
-    /// TODO: Update summary.
+    /// Voronoi diagram interface.
     /// </summary>
     public interface IVoronoi
     {
@@ -22,6 +22,6 @@ namespace TriangleNet.Tools
         /// <summary>
         /// Gets the list of Voronoi regions.
         /// </summary>
-        List<VoronoiRegion> Regions { get; }
+        ICollection<VoronoiRegion> Regions { get; }
     }
 }

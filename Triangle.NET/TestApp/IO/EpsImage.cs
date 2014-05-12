@@ -321,10 +321,10 @@ namespace MeshExplorer.IO
 
         private void UpdateMetrics(BoundingBox bounds)
         {
-            x_max = bounds.Xmax;
-            x_min = bounds.Xmin;
-            y_max = bounds.Ymax;
-            y_min = bounds.Ymin;
+            x_max = bounds.MaxX;
+            x_min = bounds.MinX;
+            y_max = bounds.MaxY;
+            y_min = bounds.MinY;
 
             // Enlarge width 5% on each side
             x_scale = x_max - x_min;

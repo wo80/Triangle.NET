@@ -139,7 +139,7 @@ namespace TriangleNet.Geometry
         public void AddPoint(double x, double y, int boundary)
         {
             points.Add(new Vertex(x, y, boundary));
-            bounds.Update(x, y);
+            bounds.Expand(x, y);
         }
 
         /// <summary>
@@ -177,7 +177,7 @@ namespace TriangleNet.Geometry
             }
 
             points.Add(new Vertex(x, y, boundary) { attributes = attribs });
-            bounds.Update(x, y);
+            bounds.Expand(x, y);
         }
 
         /// <summary>
@@ -202,7 +202,7 @@ namespace TriangleNet.Geometry
             }
 
             points.Add(v);
-            bounds.Update(v.x, v.y);
+            bounds.Expand(v.x, v.y);
         }
 
         /// <summary>

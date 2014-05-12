@@ -42,9 +42,9 @@ namespace TriangleNet.Algorithm
                 width = 1.0;
             }
             // Create the vertices of the bounding box.
-            mesh.infvertex1 = new Vertex(box.Xmin - 50.0 * width, box.Ymin - 40.0 * width);
-            mesh.infvertex2 = new Vertex(box.Xmax + 50.0 * width, box.Ymin - 40.0 * width);
-            mesh.infvertex3 = new Vertex(0.5 * (box.Xmin + box.Xmax), box.Ymax + 60.0 * width);
+            mesh.infvertex1 = new Vertex(box.MinX - 50.0 * width, box.MinY - 40.0 * width);
+            mesh.infvertex2 = new Vertex(box.MaxX + 50.0 * width, box.MinY - 40.0 * width);
+            mesh.infvertex3 = new Vertex(0.5 * (box.MinX + box.MaxX), box.MaxY + 60.0 * width);
 
             // Create the bounding box.
             mesh.MakeTriangle(ref inftri);

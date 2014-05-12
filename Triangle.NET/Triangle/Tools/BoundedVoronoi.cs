@@ -67,7 +67,7 @@ namespace TriangleNet.Tools
         /// <summary>
         /// Gets the list of Voronoi regions.
         /// </summary>
-        public List<VoronoiRegion> Regions
+        public ICollection<VoronoiRegion> Regions
         {
             get { return regions; }
         }
@@ -95,11 +95,11 @@ namespace TriangleNet.Tools
                 // TODO: Need a reliable way to check if a vertex is on a segment
                 if (v.type == VertexType.FreeVertex || v.Boundary == 0)
                 {
-                    ConstructBvdCell(v);
+                    ConstructCell(v);
                 }
                 else if (includeBoundary)
                 {
-                    ConstructBoundaryBvdCell(v);
+                    ConstructBoundaryCell(v);
                 }
             }
 
@@ -262,7 +262,7 @@ namespace TriangleNet.Tools
             return false;
         }
 
-        private void ConstructBvdCell(Vertex vertex)
+        private void ConstructCell(Vertex vertex)
         {
             VoronoiRegion region = new VoronoiRegion(vertex);
             regions.Add(region);
@@ -374,7 +374,7 @@ namespace TriangleNet.Tools
             region.Add(vpoints);
         }
 
-        private void ConstructBoundaryBvdCell(Vertex vertex)
+        private void ConstructBoundaryCell(Vertex vertex)
         {
             VoronoiRegion region = new VoronoiRegion(vertex);
             regions.Add(region);

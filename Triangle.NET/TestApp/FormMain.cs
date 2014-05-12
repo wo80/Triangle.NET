@@ -8,6 +8,7 @@ using MeshExplorer.IO;
 using MeshRenderer.Core;
 using TriangleNet;
 using TriangleNet.Geometry;
+using TriangleNet.Log;
 using TriangleNet.Tools;
 
 namespace MeshExplorer
@@ -340,31 +341,38 @@ namespace MeshExplorer
 
         private bool Open(string filename)
         {
-            if (FileProcessor.ContainsMeshData(filename))
+            if (!FileProcessor.CanHandleFile(filename))
             {
-                if (DarkMessageBox.Show("Import mesh", Settings.ImportString,
-                    "Do you want to import the mesh?", MessageBoxButtons.YesNo) == DialogResult.OK)
-                {
-                    input = null;
-                    mesh = FileProcessor.Import(filename);
-
-                    if (mesh != null)
-                    {
-                        statisticView.UpdateStatistic(mesh);
-
-                        // Update settings
-                        settings.CurrentFile = Path.GetFileName(filename);
-
-                        HandleMeshImport();
-                        btnSmooth.Enabled = true; // TODO: Remove
-                    }
-                    // else Message
-
-                    return true;
-                }
+                // TODO: show message.
             }
+            else
+            {
+                if (FileProcessor.ContainsMeshData(filename))
+                {
+                    if (DarkMessageBox.Show("Import mesh", Settings.ImportString,
+                        "Do you want to import the mesh?", MessageBoxButtons.YesNo) == DialogResult.OK)
+                    {
+                        input = null;
+                        mesh = FileProcessor.Import(filename);
 
-            input = FileProcessor.Read(filename);
+                        if (mesh != null)
+                        {
+                            statisticView.UpdateStatistic(mesh);
+
+                            // Update settings
+                            settings.CurrentFile = Path.GetFileName(filename);
+
+                            HandleMeshImport();
+                            btnSmooth.Enabled = true; // TODO: Remove
+                        }
+                        // else Message
+
+                        return true;
+                    }
+                }
+
+                input = FileProcessor.Read(filename);
+            }
 
             if (input != null)
             {
@@ -736,6 +744,16 @@ namespace MeshExplorer
                 bool isDelaunay = MeshValidator.IsDelaunay(mesh);
 
                 Behavior.Verbose = save;
+
+                if (isConsistent)
+                {
+                    SimpleLog.Instance.Info("Mesh topology appears to be consistent.");
+                }
+
+                if (isDelaunay)
+                {
+                    SimpleLog.Instance.Info("Mesh is (conforming) Delaunay.");
+                }
 
                 ShowLog();
             }
