@@ -51,7 +51,7 @@
     <Compile Include="Meshing\IConstraintMesher.cs" />
     <Compile Include="Meshing\IQualityMesher.cs" />
     <Compile Include="Meshing\ITriangulator.cs" />
-    <Compile Include="BadTriQueue.cs" />
+    <Compile Include="Data\BadTriQueue.cs" />
     <Compile Include="Behavior.cs" />
     <Compile Include="Meshing\ConstraintMesher.cs" />
     <Compile Include="Data\BadSubseg.cs" />
@@ -60,7 +60,7 @@
     <Compile Include="Data\Otri.cs" />
     <Compile Include="Data\Segment.cs" />
     <Compile Include="Data\Triangle.cs" />
-    <Compile Include="Data\Vertex.cs" />
+    <Compile Include="Geometry\Vertex.cs" />
     <Compile Include="Meshing\Algorithm\Dwyer.cs" />
     <Compile Include="Geometry\Rectangle.cs" />
     <Compile Include="Geometry\Edge.cs" />
@@ -77,10 +77,10 @@
     <Compile Include="IO\InputTriangle.cs" />
     <Compile Include="IO\TriangleReader.cs" />
     <Compile Include="IO\TriangleFormat.cs" />
-    <Compile Include="Log\ILog.cs" />
-    <Compile Include="Log\ILogItem.cs" />
-    <Compile Include="Log\SimpleLog.cs" />
-    <Compile Include="Log\SimpleLogItem.cs" />
+    <Compile Include="Logging\ILog.cs" />
+    <Compile Include="Logging\ILogItem.cs" />
+    <Compile Include="Log.cs" />
+    <Compile Include="Logging\LogItem.cs" />
     <Compile Include="Meshing\QualityOptions.cs" />
     <Compile Include="MeshValidator.cs" />
     <Compile Include="NewLocation.cs" />
@@ -88,7 +88,7 @@
     <Compile Include="Enums.cs" />
     <Compile Include="Meshing\Algorithm\Incremental.cs" />
     <Compile Include="Mesh.cs" />
-    <Compile Include="Primitives.cs" />
+    <Compile Include="RobustPredicates.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sampler.cs" />
     <Compile Include="Smoothing\ISmoother.cs" />

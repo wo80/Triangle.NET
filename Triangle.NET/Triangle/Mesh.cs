@@ -11,7 +11,7 @@ namespace TriangleNet
     using System.Collections.Generic;
     using System.Linq;
     using TriangleNet.Data;
-    using TriangleNet.Log;
+    using TriangleNet.Logging;
     using TriangleNet.IO;
     using TriangleNet.Meshing;
     using TriangleNet.Meshing.Algorithm;
@@ -26,7 +26,7 @@ namespace TriangleNet
     {
         #region Variables
 
-        ILog<SimpleLogItem> logger;
+        ILog<LogItem> logger;
 
         QualityMesher quality;
 
@@ -188,7 +188,7 @@ namespace TriangleNet
         {
             this.behavior = behavior;
 
-            logger = SimpleLog.Instance;
+            logger = Log.Instance;
 
             behavior = new Behavior();
 
@@ -205,7 +205,7 @@ namespace TriangleNet
 
             locator = new TriangleLocator(this);
 
-            Primitives.ExactInit();
+            RobustPredicates.ExactInit();
 
             if (dummytri == null)
             {
@@ -858,9 +858,9 @@ namespace TriangleNet
                             {
                                 // Add the subsegment to the list of encroached subsegments.
                                 encroached = new BadSubseg();
-                                encroached.encsubseg = brokensubseg;
-                                encroached.subsegorg = brokensubseg.Org();
-                                encroached.subsegdest = brokensubseg.Dest();
+                                encroached.subseg = brokensubseg;
+                                encroached.org = brokensubseg.Org();
+                                encroached.dest = brokensubseg.Dest();
 
                                 quality.AddBadSubseg(encroached);
                             }
@@ -1133,7 +1133,7 @@ namespace TriangleNet
                             // the boundary of the triangulation. 'farvertex' might be
                             // infinite as well, but trust me, this same condition should
                             // be applied.
-                            doflip = Primitives.CounterClockwise(newvertex, rightvertex, farvertex) > 0.0;
+                            doflip = RobustPredicates.CounterClockwise(newvertex, rightvertex, farvertex) > 0.0;
                         }
                         else if ((rightvertex == infvertex1) ||
                                  (rightvertex == infvertex2) ||
@@ -1143,7 +1143,7 @@ namespace TriangleNet
                             // the boundary of the triangulation. 'farvertex' might be
                             // infinite as well, but trust me, this same condition should
                             // be applied.
-                            doflip = Primitives.CounterClockwise(farvertex, leftvertex, newvertex) > 0.0;
+                            doflip = RobustPredicates.CounterClockwise(farvertex, leftvertex, newvertex) > 0.0;
                         }
                         else if ((farvertex == infvertex1) ||
                                  (farvertex == infvertex2) ||
@@ -1156,7 +1156,7 @@ namespace TriangleNet
                         else
                         {
                             // Test whether the edge is locally Delaunay.
-                            doflip = Primitives.InCircle(leftvertex, newvertex, rightvertex, farvertex) > 0.0;
+                            doflip = RobustPredicates.InCircle(leftvertex, newvertex, rightvertex, farvertex) > 0.0;
                         }
                         if (doflip)
                         {
@@ -1686,7 +1686,7 @@ namespace TriangleNet
                 testtri.OnextSelf();
                 testvertex = testtri.Dest();
                 // Is this a better vertex?
-                if (Primitives.InCircle(leftbasevertex, rightbasevertex, bestvertex, testvertex) > 0.0)
+                if (RobustPredicates.InCircle(leftbasevertex, rightbasevertex, bestvertex, testvertex) > 0.0)
                 {
                     testtri.Copy(ref besttri);
                     bestvertex = testvertex;

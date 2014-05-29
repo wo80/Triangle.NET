@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using TriangleNet.Log;
+using TriangleNet;
+using TriangleNet.Logging;
 
 namespace MeshExplorer
 {
@@ -19,7 +16,7 @@ namespace MeshExplorer
 
         public void AddItem(string message, bool warning)
         {
-            ILog<SimpleLogItem> log = SimpleLog.Instance;
+            ILog<LogItem> log = Log.Instance;
 
             if (warning)
             {
@@ -35,7 +32,7 @@ namespace MeshExplorer
         {
             listLog.Items.Clear();
 
-            ILog<SimpleLogItem> log = SimpleLog.Instance;
+            ILog<LogItem> log = Log.Instance;
 
             foreach (var item in log.Data)
             {
@@ -43,7 +40,7 @@ namespace MeshExplorer
             }
         }
 
-        private ListViewItem CreateListViewItem(SimpleLogItem item)
+        private ListViewItem CreateListViewItem(LogItem item)
         {
             ListViewItem lvi = new ListViewItem(new string[] { item.Message, item.Info });
 
@@ -81,7 +78,7 @@ namespace MeshExplorer
                 if (ModifierKeys == Keys.Control)
                 {
                     listLog.Items.Clear();
-                    SimpleLog.Instance.Clear();
+                    Log.Instance.Clear();
                 }
             }
         }

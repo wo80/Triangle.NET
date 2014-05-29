@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="Quality.cs">
+// <copyright file="QualityMesher.cs">
 // Original Triangle code by Jonathan Richard Shewchuk, http://www.cs.cmu.edu/~quake/triangle.html
 // Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
 // </copyright>
@@ -10,8 +10,8 @@ namespace TriangleNet.Meshing
     using System;
     using System.Collections.Generic;
     using TriangleNet.Data;
-    using TriangleNet.Log;
     using TriangleNet.Geometry;
+    using TriangleNet.Logging;
 
     /// <summary>
     /// Provides methods for mesh quality enforcement and testing.
@@ -25,11 +25,11 @@ namespace TriangleNet.Meshing
 
         NewLocation newLocation;
 
-        ILog<SimpleLogItem> logger;
+        ILog<LogItem> logger;
 
         public QualityMesher(Mesh mesh)
         {
-            logger = SimpleLog.Instance;
+            logger = Log.Instance;
 
             badsubsegs = new Queue<BadSubseg>();
             queue = new BadTriQueue();
@@ -150,15 +150,15 @@ namespace TriangleNet.Meshing
                 encroachedseg = new BadSubseg();
                 if (encroached == 1)
                 {
-                    encroachedseg.encsubseg = testsubseg;
-                    encroachedseg.subsegorg = eorg;
-                    encroachedseg.subsegdest = edest;
+                    encroachedseg.subseg = testsubseg;
+                    encroachedseg.org = eorg;
+                    encroachedseg.dest = edest;
                 }
                 else
                 {
-                    encroachedseg.encsubseg = testsym;
-                    encroachedseg.subsegorg = edest;
-                    encroachedseg.subsegdest = eorg;
+                    encroachedseg.subseg = testsym;
+                    encroachedseg.org = edest;
+                    encroachedseg.dest = eorg;
                 }
 
                 badsubsegs.Enqueue(encroachedseg);
@@ -430,14 +430,14 @@ namespace TriangleNet.Meshing
 
                 seg = badsubsegs.Dequeue();
 
-                currentenc = seg.encsubseg;
+                currentenc = seg.subseg;
                 eorg = currentenc.Org();
                 edest = currentenc.Dest();
                 // Make sure that this segment is still the same segment it was
                 // when it was determined to be encroached.  If the segment was
                 // enqueued multiple times (because several newly inserted
                 // vertices encroached it), it may have already been split.
-                if (!Osub.IsDead(currentenc.seg) && (eorg == seg.subsegorg) && (edest == seg.subsegdest))
+                if (!Osub.IsDead(currentenc.seg) && (eorg == seg.org) && (edest == seg.dest))
                 {
                     // To decide where to split a segment, we need to know if the
                     // segment shares an endpoint with an adjacent segment.
@@ -569,7 +569,7 @@ namespace TriangleNet.Meshing
                         // Roundoff in the above calculation may yield a 'newvertex'
                         // that is not precisely collinear with 'eorg' and 'edest'.
                         // Improve collinearity by one step of iterative refinement.
-                        multiplier = Primitives.CounterClockwise(eorg, edest, newvertex);
+                        multiplier = RobustPredicates.CounterClockwise(eorg, edest, newvertex);
                         divisor = ((eorg.x - edest.x) * (eorg.x - edest.x) +
                                    (eorg.y - edest.y) * (eorg.y - edest.y));
                         if ((multiplier != 0.0) && (divisor != 0.0))
@@ -615,7 +615,7 @@ namespace TriangleNet.Meshing
 
                 // Set subsegment's origin to NULL. This makes it possible to detect dead 
                 // badsubsegs when traversing the list of all badsubsegs.
-                seg.subsegorg = null;
+                seg.org = null;
             }
         }
 
@@ -658,8 +658,8 @@ namespace TriangleNet.Meshing
             // Make sure that this triangle is still the same triangle it was
             // when it was tested and determined to be of bad quality.
             // Subsequent transformations may have made it a different triangle.
-            if (!Otri.IsDead(badotri.triangle) && (borg == badtri.triangorg) &&
-                (bdest == badtri.triangdest) && (bapex == badtri.triangapex))
+            if (!Otri.IsDead(badotri.triangle) && (borg == badtri.org) &&
+                (bdest == badtri.dest) && (bapex == badtri.apex))
             {
                 errorflag = false;
                 // Create a new vertex at the triangle's circumcenter.
@@ -670,7 +670,7 @@ namespace TriangleNet.Meshing
                 // reset VertexType?
                 if (behavior.fixedArea || behavior.VarArea)
                 {
-                    newloc = Primitives.FindCircumcenter(borg, bdest, bapex, ref xi, ref eta, behavior.offconstant);
+                    newloc = RobustPredicates.FindCircumcenter(borg, bdest, bapex, ref xi, ref eta, behavior.offconstant);
                 }
                 else
                 {
@@ -682,7 +682,7 @@ namespace TriangleNet.Meshing
                     ((newloc.x == bdest.x) && (newloc.y == bdest.y)) ||
                     ((newloc.x == bapex.x) && (newloc.y == bapex.y)))
                 {
-                    if (Behavior.Verbose)
+                    if (Log.Verbose)
                     {
                         logger.Warning("New vertex falls on existing vertex.", "Quality.SplitTriangle()");
                         errorflag = true;
@@ -746,7 +746,7 @@ namespace TriangleNet.Meshing
                     else
                     {   // success == DUPLICATEVERTEX
                         // Couldn't insert the new vertex because a vertex is already there.
-                        if (Behavior.Verbose)
+                        if (Log.Verbose)
                         {
                             logger.Warning("New vertex falls on existing vertex.", "Quality.SplitTriangle()");
                             errorflag = true;
@@ -811,7 +811,7 @@ namespace TriangleNet.Meshing
             // and have no low-quality triangles.
 
             // Might we have run out of Steiner points too soon?
-            if (Behavior.Verbose && behavior.ConformingDelaunay && (badsubsegs.Count > 0) && (mesh.steinerleft == 0))
+            if (Log.Verbose && behavior.ConformingDelaunay && (badsubsegs.Count > 0) && (mesh.steinerleft == 0))
             {
 
                 logger.Warning("I ran out of Steiner points, but the mesh has encroached subsegments, "

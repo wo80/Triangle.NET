@@ -11,7 +11,7 @@ namespace TriangleNet.IO
     using System.IO;
     using System.Globalization;
     using TriangleNet.Data;
-    using TriangleNet.Log;
+    using TriangleNet.Logging;
     using TriangleNet.Geometry;
     using System.Collections.Generic;
 
@@ -385,17 +385,17 @@ namespace TriangleNet.IO
 
                     if ((end1 < 0) || (end1 >= invertices))
                     {
-                        if (Behavior.Verbose)
+                        if (Log.Verbose)
                         {
-                            SimpleLog.Instance.Warning("Invalid first endpoint of segment.",
+                            Log.Instance.Warning("Invalid first endpoint of segment.",
                                 "MeshReader.ReadPolyfile()");
                         }
                     }
                     else if ((end2 < 0) || (end2 >= invertices))
                     {
-                        if (Behavior.Verbose)
+                        if (Log.Verbose)
                         {
-                            SimpleLog.Instance.Warning("Invalid second endpoint of segment.",
+                            Log.Instance.Warning("Invalid second endpoint of segment.",
                                 "MeshReader.ReadPolyfile()");
                         }
                     }
@@ -521,7 +521,7 @@ namespace TriangleNet.IO
 
                 if (attributes > 1)
                 {
-                    SimpleLog.Instance.Warning("Triangle attributes not supported.", "FileReader.Read");
+                    Log.Instance.Warning("Triangle attributes not supported.", "FileReader.Read");
                 }
 
                 triangles = new List<ITriangle>(intriangles);
@@ -593,7 +593,7 @@ namespace TriangleNet.IO
 
                 if (int.Parse(line[0]) != intriangles)
                 {
-                    SimpleLog.Instance.Warning("Number of area constraints doesn't match number of triangles.",
+                    Log.Instance.Warning("Number of area constraints doesn't match number of triangles.",
                         "ReadAreaFile()");
                     return null;
                 }
@@ -684,17 +684,17 @@ namespace TriangleNet.IO
 
                     if ((end1 < 0) || (end1 >= invertices))
                     {
-                        if (Behavior.Verbose)
+                        if (Log.Verbose)
                         {
-                            SimpleLog.Instance.Warning("Invalid first endpoint of segment.",
+                            Log.Instance.Warning("Invalid first endpoint of segment.",
                                 "MeshReader.ReadPolyfile()");
                         }
                     }
                     else if ((end2 < 0) || (end2 >= invertices))
                     {
-                        if (Behavior.Verbose)
+                        if (Log.Verbose)
                         {
-                            SimpleLog.Instance.Warning("Invalid second endpoint of segment.",
+                            Log.Instance.Warning("Invalid second endpoint of segment.",
                                 "MeshReader.ReadPolyfile()");
                         }
                     }

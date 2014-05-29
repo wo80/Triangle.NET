@@ -9,7 +9,8 @@ namespace TriangleNet.Meshing.Algorithm
 {
     using System;
     using TriangleNet.Data;
-    using TriangleNet.Log;
+    using TriangleNet.Geometry;
+    using TriangleNet.Logging;
 
     /// <summary>
     /// Builds a delaunay triangulation using the divide-and-conquer algorithm.
@@ -45,7 +46,8 @@ namespace TriangleNet.Meshing.Algorithm
     class Dwyer
     {
         static Random rand = new Random(DateTime.Now.Millisecond);
-        bool useDwyer = true;
+
+        public bool UseDwyer = true;
 
         Vertex[] sortarray;
         Mesh mesh;
@@ -314,7 +316,7 @@ namespace TriangleNet.Meshing.Algorithm
             innerrightorg = innerright.Org();
             innerrightapex = innerright.Apex();
             // Special treatment for horizontal cuts.
-            if (useDwyer && (axis == 1))
+            if (UseDwyer && (axis == 1))
             {
                 farleftpt = farleft.Org();
                 farleftapex = farleft.Apex();
@@ -363,7 +365,7 @@ namespace TriangleNet.Meshing.Algorithm
             {
                 changemade = false;
                 // Make innerleftdest the "bottommost" vertex of the left hull.
-                if (Primitives.CounterClockwise(innerleftdest, innerleftapex, innerrightorg) > 0.0)
+                if (RobustPredicates.CounterClockwise(innerleftdest, innerleftapex, innerrightorg) > 0.0)
                 {
                     innerleft.LprevSelf();
                     innerleft.SymSelf();
@@ -372,7 +374,7 @@ namespace TriangleNet.Meshing.Algorithm
                     changemade = true;
                 }
                 // Make innerrightorg the "bottommost" vertex of the right hull.
-                if (Primitives.CounterClockwise(innerrightapex, innerrightorg, innerleftdest) > 0.0)
+                if (RobustPredicates.CounterClockwise(innerrightapex, innerrightorg, innerleftdest) > 0.0)
                 {
                     innerright.LnextSelf();
                     innerright.SymSelf();
@@ -420,8 +422,8 @@ namespace TriangleNet.Meshing.Algorithm
                 // because even though the left triangulation might seem finished now,
                 // moving up on the right triangulation might reveal a new vertex of
                 // the left triangulation. And vice-versa.)
-                leftfinished = Primitives.CounterClockwise(upperleft, lowerleft, lowerright) <= 0.0;
-                rightfinished = Primitives.CounterClockwise(upperright, lowerleft, lowerright) <= 0.0;
+                leftfinished = RobustPredicates.CounterClockwise(upperleft, lowerleft, lowerright) <= 0.0;
+                rightfinished = RobustPredicates.CounterClockwise(upperright, lowerleft, lowerright) <= 0.0;
                 if (leftfinished && rightfinished)
                 {
                     // Create the top new bounding triangle.
@@ -437,7 +439,7 @@ namespace TriangleNet.Meshing.Algorithm
                     nextedge.Bond(ref leftcand);
 
                     // Special treatment for horizontal cuts.
-                    if (useDwyer && (axis == 1))
+                    if (UseDwyer && (axis == 1))
                     {
                         farleftpt = farleft.Org();
                         farleftapex = farleft.Apex();
@@ -478,7 +480,7 @@ namespace TriangleNet.Meshing.Algorithm
                     if (nextapex != null)
                     {
                         // Check whether the edge is Delaunay.
-                        badedge = Primitives.InCircle(lowerleft, lowerright, upperleft, nextapex) > 0.0;
+                        badedge = RobustPredicates.InCircle(lowerleft, lowerright, upperleft, nextapex) > 0.0;
                         while (badedge)
                         {
                             // Eliminate the edge with an edge flip.  As a result, the
@@ -508,7 +510,7 @@ namespace TriangleNet.Meshing.Algorithm
                             if (nextapex != null)
                             {
                                 // Check whether the edge is Delaunay.
-                                badedge = Primitives.InCircle(lowerleft, lowerright, upperleft, nextapex) > 0.0;
+                                badedge = RobustPredicates.InCircle(lowerleft, lowerright, upperleft, nextapex) > 0.0;
                             }
                             else
                             {
@@ -530,7 +532,7 @@ namespace TriangleNet.Meshing.Algorithm
                     if (nextapex != null)
                     {
                         // Check whether the edge is Delaunay.
-                        badedge = Primitives.InCircle(lowerleft, lowerright, upperright, nextapex) > 0.0;
+                        badedge = RobustPredicates.InCircle(lowerleft, lowerright, upperright, nextapex) > 0.0;
                         while (badedge)
                         {
                             // Eliminate the edge with an edge flip.  As a result, the
@@ -560,7 +562,7 @@ namespace TriangleNet.Meshing.Algorithm
                             if (nextapex != null)
                             {
                                 // Check whether the edge is Delaunay.
-                                badedge = Primitives.InCircle(lowerleft, lowerright, upperright, nextapex) > 0.0;
+                                badedge = RobustPredicates.InCircle(lowerleft, lowerright, upperright, nextapex) > 0.0;
                             }
                             else
                             {
@@ -571,7 +573,7 @@ namespace TriangleNet.Meshing.Algorithm
                     }
                 }
                 if (leftfinished || (!rightfinished &&
-                       (Primitives.InCircle(upperleft, lowerleft, lowerright, upperright) > 0.0)))
+                       (RobustPredicates.InCircle(upperleft, lowerleft, lowerright, upperright) > 0.0)))
                 {
                     // Knit the triangulations, adding an edge from 'lowerleft'
                     // to 'upperright'.
@@ -660,7 +662,7 @@ namespace TriangleNet.Meshing.Algorithm
                 mesh.MakeTriangle(ref tri1);
                 mesh.MakeTriangle(ref tri2);
                 mesh.MakeTriangle(ref tri3);
-                area = Primitives.CounterClockwise(sortarray[left], sortarray[left + 1], sortarray[left + 2]);
+                area = RobustPredicates.CounterClockwise(sortarray[left], sortarray[left + 1], sortarray[left + 2]);
                 if (area == 0.0)
                 {
                     // Three collinear vertices; the triangulation is two edges.
@@ -858,9 +860,9 @@ namespace TriangleNet.Meshing.Algorithm
                 if ((sortarray[i].x == sortarray[j].x)
                     && (sortarray[i].y == sortarray[j].y))
                 {
-                    if (Behavior.Verbose)
+                    if (Log.Verbose)
                     {
-                        SimpleLog.Instance.Warning(
+                        Log.Instance.Warning(
                             String.Format("A duplicate vertex appeared and was ignored (ID {0}).", sortarray[j].hash), 
                             "DivConquer.DivconqDelaunay()");
                     }
@@ -874,7 +876,7 @@ namespace TriangleNet.Meshing.Algorithm
                 }
             }
             i++;
-            if (useDwyer)
+            if (UseDwyer)
             {
                 // Re-sort the array of vertices to accommodate alternating cuts.
                 divider = i >> 1;

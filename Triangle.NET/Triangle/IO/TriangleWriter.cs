@@ -485,7 +485,7 @@ namespace TriangleNet.IO
                     torg = tri.Org();
                     tdest = tri.Dest();
                     tapex = tri.Apex();
-                    circumcenter = Primitives.FindCircumcenter(torg, tdest, tapex, ref xi, ref eta);
+                    circumcenter = RobustPredicates.FindCircumcenter(torg, tdest, tapex, ref xi, ref eta);
 
                     // X and y coordinates.
                     writer.Write("{0} {1} {2}", index, circumcenter.X.ToString(nfi),

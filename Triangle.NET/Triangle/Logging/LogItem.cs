@@ -4,17 +4,14 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace TriangleNet.Log
+namespace TriangleNet.Logging
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
 
     /// <summary>
     /// Represents an item stored in the log.
     /// </summary>
-    public class SimpleLogItem : ILogItem
+    public class LogItem : ILogItem
     {
         DateTime time;
         LogLevel level;
@@ -41,11 +38,11 @@ namespace TriangleNet.Log
             get { return info; }
         }
 
-        public SimpleLogItem(LogLevel level, string message)
+        public LogItem(LogLevel level, string message)
             : this(level, message, "")
         { }
 
-        public SimpleLogItem(LogLevel level, string message, string info)
+        public LogItem(LogLevel level, string message, string info)
         {
             this.time = DateTime.Now;
             this.level = level;

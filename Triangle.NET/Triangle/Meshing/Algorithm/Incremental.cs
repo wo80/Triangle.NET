@@ -8,7 +8,7 @@
 namespace TriangleNet.Meshing.Algorithm
 {
     using TriangleNet.Data;
-    using TriangleNet.Log;
+    using TriangleNet.Logging;
     using TriangleNet.Geometry;
 
     /// <summary>
@@ -165,9 +165,9 @@ namespace TriangleNet.Meshing.Algorithm
                 Osub tmp = default(Osub);
                 if (mesh.InsertVertex(v, ref starttri, ref tmp, false, false) == InsertVertexResult.Duplicate)
                 {
-                    if (Behavior.Verbose)
+                    if (Log.Verbose)
                     {
-                        SimpleLog.Instance.Warning("A duplicate vertex appeared and was ignored.", 
+                        Log.Instance.Warning("A duplicate vertex appeared and was ignored.", 
                             "Incremental.IncrementalDelaunay()");
                     }
                     v.type = VertexType.UndeadVertex;

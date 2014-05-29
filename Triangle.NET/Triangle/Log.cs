@@ -4,12 +4,10 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace TriangleNet.Log
+namespace TriangleNet
 {
-    using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
+    using TriangleNet.Logging;
 
     /// <summary>
     /// A simple logger, which logs messages to a List.
@@ -17,23 +15,28 @@ namespace TriangleNet.Log
     /// <remarks>Using singleton pattern as proposed by Jon Skeet.
     /// http://csharpindepth.com/Articles/General/Singleton.aspx
     /// </remarks>
-    public sealed class SimpleLog : ILog<SimpleLogItem>
+    public sealed class Log : ILog<LogItem>
     {
-        private List<SimpleLogItem> log = new List<SimpleLogItem>();
+        /// <summary>
+        /// Log detailed information.
+        /// </summary>
+        public static bool Verbose { get; set; }
+
+        private List<LogItem> log = new List<LogItem>();
 
         private LogLevel level = LogLevel.Info;
 
         #region Singleton pattern
 
-        private static readonly SimpleLog instance = new SimpleLog();
+        private static readonly Log instance = new Log();
 
         // Explicit static constructor to tell C# compiler
         // not to mark type as beforefieldinit
-        static SimpleLog() { }
+        static Log() { }
 
-        private SimpleLog() { }
+        private Log() { }
 
-        public static ILog<SimpleLogItem> Instance
+        public static ILog<LogItem> Instance
         {
             get
             {
@@ -43,7 +46,7 @@ namespace TriangleNet.Log
 
         #endregion
 
-        public void Add(SimpleLogItem item)
+        public void Add(LogItem item)
         {
             log.Add(item);
         }
@@ -55,20 +58,20 @@ namespace TriangleNet.Log
 
         public void Info(string message)
         {
-            log.Add(new SimpleLogItem(LogLevel.Info, message));
+            log.Add(new LogItem(LogLevel.Info, message));
         }
 
         public void Warning(string message, string location)
         {
-            log.Add(new SimpleLogItem(LogLevel.Warning, message, location));
+            log.Add(new LogItem(LogLevel.Warning, message, location));
         }
 
         public void Error(string message, string location)
         {
-            log.Add(new SimpleLogItem(LogLevel.Error, message, location));
+            log.Add(new LogItem(LogLevel.Error, message, location));
         }
 
-        public IList<SimpleLogItem> Data
+        public IList<LogItem> Data
         {
             get { return log; }
         }

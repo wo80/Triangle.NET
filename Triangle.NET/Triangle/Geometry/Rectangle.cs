@@ -20,8 +20,9 @@ namespace TriangleNet.Geometry
         /// Initializes a new instance of the <see cref="Rectangle" /> class.
         /// </summary>
         public Rectangle()
-            : this(double.MaxValue, double.MaxValue, -double.MaxValue, -double.MaxValue)
         {
+            this.xmin = this.ymin = double.MaxValue;
+            this.xmax = this.ymax = -double.MaxValue;
         }
 
         public Rectangle(Rectangle other)
@@ -109,8 +110,7 @@ namespace TriangleNet.Geometry
         /// <summary>
         /// Expand rectangle to include given point.
         /// </summary>
-        /// <param name="x">X coordinate.</param>
-        /// <param name="p">Y coordinate.</param>
+        /// <param name="p">Point.</param>
         public void Expand(Point p)
         {
             xmin = Math.Min(xmin, p.x);
@@ -153,12 +153,22 @@ namespace TriangleNet.Geometry
             return ((pt.x >= xmin) && (pt.x <= xmax) && (pt.y >= ymin) && (pt.y <= ymax));
         }
 
+        /// <summary>
+        /// Check if given rectangle is inside bounding box.
+        /// </summary>
+        /// <param name="other">Rectangle to check.</param>
+        /// <returns>Return true, if bounding box contains given rectangle.</returns>
         public bool Contains(Rectangle other)
         {
             return (xmin <= other.Left && other.Right <= xmax
                 && ymin <= other.Bottom && other.Top <= ymax);
         }
 
+        /// <summary>
+        /// Check if given rectangle intersects bounding box.
+        /// </summary>
+        /// <param name="other">Rectangle to check.</param>
+        /// <returns>Return true, if given rectangle intersects bounding box.</returns>
         public bool Intersects(Rectangle other)
         {
             return (other.Left < xmax && xmin < other.Right

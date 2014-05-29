@@ -9,7 +9,6 @@ namespace TriangleNet
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
 
     /// <summary>
     /// Used for triangle sampling in the Mesh.Locate method.
@@ -93,7 +92,7 @@ namespace TriangleNet
                 // sure, use a range variable...
                 key = rand.Next(i * range, (i + 1) * range - 1);
 
-                if (!mesh.triangles.Keys.Contains(keys[key]))
+                if (!mesh.triangles.ContainsKey(keys[key]))
                 {
                     // Keys collection isn't up to date anymore!
                     this.Update(mesh, true);

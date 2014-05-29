@@ -128,10 +128,10 @@ namespace TriangleNet
                 }
                 // Does the point lie on the other side of the line defined by the
                 // triangle edge opposite the triangle's destination?
-                destorient = Primitives.CounterClockwise(forg, fapex, searchpoint);
+                destorient = RobustPredicates.CounterClockwise(forg, fapex, searchpoint);
                 // Does the point lie on the other side of the line defined by the
                 // triangle edge opposite the triangle's origin?
-                orgorient = Primitives.CounterClockwise(fapex, fdest, searchpoint);
+                orgorient = RobustPredicates.CounterClockwise(fapex, fdest, searchpoint);
                 if (destorient > 0.0)
                 {
                     if (orgorient > 0.0)
@@ -317,7 +317,7 @@ namespace TriangleNet
                 return LocateResult.OnVertex;
             }
             // Orient 'searchtri' to fit the preconditions of calling preciselocate().
-            ahead = Primitives.CounterClockwise(torg, tdest, searchpoint);
+            ahead = RobustPredicates.CounterClockwise(torg, tdest, searchpoint);
             if (ahead < 0.0)
             {
                 // Turn around so that 'searchpoint' is to the left of the

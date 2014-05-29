@@ -26,6 +26,16 @@ namespace TriangleNet.Meshing
         /// </summary>
         public bool Convex { get; set; }
 
+        /// <summary>
+        /// Suppresses boundary segment splitting.
+        /// </summary>
+        /// <remarks>
+        /// 0 = split segments (default)
+        /// 1 = no new vertices on the boundary
+        /// 2 = prevent all segment splitting, including internal boundaries
+        /// </remarks>
+        public int SegmentSplitting { get; set; }
+
         #endregion
     }
 }

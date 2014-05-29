@@ -178,7 +178,7 @@ namespace TriangleNet
                 // Use the counterclockwise() routine to ensure a positive (and
                 //   reasonably accurate) result, avoiding any possibility of
                 //   division by zero.
-                denominator = 0.5 / Primitives.CounterClockwise(tdest, tapex, torg);
+                denominator = 0.5 / RobustPredicates.CounterClockwise(tdest, tapex, torg);
                 // Don't count the above as an orientation test.
                 Statistic.CounterClockwiseCount--;
             }
@@ -473,7 +473,7 @@ namespace TriangleNet
                         neighborvertex_2 = neighborotri.Dest();
                         neighborvertex_3 = neighborotri.Apex();
                         // now calculate neighbor's circumcenter which is the voronoi site
-                        neighborCircumcenter = Primitives.FindCircumcenter(neighborvertex_1, neighborvertex_2, neighborvertex_3,
+                        neighborCircumcenter = RobustPredicates.FindCircumcenter(neighborvertex_1, neighborvertex_2, neighborvertex_3,
                             ref xi_tmp, ref eta_tmp);
 
                         /// compute petal and Voronoi edge intersection ///
@@ -604,7 +604,7 @@ namespace TriangleNet
                         neighborvertex_2 = neighborotri.Dest();
                         neighborvertex_3 = neighborotri.Apex();
                         // now calculate neighbor's circumcenter which is the voronoi site
-                        neighborCircumcenter = Primitives.FindCircumcenter(neighborvertex_1, neighborvertex_2, neighborvertex_3,
+                        neighborCircumcenter = RobustPredicates.FindCircumcenter(neighborvertex_1, neighborvertex_2, neighborvertex_3,
                             ref xi_tmp, ref eta_tmp);
 
                         /// compute petal and Voronoi edge intersection ///
@@ -891,7 +891,7 @@ namespace TriangleNet
                 // Use the counterclockwise() routine to ensure a positive (and
                 //   reasonably accurate) result, avoiding any possibility of
                 //   division by zero.
-                denominator = 0.5 / Primitives.CounterClockwise(tdest, tapex, torg);
+                denominator = 0.5 / RobustPredicates.CounterClockwise(tdest, tapex, torg);
                 // Don't count the above as an orientation test.
                 Statistic.CounterClockwiseCount--;
             }
@@ -1234,7 +1234,7 @@ namespace TriangleNet
                         neighborvertex_2 = neighborotri.Dest();
                         neighborvertex_3 = neighborotri.Apex();
                         // now calculate neighbor's circumcenter which is the voronoi site
-                        neighborCircumcenter = Primitives.FindCircumcenter(neighborvertex_1, neighborvertex_2, neighborvertex_3,
+                        neighborCircumcenter = RobustPredicates.FindCircumcenter(neighborvertex_1, neighborvertex_2, neighborvertex_3,
                             ref xi_tmp, ref eta_tmp);
 
                         /// compute petal and Voronoi edge intersection ///						
@@ -1516,7 +1516,7 @@ namespace TriangleNet
                         neighborvertex_2 = neighborotri.Dest();
                         neighborvertex_3 = neighborotri.Apex();
                         // now calculate neighbor's circumcenter which is the voronoi site
-                        neighborCircumcenter = Primitives.FindCircumcenter(neighborvertex_1, neighborvertex_2, neighborvertex_3,
+                        neighborCircumcenter = RobustPredicates.FindCircumcenter(neighborvertex_1, neighborvertex_2, neighborvertex_3,
                             ref xi_tmp, ref eta_tmp);
 
                         /// compute petal and Voronoi edge intersection ///
@@ -2521,9 +2521,9 @@ namespace TriangleNet
                 petalr = new double[2 * numpoints];
                 wedges = new double[2 * numpoints * 16 + 36];
 
-                if (Behavior.Verbose)
+                if (Log.Verbose)
                 {
-                    Log.SimpleLog.Instance.Info("NewLocation: resized work arrays (" + 2 * numpoints + ")");
+                    Log.Instance.Info("NewLocation: resized work arrays (" + 2 * numpoints + ")");
                 }
             }
 
@@ -2788,9 +2788,9 @@ namespace TriangleNet
                 petalr = new double[2 * numpoints];
                 wedges = new double[2 * numpoints * 20 + 40];
 
-                if (Behavior.Verbose)
+                if (Log.Verbose)
                 {
-                    Log.SimpleLog.Instance.Info("NewLocation: resized work arrays (" + 2 * numpoints + ")");
+                    Log.Instance.Info("NewLocation: resized work arrays (" + 2 * numpoints + ")");
                 }
             }
 
@@ -4099,7 +4099,7 @@ namespace TriangleNet
             else
             {
                 // Orient 'searchtri' to fit the preconditions of calling preciselocate().
-                ahead = Primitives.CounterClockwise(torg, tdest, newvertex);
+                ahead = RobustPredicates.CounterClockwise(torg, tdest, newvertex);
                 if (ahead < 0.0)
                 {
                     // Turn around so that 'searchpoint' is to the left of the

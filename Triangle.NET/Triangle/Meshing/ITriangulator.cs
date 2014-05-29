@@ -6,16 +6,14 @@
 
 namespace TriangleNet.Meshing
 {
-    using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
+    using TriangleNet.Geometry;
 
     /// <summary>
     /// TODO: Update summary.
     /// </summary>
     public interface ITriangulator
     {
-        int Triangulate(Mesh mesh);
+        Mesh Triangulate(ICollection<Vertex> points);
     }
 }

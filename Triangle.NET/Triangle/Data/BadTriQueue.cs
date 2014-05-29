@@ -5,10 +5,9 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace TriangleNet
+namespace TriangleNet.Data
 {
-    using System.Collections.Generic;
-    using TriangleNet.Data;
+    using TriangleNet.Geometry;
 
     /// <summary>
     /// A (priority) queue for bad triangles.
@@ -20,7 +19,7 @@ namespace TriangleNet
     /// </remarks>
     class BadTriQueue
     {
-        static readonly double SQRT2 = 1.4142135623730950488016887242096980785696718753769480732;
+        const double SQRT2 = 1.4142135623730950488016887242096980785696718753769480732;
 
         public int Count { get { return this.count; } }
 
@@ -135,12 +134,12 @@ namespace TriangleNet
             else
             {
                 // Add the bad triangle to the end of an already nonempty queue.
-                queuetail[queuenumber].nexttriang = badtri;
+                queuetail[queuenumber].next = badtri;
             }
             // Maintain a pointer to the last triangle of the queue.
             queuetail[queuenumber] = badtri;
             // Newly enqueued bad triangle has no successor in the queue.
-            badtri.nexttriang = null;
+            badtri.next = null;
         }
 
         /// <summary>
@@ -158,9 +157,9 @@ namespace TriangleNet
 
             newbad.poortri = enqtri;
             newbad.key = minedge;
-            newbad.triangapex = enqapex;
-            newbad.triangorg = enqorg;
-            newbad.triangdest = enqdest;
+            newbad.apex = enqapex;
+            newbad.org = enqorg;
+            newbad.dest = enqdest;
 
             Enqueue(newbad);
         }
@@ -182,7 +181,7 @@ namespace TriangleNet
             // Find the first triangle of the highest-priority queue.
             BadTriangle result = queuefront[firstnonemptyq];
             // Remove the triangle from the queue.
-            queuefront[firstnonemptyq] = result.nexttriang;
+            queuefront[firstnonemptyq] = result.next;
             // If this queue is now empty, note the new highest-priority
             // nonempty queue.
             if (result == queuetail[firstnonemptyq])

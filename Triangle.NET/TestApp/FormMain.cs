@@ -8,7 +8,7 @@ using MeshExplorer.IO;
 using MeshRenderer.Core;
 using TriangleNet;
 using TriangleNet.Geometry;
-using TriangleNet.Log;
+using TriangleNet.Logging;
 using TriangleNet.Tools;
 
 namespace MeshExplorer
@@ -552,13 +552,13 @@ namespace MeshExplorer
         {
             if (mesh == null || settings.ExceptionThrown) return;
 
-            bool tmp = Behavior.Verbose;
-            Behavior.Verbose = true;
+            bool tmp = Log.Verbose;
+            Log.Verbose = true;
 
             mesh.Renumber(NodeNumbering.CuthillMcKee);
             ShowLog();
 
-            Behavior.Verbose = tmp;
+            Log.Verbose = tmp;
         }
 
         private void Smooth()
@@ -736,23 +736,23 @@ namespace MeshExplorer
         {
             if (mesh != null)
             {
-                bool save = Behavior.Verbose;
+                bool save = Log.Verbose;
 
-                Behavior.Verbose = true;
+                Log.Verbose = true;
 
                 bool isConsistent = MeshValidator.IsConsistent(mesh);
                 bool isDelaunay = MeshValidator.IsDelaunay(mesh);
 
-                Behavior.Verbose = save;
+                Log.Verbose = save;
 
                 if (isConsistent)
                 {
-                    SimpleLog.Instance.Info("Mesh topology appears to be consistent.");
+                    Log.Instance.Info("Mesh topology appears to be consistent.");
                 }
 
                 if (isDelaunay)
                 {
-                    SimpleLog.Instance.Info("Mesh is (conforming) Delaunay.");
+                    Log.Instance.Info("Mesh is (conforming) Delaunay.");
                 }
 
                 ShowLog();

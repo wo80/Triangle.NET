@@ -8,9 +8,7 @@
 namespace TriangleNet.Data
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
+    using TriangleNet.Geometry;
 
     /// <summary>
     /// A queue used to store bad triangles.
@@ -22,18 +20,11 @@ namespace TriangleNet.Data
     /// </remarks>
     class BadTriangle
     {
-        public static int OTID = 0;
-        public int ID = 0;
-
         public Otri poortri; // A skinny or too-large triangle.
         public double key;       // cos^2 of smallest (apical) angle.
-        public Vertex triangorg, triangdest, triangapex; // Its three vertices.
-        public BadTriangle nexttriang; // Pointer to next bad triangle.
+        public Vertex org, dest, apex; // Its three vertices.
+        public BadTriangle next; // Pointer to next bad triangle.
 
-        public BadTriangle()
-        {
-            ID = OTID++;
-        }
         public override string ToString()
         {
             return String.Format("B-TID {0}", poortri.triangle.hash);

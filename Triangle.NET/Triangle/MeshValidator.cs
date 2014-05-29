@@ -9,7 +9,7 @@ namespace TriangleNet
 {
     using System;
     using TriangleNet.Data;
-    using TriangleNet.Log;
+    using TriangleNet.Geometry;
 
     public static class MeshValidator
     {
@@ -25,7 +25,7 @@ namespace TriangleNet
             int horrors;
             bool saveexact;
 
-            var logger = SimpleLog.Instance;
+            var logger = Log.Instance;
 
             // Temporarily turn on exact arithmetic if it's off.
             saveexact = Behavior.NoExact;
@@ -47,11 +47,11 @@ namespace TriangleNet
                         // Only test for inversion once.
                         // Test if the triangle is flat or inverted.
                         triapex = tri.Apex();
-                        if (Primitives.CounterClockwise(triorg, tridest, triapex) <= 0.0)
+                        if (RobustPredicates.CounterClockwise(triorg, tridest, triapex) <= 0.0)
                         {
-                            if (Behavior.Verbose)
+                            if (Log.Verbose)
                             {
-                                logger.Warning("Triangle is flat or inverted.", "Quality.CheckMesh()");
+                                logger.Warning("Triangle is flat or inverted.", "MeshValidator.IsConsistent()");
                             }
 
                             horrors++;
@@ -66,10 +66,10 @@ namespace TriangleNet
                         oppotri.Sym(ref oppooppotri);
                         if ((tri.triangle != oppooppotri.triangle) || (tri.orient != oppooppotri.orient))
                         {
-                            if (tri.triangle == oppooppotri.triangle && Behavior.Verbose)
+                            if (tri.triangle == oppooppotri.triangle && Log.Verbose)
                             {
                                 logger.Warning("Asymmetric triangle-triangle bond: (Right triangle, wrong orientation)",
-                                    "Quality.CheckMesh()");
+                                    "MeshValidator.IsConsistent()");
                             }
 
                             horrors++;
@@ -80,10 +80,10 @@ namespace TriangleNet
                         oppodest = oppotri.Dest();
                         if ((triorg != oppodest) || (tridest != oppoorg))
                         {
-                            if (Behavior.Verbose)
+                            if (Log.Verbose)
                             {
                                 logger.Warning("Mismatched edge coordinates between two triangles.",
-                                    "Quality.CheckMesh()");
+                                    "MeshValidator.IsConsistent()");
                             }
 
                             horrors++;
@@ -96,10 +96,10 @@ namespace TriangleNet
             mesh.MakeVertexMap();
             foreach (var v in mesh.vertices.Values)
             {
-                if (v.tri.triangle == null && Behavior.Verbose)
+                if (v.tri.triangle == null && Log.Verbose)
                 {
                     logger.Warning("Vertex (ID " + v.id + ") not connected to mesh (duplicate input vertex?)",
-                                "Quality.CheckMesh()");
+                                "MeshValidator.IsConsistent()");
                 }
             }
 
@@ -140,7 +140,7 @@ namespace TriangleNet
             int horrors;
             bool saveexact;
 
-            var logger = SimpleLog.Instance;
+            var logger = Log.Instance;
 
             // Temporarily turn on exact arithmetic if it's off.
             saveexact = Behavior.NoExact;
@@ -190,12 +190,12 @@ namespace TriangleNet
 
                     if (shouldbedelaunay)
                     {
-                        if (Primitives.NonRegular(org, dest, apex, oppoapex) > 0.0)
+                        if (RobustPredicates.NonRegular(org, dest, apex, oppoapex) > 0.0)
                         {
-                            if (Behavior.Verbose)
+                            if (Log.Verbose)
                             {
                                 logger.Warning(String.Format("Non-regular pair of triangles found (IDs {0}/{1}).",
-                                    loop.triangle.id, oppotri.triangle.id), "Quality.CheckDelaunay()");
+                                    loop.triangle.id, oppotri.triangle.id), "MeshValidator.IsDelaunay()");
                             }
 
                             horrors++;

@@ -8,9 +8,7 @@
 namespace TriangleNet.Data
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
+    using TriangleNet.Geometry;
 
     /// <summary>
     /// A queue used to store encroached subsegments.
@@ -21,25 +19,17 @@ namespace TriangleNet.Data
     /// </remarks>
     class BadSubseg
     {
-        private static int hashSeed = 0;
-        internal int Hash;
-
-        public Osub encsubseg; // An encroached subsegment.
-        public Vertex subsegorg, subsegdest; // Its two vertices.
-
-        public BadSubseg()
-        {
-            this.Hash = hashSeed++;
-        }
+        public Osub subseg; // An encroached subsegment.
+        public Vertex org, dest; // Its two vertices.
 
         public override int GetHashCode()
         {
-            return this.Hash;
+            return subseg.seg.hash;
         }
 
         public override string ToString()
         {
-            return String.Format("B-SID {0}", encsubseg.seg.hash);
+            return String.Format("B-SID {0}", subseg.seg.hash);
         }
-    };
+    }
 }

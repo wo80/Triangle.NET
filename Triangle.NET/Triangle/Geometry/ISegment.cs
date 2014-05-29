@@ -6,15 +6,11 @@
 
 namespace TriangleNet.Geometry
 {
-    using TriangleNet.Data;
-
     /// <summary>
     /// Interface for segment geometry.
     /// </summary>
     public interface ISegment : IEdge
     {
-        #region Public properties
-
         /// <summary>
         /// Gets the segments endpoint.
         /// </summary>
@@ -26,7 +22,5 @@ namespace TriangleNet.Geometry
         /// </summary>
         /// <param name="index">The triangle index (0 or 1).</param>
         ITriangle GetTriangle(int index);
-
-        #endregion
     }
 }

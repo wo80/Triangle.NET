@@ -11,7 +11,7 @@ namespace TriangleNet.Meshing
     using System.Collections.Generic;
     using TriangleNet.Data;
     using TriangleNet.Geometry;
-    using TriangleNet.Log;
+    using TriangleNet.Logging;
     using TriangleNet.Tools;
 
     internal class ConstraintMesher
@@ -22,7 +22,7 @@ namespace TriangleNet.Meshing
 
         List<Triangle> viri;
 
-        ILog<SimpleLogItem> logger;
+        ILog<LogItem> logger;
 
         public ConstraintMesher(Mesh mesh)
         {
@@ -32,7 +32,7 @@ namespace TriangleNet.Meshing
 
             this.viri = new List<Triangle>();
 
-            logger = SimpleLog.Instance;
+            logger = Log.Instance;
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace TriangleNet.Meshing
                         // falls within the starting triangle.
                         searchorg = searchtri.Org();
                         searchdest = searchtri.Dest();
-                        if (Primitives.CounterClockwise(searchorg, searchdest, hole) > 0.0)
+                        if (RobustPredicates.CounterClockwise(searchorg, searchdest, hole) > 0.0)
                         {
                             // Find a triangle that contains the hole.
                             intersect = mesh.locator.Locate(hole, ref searchtri);
@@ -114,7 +114,7 @@ namespace TriangleNet.Meshing
                         // region point falls within the starting triangle.
                         searchorg = searchtri.Org();
                         searchdest = searchtri.Dest();
-                        if (Primitives.CounterClockwise(searchorg, searchdest, region.point) > 0.0)
+                        if (RobustPredicates.CounterClockwise(searchorg, searchdest, region.point) > 0.0)
                         {
                             // Find a triangle that contains the region point.
                             intersect = mesh.locator.Locate(region.point, ref searchtri);
@@ -202,14 +202,14 @@ namespace TriangleNet.Meshing
 
                     if ((end1 < 0) || (end1 >= mesh.invertices))
                     {
-                        if (Behavior.Verbose)
+                        if (Log.Verbose)
                         {
                             logger.Warning("Invalid first endpoint of segment.", "Mesh.FormSkeleton().1");
                         }
                     }
                     else if ((end2 < 0) || (end2 >= mesh.invertices))
                     {
-                        if (Behavior.Verbose)
+                        if (Log.Verbose)
                         {
                             logger.Warning("Invalid second endpoint of segment.", "Mesh.FormSkeleton().2");
                         }
@@ -224,7 +224,7 @@ namespace TriangleNet.Meshing
                         endpoint2 = mesh.vertices[end2];
                         if ((endpoint1.x == endpoint2.x) && (endpoint1.y == endpoint2.y))
                         {
-                            if (Behavior.Verbose)
+                            if (Log.Verbose)
                             {
                                 logger.Warning("Endpoints of segment (IDs " + end1 + "/" + end2 + ") are coincident.",
                                     "Mesh.FormSkeleton()");
@@ -544,10 +544,10 @@ namespace TriangleNet.Meshing
             rightvertex = searchtri.Dest();
             leftvertex = searchtri.Apex();
             // Is 'searchpoint' to the left?
-            leftccw = Primitives.CounterClockwise(searchpoint, startvertex, leftvertex);
+            leftccw = RobustPredicates.CounterClockwise(searchpoint, startvertex, leftvertex);
             leftflag = leftccw > 0.0;
             // Is 'searchpoint' to the right?
-            rightccw = Primitives.CounterClockwise(startvertex, searchpoint, rightvertex);
+            rightccw = RobustPredicates.CounterClockwise(startvertex, searchpoint, rightvertex);
             rightflag = rightccw > 0.0;
             if (leftflag && rightflag)
             {
@@ -574,7 +574,7 @@ namespace TriangleNet.Meshing
                 }
                 leftvertex = searchtri.Apex();
                 rightccw = leftccw;
-                leftccw = Primitives.CounterClockwise(searchpoint, startvertex, leftvertex);
+                leftccw = RobustPredicates.CounterClockwise(searchpoint, startvertex, leftvertex);
                 leftflag = leftccw > 0.0;
             }
             while (rightflag)
@@ -588,7 +588,7 @@ namespace TriangleNet.Meshing
                 }
                 rightvertex = searchtri.Dest();
                 leftccw = rightccw;
-                rightccw = Primitives.CounterClockwise(startvertex, searchpoint, rightvertex);
+                rightccw = RobustPredicates.CounterClockwise(startvertex, searchpoint, rightvertex);
                 rightflag = rightccw > 0.0;
             }
             if (leftccw == 0.0)
@@ -867,7 +867,7 @@ namespace TriangleNet.Meshing
             // Check whether the previous polygon vertex is a reflex vertex.
             if (leftside)
             {
-                if (Primitives.CounterClockwise(nearvertex, leftvertex, farvertex) <= 0.0)
+                if (RobustPredicates.CounterClockwise(nearvertex, leftvertex, farvertex) <= 0.0)
                 {
                     // leftvertex is a reflex vertex too. Nothing can
                     // be done until a convex section is found.
@@ -876,20 +876,20 @@ namespace TriangleNet.Meshing
             }
             else
             {
-                if (Primitives.CounterClockwise(farvertex, rightvertex, nearvertex) <= 0.0)
+                if (RobustPredicates.CounterClockwise(farvertex, rightvertex, nearvertex) <= 0.0)
                 {
                     // rightvertex is a reflex vertex too.  Nothing can
                     // be done until a convex section is found.
                     return;
                 }
             }
-            if (Primitives.CounterClockwise(rightvertex, leftvertex, farvertex) > 0.0)
+            if (RobustPredicates.CounterClockwise(rightvertex, leftvertex, farvertex) > 0.0)
             {
                 // fartri is not an inverted triangle, and farvertex is not a reflex
                 // vertex.  As there are no reflex vertices, fixuptri isn't an
                 // inverted triangle, either.  Hence, test the edge between the
                 // triangles to ensure it is locally Delaunay.
-                if (Primitives.InCircle(leftvertex, farvertex, rightvertex, nearvertex) <= 0.0)
+                if (RobustPredicates.InCircle(leftvertex, farvertex, rightvertex, nearvertex) <= 0.0)
                 {
                     return;
                 }
@@ -991,7 +991,7 @@ namespace TriangleNet.Meshing
                 {
                     // Check whether farvertex is to the left or right of the segment being
                     // inserted, to decide which edge of fixuptri to dig through next.
-                    area = Primitives.CounterClockwise(endpoint1, endpoint2, farvertex);
+                    area = RobustPredicates.CounterClockwise(endpoint1, endpoint2, farvertex);
                     if (area == 0.0)
                     {
                         // We've collided with a vertex between endpoint1 and endpoint2.

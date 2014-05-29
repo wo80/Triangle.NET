@@ -23,7 +23,7 @@ namespace TriangleNet
     /// command prompt with the command "CL /P /C EXACT.C", see
     /// http://msdn.microsoft.com/en-us/library/8z9z0bx6.aspx
     /// </remarks>
-    public static class Primitives
+    public static class RobustPredicates
     {
         private static double epsilon, splitter, resulterrbound;
         private static double ccwerrboundA, ccwerrboundB, ccwerrboundC;

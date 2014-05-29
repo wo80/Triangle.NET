@@ -128,7 +128,7 @@ namespace TriangleNet.Tools
             {
                 tri.triangle = item;
 
-                pt = Primitives.FindCircumcenter(tri.Org(), tri.Dest(), tri.Apex(), ref xi, ref eta);
+                pt = RobustPredicates.FindCircumcenter(tri.Org(), tri.Dest(), tri.Apex(), ref xi, ref eta);
                 pt.id = item.id;
 
                 points[item.id] = pt;

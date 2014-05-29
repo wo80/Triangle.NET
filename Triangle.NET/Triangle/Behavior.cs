@@ -9,7 +9,7 @@ namespace TriangleNet
 {
     using System;
     using TriangleNet.Geometry;
-    using TriangleNet.Log;
+    using TriangleNet.Logging;
 
     /// <summary>
     /// Controls the behavior of the meshing software.
@@ -72,7 +72,7 @@ namespace TriangleNet
                 this.minAngle = 0;
                 this.quality = false;
 
-                SimpleLog.Instance.Warning("Invalid quality option (minimum angle).", "Mesh.Behavior");
+                Log.Instance.Warning("Invalid quality option (minimum angle).", "Mesh.Behavior");
             }
 
             if ((this.maxAngle != 0.0) && this.maxAngle < 90 || this.maxAngle > 180)
@@ -80,7 +80,7 @@ namespace TriangleNet
                 this.maxAngle = 0;
                 this.quality = false;
 
-                SimpleLog.Instance.Warning("Invalid quality option (maximum angle).", "Mesh.Behavior");
+                Log.Instance.Warning("Invalid quality option (maximum angle).", "Mesh.Behavior");
             }
 
             this.useSegments = this.Poly || this.Quality || this.Convex;
@@ -105,11 +105,6 @@ namespace TriangleNet
         /// No exact arithmetic.
         /// </summary>
         public static bool NoExact { get; set; }
-
-        /// <summary>
-        /// Log detailed information.
-        /// </summary>
-        public static bool Verbose { get; set; }
 
         #endregion
 

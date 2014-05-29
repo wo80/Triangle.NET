@@ -12,7 +12,7 @@ namespace TriangleNet.Meshing
     using System.Linq;
     using TriangleNet.Data;
     using TriangleNet.Geometry;
-    using TriangleNet.Log;
+    using TriangleNet.Logging;
 
     /// <summary>
     /// The DataReader class provides methods for mesh reconstruction.
@@ -140,7 +140,7 @@ namespace TriangleNet.Meshing
                 {
                     if ((corner[j] < 0) || (corner[j] >= mesh.invertices))
                     {
-                        SimpleLog.Instance.Error("Triangle has an invalid vertex index.", "MeshReader.Reconstruct()");
+                        Log.Instance.Error("Triangle has an invalid vertex index.", "MeshReader.Reconstruct()");
                         throw new Exception("Triangle has an invalid vertex index.");
                     }
                 }
@@ -250,7 +250,7 @@ namespace TriangleNet.Meshing
                     {
                         if ((end[j] < 0) || (end[j] >= mesh.invertices))
                         {
-                            SimpleLog.Instance.Error("Segment has an invalid vertex index.", "MeshReader.Reconstruct()");
+                            Log.Instance.Error("Segment has an invalid vertex index.", "MeshReader.Reconstruct()");
                             throw new Exception("Segment has an invalid vertex index.");
                         }
                     }

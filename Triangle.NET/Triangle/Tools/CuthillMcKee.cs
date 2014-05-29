@@ -11,7 +11,7 @@ namespace TriangleNet.Tools
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
-    using TriangleNet.Log;
+    using TriangleNet.Logging;
 
     /// <summary>
     /// Applies the Cuthill and McKee renumbering algorithm to reduce the bandwidth of
@@ -51,9 +51,9 @@ namespace TriangleNet.Tools
 
             bandwidth2 = PermBandwidth(perm, perm_inv);
 
-            if (Behavior.Verbose)
+            if (Log.Verbose)
             {
-                SimpleLog.Instance.Info(String.Format("Reverse Cuthill-McKee (Bandwidth: {0} > {1})",
+                Log.Instance.Info(String.Format("Reverse Cuthill-McKee (Bandwidth: {0} > {1})",
                     bandwidth1, bandwidth2));
             }
 

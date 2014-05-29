@@ -11,7 +11,7 @@ namespace TriangleNet.Meshing.Algorithm
     using System.Collections.Generic;
     using TriangleNet.Data;
     using TriangleNet.Geometry;
-    using TriangleNet.Log;
+    using TriangleNet.Logging;
     using TriangleNet.Tools;
 
     /// <summary>
@@ -381,7 +381,7 @@ namespace TriangleNet.Meshing.Algorithm
             Point searchpoint = new Point(); // TODO: mesh.nextras
             Otri dummytri = default(Otri);
 
-            ccwabc = Primitives.CounterClockwise(pa, pb, pc);
+            ccwabc = RobustPredicates.CounterClockwise(pa, pb, pc);
             xac = pa.x - pc.x;
             yac = pa.y - pc.y;
             xbc = pb.x - pc.x;
@@ -571,7 +571,7 @@ namespace TriangleNet.Meshing.Algorithm
             {
                 if (heapsize == 0)
                 {
-                    SimpleLog.Instance.Error("Input vertices are all identical.", "SweepLine.Triangulate()");
+                    Log.Instance.Error("Input vertices are all identical.", "SweepLine.Triangulate()");
                     throw new Exception("Input vertices are all identical.");
                 }
                 secondvertex = eventheap[0].vertexEvent;
@@ -580,9 +580,9 @@ namespace TriangleNet.Meshing.Algorithm
                 if ((firstvertex.x == secondvertex.x) &&
                     (firstvertex.y == secondvertex.y))
                 {
-                    if (Behavior.Verbose)
+                    if (Log.Verbose)
                     {
-                        SimpleLog.Instance.Warning("A duplicate vertex appeared and was ignored (ID " + secondvertex.id + ").",
+                        Log.Instance.Warning("A duplicate vertex appeared and was ignored (ID " + secondvertex.id + ").",
                             "SweepLine.Triangulate().1");
                     }
                     secondvertex.type = VertexType.UndeadVertex;
@@ -636,9 +636,9 @@ namespace TriangleNet.Meshing.Algorithm
                     if ((nextvertex.x == lastvertex.x) &&
                         (nextvertex.y == lastvertex.y))
                     {
-                        if (Behavior.Verbose)
+                        if (Log.Verbose)
                         {
-                            SimpleLog.Instance.Warning("A duplicate vertex appeared and was ignored (ID " + nextvertex.id + ").",
+                            Log.Instance.Warning("A duplicate vertex appeared and was ignored (ID " + nextvertex.id + ").",
                                 "SweepLine.Triangulate().2");
                         }
                         nextvertex.type = VertexType.UndeadVertex;
@@ -700,7 +700,7 @@ namespace TriangleNet.Meshing.Algorithm
                     leftvertex = farlefttri.Apex();
                     midvertex = lefttri.Dest();
                     rightvertex = lefttri.Apex();
-                    lefttest = Primitives.CounterClockwise(leftvertex, midvertex, rightvertex);
+                    lefttest = RobustPredicates.CounterClockwise(leftvertex, midvertex, rightvertex);
                     if (lefttest > 0.0)
                     {
                         newevent = new SweepEvent();
@@ -715,7 +715,7 @@ namespace TriangleNet.Meshing.Algorithm
                     leftvertex = righttri.Apex();
                     midvertex = righttri.Org();
                     rightvertex = farrighttri.Apex();
-                    righttest = Primitives.CounterClockwise(leftvertex, midvertex, rightvertex);
+                    righttest = RobustPredicates.CounterClockwise(leftvertex, midvertex, rightvertex);
                     if (righttest > 0.0)
                     {
                         newevent = new SweepEvent();

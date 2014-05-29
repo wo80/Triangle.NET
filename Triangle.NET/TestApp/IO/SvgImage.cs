@@ -10,7 +10,7 @@ namespace MeshExplorer.IO
     using System.IO;
     using System.Text;
     using TriangleNet;
-    using TriangleNet.Data;
+    using TriangleNet.Geometry;
 
     /// <summary>
     /// Writes a mesh to an SVG file.
