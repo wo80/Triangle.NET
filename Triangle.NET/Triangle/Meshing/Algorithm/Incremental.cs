@@ -7,16 +7,53 @@
 
 namespace TriangleNet.Meshing.Algorithm
 {
+    using System.Collections.Generic;
     using TriangleNet.Data;
-    using TriangleNet.Logging;
     using TriangleNet.Geometry;
 
     /// <summary>
     /// Builds a delaunay triangulation using the incremental algorithm.
     /// </summary>
-    class Incremental
+    public class Incremental : ITriangulator
     {
         Mesh mesh;
+
+        /// <summary>
+        /// Form a Delaunay triangulation by incrementally inserting vertices.
+        /// </summary>
+        /// <returns>Returns the number of edges on the convex hull of the 
+        /// triangulation.</returns>
+        public IMesh Triangulate(ICollection<Vertex> points)
+        {
+            this.mesh = new Mesh();
+            this.mesh.TransferNodes(points);
+
+            Otri starttri = new Otri();
+
+            // Create a triangular bounding box.
+            GetBoundingBox();
+
+            foreach (var v in mesh.vertices.Values)
+            {
+                starttri.triangle = Mesh.dummytri;
+                Osub tmp = default(Osub);
+                if (mesh.InsertVertex(v, ref starttri, ref tmp, false, false) == InsertVertexResult.Duplicate)
+                {
+                    if (Log.Verbose)
+                    {
+                        Log.Instance.Warning("A duplicate vertex appeared and was ignored.",
+                            "Incremental.IncrementalDelaunay()");
+                    }
+                    v.type = VertexType.UndeadVertex;
+                    mesh.undeads++;
+                }
+            }
+
+            // Remove the bounding box.
+            this.mesh.hullsize = RemoveBox();
+
+            return this.mesh;
+        }
 
         /// <summary>
         /// Form an "infinite" bounding triangle to insert vertices into.
@@ -143,39 +180,6 @@ namespace TriangleNet.Meshing.Algorithm
             mesh.TriangleDealloc(finaledge.triangle);
 
             return hullsize;
-        }
-
-        /// <summary>
-        /// Form a Delaunay triangulation by incrementally inserting vertices.
-        /// </summary>
-        /// <returns>Returns the number of edges on the convex hull of the 
-        /// triangulation.</returns>
-        public int Triangulate(Mesh mesh)
-        {
-            this.mesh = mesh;
-
-            Otri starttri = new Otri();
-
-            // Create a triangular bounding box.
-            GetBoundingBox();
-
-            foreach (var v in mesh.vertices.Values)
-            {
-                starttri.triangle = Mesh.dummytri;
-                Osub tmp = default(Osub);
-                if (mesh.InsertVertex(v, ref starttri, ref tmp, false, false) == InsertVertexResult.Duplicate)
-                {
-                    if (Log.Verbose)
-                    {
-                        Log.Instance.Warning("A duplicate vertex appeared and was ignored.", 
-                            "Incremental.IncrementalDelaunay()");
-                    }
-                    v.type = VertexType.UndeadVertex;
-                    mesh.undeads++;
-                }
-            }
-            // Remove the bounding box.
-            return RemoveBox();
         }
     }
 }

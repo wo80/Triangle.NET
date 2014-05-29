@@ -18,8 +18,8 @@ namespace MeshExplorer.Views
     /// </summary>
     public interface IView
     {
-        void HandleNewInput(InputGeometry geometry);
-        void HandleMeshImport(InputGeometry geometry, Mesh mesh);
+        void HandleNewInput(IPolygon geometry);
+        void HandleMeshImport(IPolygon geometry, Mesh mesh);
         void HandleMeshUpdate(Mesh mesh);
         void HandleMeshChange(Mesh mesh);
     }

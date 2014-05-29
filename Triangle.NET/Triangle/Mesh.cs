@@ -9,26 +9,23 @@ namespace TriangleNet
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using TriangleNet.Data;
-    using TriangleNet.Logging;
-    using TriangleNet.IO;
-    using TriangleNet.Meshing;
-    using TriangleNet.Meshing.Algorithm;
-    using TriangleNet.Smoothing;
     using TriangleNet.Geometry;
+    using TriangleNet.Logging;
+    using TriangleNet.Meshing;
+    using TriangleNet.Meshing.Iterators;
     using TriangleNet.Tools;
 
     /// <summary>
     /// Mesh data structure.
     /// </summary>
-    public class Mesh
+    public class Mesh : IMesh
     {
         #region Variables
 
         ILog<LogItem> logger;
 
-        QualityMesher quality;
+        QualityMesher qualityMesher;
 
         // Stack that maintains a list of recently flipped triangles.
         Stack<Otri> flipstack;
@@ -86,14 +83,6 @@ namespace TriangleNet
         #region Public properties
 
         /// <summary>
-        /// Gets the mesh behavior instance.
-        /// </summary>
-        public Behavior Behavior
-        {
-            get { return this.behavior; }
-        }
-
-        /// <summary>
         /// Gets the mesh bounding box.
         /// </summary>
         public Rectangle Bounds
@@ -140,7 +129,7 @@ namespace TriangleNet
         {
             get
             {
-                EdgeEnumerator e = new EdgeEnumerator(this);
+                var e = new EdgeIterator(this);
                 while (e.MoveNext())
                 {
                     yield return e.Current;
@@ -177,17 +166,7 @@ namespace TriangleNet
         /// Initializes a new instance of the <see cref="Mesh" /> class.
         /// </summary>
         public Mesh()
-            : this(new Behavior())
         {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Mesh" /> class.
-        /// </summary>
-        public Mesh(Behavior behavior)
-        {
-            this.behavior = behavior;
-
             logger = Log.Instance;
 
             behavior = new Behavior();
@@ -201,7 +180,7 @@ namespace TriangleNet
             holes = new List<Point>();
             regions = new List<RegionPointer>();
 
-            quality = new QualityMesher(this);
+            qualityMesher = new QualityMesher(this);
 
             locator = new TriangleLocator(this);
 
@@ -214,217 +193,14 @@ namespace TriangleNet
             }
         }
 
-        /// <summary>
-        /// Triangulate given input file (.node or .poly).
-        /// </summary>
-        /// <param name="input"></param>
-        public void Triangulate(string inputFile)
+        public void Refine(QualityOptions quality)
         {
-            InputGeometry input = TriangleReader.Read(inputFile);
+            behavior.MinAngle = quality.MinimumAngle;
+            behavior.MaxAngle = quality.MaximumAngle;
 
-            this.Triangulate(input);
-        }
-
-        /// <summary>
-        /// Triangulate given input data.
-        /// </summary>
-        /// <param name="input"></param>
-        public void Triangulate(InputGeometry input)
-        {
-            ResetData();
-
-            behavior.Poly = input.HasSegments;
-            //behavior.useSegments = input.HasSegments;
-
-            //if (input.EdgeMarkers != null)
-            //{
-            //    behavior.UseBoundaryMarkers = true;
-            //}
-
-            // TODO: remove
-            if (!behavior.Poly)
-            {
-                // Be careful not to allocate space for element area constraints that
-                // will never be assigned any value (other than the default -1.0).
-                behavior.VarArea = false;
-
-                // Be careful not to add an extra attribute to each element unless the
-                // input supports it (PSLG in, but not refining a preexisting mesh).
-                behavior.useRegions = false;
-            }
-
-            behavior.useRegions = input.Regions.Count > 0;
-
-            steinerleft = behavior.SteinerPoints;
-
-            TransferNodes(input);
-
-            hullsize = Delaunay(); // Triangulate the vertices.
-
-            // Ensure that no vertex can be mistaken for a triangular bounding
-            // box vertex in insertvertex().
-            infvertex1 = null;
-            infvertex2 = null;
-            infvertex3 = null;
-
-            // Insert segments, carving holes.
-            var mesher = new ConstraintMesher(this);
-
-            if (behavior.useSegments)
-            {
-                // Segments will be introduced next.
-                checksegments = true;
-
-                // Insert PSLG segments and/or convex hull segments.
-                mesher.FormSkeleton(input);
-            }
-
-            if (behavior.Poly && (triangles.Count > 0))
-            {
-                // Copy holes
-                foreach (var item in input.holes)
-                {
-                    holes.Add(item);
-                }
-
-                // Copy regions
-                foreach (var item in input.regions)
-                {
-                    regions.Add(item);
-                }
-
-                //dummytri.neighbors[2].triangle = dummytri;
-
-                // Carve out holes and concavities.
-                mesher.CarveHoles();
-            }
-            else
-            {
-                // Without a PSLG, there can be no holes or regional attributes
-                // or area constraints. The following are set to zero to avoid
-                // an accidental free() later.
-                //
-                // TODO: -
-                holes.Clear();
-                regions.Clear();
-            }
-
-            if ((behavior.Quality || behavior.ConformingDelaunay) && triangles.Count > 0)
-            {
-                quality.EnforceQuality(); // Enforce angle and area constraints.
-            }
-
-            // Calculate the number of edges.
-            edges = (3 * triangles.Count + hullsize) / 2;
-        }
-
-        /// <summary>
-        /// Refines the current mesh by finding the maximum triangle area and setting
-        /// the a global area constraint to half its size.
-        /// </summary>
-        public void Refine(bool halfArea)
-        {
-            if (halfArea)
-            {
-                double tmp, maxArea = 0;
-
-                foreach (var t in this.triangles.Values)
-                {
-                    tmp = (t.vertices[2].x - t.vertices[0].x) * (t.vertices[1].y - t.vertices[0].y) -
-                        (t.vertices[1].x - t.vertices[0].x) * (t.vertices[2].y - t.vertices[0].y);
-
-                    tmp = Math.Abs(tmp) / 2.0;
-
-                    if (tmp > maxArea)
-                    {
-                        maxArea = tmp;
-                    }
-                }
-
-                this.Refine(maxArea / 2);
-            }
-            else
-            {
-                Refine();
-            }
-        }
-
-        /// <summary>
-        /// Refines the current mesh by setting a global area constraint.
-        /// </summary>
-        /// <param name="areaConstraint">Global area constraint.</param>
-        public void Refine(double areaConstraint)
-        {
-            behavior.fixedArea = true;
-            behavior.MaxArea = areaConstraint;
+            behavior.MaxArea = quality.MaximumArea;
 
             this.Refine();
-
-            // Reset option for sanity
-            behavior.fixedArea = false;
-            behavior.MaxArea = -1.0;
-        }
-
-        /// <summary>
-        /// Refines the current mesh.
-        /// </summary>
-        public void Refine()
-        {
-            inelements = triangles.Count;
-            invertices = vertices.Count;
-
-            // TODO: Set all vertex types to input (i.e. NOT free)?
-
-            if (behavior.Poly)
-            {
-                if (behavior.useSegments)
-                {
-                    insegments = subsegs.Count;
-                }
-                else
-                {
-                    insegments = (int)hullsize;
-                }
-            }
-
-            Reset();
-
-            steinerleft = behavior.SteinerPoints;
-
-            // Ensure that no vertex can be mistaken for a triangular bounding
-            // box vertex in insertvertex().
-            infvertex1 = null;
-            infvertex2 = null;
-            infvertex3 = null;
-
-            if (behavior.useSegments)
-            {
-                checksegments = true;
-            }
-
-            // TODO
-            //holes.Clear();
-            //regions.Clear();
-
-            if (triangles.Count > 0)
-            {
-                // Enforce angle and area constraints.
-                quality.EnforceQuality();
-            }
-
-            // Calculate the number of edges.
-            edges = (3 * triangles.Count + hullsize) / 2;
-        }
-
-        /// <summary>
-        /// Smooth the current mesh.
-        /// </summary>
-        public void Smooth()
-        {
-            numbering = NodeNumbering.None;
-
-            ISmoother smoother = new SimpleSmoother(this);
-            smoother.Smooth();
         }
 
         /// <summary>
@@ -481,33 +257,226 @@ namespace TriangleNet
 
         #region Misc
 
+        /*
         /// <summary>
-        /// Form a Delaunay triangulation.
+        /// Load a mesh from file (.node/poly and .ele).
         /// </summary>
-        /// <returns>The number of points on the hull.</returns>
-        private int Delaunay()
+        public void Load(string filename)
         {
-            int hulledges = 0;
+            List<ITriangle> triangles;
+            InputGeometry geometry;
 
-            if (behavior.Algorithm == TriangulationAlgorithm.Dwyer)
+            FileReader.Read(filename, out geometry, out triangles);
+
+            if (geometry != null && triangles != null)
             {
-                Dwyer alg = new Dwyer();
-                hulledges = alg.Triangulate(this);
+                Load(geometry, triangles);
             }
-            else if (behavior.Algorithm == TriangulationAlgorithm.SweepLine)
+        }
+
+        /// <summary>
+        /// Reconstructs a mesh from raw input data.
+        /// </summary>
+        public void Load(InputGeometry input, List<ITriangle> triangles)
+        {
+            if (input == null || triangles == null)
             {
-                SweepLine alg = new SweepLine();
-                hulledges = alg.Triangulate(this);
-            }
-            else
-            {
-                Incremental alg = new Incremental();
-                hulledges = alg.Triangulate(this);
+                throw new ArgumentException("Invalid input (argument is null).");
             }
 
-            // The input vertices may all be collinear, so there are 
-            // no triangles.
-            return (triangles.Count == 0) ? 0 : hulledges;
+            // Clear all data structures / reset hash seeds
+            this.ResetData();
+
+            if (input.HasSegments)
+            {
+                behavior.Poly = true;
+
+                this.holes.AddRange(input.Holes);
+            }
+
+            //if (input.EdgeMarkers != null)
+            //{
+            //    behavior.UseBoundaryMarkers = true;
+            //}
+
+            //if (input.TriangleAreas != null)
+            //{
+            //    behavior.VarArea = true;
+            //}
+
+            // TODO: remove
+            if (!behavior.Poly)
+            {
+                // Be careful not to allocate space for element area constraints that
+                // will never be assigned any value (other than the default -1.0).
+                behavior.VarArea = false;
+
+                // Be careful not to add an extra attribute to each element unless the
+                // input supports it (PSLG in, but not refining a preexisting mesh).
+                behavior.useRegions = false;
+            }
+
+            behavior.useRegions = input.Regions.Count > 0;
+
+            TransferNodes(input.points);
+
+            // Read and reconstruct a mesh.
+            hullsize = DataReader.Reconstruct(this, input, triangles.ToArray());
+
+            // Calculate the number of edges.
+            edges = (3 * triangles.Count + hullsize) / 2;
+        }
+        */
+
+        /// <summary>
+        /// Triangulate given input data.
+        /// </summary>
+        /// <param name="input"></param>
+        internal void ApplyConstraints(IPolygon input, ConstraintOptions options, QualityOptions quality)
+        {
+            behavior.Poly = input.Segments.Count > 0;
+
+            // Copy constraint options
+            if (options != null)
+            {
+                behavior.ConformingDelaunay = options.ConformingDelaunay;
+                behavior.Convex = options.Convex;
+                behavior.NoBisect = options.SegmentSplitting;
+
+                if (behavior.ConformingDelaunay)
+                {
+                    behavior.Quality = true;
+                }
+            }
+
+            // Copy quality options
+            if (quality != null)
+            {
+                behavior.MinAngle = quality.MinimumAngle;
+                behavior.MaxAngle = quality.MaximumAngle;
+                behavior.MaxArea = quality.MaximumArea;
+                behavior.UserTest = quality.UserTest;
+
+                behavior.Quality = true;
+            }
+
+            //if (input.EdgeMarkers != null)
+            //{
+            //    behavior.UseBoundaryMarkers = true;
+            //}
+
+            // TODO: remove
+            if (!behavior.Poly)
+            {
+                // Be careful not to allocate space for element area constraints that
+                // will never be assigned any value (other than the default -1.0).
+                behavior.VarArea = false;
+            }
+
+            behavior.useRegions = input.Regions.Count > 0;
+
+            steinerleft = behavior.SteinerPoints;
+
+            // Ensure that no vertex can be mistaken for a triangular bounding
+            // box vertex in insertvertex().
+            infvertex1 = null;
+            infvertex2 = null;
+            infvertex3 = null;
+
+            // Insert segments, carving holes.
+            var mesher = new ConstraintMesher(this);
+
+            if (behavior.useSegments)
+            {
+                // Segments will be introduced next.
+                checksegments = true;
+
+                // Insert PSLG segments and/or convex hull segments.
+                mesher.FormSkeleton(input);
+            }
+
+            if (behavior.Poly && (triangles.Count > 0))
+            {
+                // Copy holes
+                foreach (var item in input.Holes)
+                {
+                    holes.Add(item);
+                }
+
+                // Copy regions
+                foreach (var item in input.Regions)
+                {
+                    regions.Add(item);
+                }
+
+                // Carve out holes and concavities.
+                mesher.CarveHoles();
+            }
+
+            if (behavior.Quality && triangles.Count > 0)
+            {
+                // Enforce angle and area constraints.
+                qualityMesher.EnforceQuality();
+            }
+
+            // Calculate the number of edges.
+            edges = (3 * triangles.Count + hullsize) / 2;
+        }
+
+        /// <summary>
+        /// Refines the current mesh.
+        /// </summary>
+        internal void Refine()
+        {
+            inelements = triangles.Count;
+            invertices = vertices.Count;
+
+            // TODO: Set all vertex types to input (i.e. NOT free)?
+
+            if (behavior.Poly)
+            {
+                insegments = behavior.useSegments ? subsegs.Count : hullsize;
+            }
+
+            Reset();
+
+            steinerleft = behavior.SteinerPoints;
+
+            // Ensure that no vertex can be mistaken for a triangular bounding
+            // box vertex in insertvertex().
+            infvertex1 = infvertex2 = infvertex3 = null;
+
+            if (behavior.useSegments)
+            {
+                checksegments = true;
+            }
+
+            if (triangles.Count > 0)
+            {
+                // Enforce angle and area constraints.
+                qualityMesher.EnforceQuality();
+            }
+
+            // Calculate the number of edges.
+            edges = (3 * triangles.Count + hullsize) / 2;
+        }
+
+        internal void CopyTo(Mesh target)
+        {
+            target.vertices = this.vertices;
+            target.triangles = this.triangles;
+            target.subsegs = this.subsegs;
+
+            target.holes = this.holes;
+            target.regions = this.regions;
+
+            target.hash_vtx = this.hash_vtx;
+            target.hash_seg = this.hash_seg;
+            target.hash_tri = this.hash_tri;
+
+            target.numbering = this.numbering;
+            target.hullsize = this.hullsize;
+            target.edges = this.edges;
         }
 
         /// <summary>
@@ -625,12 +594,11 @@ namespace TriangleNet
         /// Read the vertices from memory.
         /// </summary>
         /// <param name="data">The input data.</param>
-        internal void TransferNodes(InputGeometry data)
+        internal void TransferNodes(ICollection<Vertex> points)
         {
-            List<Vertex> points = data.points;
-
             this.invertices = points.Count;
             this.mesh_dim = 2;
+            this.bounds = new Rectangle();
 
             if (this.invertices < 3)
             {
@@ -638,17 +606,21 @@ namespace TriangleNet
                 throw new Exception("Input must have at least three input vertices.");
             }
 
-            this.nextras = points[0].attributes == null ? 0 : points[0].attributes.Length;
+            bool first = true;
 
-            foreach (Vertex vertex in points)
+            foreach (Vertex p in points)
             {
-                vertex.hash = this.hash_vtx++;
-                vertex.id = vertex.hash;
+                if (first)
+                {
+                    this.nextras = p.attributes == null ? 0 : p.attributes.Length;
+                    first = false;
+                }
 
-                this.vertices.Add(vertex.hash, vertex);
+                p.hash = p.id = this.hash_vtx++;
+
+                this.vertices.Add(p.hash, p);
+                this.bounds.Expand(p);
             }
-
-            this.bounds = data.Bounds;
         }
 
         /// <summary>
@@ -862,7 +834,7 @@ namespace TriangleNet
                                 encroached.org = brokensubseg.Org();
                                 encroached.dest = brokensubseg.Dest();
 
-                                quality.AddBadSubseg(encroached);
+                                qualityMesher.AddBadSubseg(encroached);
                             }
                         }
                         // Return a handle whose primary edge contains the vertex,
@@ -1100,7 +1072,7 @@ namespace TriangleNet
                         if (segmentflaws)
                         {
                             // Does the new vertex encroach upon this subsegment?
-                            if (quality.CheckSeg4Encroach(ref checksubseg) > 0)
+                            if (qualityMesher.CheckSeg4Encroach(ref checksubseg) > 0)
                             {
                                 success = InsertVertexResult.Encroaching;
                             }
@@ -1266,7 +1238,7 @@ namespace TriangleNet
                     if (triflaws)
                     {
                         // Check the triangle 'horiz' for quality.
-                        quality.TestTriangle(ref horiz);
+                        qualityMesher.TestTriangle(ref horiz);
                     }
 
                     // Look for the next edge around the newly inserted vertex.
@@ -1338,12 +1310,9 @@ namespace TriangleNet
                 oppotri.SegBond(ref newsubseg);
                 newsubseg.seg.boundary = subsegmark;
             }
-            else
+            else if (newsubseg.seg.boundary == 0)
             {
-                if (newsubseg.seg.boundary == 0)
-                {
-                    newsubseg.seg.boundary = subsegmark;
-                }
+                newsubseg.seg.boundary = subsegmark;
             }
         }
 
@@ -1718,7 +1687,7 @@ namespace TriangleNet
                 {
                     // Check the quality of the newly committed triangle.
                     besttri.Sym(ref testtri);
-                    quality.TestTriangle(ref testtri);
+                    qualityMesher.TestTriangle(ref testtri);
                 }
             }
             // Return the base triangle.
@@ -1795,7 +1764,7 @@ namespace TriangleNet
             deltri.SetOrg(neworg);
             if (behavior.NoBisect == 0)
             {
-                quality.TestTriangle(ref deltri);
+                qualityMesher.TestTriangle(ref deltri);
             }
 
             // Delete the two spliced-out triangles.

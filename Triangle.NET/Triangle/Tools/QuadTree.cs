@@ -108,6 +108,7 @@ namespace TriangleNet.Tools
                 // Point is inside or on the edge of this triangle.
                 return true;
             }
+
             return false;
         }
 
@@ -115,315 +116,314 @@ namespace TriangleNet.Tools
         {
             return p.X * q.X + p.Y * q.Y;
         }
+
+        /// <summary>
+        /// A node of the quadtree.
+        /// </summary>
+        class QuadNode
+        {
+            const int SW = 0;
+            const int SE = 1;
+            const int NW = 2;
+            const int NE = 3;
+
+            const double EPS = 1e-6;
+
+            static readonly byte[] BITVECTOR = { 0x1, 0x2, 0x4, 0x8 };
+
+            Rectangle bounds;
+            Point pivot;
+            QuadTree tree;
+            QuadNode[] regions;
+            List<int> triangles;
+
+            byte bitRegions;
+
+            public QuadNode(Rectangle box, QuadTree tree)
+                : this(box, tree, false)
+            {
+            }
+
+            public QuadNode(Rectangle box, QuadTree tree, bool init)
+            {
+                this.tree = tree;
+
+                this.bounds = new Rectangle(box.Left, box.Bottom, box.Width, box.Height);
+                this.pivot = new Point((box.Left + box.Right) / 2, (box.Bottom + box.Top) / 2);
+
+                this.bitRegions = 0;
+
+                this.regions = new QuadNode[4];
+                this.triangles = new List<int>();
+
+                if (init)
+                {
+                    int count = tree.triangles.Length;
+
+                    // Allocate memory upfront
+                    triangles.Capacity = count;
+
+                    for (int i = 0; i < count; i++)
+                    {
+                        triangles.Add(i);
+                    }
+                }
+            }
+
+            public List<int> FindTriangles(Point searchPoint)
+            {
+                int region = FindRegion(searchPoint);
+                if (regions[region] == null)
+                {
+                    return triangles;
+                }
+                return regions[region].FindTriangles(searchPoint);
+            }
+
+            public void CreateSubRegion(int currentDepth)
+            {
+                // The four sub regions of the quad tree
+                //   +--------------+
+                //   |  nw  |  ne   |
+                //   |------+pivot--|
+                //   |  sw  |  se   |
+                //   +--------------+
+                Rectangle box;
+
+                var width = bounds.Right - pivot.X;
+                var height = bounds.Top - pivot.Y;
+
+                // 1. region south west
+                box = new Rectangle(bounds.Left, bounds.Bottom, width, height);
+                regions[0] = new QuadNode(box, tree);
+
+                // 2. region south east
+                box = new Rectangle(pivot.X, bounds.Bottom, width, height);
+                regions[1] = new QuadNode(box, tree);
+
+                // 3. region north west
+                box = new Rectangle(bounds.Left, pivot.Y, width, height);
+                regions[2] = new QuadNode(box, tree);
+
+                // 4. region north east
+                box = new Rectangle(pivot.X, pivot.Y, width, height);
+                regions[3] = new QuadNode(box, tree);
+
+                Point[] triangle = new Point[3];
+
+                // Find region for every triangle vertex
+                foreach (var index in triangles)
+                {
+                    ITriangle tri = tree.triangles[index];
+
+                    triangle[0] = tri.GetVertex(0);
+                    triangle[1] = tri.GetVertex(1);
+                    triangle[2] = tri.GetVertex(2);
+
+                    AddTriangleToRegion(triangle, index);
+                }
+
+                for (int i = 0; i < 4; i++)
+                {
+                    if (regions[i].triangles.Count > tree.sizeBound && currentDepth < tree.maxDepth)
+                    {
+                        regions[i].CreateSubRegion(currentDepth + 1);
+                    }
+                }
+            }
+
+            void AddTriangleToRegion(Point[] triangle, int index)
+            {
+                bitRegions = 0;
+                if (QuadTree.IsPointInTriangle(pivot, triangle[0], triangle[1], triangle[2]))
+                {
+                    AddToRegion(index, SW);
+                    AddToRegion(index, SE);
+                    AddToRegion(index, NW);
+                    AddToRegion(index, NE);
+                    return;
+                }
+
+                FindTriangleIntersections(triangle, index);
+
+                if (bitRegions == 0)
+                {
+                    // we didn't find any intersection so we add this triangle to a point's region		
+                    int region = FindRegion(triangle[0]);
+                    regions[region].triangles.Add(index);
+                }
+            }
+
+            void FindTriangleIntersections(Point[] triangle, int index)
+            {
+                // PLEASE NOTE:
+                // Handling of component comparison is tightly associated with the implementation 
+                // of the findRegion() function. That means when the point to be compared equals 
+                // the pivot point the triangle must be put at least into region 2.
+                //
+                // Linear equations are in parametric form.
+                //    pivot.x = triangle[0].x + t * (triangle[1].x - triangle[0].x)
+                //    pivot.y = triangle[0].y + t * (triangle[1].y - triangle[0].y)
+
+                int k = 2;
+
+                double dx, dy;
+                // Iterate through all triangle laterals and find bounding box intersections
+                for (int i = 0; i < 3; k = i++)
+                {
+                    dx = triangle[i].X - triangle[k].X;
+                    dy = triangle[i].Y - triangle[k].Y;
+
+                    if (dx != 0.0)
+                    {
+                        FindIntersectionsWithX(dx, dy, triangle, index, k);
+                    }
+                    if (dy != 0.0)
+                    {
+                        FindIntersectionsWithY(dx, dy, triangle, index, k);
+                    }
+                }
+            }
+
+            void FindIntersectionsWithX(double dx, double dy, Point[] triangle, int index, int k)
+            {
+                double t;
+
+                // find intersection with plane x = m_pivot.dX
+                t = (pivot.X - triangle[k].X) / dx;
+                if (t < (1 + EPS) && t > -EPS)
+                {
+                    // we have an intersection
+                    double yComponent = triangle[k].Y + t * dy;
+
+                    if (yComponent < pivot.Y && yComponent >= bounds.Bottom)
+                    {
+                        AddToRegion(index, SW);
+                        AddToRegion(index, SE);
+                    }
+                    else if (yComponent <= bounds.Top)
+                    {
+                        AddToRegion(index, NW);
+                        AddToRegion(index, NE);
+                    }
+                }
+
+                // find intersection with plane x = m_boundingBox[0].dX
+                t = (bounds.Left - triangle[k].X) / dx;
+                if (t < (1 + EPS) && t > -EPS)
+                {
+                    // we have an intersection
+                    double yComponent = triangle[k].Y + t * dy;
+
+                    if (yComponent < pivot.Y && yComponent >= bounds.Bottom)
+                    {
+                        AddToRegion(index, SW);
+                    }
+                    else if (yComponent <= bounds.Top) // TODO: check && yComponent >= pivot.Y
+                    {
+                        AddToRegion(index, NW);
+                    }
+                }
+
+                // find intersection with plane x = m_boundingBox[1].dX
+                t = (bounds.Right - triangle[k].X) / dx;
+                if (t < (1 + EPS) && t > -EPS)
+                {
+                    // we have an intersection
+                    double yComponent = triangle[k].Y + t * dy;
+
+                    if (yComponent < pivot.Y && yComponent >= bounds.Bottom)
+                    {
+                        AddToRegion(index, SE);
+                    }
+                    else if (yComponent <= bounds.Top)
+                    {
+                        AddToRegion(index, NE);
+                    }
+                }
+            }
+
+            void FindIntersectionsWithY(double dx, double dy, Point[] triangle, int index, int k)
+            {
+                double t, xComponent;
+
+                // find intersection with plane y = m_pivot.dY
+                t = (pivot.Y - triangle[k].Y) / dy;
+                if (t < (1 + EPS) && t > -EPS)
+                {
+                    // we have an intersection
+                    xComponent = triangle[k].X + t * dx;
+
+                    if (xComponent > pivot.X && xComponent <= bounds.Right)
+                    {
+                        AddToRegion(index, SE);
+                        AddToRegion(index, NE);
+                    }
+                    else if (xComponent >= bounds.Left)
+                    {
+                        AddToRegion(index, SW);
+                        AddToRegion(index, NW);
+                    }
+                }
+
+                // find intersection with plane y = m_boundingBox[0].dY
+                t = (bounds.Bottom - triangle[k].Y) / dy;
+                if (t < (1 + EPS) && t > -EPS)
+                {
+                    // we have an intersection
+                    xComponent = triangle[k].X + t * dx;
+
+                    if (xComponent > pivot.X && xComponent <= bounds.Right)
+                    {
+                        AddToRegion(index, SE);
+                    }
+                    else if (xComponent >= bounds.Left)
+                    {
+                        AddToRegion(index, SW);
+                    }
+                }
+
+                // find intersection with plane y = m_boundingBox[1].dY
+                t = (bounds.Top - triangle[k].Y) / dy;
+                if (t < (1 + EPS) && t > -EPS)
+                {
+                    // we have an intersection
+                    xComponent = triangle[k].X + t * dx;
+
+                    if (xComponent > pivot.X && xComponent <= bounds.Right)
+                    {
+                        AddToRegion(index, NE);
+                    }
+                    else if (xComponent >= bounds.Left)
+                    {
+                        AddToRegion(index, NW);
+                    }
+                }
+            }
+
+            int FindRegion(Point point)
+            {
+                int b = 2;
+                if (point.Y < pivot.Y)
+                {
+                    b = 0;
+                }
+                if (point.X > pivot.X)
+                {
+                    b++;
+                }
+                return b;
+            }
+
+            void AddToRegion(int index, int region)
+            {
+                //if (!(m_bitRegions & BITVECTOR[region]))
+                if ((bitRegions & BITVECTOR[region]) == 0)
+                {
+                    regions[region].triangles.Add(index);
+                    bitRegions |= BITVECTOR[region];
+                }
+            }
+        }
     }
-
-    #region QuadNode class
-
-    /// <summary>
-    /// A node of the quadtree.
-    /// </summary>
-    class QuadNode
-    {
-        const int SW = 0;
-        const int SE = 1;
-        const int NW = 2;
-        const int NE = 3;
-
-        const double EPS = 1e-6;
-
-        static readonly byte[] BITVECTOR = { 0x1, 0x2, 0x4, 0x8 };
-
-        Rectangle bounds;
-        Point pivot;
-        QuadTree tree;
-        QuadNode[] regions;
-        List<int> triangles;
-
-        byte bitRegions;
-
-        public QuadNode(Rectangle box, QuadTree tree)
-            : this(box, tree, false)
-        {
-        }
-
-        public QuadNode(Rectangle box, QuadTree tree, bool init)
-        {
-            this.tree = tree;
-
-            this.bounds = new Rectangle(box.Left, box.Bottom, box.Right, box.Top);
-            this.pivot = new Point((box.Left + box.Right) / 2, (box.Bottom + box.Top) / 2);
-
-            this.bitRegions = 0;
-
-            this.regions = new QuadNode[4];
-            this.triangles = new List<int>();
-
-            if (init)
-            {
-                int count = tree.triangles.Length;
-
-                // Allocate memory upfront
-                triangles.Capacity = count;
-
-                for (int i = 0; i < count; i++)
-                {
-                    triangles.Add(i);
-                }
-            }
-        }
-
-        public List<int> FindTriangles(Point searchPoint)
-        {
-            int region = FindRegion(searchPoint);
-            if (regions[region] == null)
-            {
-                return triangles;
-            }
-            return regions[region].FindTriangles(searchPoint);
-        }
-
-        public void CreateSubRegion(int currentDepth)
-        {
-            // The four sub regions of the quad tree
-            //   +--------------+
-            //   |  nw  |  ne   |
-            //   |------+pivot--|
-            //   |  sw  |  se   |
-            //   +--------------+
-            Rectangle box;
-
-            // 1. region south west
-            box = new Rectangle(bounds.Left, bounds.Bottom, pivot.X, pivot.Y);
-            regions[0] = new QuadNode(box, tree);
-
-            // 2. region south east
-            box = new Rectangle(pivot.X, bounds.Bottom, bounds.Right, pivot.Y);
-            regions[1] = new QuadNode(box, tree);
-
-            // 3. region north west
-            box = new Rectangle(bounds.Left, pivot.Y, pivot.X, bounds.Top);
-            regions[2] = new QuadNode(box, tree);
-
-            // 4. region north east
-            box = new Rectangle(pivot.X, pivot.Y, bounds.Right, bounds.Top);
-            regions[3] = new QuadNode(box, tree);
-
-            Point[] triangle = new Point[3];
-
-            // Find region for every triangle vertex
-            foreach (var index in triangles)
-            {
-                ITriangle tri = tree.triangles[index];
-
-                triangle[0] = tri.GetVertex(0);
-                triangle[1] = tri.GetVertex(1);
-                triangle[2] = tri.GetVertex(2);
-
-                AddTriangleToRegion(triangle, index);
-            }
-
-            for (int i = 0; i < 4; i++)
-            {
-                if (regions[i].triangles.Count > tree.sizeBound && currentDepth < tree.maxDepth)
-                {
-                    regions[i].CreateSubRegion(currentDepth + 1);
-                }
-            }
-        }
-
-        void AddTriangleToRegion(Point[] triangle, int index)
-        {
-            bitRegions = 0;
-            if (QuadTree.IsPointInTriangle(pivot, triangle[0], triangle[1], triangle[2]))
-            {
-                AddToRegion(index, SW);
-                AddToRegion(index, SE);
-                AddToRegion(index, NW);
-                AddToRegion(index, NE);
-                return;
-            }
-
-            FindTriangleIntersections(triangle, index);
-
-            if (bitRegions == 0)
-            {
-                // we didn't find any intersection so we add this triangle to a point's region		
-                int region = FindRegion(triangle[0]);
-                regions[region].triangles.Add(index);
-            }
-        }
-
-        void FindTriangleIntersections(Point[] triangle, int index)
-        {
-            // PLEASE NOTE:
-            // Handling of component comparison is tightly associated with the implementation 
-            // of the findRegion() function. That means when the point to be compared equals 
-            // the pivot point the triangle must be put at least into region 2.
-            //
-            // Linear equations are in parametric form.
-            //    pivot.x = triangle[0].x + t * (triangle[1].x - triangle[0].x)
-            //    pivot.y = triangle[0].y + t * (triangle[1].y - triangle[0].y)
-
-            int k = 2;
-
-            double dx, dy;
-            // Iterate through all triangle laterals and find bounding box intersections
-            for (int i = 0; i < 3; k = i++)
-            {
-                dx = triangle[i].X - triangle[k].X;
-                dy = triangle[i].Y - triangle[k].Y;
-
-                if (dx != 0.0)
-                {
-                    FindIntersectionsWithX(dx, dy, triangle, index, k);
-                }
-                if (dy != 0.0)
-                {
-                    FindIntersectionsWithY(dx, dy, triangle, index, k);
-                }
-            }
-        }
-
-        void FindIntersectionsWithX(double dx, double dy, Point[] triangle, int index, int k)
-        {
-            double t;
-
-            // find intersection with plane x = m_pivot.dX
-            t = (pivot.X - triangle[k].X) / dx;
-            if (t < (1 + EPS) && t > -EPS)
-            {
-                // we have an intersection
-                double yComponent = triangle[k].Y + t * dy;
-
-                if (yComponent < pivot.Y && yComponent >= bounds.Bottom)
-                {
-                    AddToRegion(index, SW);
-                    AddToRegion(index, SE);
-                }
-                else if (yComponent <= bounds.Top)
-                {
-                    AddToRegion(index, NW);
-                    AddToRegion(index, NE);
-                }
-            }
-
-            // find intersection with plane x = m_boundingBox[0].dX
-            t = (bounds.Left - triangle[k].X) / dx;
-            if (t < (1 + EPS) && t > -EPS)
-            {
-                // we have an intersection
-                double yComponent = triangle[k].Y + t * dy;
-
-                if (yComponent < pivot.Y && yComponent >= bounds.Bottom)
-                {
-                    AddToRegion(index, SW);
-                }
-                else if (yComponent <= bounds.Top) // TODO: check && yComponent >= pivot.Y
-                {
-                    AddToRegion(index, NW);
-                }
-            }
-
-            // find intersection with plane x = m_boundingBox[1].dX
-            t = (bounds.Right - triangle[k].X) / dx;
-            if (t < (1 + EPS) && t > -EPS)
-            {
-                // we have an intersection
-                double yComponent = triangle[k].Y + t * dy;
-
-                if (yComponent < pivot.Y && yComponent >= bounds.Bottom)
-                {
-                    AddToRegion(index, SE);
-                }
-                else if (yComponent <= bounds.Top)
-                {
-                    AddToRegion(index, NE);
-                }
-            }
-        }
-
-        void FindIntersectionsWithY(double dx, double dy, Point[] triangle, int index, int k)
-        {
-            double t, xComponent;
-
-            // find intersection with plane y = m_pivot.dY
-            t = (pivot.Y - triangle[k].Y) / dy;
-            if (t < (1 + EPS) && t > -EPS)
-            {
-                // we have an intersection
-                xComponent = triangle[k].X + t * dx;
-
-                if (xComponent > pivot.X && xComponent <= bounds.Right)
-                {
-                    AddToRegion(index, SE);
-                    AddToRegion(index, NE);
-                }
-                else if (xComponent >= bounds.Left)
-                {
-                    AddToRegion(index, SW);
-                    AddToRegion(index, NW);
-                }
-            }
-
-            // find intersection with plane y = m_boundingBox[0].dY
-            t = (bounds.Bottom - triangle[k].Y) / dy;
-            if (t < (1 + EPS) && t > -EPS)
-            {
-                // we have an intersection
-                xComponent = triangle[k].X + t * dx;
-
-                if (xComponent > pivot.X && xComponent <= bounds.Right)
-                {
-                    AddToRegion(index, SE);
-                }
-                else if (xComponent >= bounds.Left)
-                {
-                    AddToRegion(index, SW);
-                }
-            }
-
-            // find intersection with plane y = m_boundingBox[1].dY
-            t = (bounds.Top - triangle[k].Y) / dy;
-            if (t < (1 + EPS) && t > -EPS)
-            {
-                // we have an intersection
-                xComponent = triangle[k].X + t * dx;
-
-                if (xComponent > pivot.X && xComponent <= bounds.Right)
-                {
-                    AddToRegion(index, NE);
-                }
-                else if (xComponent >= bounds.Left)
-                {
-                    AddToRegion(index, NW);
-                }
-            }
-        }
-
-        int FindRegion(Point point)
-        {
-            int b = 2;
-            if (point.Y < pivot.Y)
-            {
-                b = 0;
-            }
-            if (point.X > pivot.X)
-            {
-                b++;
-            }
-            return b;
-        }
-
-        void AddToRegion(int index, int region)
-        {
-            //if (!(m_bitRegions & BITVECTOR[region]))
-            if ((bitRegions & BITVECTOR[region]) == 0)
-            {
-                regions[region].triangles.Add(index);
-                bitRegions |= BITVECTOR[region];
-            }
-        }
-    }
-
-    #endregion
 }

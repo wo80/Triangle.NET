@@ -43,12 +43,15 @@
   <ItemGroup>
     <Compile Include="Geometry\IEdge.cs" />
     <Compile Include="Geometry\IPolygon.cs" />
+    <Compile Include="Geometry\IPolygonExtensions.cs" />
     <Compile Include="Geometry\Polygon.cs" />
     <Compile Include="IO\FileProcessor.cs" />
     <Compile Include="IO\IFileFormat.cs" />
     <Compile Include="Meshing\ConstraintOptions.cs" />
     <Compile Include="Meshing\Converter.cs" />
+    <Compile Include="Meshing\GenericMesher.cs" />
     <Compile Include="Meshing\IConstraintMesher.cs" />
+    <Compile Include="Meshing\IMesh.cs" />
     <Compile Include="Meshing\IQualityMesher.cs" />
     <Compile Include="Meshing\ITriangulator.cs" />
     <Compile Include="Data\BadTriQueue.cs" />
@@ -64,8 +67,7 @@
     <Compile Include="Meshing\Algorithm\Dwyer.cs" />
     <Compile Include="Geometry\Rectangle.cs" />
     <Compile Include="Geometry\Edge.cs" />
-    <Compile Include="Geometry\EdgeEnumerator.cs" />
-    <Compile Include="Geometry\InputGeometry.cs" />
+    <Compile Include="Meshing\Iterators\EdgeIterator.cs" />
     <Compile Include="Geometry\ITriangle.cs" />
     <Compile Include="Geometry\Point.cs" />
     <Compile Include="Geometry\RegionPointer.cs" />
@@ -99,7 +101,7 @@
     <Compile Include="Tools\IVoronoi.cs" />
     <Compile Include="Tools\QuadTree.cs" />
     <Compile Include="Tools\QualityMeasure.cs" />
-    <Compile Include="Tools\RegionIterator.cs" />
+    <Compile Include="Meshing\Iterators\RegionIterator.cs" />
     <Compile Include="Tools\Statistic.cs" />
     <Compile Include="Meshing\Algorithm\SweepLine.cs" />
     <Compile Include="Tools\Voronoi.cs" />

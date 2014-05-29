@@ -30,7 +30,7 @@ namespace MeshExplorer.Generators
             ranges[1] = new int[] { 2, 15 };
         }
 
-        public override InputGeometry Generate(double param0, double param1, double param2)
+        public override IPolygon Generate(double param0, double param1, double param2)
         {
             // Number of points on the outer circle
             int n = GetParamValueInt(0, param0);
@@ -44,7 +44,7 @@ namespace MeshExplorer.Generators
             // Current radius and step size
             double r, dphi;
 
-            InputGeometry input = new InputGeometry(n + 1);
+            var input = new Polygon(n + 1);
 
             // Inner cirlce (radius = 1)
             r = 1;
@@ -52,8 +52,8 @@ namespace MeshExplorer.Generators
             dphi = 2 * Math.PI / npoints;
             for (int i = 0; i < npoints; i++)
             {
-                input.AddPoint(r * Math.Cos(i * dphi), r * Math.Sin(i * dphi), 1);
-                input.AddSegment(i, (i + 1) % npoints, 1);
+                input.Add(new Vertex(r * Math.Cos(i * dphi), r * Math.Sin(i * dphi), 1));
+                input.Add(new Edge(i, (i + 1) % npoints, 1));
             }
 
             count = input.Count;
@@ -64,8 +64,8 @@ namespace MeshExplorer.Generators
             dphi = 2 * Math.PI / npoints;
             for (int i = 0; i < npoints; i++)
             {
-                input.AddPoint(r * Math.Cos(i * dphi), r * Math.Sin(i * dphi), 2);
-                input.AddSegment(count + i, count + (i + 1) % npoints, 2);
+                input.Add(new Vertex(r * Math.Cos(i * dphi), r * Math.Sin(i * dphi), 2));
+                input.Add(new Edge(count + i, count + (i + 1) % npoints, 2));
             }
 
             count = input.Count;
@@ -76,17 +76,17 @@ namespace MeshExplorer.Generators
             dphi = 2 * Math.PI / npoints;
             for (int i = 0; i < npoints; i++)
             {
-                input.AddPoint(r * Math.Cos(i * dphi), r * Math.Sin(i * dphi), 3);
-                input.AddSegment(count + i, count + (i + 1) % npoints, 3);
+                input.Add(new Vertex(r * Math.Cos(i * dphi), r * Math.Sin(i * dphi), 3));
+                input.Add(new Edge(count + i, count + (i + 1) % npoints, 3));
             }
 
-            input.AddHole(0, 0);
+            input.Holes.Add(new Point(0, 0));
 
             // Regions: |++++++|++++++|---|
             //          r             1   0
 
-            input.AddRegion((r + 3.0) / 4.0, 0, 1);
-            input.AddRegion((3 * r + 1.0) / 4.0, 0, 2);
+            input.Regions.Add(new RegionPointer((r + 3.0) / 4.0, 0, 1));
+            input.Regions.Add(new RegionPointer((3 * r + 1.0) / 4.0, 0, 2));
 
             return input;
         }

@@ -8,7 +8,9 @@ using MeshExplorer.IO;
 using MeshRenderer.Core;
 using TriangleNet;
 using TriangleNet.Geometry;
-using TriangleNet.Logging;
+using TriangleNet.Meshing;
+using TriangleNet.Meshing.Algorithm;
+using TriangleNet.Smoothing;
 using TriangleNet.Tools;
 
 namespace MeshExplorer
@@ -16,7 +18,7 @@ namespace MeshExplorer
     public partial class FormMain : Form
     {
         Settings settings;
-        InputGeometry input;
+        IPolygon input;
         Mesh mesh;
 
         FormLog frmLog;
@@ -108,7 +110,7 @@ namespace MeshExplorer
 
         void frmGenerator_InputGenerated(object sender, EventArgs e)
         {
-            this.input = sender as InputGeometry;
+            this.input = sender as IPolygon;
 
             if (input != null)
             {
@@ -442,29 +444,25 @@ namespace MeshExplorer
 
             //Stopwatch sw = new Stopwatch();
 
-            mesh = new Mesh();
+            var options = new ConstraintOptions();
+            var quality = new QualityOptions();
 
             if (meshControlView.ParamConformDelChecked)
             {
-                mesh.Behavior.ConformingDelaunay = true;
-            }
-
-            if (meshControlView.ParamSweeplineChecked)
-            {
-                mesh.Behavior.Algorithm = TriangulationAlgorithm.SweepLine;
+                options.ConformingDelaunay = true;
             }
 
             if (meshControlView.ParamQualityChecked)
             {
-                mesh.Behavior.Quality = true;
+                //mesh.Behavior.Quality = true;
 
-                mesh.Behavior.MinAngle = meshControlView.ParamMinAngleValue;
+                quality.MinimumAngle = meshControlView.ParamMinAngleValue;
 
                 double maxAngle = meshControlView.ParamMaxAngleValue;
 
                 if (maxAngle < 180)
                 {
-                    mesh.Behavior.MaxAngle = maxAngle;
+                    quality.MaximumAngle = maxAngle;
                 }
 
                 // Ignore area constraints on initial triangulation.
@@ -474,19 +472,26 @@ namespace MeshExplorer
                 //{
                 //    var size = input.Bounds;
                 //    double min = Math.Min(size.Width, size.Height);
-                //    mesh.Behavior.MaxArea, area * min);
+                //    mesh.SetOption(Options.MaxArea, area * min);
                 //}
             }
 
             if (meshControlView.ParamConvexChecked)
             {
-                mesh.Behavior.Convex = true;
+                options.Convex = true;
             }
 
             try
             {
                 //sw.Start();
-                mesh.Triangulate(input);
+                if (meshControlView.ParamSweeplineChecked)
+                {
+                    mesh = (Mesh)input.Triangulate(options, quality, new SweepLine());
+                }
+                else
+                {
+                    mesh = (Mesh)input.Triangulate(options, quality);
+                }
                 //sw.Stop();
 
                 statisticView.UpdateStatistic(mesh);
@@ -515,24 +520,26 @@ namespace MeshExplorer
 
             double area = meshControlView.ParamMaxAreaValue;
 
+            var quality = new QualityOptions();
+
             if (area > 0 && area < 1)
             {
-                mesh.Behavior.MaxArea = area * statisticView.Statistic.LargestArea;
+                quality.MaximumArea = area * statisticView.Statistic.LargestArea;
             }
 
-            mesh.Behavior.MinAngle = meshControlView.ParamMinAngleValue;
+            quality.MinimumAngle = meshControlView.ParamMinAngleValue;
 
             double maxAngle = meshControlView.ParamMaxAngleValue;
 
             if (maxAngle < 180)
             {
-                mesh.Behavior.MaxAngle = maxAngle;
+                quality.MaximumAngle = maxAngle;
             }
 
             try
             {
                 sw.Start();
-                mesh.Refine();
+                mesh.Refine(quality);
                 sw.Stop();
 
                 statisticView.UpdateStatistic(mesh);
@@ -572,10 +579,12 @@ namespace MeshExplorer
 
             Stopwatch sw = new Stopwatch();
 
+            var smoother = new SimpleSmoother();
+
             try
             {
                 sw.Start();
-                mesh.Smooth();
+                smoother.Smooth(this.mesh);
                 sw.Stop();
 
                 statisticView.UpdateStatistic(mesh);

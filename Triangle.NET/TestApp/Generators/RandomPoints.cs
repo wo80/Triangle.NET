@@ -6,10 +6,6 @@
 
 namespace MeshExplorer.Generators
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using TriangleNet.Geometry;
 
     /// <summary>
@@ -32,7 +28,7 @@ namespace MeshExplorer.Generators
             ranges[2] = new int[] { 10, 200 };
         }
 
-        public override InputGeometry Generate(double param0, double param1, double param2)
+        public override IPolygon Generate(double param0, double param1, double param2)
         {
             int numPoints = GetParamValueInt(0, param0);
             numPoints = (numPoints / 10) * 10;
@@ -42,15 +38,15 @@ namespace MeshExplorer.Generators
                 numPoints = 5;
             }
 
-            InputGeometry input = new InputGeometry(numPoints);
+            var input = new Polygon(numPoints);
 
             int width = GetParamValueInt(1, param1);
             int height = GetParamValueInt(2, param2);
 
             for (int i = 0; i < numPoints; i++)
             {
-                input.AddPoint(Util.Random.NextDouble() * width,
-                        Util.Random.NextDouble() * height);
+                input.Add(new Vertex(Util.Random.NextDouble() * width,
+                        Util.Random.NextDouble() * height));
             }
 
             return input;

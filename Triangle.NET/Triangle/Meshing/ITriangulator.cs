@@ -14,6 +14,6 @@ namespace TriangleNet.Meshing
     /// </summary>
     public interface ITriangulator
     {
-        Mesh Triangulate(ICollection<Vertex> points);
+        IMesh Triangulate(ICollection<Vertex> points);
     }
 }

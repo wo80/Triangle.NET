@@ -9,15 +9,12 @@ namespace TriangleNet
 {
     using System;
     using TriangleNet.Geometry;
-    using TriangleNet.Logging;
 
     /// <summary>
     /// Controls the behavior of the meshing software.
     /// </summary>
-    public class Behavior
+    class Behavior
     {
-        #region Class members
-
         bool poly = false;
         bool quality = false;
         bool varArea = false;
@@ -26,7 +23,6 @@ namespace TriangleNet
         bool boundaryMarkers = true;
         bool noHoles = false;
         bool conformDel = false;
-        TriangulationAlgorithm algorithm = TriangulationAlgorithm.Dwyer;
 
         Func<ITriangle, double, bool> usertest;
 
@@ -43,8 +39,6 @@ namespace TriangleNet
         internal double goodAngle = 0.0;
         internal double maxGoodAngle = 0.0;
         internal double offconstant = 0.0;
-
-        #endregion
 
         /// <summary>
         /// Creates an instance of the Behavior class.
@@ -153,7 +147,7 @@ namespace TriangleNet
             set
             {
                 maxArea = value;
-                fixedArea = value > 0;
+                fixedArea = value > 0.0;
             }
         }
 
@@ -200,15 +194,6 @@ namespace TriangleNet
         {
             get { return conformDel; }
             set { conformDel = value; }
-        }
-
-        /// <summary>
-        /// Algorithm to use for triangulation.
-        /// </summary>
-        public TriangulationAlgorithm Algorithm
-        {
-            get { return algorithm; }
-            set { algorithm = value; }
         }
 
         /// <summary>

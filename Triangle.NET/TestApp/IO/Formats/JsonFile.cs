@@ -80,9 +80,9 @@ namespace MeshExplorer.IO.Formats
             throw new NotImplementedException();
         }
 
-        public Mesh Import(string filename)
+        public IMesh Import(string filename)
         {
-            InputGeometry geometry = this.Read(filename);
+            var geometry = (Polygon)this.Read(filename);
 
             List<ITriangle> triangles = null;
 
@@ -92,7 +92,7 @@ namespace MeshExplorer.IO.Formats
 
                 if (tri != null)
                 {
-                    triangles = ReadTriangles(tri, geometry.Count);
+                    triangles = ReadTriangles(tri, geometry.Points.Count);
                 }
             }
 
@@ -101,7 +101,7 @@ namespace MeshExplorer.IO.Formats
             return converter.ToMesh(geometry, triangles);
         }
 
-        public void Write(Mesh mesh, string filename)
+        public void Write(IMesh mesh, string filename)
         {
             using (StreamWriter writer = new StreamWriter(filename))
             {
@@ -119,16 +119,16 @@ namespace MeshExplorer.IO.Formats
                 writer.Write("\"dim\":2");
                 writer.Write("}");
 
-                if (mesh.CurrentNumbering == NodeNumbering.None)
+                if (((Mesh)mesh).CurrentNumbering == NodeNumbering.None)
                 {
-                    mesh.Renumber(NodeNumbering.Linear);
+                    ((Mesh)mesh).Renumber(NodeNumbering.Linear);
                 }
 
                 // Write the coordinates
                 if (nv > 0)
                 {
                     writer.Write(",");
-                    WritePoints(mesh, writer, nv);
+                    WritePoints((Mesh)mesh, writer, nv);
                 }
 
                 // Write the segments
@@ -156,7 +156,7 @@ namespace MeshExplorer.IO.Formats
             }
         }
 
-        public void Write(Mesh mesh, StreamWriter stream)
+        public void Write(IMesh mesh, StreamWriter stream)
         {
             throw new NotImplementedException();
         }
@@ -166,11 +166,11 @@ namespace MeshExplorer.IO.Formats
         /// </summary>
         /// <param name="filename"></param>
         /// <returns></returns>
-        public InputGeometry Read(string filename)
+        public IPolygon Read(string filename)
         {
             ParseJson(filename);
 
-            InputGeometry data = new InputGeometry();
+            var data = new Polygon();
 
             if (json == null)
             {
@@ -223,12 +223,12 @@ namespace MeshExplorer.IO.Formats
             return data;
         }
 
-        public void Write(InputGeometry polygon, string filename)
+        public void Write(IPolygon polygon, string filename)
         {
             throw new NotImplementedException();
         }
 
-        public void Write(InputGeometry polygon, StreamWriter stream)
+        public void Write(IPolygon polygon, StreamWriter stream)
         {
             throw new NotImplementedException();
         }
@@ -248,7 +248,7 @@ namespace MeshExplorer.IO.Formats
 
         #region Read helpers
 
-        private void ReadPoints(InputGeometry geometry, Dictionary<string, object> points, ref int count)
+        private void ReadPoints(Polygon geometry, Dictionary<string, object> points, ref int count)
         {
             ArrayList data = points["data"] as ArrayList;
 
@@ -286,16 +286,16 @@ namespace MeshExplorer.IO.Formats
                         mark = int.Parse(markers[i / 2].ToString());
                     }
 
-                    geometry.AddPoint(
+                    geometry.Add(new Vertex(
                         double.Parse(data[i].ToString(), Util.Nfi),
                         double.Parse(data[i + 1].ToString(), Util.Nfi),
                         mark
-                    );
+                    ));
                 }
             }
         }
 
-        private void ReadSegments(InputGeometry geometry, Dictionary<string, object> segments, int count)
+        private void ReadSegments(Polygon geometry, Dictionary<string, object> segments, int count)
         {
             ArrayList data = segments["data"] as ArrayList;
 
@@ -334,12 +334,12 @@ namespace MeshExplorer.IO.Formats
                         throw new Exception("JSON format error (segment index).");
                     }
 
-                    geometry.AddSegment(p0, p1, mark);
+                    geometry.Add(new Edge(p0, p1, mark));
                 }
             }
         }
 
-        private void ReadHoles(InputGeometry geometry, ArrayList holes)
+        private void ReadHoles(Polygon geometry, ArrayList holes)
         {
             int n = holes.Count;
 
@@ -350,10 +350,10 @@ namespace MeshExplorer.IO.Formats
 
             for (int i = 0; i < n; i += 2)
             {
-                geometry.AddHole(
+                geometry.Holes.Add(new Point(
                     double.Parse(holes[i].ToString(), Util.Nfi),
                     double.Parse(holes[i + 1].ToString(), Util.Nfi)
-                );
+                ));
             }
         }
 

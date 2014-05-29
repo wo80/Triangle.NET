@@ -8,9 +8,9 @@ namespace MeshExplorer.IO.Formats
 {
     using System;
     using System.IO;
-    using TriangleNet;
     using TriangleNet.Geometry;
     using TriangleNet.IO;
+    using TriangleNet.Meshing;
 
     /// <summary>
     /// Read and write files defined in classic Triangle format.
@@ -47,27 +47,27 @@ namespace MeshExplorer.IO.Formats
             throw new NotImplementedException();
         }
 
-        public InputGeometry Read(string filename)
+        public IPolygon Read(string filename)
         {
             return format.Read(filename);
         }
 
-        public void Write(InputGeometry polygon, string filename)
+        public void Write(IPolygon polygon, string filename)
         {
             format.Write(polygon, filename);
         }
 
-        public void Write(InputGeometry polygon, StreamWriter stream)
+        public void Write(IPolygon polygon, StreamWriter stream)
         {
             format.Write(polygon, stream);
         }
 
-        public Mesh Import(string filename)
+        public IMesh Import(string filename)
         {
             return format.Import(filename);
         }
 
-        public void Write(Mesh mesh, string filename)
+        public void Write(IMesh mesh, string filename)
         {
             if (mesh.Vertices.Count > 0)
             {
@@ -75,9 +75,9 @@ namespace MeshExplorer.IO.Formats
             }
         }
 
-        public void Write(Mesh mesh, StreamWriter stream)
+        public void Write(IMesh mesh, StreamWriter stream)
         {
-            throw new NotImplementedException();
+            format.Write(mesh, stream);
         }
     }
 }

@@ -79,7 +79,7 @@
             this.label19.Name = "label19";
             this.label19.Size = new System.Drawing.Size(134, 40);
             this.label19.TabIndex = 6;
-            this.label19.Text = "Beta 3 (2013-06-18)\r\nChristian Woltering\r\nMIT";
+            this.label19.Text = "Beta 4 (2014-05-30)\r\nChristian Woltering\r\nMIT";
             // 
             // label18
             // 

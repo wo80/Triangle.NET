@@ -59,7 +59,7 @@ namespace TriangleNet.IO
         /// <param name="line">The current line.</param>
         /// <param name="attributes">Number of point attributes</param>
         /// <param name="marks">Number of point markers (0 or 1)</param>
-        static void ReadVertex(InputGeometry data, int index, string[] line, int attributes, int marks)
+        static void ReadVertex(Polygon data, int index, string[] line, int attributes, int marks)
         {
             double x = double.Parse(line[1], nfi);
             double y = double.Parse(line[2], nfi);
@@ -81,7 +81,7 @@ namespace TriangleNet.IO
                 mark = int.Parse(line[3 + attributes]);
             }
 
-            data.AddPoint(x, y, mark, attribs);
+            data.Add(new Vertex(x, y, mark), attribs);
         }
 
         #endregion
@@ -91,7 +91,7 @@ namespace TriangleNet.IO
         /// <summary>
         /// Reads geometry information from .node or .poly files.
         /// </summary>
-        public static void Read(string filename, out InputGeometry geometry)
+        public static void Read(string filename, out Polygon geometry)
         {
             geometry = null;
 
@@ -111,7 +111,7 @@ namespace TriangleNet.IO
         /// <summary>
         /// Reads a mesh from .node, .poly or .ele files.
         /// </summary>
-        public static void Read(string filename, out InputGeometry geometry, out List<ITriangle> triangles)
+        public static void Read(string filename, out Polygon geometry, out List<ITriangle> triangles)
         {
             triangles = null;
 
@@ -128,9 +128,9 @@ namespace TriangleNet.IO
         /// <summary>
         /// Reads geometry information from .node or .poly files.
         /// </summary>
-        public static InputGeometry Read(string filename)
+        public static IPolygon Read(string filename)
         {
-            InputGeometry geometry = null;
+            Polygon geometry = null;
 
             TriangleReader.Read(filename, out geometry);
 
@@ -144,7 +144,7 @@ namespace TriangleNet.IO
         /// </summary>
         /// <param name="nodefilename"></param>
         /// <remarks>Will NOT read associated .ele by default.</remarks>
-        public static InputGeometry ReadNodeFile(string nodefilename)
+        public static Polygon ReadNodeFile(string nodefilename)
         {
             return ReadNodeFile(nodefilename, false);
         }
@@ -154,9 +154,9 @@ namespace TriangleNet.IO
         /// </summary>
         /// <param name="nodefilename"></param>
         /// <param name="readElements"></param>
-        public static InputGeometry ReadNodeFile(string nodefilename, bool readElements)
+        public static Polygon ReadNodeFile(string nodefilename, bool readElements)
         {
-            InputGeometry data;
+            Polygon data;
 
             startIndex = 0;
 
@@ -197,7 +197,7 @@ namespace TriangleNet.IO
                     nodemarkers = int.Parse(line[3]);
                 }
 
-                data = new InputGeometry(invertices);
+                data = new Polygon(invertices);
 
                 // Read the vertices.
                 if (invertices > 0)
@@ -242,7 +242,7 @@ namespace TriangleNet.IO
         /// </summary>
         /// <param name="polyfilename"></param>
         /// <remarks>Will NOT read associated .ele by default.</remarks>
-        public static InputGeometry ReadPolyFile(string polyfilename)
+        public static Polygon ReadPolyFile(string polyfilename)
         {
             return ReadPolyFile(polyfilename, false, false);
         }
@@ -253,7 +253,7 @@ namespace TriangleNet.IO
         /// <param name="polyfilename"></param>
         /// <param name="readElements">If true, look for an associated .ele file.</param>
         /// <remarks>Will NOT read associated .area by default.</remarks>
-        public static InputGeometry ReadPolyFile(string polyfilename, bool readElements)
+        public static Polygon ReadPolyFile(string polyfilename, bool readElements)
         {
             return ReadPolyFile(polyfilename, readElements, false);
         }
@@ -264,10 +264,10 @@ namespace TriangleNet.IO
         /// <param name="polyfilename"></param>
         /// <param name="readElements">If true, look for an associated .ele file.</param>
         /// <param name="readElements">If true, look for an associated .area file.</param>
-        public static InputGeometry ReadPolyFile(string polyfilename, bool readElements, bool readArea)
+        public static Polygon ReadPolyFile(string polyfilename, bool readElements, bool readArea)
         {
             // Read poly file
-            InputGeometry data;
+            Polygon data;
 
             startIndex = 0;
 
@@ -306,7 +306,7 @@ namespace TriangleNet.IO
                 // Read the vertices.
                 if (invertices > 0)
                 {
-                    data = new InputGeometry(invertices);
+                    data = new Polygon(invertices);
 
                     for (int i = 0; i < invertices; i++)
                     {
@@ -335,7 +335,7 @@ namespace TriangleNet.IO
                     // the vertices should be read from a separate .node file.
                     string nodefile = Path.ChangeExtension(polyfilename, ".node");
                     data = ReadNodeFile(nodefile);
-                    invertices = data.Count;
+                    invertices = data.Points.Count;
                 }
 
                 if (data.Points == null)
@@ -401,7 +401,7 @@ namespace TriangleNet.IO
                     }
                     else
                     {
-                        data.AddSegment(end1, end2, mark);
+                        data.Add(new Edge(end1, end2, mark));
                     }
                 }
 
@@ -428,8 +428,8 @@ namespace TriangleNet.IO
                             throw new Exception("Invalid hole.");
                         }
 
-                        data.AddHole(double.Parse(line[1], nfi),
-                            double.Parse(line[2], nfi));
+                        data.Holes.Add(new Point(double.Parse(line[1], nfi),
+                            double.Parse(line[2], nfi)));
                     }
                 }
 
@@ -452,12 +452,10 @@ namespace TriangleNet.IO
                                 throw new Exception("Invalid region attributes.");
                             }
 
-                            data.AddRegion(
-                                // Region x and y
-                                double.Parse(line[1], nfi),
-                                double.Parse(line[2], nfi),
-                                // Region id
-                                int.Parse(line[3]));
+                            data.Regions.Add(new RegionPointer(
+                                double.Parse(line[1], nfi), // Region x
+                                double.Parse(line[2], nfi), // Region y
+                                int.Parse(line[3]))); // Region id
                         }
                     }
                 }

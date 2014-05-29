@@ -51,9 +51,9 @@ namespace MeshExplorer.IO
         /// <summary>
         /// Read an input geometry from given file.
         /// </summary>
-        public static InputGeometry Read(string path)
+        public static IPolygon Read(string path)
         {
-            IMeshFile provider = GetProviderInstance(path);
+            var provider = GetProviderInstance(path);
 
             return provider.Read(path);
         }
@@ -65,9 +65,9 @@ namespace MeshExplorer.IO
         /// <returns></returns>
         public static Mesh Import(string path)
         {
-            IMeshFile provider = GetProviderInstance(path);
+            var provider = GetProviderInstance(path);
 
-            return provider.Import(path);
+            return (Mesh)provider.Import(path);
         }
 
         /// <summary>

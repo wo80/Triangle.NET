@@ -76,11 +76,11 @@ namespace MeshExplorer.Views
 
         #region IView
 
-        public void HandleNewInput(InputGeometry geometry)
+        public void HandleNewInput(IPolygon geometry)
         {
         }
 
-        public void HandleMeshImport(InputGeometry geometry, Mesh mesh)
+        public void HandleMeshImport(IPolygon geometry, Mesh mesh)
         {
         }
 

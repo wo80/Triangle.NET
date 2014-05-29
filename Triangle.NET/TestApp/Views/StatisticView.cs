@@ -34,14 +34,14 @@ namespace MeshExplorer.Views
 
         #region IView
 
-        public void HandleNewInput(InputGeometry geometry)
+        public void HandleNewInput(IPolygon geometry)
         {
             // Reset labels
             lbNumVert2.Text = "-";
             lbNumTri2.Text = "-";
             lbNumSeg2.Text = "-";
 
-            lbNumVert.Text = geometry.Count.ToString();
+            lbNumVert.Text = geometry.Points.Count.ToString();
             lbNumSeg.Text = geometry.Segments.Count().ToString();
             lbNumTri.Text = "0";
 
@@ -62,7 +62,7 @@ namespace MeshExplorer.Views
             angleHistogram1.SetData(null, null);
         }
 
-        public void HandleMeshImport(InputGeometry geometry, Mesh mesh)
+        public void HandleMeshImport(IPolygon geometry, Mesh mesh)
         {
             // Previous mesh stats
             lbNumVert2.Text = "-";

@@ -6,11 +6,8 @@
 
 namespace TriangleNet.Smoothing
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using TriangleNet.Geometry;
+    using TriangleNet.Meshing;
     using TriangleNet.Tools;
 
     /// <summary>
@@ -22,35 +19,42 @@ namespace TriangleNet.Smoothing
     /// </remarks>
     public class SimpleSmoother : ISmoother
     {
-        Mesh mesh;
+        ConstraintOptions options;
 
-        public SimpleSmoother(Mesh mesh)
+        public SimpleSmoother()
         {
-            this.mesh = mesh;
+            this.options = new ConstraintOptions() { ConformingDelaunay = true };
         }
 
-        public void Smooth()
+        public void Smooth(IMesh mesh)
         {
-            mesh.behavior.Quality = false;
+            Smooth(mesh, 10);
+        }
+
+        public void Smooth(IMesh mesh, int limit)
+        {
+            var smoothedMesh = (Mesh)mesh;
 
             // Take a few smoothing rounds.
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < limit; i++)
             {
-                Step();
+                Step(smoothedMesh);
 
                 // Actually, we only want to rebuild, if mesh is no longer
                 // Delaunay. Flipping edges could be the right choice instead 
                 // of re-triangulating...
-                mesh.Triangulate(Rebuild());
+                smoothedMesh = (Mesh)Rebuild(smoothedMesh).Triangulate(options);
             }
+
+            smoothedMesh.CopyTo((Mesh)mesh);
         }
 
         /// <summary>
         /// Smooth all free nodes.
         /// </summary>
-        private void Step()
+        private void Step(Mesh mesh)
         {
-            BoundedVoronoi voronoi = new BoundedVoronoi(this.mesh, false);
+            BoundedVoronoi voronoi = new BoundedVoronoi(mesh, false);
 
             var cells = voronoi.Regions;
 
@@ -76,31 +80,24 @@ namespace TriangleNet.Smoothing
         /// <summary>
         /// Rebuild the input geometry.
         /// </summary>
-        private InputGeometry Rebuild()
+        private Polygon Rebuild(Mesh mesh)
         {
-            InputGeometry geometry = new InputGeometry(mesh.vertices.Count);
+            var data = new Polygon(mesh.vertices.Count);
 
-            foreach (var vertex in mesh.vertices.Values)
+            foreach (var v in mesh.vertices.Values)
             {
-                geometry.AddPoint(vertex.x, vertex.y, vertex.mark);
+                // Reset to input vertex.
+                v.type = VertexType.InputVertex;
+
+                data.Points.Add(v);
             }
 
-            foreach (var segment in mesh.subsegs.Values)
-            {
-                geometry.AddSegment(segment.P0, segment.P1, segment.Boundary);
-            }
+            data.Segments.AddRange(mesh.subsegs.Values);
 
-            foreach (var hole in mesh.holes)
-            {
-                geometry.AddHole(hole.x, hole.y);
-            }
+            data.Holes.AddRange(mesh.holes);
+            data.Regions.AddRange(mesh.regions);
 
-            foreach (var region in mesh.regions)
-            {
-                geometry.AddRegion(region.point.x, region.point.y, region.id);
-            }
-
-            return geometry;
+            return data;
         }
     }
 }

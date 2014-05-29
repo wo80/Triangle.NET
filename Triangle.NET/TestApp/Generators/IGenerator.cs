@@ -6,10 +6,6 @@
 
 namespace MeshExplorer.Generators
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using TriangleNet.Geometry;
 
     /// <summary>
@@ -22,6 +18,6 @@ namespace MeshExplorer.Generators
         int ParameterCount { get; }
         string ParameterDescription(int paramIndex);
         string ParameterDescription(int paramIndex, double paramValue);
-        InputGeometry Generate(double param1, double param2, double param3);
+        IPolygon Generate(double param1, double param2, double param3);
     }
 }

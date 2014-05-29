@@ -7,9 +7,6 @@
 namespace MeshExplorer.Generators
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using TriangleNet.Geometry;
 
     /// <summary>
@@ -32,11 +29,11 @@ namespace MeshExplorer.Generators
             ranges[2] = new int[] { 5, 20 };
         }
 
-        public override InputGeometry Generate(double param0, double param1, double param2)
+        public override IPolygon Generate(double param0, double param1, double param2)
         {
             int numPoints = GetParamValueInt(1, param1);
 
-            InputGeometry input = new InputGeometry(numPoints + 4);
+            var input = new Polygon(numPoints + 4);
 
             double x, y, step = 2 * Math.PI / numPoints;
 
@@ -48,11 +45,11 @@ namespace MeshExplorer.Generators
                 x = r * Math.Cos(i * step);
                 y = r * Math.Sin(i * step);
 
-                input.AddPoint(x, y, 2);
-                input.AddSegment(i, (i + 1) % numPoints, 2);
+                input.Add(new Vertex(x, y, 2));
+                input.Add(new Edge(i, (i + 1) % numPoints, 2));
             }
 
-            numPoints = input.Count;
+            numPoints = input.Points.Count;
 
             int numPointsB = GetParamValueInt(0, param0);
 
@@ -62,38 +59,38 @@ namespace MeshExplorer.Generators
             // Left box boundary points
             for (int i = 0; i < numPointsB; i++)
             {
-                input.AddPoint(-50, -50 + i * step, 1);
+                input.Add(new Vertex(-50, -50 + i * step, 1));
             }
 
             // Top box boundary points
             for (int i = 0; i < numPointsB; i++)
             {
-                input.AddPoint(-50 + i * step, 50, 1);
+                input.Add(new Vertex(-50 + i * step, 50, 1));
             }
 
             // Right box boundary points
             for (int i = 0; i < numPointsB; i++)
             {
-                input.AddPoint(50, 50 - i * step, 1);
+                input.Add(new Vertex(50, 50 - i * step, 1));
             }
 
             // Bottom box boundary points
             for (int i = 0; i < numPointsB; i++)
             {
-                input.AddPoint(50 - i * step, -50, 1);
+                input.Add(new Vertex(50 - i * step, -50, 1));
             }
 
             // Add box segments
             for (int i = numPoints; i < input.Count - 1; i++)
             {
-                input.AddSegment(i, i + 1, 1);
+                input.Add(new Edge(i, i + 1, 1));
             }
 
             // Add last segments which closes the box
-            input.AddSegment(input.Count - 1, numPoints, 1);
+            input.Add(new Edge(input.Count - 1, numPoints, 1));
 
             // Add hole
-            input.AddHole(0, 0);
+            input.Holes.Add(new Point(0, 0));
 
             return input;
         }

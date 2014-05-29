@@ -12,14 +12,13 @@ namespace TriangleNet.Meshing
     using System.Linq;
     using TriangleNet.Data;
     using TriangleNet.Geometry;
-    using TriangleNet.Logging;
 
     /// <summary>
     /// The DataReader class provides methods for mesh reconstruction.
     /// </summary>
     public class Converter
     {
-        public Mesh ToMesh(InputGeometry polygon, IList<ITriangle> triangles)
+        public Mesh ToMesh(Polygon polygon, IList<ITriangle> triangles)
         {
             return ToMesh(polygon, triangles.ToArray());
         }
@@ -46,7 +45,7 @@ namespace TriangleNet.Meshing
         /// the corresponding pointer is adjusted to refer to a subsegment rather
         /// than the next triangle of the stack.
         /// </remarks>
-        public Mesh ToMesh(InputGeometry polygon, ITriangle[] triangles)
+        public Mesh ToMesh(Polygon polygon, ITriangle[] triangles)
         {
             Otri tri = default(Otri);
             Osub subseg = default(Osub);
@@ -57,7 +56,7 @@ namespace TriangleNet.Meshing
 
             var mesh = new Mesh();
 
-            mesh.TransferNodes(polygon);
+            mesh.TransferNodes(polygon.Points);
 
             mesh.inelements = elements;
             mesh.regions.AddRange(polygon.Regions);
@@ -213,7 +212,7 @@ namespace TriangleNet.Meshing
             return vertexarray;
         }
 
-        private static void SetSegments(Mesh mesh, InputGeometry polygon, List<Otri>[] vertexarray)
+        private static void SetSegments(Mesh mesh, Polygon polygon, List<Otri>[] vertexarray)
         {
             Otri checktri = default(Otri);
             Otri nexttri; // Triangle
@@ -242,9 +241,9 @@ namespace TriangleNet.Meshing
                 {
                     subseg.seg = item;
 
-                    end[0] = polygon.segments[i].P0;
-                    end[1] = polygon.segments[i].P1;
-                    boundmarker = polygon.segments[i].Boundary;
+                    end[0] = polygon.Segments[i].P0;
+                    end[1] = polygon.Segments[i].P1;
+                    boundmarker = polygon.Segments[i].Boundary;
 
                     for (int j = 0; j < 2; j++)
                     {

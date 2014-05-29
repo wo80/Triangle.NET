@@ -129,7 +129,7 @@ namespace TriangleNet.IO
             }
         }
 
-        private void WriteGeometry(InputGeometry geometry)
+        private void WriteGeometry(IPolygon geometry)
         {
             stream.WriteLine("#!G{0}", this.iteration++);
         }

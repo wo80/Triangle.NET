@@ -7,9 +7,6 @@
 namespace MeshExplorer.Generators
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using TriangleNet.Geometry;
 
     /// <summary>
@@ -60,7 +57,7 @@ namespace MeshExplorer.Generators
             return "";
         }
 
-        public override InputGeometry Generate(double param0, double param1, double param2)
+        public override IPolygon Generate(double param0, double param1, double param2)
         {
             int numPoints = GetParamValueInt(0, param0);
             numPoints = (numPoints / 10) * 10;
@@ -72,7 +69,7 @@ namespace MeshExplorer.Generators
 
             double exp = (param1 + 10) / 100;
 
-            InputGeometry input = new InputGeometry(numPoints);
+            var input = new Polygon(numPoints);
 
             int i = 0, cNum = 2 * (int)Math.Floor(Math.Sqrt(numPoints));
 
@@ -84,8 +81,8 @@ namespace MeshExplorer.Generators
                 // Add a little error
                 r = Util.Random.NextDouble();
 
-                input.AddPoint((radius + r) * Math.Cos(i * step),
-                    (radius + r) * Math.Sin(i * step));
+                input.Add(new Vertex((radius + r) * Math.Cos(i * step),
+                    (radius + r) * Math.Sin(i * step)));
             }
 
             for (; i < numPoints; i++)
@@ -94,7 +91,7 @@ namespace MeshExplorer.Generators
                 r = Math.Pow(Util.Random.NextDouble(), exp) * radius;
                 phi = Util.Random.NextDouble() * Math.PI * 2;
 
-                input.AddPoint(r * Math.Cos(phi), r * Math.Sin(phi));
+                input.Add(new Vertex(r * Math.Cos(phi), r * Math.Sin(phi)));
             }
 
             return input;

@@ -7,9 +7,6 @@
 namespace MeshExplorer.Generators
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using TriangleNet.Geometry;
 
     /// <summary>
@@ -53,7 +50,7 @@ namespace MeshExplorer.Generators
             return num.ToString();
         }
 
-        public abstract InputGeometry Generate(double param0, double param1, double param2);
+        public abstract IPolygon Generate(double param0, double param1, double param2);
 
         protected int GetParamValueInt(int paramIndex, double paramOffset)
         {

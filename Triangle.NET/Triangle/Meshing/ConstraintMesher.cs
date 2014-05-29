@@ -12,7 +12,7 @@ namespace TriangleNet.Meshing
     using TriangleNet.Data;
     using TriangleNet.Geometry;
     using TriangleNet.Logging;
-    using TriangleNet.Tools;
+    using TriangleNet.Meshing.Iterators;
 
     internal class ConstraintMesher
     {
@@ -165,7 +165,7 @@ namespace TriangleNet.Meshing
         /// Create the segments of a triangulation, including PSLG segments and edges 
         /// on the convex hull.
         /// </summary>
-        public void FormSkeleton(InputGeometry input)
+        public void FormSkeleton(IPolygon input)
         {
             Vertex endpoint1, endpoint2;
             int end1, end2;
@@ -184,7 +184,7 @@ namespace TriangleNet.Meshing
 
                 // If segments are to be inserted, compute a mapping
                 // from vertices to triangles.
-                if (input.HasSegments)
+                if (input.Segments.Count > 0)
                 {
                     mesh.MakeVertexMap();
                 }
@@ -192,7 +192,7 @@ namespace TriangleNet.Meshing
                 boundmarker = 0;
 
                 // Read and insert the segments.
-                foreach (var seg in input.segments)
+                foreach (var seg in input.Segments)
                 {
                     mesh.insegments++;
 

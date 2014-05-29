@@ -7,9 +7,6 @@
 namespace MeshExplorer.Generators
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using TriangleNet.Geometry;
 
     /// <summary>
@@ -47,12 +44,12 @@ namespace MeshExplorer.Generators
             return "";
         }
 
-        public override InputGeometry Generate(double param0, double param1, double param2)
+        public override IPolygon Generate(double param0, double param1, double param2)
         {
             int n = GetParamValueInt(0, param0);
             int m = n / 2;
 
-            InputGeometry input = new InputGeometry(n + 1);
+            var input = new Polygon(n + 1);
 
             double ro, r = 10;
             double step = 2 * Math.PI / m;
@@ -60,8 +57,8 @@ namespace MeshExplorer.Generators
             // Inner ring
             for (int i = 0; i < m; i++)
             {
-                input.AddPoint(r * Math.Cos(i * step), r * Math.Sin(i * step));
-                input.AddSegment(i, (i + 1) % m, 1);
+                input.Add(new Vertex(r * Math.Cos(i * step), r * Math.Sin(i * step)));
+                input.Add(new Edge(i, (i + 1) % m, 1));
             }
 
             r = 1.5 * r;
@@ -80,11 +77,11 @@ namespace MeshExplorer.Generators
                     ro = r + r * Util.Random.NextDouble() * (param1 / 100);
                 }
 
-                input.AddPoint(ro * Math.Cos(i * step + offset), ro * Math.Sin(i * step + offset));
-                input.AddSegment(m + i, m + ((i + 1) % n), 2);
+                input.Add(new Vertex(ro * Math.Cos(i * step + offset), ro * Math.Sin(i * step + offset)));
+                input.Add(new Edge(m + i, m + ((i + 1) % n), 2));
             }
 
-            input.AddHole(0, 0);
+            input.Holes.Add(new Point(0, 0));
 
             return input;
         }

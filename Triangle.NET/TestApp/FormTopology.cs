@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using MeshExplorer.Topology;
 using TriangleNet;
 using TriangleNet.Geometry;
+using TriangleNet.Meshing;
 using TriangleNet.Tools;
 
 namespace MeshExplorer
@@ -25,10 +21,8 @@ namespace MeshExplorer
 
         private void FormTopology_Load(object sender, EventArgs e)
         {
-            var geometry = RectanglePolygon.Generate(4);
-
-            mesh = new Mesh();
-            mesh.Triangulate(geometry);
+            var mesher = new GenericMesher();
+            mesh = (Mesh)mesher.StructurdMesh(new Rectangle(0.0, 0.0, 4.0, 4.0), 4, 4);
 
             renderControl.Initialize(mesh);
 
@@ -74,23 +68,6 @@ namespace MeshExplorer
 
             return tree.Query(p.X, p.Y);
         }
-
-        private bool TriangleContainsPoint(ITriangle triangle, float x, float y)
-        {
-            bool t1, t2, t3;
-
-            t1 = Sign(x, y, triangle.GetVertex(0), triangle.GetVertex(1)) < 0.0;
-            t2 = Sign(x, y, triangle.GetVertex(1), triangle.GetVertex(2)) < 0.0;
-            t3 = Sign(x, y, triangle.GetVertex(2), triangle.GetVertex(0)) < 0.0;
-
-            return (t1 == t2) && (t2 == t3);
-        }
-
-        private double Sign(double x, double y, Point p, Point q)
-        {
-            return (x - q.X) * (p.Y - q.Y) - (p.X - q.X) * (y - q.Y);
-        }
-
 
         private void InvokePrimitive(string name)
         {

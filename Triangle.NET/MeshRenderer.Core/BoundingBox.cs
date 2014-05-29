@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Drawing;
-
+﻿
 namespace MeshRenderer.Core
 {
+    using System.Drawing;
+    using Rectangle = TriangleNet.Geometry.Rectangle;
+
     public struct BoundingBox
     {
         public float Left;
@@ -29,6 +27,14 @@ namespace MeshRenderer.Core
             this.Right = right;
             this.Bottom = bottom;
             this.Top = top;
+        }
+
+        public BoundingBox(Rectangle rectangle)
+        {
+            this.Left = (float)rectangle.Left;
+            this.Right = (float)rectangle.Right;
+            this.Bottom = (float)rectangle.Bottom;
+            this.Top = (float)rectangle.Top;
         }
 
         public void Update(Point pt)

@@ -5,7 +5,7 @@ namespace TriangleNet.Meshing
 
     public interface IConstraintMesher
     {
-        Mesh Triangulate(IPolygon polygon);
-        Mesh Triangulate(IPolygon polygon, ConstraintOptions options);
+        IMesh Triangulate(IPolygon polygon);
+        IMesh Triangulate(IPolygon polygon, ConstraintOptions options);
     }
 }

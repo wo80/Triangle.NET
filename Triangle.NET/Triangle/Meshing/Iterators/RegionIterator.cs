@@ -5,12 +5,10 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace TriangleNet.Tools
+namespace TriangleNet.Meshing.Iterators
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using TriangleNet.Data;
 
     /// <summary>

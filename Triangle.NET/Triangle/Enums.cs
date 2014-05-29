@@ -8,14 +8,14 @@
 namespace TriangleNet
 {
     /// <summary>
-    /// Implemented triangulation algorithms.
+    /// The type of the mesh vertex.
     /// </summary>
-    public enum TriangulationAlgorithm
-    {
-        Dwyer,
-        Incremental,
-        SweepLine
-    };
+    public enum VertexType { InputVertex, SegmentVertex, FreeVertex, DeadVertex, UndeadVertex };
+
+    /// <summary>
+    /// Node renumbering algorithms.
+    /// </summary>
+    public enum NodeNumbering { None, Linear, CuthillMcKee };
 
     /// <summary>
     /// Labels that signify the result of point location.
@@ -43,14 +43,4 @@ namespace TriangleNet
     /// direction triangle, or along the right edge of the direction triangle.
     /// </remarks>
     enum FindDirectionResult { Within, Leftcollinear, Rightcollinear };
-
-    /// <summary>
-    /// The type of the mesh vertex.
-    /// </summary>
-    public enum VertexType { InputVertex, SegmentVertex, FreeVertex, DeadVertex, UndeadVertex };
-
-    /// <summary>
-    /// Node renumbering algorithms.
-    /// </summary>
-    public enum NodeNumbering { None, Linear, CuthillMcKee };
 }

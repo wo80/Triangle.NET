@@ -65,7 +65,7 @@ namespace MeshExplorer
             {
                 try
                 {
-                    InputGeometry input = currentGenerator.Generate(sliderParam1.Value,
+                    var input = currentGenerator.Generate(sliderParam1.Value,
                         sliderParam2.Value, sliderParam3.Value);
 
                     InputGenerated(input, EventArgs.Empty);

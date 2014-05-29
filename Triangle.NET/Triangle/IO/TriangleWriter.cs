@@ -186,16 +186,16 @@ namespace TriangleNet.IO
         /// <remarks>If the nodes should not be written into this file, 
         /// make sure a .node file was written before, so that the nodes 
         /// are numbered right.</remarks>
-        public static void WritePoly(InputGeometry polygon, string filename)
+        public static void WritePoly(IPolygon polygon, string filename)
         {
-            bool hasMarkers = true;
+            bool hasMarkers = polygon.HasSegmentMarkers;
 
             using (StreamWriter writer = new StreamWriter(filename))
             {
                 // TODO: write vertex attributes
 
                 // Write nodes to this file.
-                TriangleWriter.WriteNodes(writer, polygon.points, true, 0, false);
+                TriangleWriter.WriteNodes(writer, polygon.Points, polygon.HasPointMarkers, 0, false);
 
                 // Number of segments, number of boundary markers (zero or one).
                 writer.WriteLine("{0} {1}", polygon.Segments.Count, hasMarkers ? "1" : "0");

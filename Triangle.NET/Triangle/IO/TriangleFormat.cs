@@ -29,14 +29,14 @@ namespace TriangleNet.IO
             return false;
         }
 
-        public Mesh Import(string filename)
+        public IMesh Import(string filename)
         {
             string ext = Path.GetExtension(filename);
 
             if (ext == ".node" || ext == ".poly" || ext == ".ele")
             {
                 List<ITriangle> triangles;
-                InputGeometry geometry;
+                Polygon geometry;
 
                 TriangleReader.Read(filename, out geometry, out triangles);
 
@@ -51,18 +51,18 @@ namespace TriangleNet.IO
             throw new NotSupportedException("Could not load '" + filename + "' file.");
         }
 
-        public void Write(Mesh mesh, string filename)
+        public void Write(IMesh mesh, string filename)
         {
             TriangleWriter.WritePoly((Mesh)mesh, Path.ChangeExtension(filename, ".poly"));
             TriangleWriter.WriteElements((Mesh)mesh, Path.ChangeExtension(filename, ".ele"));
         }
 
-        public void Write(Mesh mesh, StreamWriter stream)
+        public void Write(IMesh mesh, StreamWriter stream)
         {
             throw new NotImplementedException();
         }
 
-        public InputGeometry Read(string filename)
+        public IPolygon Read(string filename)
         {
             string ext = Path.GetExtension(filename);
 
@@ -80,12 +80,12 @@ namespace TriangleNet.IO
         }
 
 
-        public void Write(InputGeometry polygon, string filename)
+        public void Write(IPolygon polygon, string filename)
         {
             TriangleWriter.WritePoly(polygon, filename);
         }
 
-        public void Write(InputGeometry polygon, StreamWriter stream)
+        public void Write(IPolygon polygon, StreamWriter stream)
         {
             throw new NotImplementedException();
         }

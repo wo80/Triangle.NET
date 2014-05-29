@@ -7,9 +7,6 @@
 namespace MeshExplorer.Generators
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using TriangleNet.Geometry;
 
     /// <summary>
@@ -28,13 +25,13 @@ namespace MeshExplorer.Generators
             ranges[0] = new int[] { 3, 61 };
         }
 
-        public override InputGeometry Generate(double param0, double param1, double param2)
+        public override IPolygon Generate(double param0, double param1, double param2)
         {
             int numRays = GetParamValueInt(0, param0);
 
-            InputGeometry input = new InputGeometry(numRays + 4);
+            var input = new Polygon(numRays + 4);
 
-            input.AddPoint(0, 0); // Center
+            input.Add(new Vertex(0, 0)); // Center
 
             double x, y, r, e, step = 2 * Math.PI / numRays;
 
@@ -45,20 +42,20 @@ namespace MeshExplorer.Generators
                 x = r * Math.Cos(i * step + e);
                 y = r * Math.Sin(i * step + e);
 
-                input.AddPoint(x, y, 2);
-                input.AddSegment(0, i + 1, 2);
+                input.Add(new Vertex(x, y, 2));
+                input.Add(new Edge(0, i + 1, 2));
             }
 
-            input.AddPoint(-1, -1, 1); // Box
-            input.AddPoint(1, -1, 1);
-            input.AddPoint(1, 1, 1);
-            input.AddPoint(-1, 1, 1);
+            input.Add(new Vertex(-1, -1, 1)); // Box
+            input.Add(new Vertex(1, -1, 1));
+            input.Add(new Vertex(1, 1, 1));
+            input.Add(new Vertex(-1, 1, 1));
 
             numRays = input.Count;
-            input.AddSegment(numRays - 1, numRays - 2, 1);
-            input.AddSegment(numRays - 2, numRays - 3, 1);
-            input.AddSegment(numRays - 3, numRays - 4, 1);
-            input.AddSegment(numRays - 4, numRays - 1, 1);
+            input.Add(new Edge(numRays - 1, numRays - 2, 1));
+            input.Add(new Edge(numRays - 2, numRays - 3, 1));
+            input.Add(new Edge(numRays - 3, numRays - 4, 1));
+            input.Add(new Edge(numRays - 4, numRays - 1, 1));
 
             return input;
         }

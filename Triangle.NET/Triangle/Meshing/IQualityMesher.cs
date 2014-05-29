@@ -5,7 +5,7 @@ namespace TriangleNet.Meshing
 
     public interface IQualityMesher
     {
-        Mesh Triangulate(IPolygon polygon, QualityOptions quality);
-        Mesh Triangulate(IPolygon polygon, ConstraintOptions options, QualityOptions quality);
+        IMesh Triangulate(IPolygon polygon, QualityOptions quality);
+        IMesh Triangulate(IPolygon polygon, ConstraintOptions options, QualityOptions quality);
     }
 }

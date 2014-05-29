@@ -8,8 +8,6 @@ namespace TriangleNet.Tools
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using TriangleNet.Data;
     using TriangleNet.Geometry;
 
@@ -285,7 +283,7 @@ namespace TriangleNet.Tools
 
             if (f_init.Org() != vertex)
             {
-                throw new Exception("ConstructBvdCell: inconsistent topology.");
+                throw new Exception("ConstructCell: inconsistent topology.");
             }
 
             // Let f be initialized to f_init
@@ -399,7 +397,7 @@ namespace TriangleNet.Tools
 
             if (f_init.Org() != vertex)
             {
-                throw new Exception("ConstructBoundaryBvdCell: inconsistent topology.");
+                throw new Exception("ConstructBoundaryCell: inconsistent topology.");
             }
             // Let f be initialized to f_init
             f_init.Copy(ref f);

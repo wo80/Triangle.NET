@@ -10,6 +10,7 @@ namespace MeshRenderer.Core
     using TriangleNet;
     using TriangleNet.Geometry;
     using TriangleNet.Tools;
+    using TriangleNet.Meshing.Iterators;
 
     /// <summary>
     /// Stores the current mesh in a rendering friendly data structure.
@@ -31,7 +32,7 @@ namespace MeshRenderer.Core
         /// <summary>
         /// Copy input geometry data.
         /// </summary>
-        public void SetInputGeometry(InputGeometry data)
+        public void SetInputGeometry(IPolygon data)
         {
             // Clear unused buffers
             this.Segments = null;
@@ -40,7 +41,7 @@ namespace MeshRenderer.Core
             this.VoronoiPoints = null;
             this.VoronoiEdges = null;
 
-            int n = data.Count;
+            int n = data.Points.Count;
             int i = 0;
 
             this.NumberOfRegions = data.Regions.Count;
@@ -68,11 +69,7 @@ namespace MeshRenderer.Core
                 this.Segments = segments.ToArray();
             }
 
-            this.Bounds = new BoundingBox(
-                (float)data.Bounds.Left,
-                (float)data.Bounds.Right,
-                (float)data.Bounds.Bottom,
-                (float)data.Bounds.Top);
+            this.Bounds = new BoundingBox(data.Bounds());
         }
 
         /// <summary>
@@ -118,14 +115,14 @@ namespace MeshRenderer.Core
             // Copy edges
             var edges = new List<uint>(2 * mesh.NumberOfEdges);
 
-            EdgeEnumerator e = new EdgeEnumerator(mesh);
+            var e = new EdgeIterator(mesh);
             while (e.MoveNext())
             {
                 edges.Add((uint)e.Current.P0);
                 edges.Add((uint)e.Current.P1);
             }
-            this.MeshEdges = edges.ToArray();
 
+            this.MeshEdges = edges.ToArray();
 
             if (this.NumberOfRegions > 0)
             {

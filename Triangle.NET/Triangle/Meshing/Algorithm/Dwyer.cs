@@ -8,9 +8,9 @@
 namespace TriangleNet.Meshing.Algorithm
 {
     using System;
+    using System.Collections.Generic;
     using TriangleNet.Data;
     using TriangleNet.Geometry;
-    using TriangleNet.Logging;
 
     /// <summary>
     /// Builds a delaunay triangulation using the divide-and-conquer algorithm.
@@ -43,7 +43,7 @@ namespace TriangleNet.Meshing.Algorithm
     /// The bounding box also makes it easy to traverse the convex hull, as the
     /// divide-and-conquer algorithm needs to do.
     /// </remarks>
-    class Dwyer
+    public class Dwyer : ITriangulator
     {
         static Random rand = new Random(DateTime.Now.Millisecond);
 
@@ -51,6 +51,83 @@ namespace TriangleNet.Meshing.Algorithm
 
         Vertex[] sortarray;
         Mesh mesh;
+
+        /// <summary>
+        /// Form a Delaunay triangulation by the divide-and-conquer method.
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// Sorts the vertices, calls a recursive procedure to triangulate them, and
+        /// removes the bounding box, setting boundary markers as appropriate.
+        /// </remarks>
+        public IMesh Triangulate(ICollection<Vertex> points)
+        {
+            this.mesh = new Mesh();
+            this.mesh.TransferNodes(points);
+
+            Otri hullleft = default(Otri), hullright = default(Otri);
+            int divider;
+            int i, j, n = points.Count;
+
+            //DebugWriter.Session.Start("test-dbg");
+
+            // Allocate an array of pointers to vertices for sorting.
+            // TODO: use ToArray
+            this.sortarray = new Vertex[n];
+            i = 0;
+            foreach (var v in points)
+            {
+                sortarray[i++] = v;
+            }
+            // Sort the vertices.
+            //Array.Sort(sortarray);
+            VertexSort(0, n - 1);
+            // Discard duplicate vertices, which can really mess up the algorithm.
+            i = 0;
+            for (j = 1; j < n; j++)
+            {
+                if ((sortarray[i].x == sortarray[j].x) && (sortarray[i].y == sortarray[j].y))
+                {
+                    if (Log.Verbose)
+                    {
+                        Log.Instance.Warning(
+                            String.Format("A duplicate vertex appeared and was ignored (ID {0}).", sortarray[j].hash),
+                            "Dwyer.Triangulate()");
+                    }
+                    sortarray[j].type = VertexType.UndeadVertex;
+                    mesh.undeads++;
+                }
+                else
+                {
+                    i++;
+                    sortarray[i] = sortarray[j];
+                }
+            }
+            i++;
+            if (UseDwyer)
+            {
+                // Re-sort the array of vertices to accommodate alternating cuts.
+                divider = i >> 1;
+                if (i - divider >= 2)
+                {
+                    if (divider >= 2)
+                    {
+                        AlternateAxes(0, divider - 1, 1);
+                    }
+                    AlternateAxes(divider, i - 1, 1);
+                }
+            }
+
+            // Form the Delaunay triangulation.
+            DivconqRecurse(0, i - 1, 0, ref hullleft, ref hullright);
+
+            //DebugWriter.Session.Write(mesh);
+            //DebugWriter.Session.Finish();
+
+            this.mesh.hullsize = RemoveGhosts(ref hullleft);
+
+            return this.mesh;
+        }
 
         /// <summary>
         /// Sort an array of vertices by x-coordinate, using the y-coordinate as a secondary key.
@@ -103,16 +180,14 @@ namespace TriangleNet.Meshing.Algorithm
                     left++;
                 }
                 while ((left <= right) && ((sortarray[left].x < pivotx) ||
-                                             ((sortarray[left].x == pivotx) &&
-                                              (sortarray[left].y < pivoty))));
+                    ((sortarray[left].x == pivotx) && (sortarray[left].y < pivoty))));
                 // Search for a vertex whose x-coordinate is too small for the right.
                 do
                 {
                     right--;
                 }
                 while ((left <= right) && ((sortarray[right].x > pivotx) ||
-                                             ((sortarray[right].x == pivotx) &&
-                                              (sortarray[right].y > pivoty))));
+                    ((sortarray[right].x == pivotx) && (sortarray[right].y > pivoty))));
 
                 if (left < right)
                 {
@@ -183,16 +258,14 @@ namespace TriangleNet.Meshing.Algorithm
                     left++;
                 }
                 while ((left <= right) && ((sortarray[left][axis] < pivot1) ||
-                                             ((sortarray[left][axis] == pivot1) &&
-                                              (sortarray[left][1 - axis] < pivot2))));
+                    ((sortarray[left][axis] == pivot1) && (sortarray[left][1 - axis] < pivot2))));
                 // Search for a vertex whose x-coordinate is too small for the right.
                 do
                 {
                     right--;
                 }
                 while ((left <= right) && ((sortarray[right][axis] > pivot1) ||
-                                             ((sortarray[right][axis] == pivot1) &&
-                                              (sortarray[right][1 - axis] > pivot2))));
+                    ((sortarray[right][axis] == pivot1) && (sortarray[right][1 - axis] > pivot2))));
                 if (left < right)
                 {
                     // Swap the left and right vertices.
@@ -822,81 +895,6 @@ namespace TriangleNet.Meshing.Algorithm
             } while (!dissolveedge.Equal(startghost));
 
             return hullsize;
-        }
-
-        /// <summary>
-        /// Form a Delaunay triangulation by the divide-and-conquer method.
-        /// </summary>
-        /// <returns></returns>
-        /// <remarks>
-        /// Sorts the vertices, calls a recursive procedure to triangulate them, and
-        /// removes the bounding box, setting boundary markers as appropriate.
-        /// </remarks>
-        public int Triangulate(Mesh m)
-        {
-            Otri hullleft = default(Otri), hullright = default(Otri);
-            int divider;
-            int i, j;
-
-            this.mesh = m;
-
-            //DebugWriter.Session.Start("test-dbg");
-
-            // Allocate an array of pointers to vertices for sorting.
-            // TODO: use ToArray
-            this.sortarray = new Vertex[m.invertices];
-            i = 0;
-            foreach (var v in m.vertices.Values)
-            {
-                sortarray[i++] = v;
-            }
-            // Sort the vertices.
-            //Array.Sort(sortarray);
-            VertexSort(0, m.invertices - 1);
-            // Discard duplicate vertices, which can really mess up the algorithm.
-            i = 0;
-            for (j = 1; j < m.invertices; j++)
-            {
-                if ((sortarray[i].x == sortarray[j].x)
-                    && (sortarray[i].y == sortarray[j].y))
-                {
-                    if (Log.Verbose)
-                    {
-                        Log.Instance.Warning(
-                            String.Format("A duplicate vertex appeared and was ignored (ID {0}).", sortarray[j].hash), 
-                            "DivConquer.DivconqDelaunay()");
-                    }
-                    sortarray[j].type = VertexType.UndeadVertex;
-                    m.undeads++;
-                }
-                else
-                {
-                    i++;
-                    sortarray[i] = sortarray[j];
-                }
-            }
-            i++;
-            if (UseDwyer)
-            {
-                // Re-sort the array of vertices to accommodate alternating cuts.
-                divider = i >> 1;
-                if (i - divider >= 2)
-                {
-                    if (divider >= 2)
-                    {
-                        AlternateAxes(0, divider - 1, 1);
-                    }
-                    AlternateAxes(divider, i - 1, 1);
-                }
-            }
-
-            // Form the Delaunay triangulation.
-            DivconqRecurse(0, i-1, 0, ref hullleft, ref hullright);
-
-            //DebugWriter.Session.Write(mesh);
-            //DebugWriter.Session.Finish();
-
-            return RemoveGhosts(ref hullleft);
         }
     }
 }

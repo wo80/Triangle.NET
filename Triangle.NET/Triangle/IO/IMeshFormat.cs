@@ -7,6 +7,7 @@
 namespace TriangleNet.IO
 {
     using System.IO;
+    using TriangleNet.Meshing;
 
     /// <summary>
     /// Interface for mesh I/O.
@@ -18,20 +19,20 @@ namespace TriangleNet.IO
         /// </summary>
         /// <param name="filename">The path of the file to read.</param>
         /// <returns>An instance of the <see cref="IMesh" /> interface.</returns>
-        Mesh Import(string filename);
+        IMesh Import(string filename);
 
         /// <summary>
         /// Save a mesh to disk.
         /// </summary>
         /// <param name="mesh">An instance of the <see cref="IMesh" /> interface.</param>
         /// <param name="filename">The path of the file to save.</param>
-        void Write(Mesh mesh, string filename);
+        void Write(IMesh mesh, string filename);
 
         /// <summary>
         /// Save a mesh to a <see cref="StreamWriter" />.
         /// </summary>
         /// <param name="mesh">An instance of the <see cref="IMesh" /> interface.</param>
         /// <param name="stream">The stream to save to.</param>
-        void Write(Mesh mesh, StreamWriter stream);
+        void Write(IMesh mesh, StreamWriter stream);
     }
 }

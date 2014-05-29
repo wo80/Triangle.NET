@@ -35,7 +35,7 @@ namespace TriangleNet.IO
         /// </summary>
         /// <param name="filename">The path of the file to read.</param>
         /// <returns>An instance of the <see cref="IPolygon" /> class.</returns>
-        public static InputGeometry Read(string filename)
+        public static IPolygon Read(string filename)
         {
             foreach (IPolygonFormat format in formats)
             {
@@ -53,7 +53,7 @@ namespace TriangleNet.IO
         /// </summary>
         /// <param name="mesh">An instance of the <see cref="IPolygon" /> class.</param>
         /// <param name="filename">The path of the file to save.</param>
-        public static void Write(InputGeometry polygon, string filename)
+        public static void Write(IPolygon polygon, string filename)
         {
             foreach (IPolygonFormat format in formats)
             {
@@ -75,7 +75,7 @@ namespace TriangleNet.IO
         /// </summary>
         /// <param name="filename">The path of the file to read.</param>
         /// <returns>An instance of the <see cref="IMesh" /> interface.</returns>
-        public static Mesh Import(string filename)
+        public static IMesh Import(string filename)
         {
             foreach (IMeshFormat format in formats)
             {
@@ -93,7 +93,7 @@ namespace TriangleNet.IO
         /// </summary>
         /// <param name="mesh">An instance of the <see cref="IMesh" /> interface.</param>
         /// <param name="filename">The path of the file to save.</param>
-        public static void Write(Mesh mesh, string filename)
+        public static void Write(IMesh mesh, string filename)
         {
             foreach (IMeshFormat format in formats)
             {

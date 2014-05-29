@@ -11,18 +11,17 @@ namespace TriangleNet.Meshing.Algorithm
     using System.Collections.Generic;
     using TriangleNet.Data;
     using TriangleNet.Geometry;
-    using TriangleNet.Logging;
     using TriangleNet.Tools;
 
     /// <summary>
     /// Builds a delaunay triangulation using the sweepline algorithm.
     /// </summary>
-    class SweepLine
+    public class SweepLine : ITriangulator
     {
         static int randomseed = 1;
         static int SAMPLERATE = 10;
 
-        int randomnation(int choices)
+        static int randomnation(int choices)
         {
             randomseed = (randomseed * 1366 + 150889) % 714025;
             return randomseed / (714025 / choices + 1);
@@ -31,6 +30,226 @@ namespace TriangleNet.Meshing.Algorithm
         Mesh mesh;
         double xminextreme; // Nonexistent x value used as a flag in sweepline.
         List<SplayNode> splaynodes;
+
+        public IMesh Triangulate(ICollection<Vertex> points)
+        {
+            this.mesh = new Mesh();
+            this.mesh.TransferNodes(points);
+
+            // Nonexistent x value used as a flag to mark circle events in sweepline
+            // Delaunay algorithm.
+            xminextreme = 10 * mesh.bounds.Left - 9 * mesh.bounds.Right;
+
+            SweepEvent[] eventheap;
+
+            SweepEvent nextevent;
+            SweepEvent newevent;
+            SplayNode splayroot;
+            Otri bottommost = default(Otri);
+            Otri searchtri = default(Otri);
+            Otri fliptri;
+            Otri lefttri = default(Otri);
+            Otri righttri = default(Otri);
+            Otri farlefttri = default(Otri);
+            Otri farrighttri = default(Otri);
+            Otri inserttri = default(Otri);
+            Vertex firstvertex, secondvertex;
+            Vertex nextvertex, lastvertex;
+            Vertex connectvertex;
+            Vertex leftvertex, midvertex, rightvertex;
+            double lefttest, righttest;
+            int heapsize;
+            bool check4events, farrightflag = false;
+
+            splaynodes = new List<SplayNode>();
+            splayroot = null;
+
+            CreateHeap(out eventheap);//, out events, out freeevents);
+            heapsize = mesh.invertices;
+
+            mesh.MakeTriangle(ref lefttri);
+            mesh.MakeTriangle(ref righttri);
+            lefttri.Bond(ref righttri);
+            lefttri.LnextSelf();
+            righttri.LprevSelf();
+            lefttri.Bond(ref righttri);
+            lefttri.LnextSelf();
+            righttri.LprevSelf();
+            lefttri.Bond(ref righttri);
+            firstvertex = eventheap[0].vertexEvent;
+
+            HeapDelete(eventheap, heapsize, 0);
+            heapsize--;
+            do
+            {
+                if (heapsize == 0)
+                {
+                    Log.Instance.Error("Input vertices are all identical.", "SweepLine.Triangulate()");
+                    throw new Exception("Input vertices are all identical.");
+                }
+                secondvertex = eventheap[0].vertexEvent;
+                HeapDelete(eventheap, heapsize, 0);
+                heapsize--;
+                if ((firstvertex.x == secondvertex.x) &&
+                    (firstvertex.y == secondvertex.y))
+                {
+                    if (Log.Verbose)
+                    {
+                        Log.Instance.Warning("A duplicate vertex appeared and was ignored (ID " + secondvertex.id + ").",
+                            "SweepLine.Triangulate().1");
+                    }
+                    secondvertex.type = VertexType.UndeadVertex;
+                    mesh.undeads++;
+                }
+            } while ((firstvertex.x == secondvertex.x) &&
+                     (firstvertex.y == secondvertex.y));
+            lefttri.SetOrg(firstvertex);
+            lefttri.SetDest(secondvertex);
+            righttri.SetOrg(secondvertex);
+            righttri.SetDest(firstvertex);
+            lefttri.Lprev(ref bottommost);
+            lastvertex = secondvertex;
+
+            while (heapsize > 0)
+            {
+                nextevent = eventheap[0];
+                HeapDelete(eventheap, heapsize, 0);
+                heapsize--;
+                check4events = true;
+                if (nextevent.xkey < mesh.bounds.Left)
+                {
+                    fliptri = nextevent.otriEvent;
+                    fliptri.Oprev(ref farlefttri);
+                    Check4DeadEvent(ref farlefttri, eventheap, ref heapsize);
+                    fliptri.Onext(ref farrighttri);
+                    Check4DeadEvent(ref farrighttri, eventheap, ref heapsize);
+
+                    if (farlefttri.Equal(bottommost))
+                    {
+                        fliptri.Lprev(ref bottommost);
+                    }
+                    mesh.Flip(ref fliptri);
+                    fliptri.SetApex(null);
+                    fliptri.Lprev(ref lefttri);
+                    fliptri.Lnext(ref righttri);
+                    lefttri.Sym(ref farlefttri);
+
+                    if (randomnation(SAMPLERATE) == 0)
+                    {
+                        fliptri.SymSelf();
+                        leftvertex = fliptri.Dest();
+                        midvertex = fliptri.Apex();
+                        rightvertex = fliptri.Org();
+                        splayroot = CircleTopInsert(splayroot, lefttri, leftvertex, midvertex, rightvertex, nextevent.ykey);
+                    }
+                }
+                else
+                {
+                    nextvertex = nextevent.vertexEvent;
+                    if ((nextvertex.x == lastvertex.x) &&
+                        (nextvertex.y == lastvertex.y))
+                    {
+                        if (Log.Verbose)
+                        {
+                            Log.Instance.Warning("A duplicate vertex appeared and was ignored (ID " + nextvertex.id + ").",
+                                "SweepLine.Triangulate().2");
+                        }
+                        nextvertex.type = VertexType.UndeadVertex;
+                        mesh.undeads++;
+                        check4events = false;
+                    }
+                    else
+                    {
+                        lastvertex = nextvertex;
+
+                        splayroot = FrontLocate(splayroot, bottommost, nextvertex, ref searchtri, ref farrightflag);
+
+                        //bottommost.Copy(ref searchtri);
+                        //farrightflag = false;
+                        //while (!farrightflag && RightOfHyperbola(ref searchtri, nextvertex))
+                        //{
+                        //    searchtri.OnextSelf();
+                        //    farrightflag = searchtri.Equal(bottommost);
+                        //}
+
+                        Check4DeadEvent(ref searchtri, eventheap, ref heapsize);
+
+                        searchtri.Copy(ref farrighttri);
+                        searchtri.Sym(ref farlefttri);
+                        mesh.MakeTriangle(ref lefttri);
+                        mesh.MakeTriangle(ref righttri);
+                        connectvertex = farrighttri.Dest();
+                        lefttri.SetOrg(connectvertex);
+                        lefttri.SetDest(nextvertex);
+                        righttri.SetOrg(nextvertex);
+                        righttri.SetDest(connectvertex);
+                        lefttri.Bond(ref righttri);
+                        lefttri.LnextSelf();
+                        righttri.LprevSelf();
+                        lefttri.Bond(ref righttri);
+                        lefttri.LnextSelf();
+                        righttri.LprevSelf();
+                        lefttri.Bond(ref farlefttri);
+                        righttri.Bond(ref farrighttri);
+                        if (!farrightflag && farrighttri.Equal(bottommost))
+                        {
+                            lefttri.Copy(ref bottommost);
+                        }
+
+                        if (randomnation(SAMPLERATE) == 0)
+                        {
+                            splayroot = SplayInsert(splayroot, lefttri, nextvertex);
+                        }
+                        else if (randomnation(SAMPLERATE) == 0)
+                        {
+                            righttri.Lnext(ref inserttri);
+                            splayroot = SplayInsert(splayroot, inserttri, nextvertex);
+                        }
+                    }
+                }
+
+                if (check4events)
+                {
+                    leftvertex = farlefttri.Apex();
+                    midvertex = lefttri.Dest();
+                    rightvertex = lefttri.Apex();
+                    lefttest = RobustPredicates.CounterClockwise(leftvertex, midvertex, rightvertex);
+                    if (lefttest > 0.0)
+                    {
+                        newevent = new SweepEvent();
+
+                        newevent.xkey = xminextreme;
+                        newevent.ykey = CircleTop(leftvertex, midvertex, rightvertex, lefttest);
+                        newevent.otriEvent = lefttri;
+                        HeapInsert(eventheap, heapsize, newevent);
+                        heapsize++;
+                        lefttri.SetOrg(new SweepEventVertex(newevent));
+                    }
+                    leftvertex = righttri.Apex();
+                    midvertex = righttri.Org();
+                    rightvertex = farrighttri.Apex();
+                    righttest = RobustPredicates.CounterClockwise(leftvertex, midvertex, rightvertex);
+                    if (righttest > 0.0)
+                    {
+                        newevent = new SweepEvent();
+
+                        newevent.xkey = xminextreme;
+                        newevent.ykey = CircleTop(leftvertex, midvertex, rightvertex, righttest);
+                        newevent.otriEvent = farrighttri;
+                        HeapInsert(eventheap, heapsize, newevent);
+                        heapsize++;
+                        farrighttri.SetOrg(new SweepEventVertex(newevent));
+                    }
+                }
+            }
+
+            splaynodes.Clear();
+            bottommost.LprevSelf();
+
+            this.mesh.hullsize = RemoveGhosts(ref bottommost);
+
+            return this.mesh;
+        }
 
         #region Heap
 
@@ -517,222 +736,6 @@ namespace TriangleNet.Meshing.Algorithm
             } while (!dissolveedge.Equal(startghost));
 
             return hullsize;
-        }
-
-        public int Triangulate(Mesh mesh)
-        {
-            this.mesh = mesh;
-
-            // Nonexistent x value used as a flag to mark circle events in sweepline
-            // Delaunay algorithm.
-            xminextreme = 10 * mesh.bounds.Left - 9 * mesh.bounds.Right;
-
-            SweepEvent[] eventheap;
-
-            SweepEvent nextevent;
-            SweepEvent newevent;
-            SplayNode splayroot;
-            Otri bottommost = default(Otri);
-            Otri searchtri = default(Otri);
-            Otri fliptri;
-            Otri lefttri = default(Otri);
-            Otri righttri = default(Otri);
-            Otri farlefttri = default(Otri);
-            Otri farrighttri = default(Otri);
-            Otri inserttri = default(Otri);
-            Vertex firstvertex, secondvertex;
-            Vertex nextvertex, lastvertex;
-            Vertex connectvertex;
-            Vertex leftvertex, midvertex, rightvertex;
-            double lefttest, righttest;
-            int heapsize;
-            bool check4events, farrightflag = false;
-
-            splaynodes = new List<SplayNode>();
-            splayroot = null;
-
-            CreateHeap(out eventheap);//, out events, out freeevents);
-            heapsize = mesh.invertices;
-
-            mesh.MakeTriangle(ref lefttri);
-            mesh.MakeTriangle(ref righttri);
-            lefttri.Bond(ref righttri);
-            lefttri.LnextSelf();
-            righttri.LprevSelf();
-            lefttri.Bond(ref righttri);
-            lefttri.LnextSelf();
-            righttri.LprevSelf();
-            lefttri.Bond(ref righttri);
-            firstvertex = eventheap[0].vertexEvent;
-
-            HeapDelete(eventheap, heapsize, 0);
-            heapsize--;
-            do
-            {
-                if (heapsize == 0)
-                {
-                    Log.Instance.Error("Input vertices are all identical.", "SweepLine.Triangulate()");
-                    throw new Exception("Input vertices are all identical.");
-                }
-                secondvertex = eventheap[0].vertexEvent;
-                HeapDelete(eventheap, heapsize, 0);
-                heapsize--;
-                if ((firstvertex.x == secondvertex.x) &&
-                    (firstvertex.y == secondvertex.y))
-                {
-                    if (Log.Verbose)
-                    {
-                        Log.Instance.Warning("A duplicate vertex appeared and was ignored (ID " + secondvertex.id + ").",
-                            "SweepLine.Triangulate().1");
-                    }
-                    secondvertex.type = VertexType.UndeadVertex;
-                    mesh.undeads++;
-                }
-            } while ((firstvertex.x == secondvertex.x) &&
-                     (firstvertex.y == secondvertex.y));
-            lefttri.SetOrg(firstvertex);
-            lefttri.SetDest(secondvertex);
-            righttri.SetOrg(secondvertex);
-            righttri.SetDest(firstvertex);
-            lefttri.Lprev(ref bottommost);
-            lastvertex = secondvertex;
-
-            while (heapsize > 0)
-            {
-                nextevent = eventheap[0];
-                HeapDelete(eventheap, heapsize, 0);
-                heapsize--;
-                check4events = true;
-                if (nextevent.xkey < mesh.bounds.Left)
-                {
-                    fliptri = nextevent.otriEvent;
-                    fliptri.Oprev(ref farlefttri);
-                    Check4DeadEvent(ref farlefttri, eventheap, ref heapsize);
-                    fliptri.Onext(ref farrighttri);
-                    Check4DeadEvent(ref farrighttri, eventheap, ref heapsize);
-
-                    if (farlefttri.Equal(bottommost))
-                    {
-                        fliptri.Lprev(ref bottommost);
-                    }
-                    mesh.Flip(ref fliptri);
-                    fliptri.SetApex(null);
-                    fliptri.Lprev(ref lefttri);
-                    fliptri.Lnext(ref righttri);
-                    lefttri.Sym(ref farlefttri);
-
-                    if (randomnation(SAMPLERATE) == 0)
-                    {
-                        fliptri.SymSelf();
-                        leftvertex = fliptri.Dest();
-                        midvertex = fliptri.Apex();
-                        rightvertex = fliptri.Org();
-                        splayroot = CircleTopInsert(splayroot, lefttri, leftvertex, midvertex, rightvertex, nextevent.ykey);
-                    }
-                }
-                else
-                {
-                    nextvertex = nextevent.vertexEvent;
-                    if ((nextvertex.x == lastvertex.x) &&
-                        (nextvertex.y == lastvertex.y))
-                    {
-                        if (Log.Verbose)
-                        {
-                            Log.Instance.Warning("A duplicate vertex appeared and was ignored (ID " + nextvertex.id + ").",
-                                "SweepLine.Triangulate().2");
-                        }
-                        nextvertex.type = VertexType.UndeadVertex;
-                        mesh.undeads++;
-                        check4events = false;
-                    }
-                    else
-                    {
-                        lastvertex = nextvertex;
-
-                        splayroot = FrontLocate(splayroot, bottommost, nextvertex, ref searchtri, ref farrightflag);
-
-                        //bottommost.Copy(ref searchtri);
-                        //farrightflag = false;
-                        //while (!farrightflag && RightOfHyperbola(ref searchtri, nextvertex))
-                        //{
-                        //    searchtri.OnextSelf();
-                        //    farrightflag = searchtri.Equal(bottommost);
-                        //}
-
-                        Check4DeadEvent(ref searchtri, eventheap, ref heapsize);
-
-                        searchtri.Copy(ref farrighttri);
-                        searchtri.Sym(ref farlefttri);
-                        mesh.MakeTriangle(ref lefttri);
-                        mesh.MakeTriangle(ref righttri);
-                        connectvertex = farrighttri.Dest();
-                        lefttri.SetOrg(connectvertex);
-                        lefttri.SetDest(nextvertex);
-                        righttri.SetOrg(nextvertex);
-                        righttri.SetDest(connectvertex);
-                        lefttri.Bond(ref righttri);
-                        lefttri.LnextSelf();
-                        righttri.LprevSelf();
-                        lefttri.Bond(ref righttri);
-                        lefttri.LnextSelf();
-                        righttri.LprevSelf();
-                        lefttri.Bond(ref farlefttri);
-                        righttri.Bond(ref farrighttri);
-                        if (!farrightflag && farrighttri.Equal(bottommost))
-                        {
-                            lefttri.Copy(ref bottommost);
-                        }
-
-                        if (randomnation(SAMPLERATE) == 0)
-                        {
-                            splayroot = SplayInsert(splayroot, lefttri, nextvertex);
-                        }
-                        else if (randomnation(SAMPLERATE) == 0)
-                        {
-                            righttri.Lnext(ref inserttri);
-                            splayroot = SplayInsert(splayroot, inserttri, nextvertex);
-                        }
-                    }
-                }
-
-                if (check4events)
-                {
-                    leftvertex = farlefttri.Apex();
-                    midvertex = lefttri.Dest();
-                    rightvertex = lefttri.Apex();
-                    lefttest = RobustPredicates.CounterClockwise(leftvertex, midvertex, rightvertex);
-                    if (lefttest > 0.0)
-                    {
-                        newevent = new SweepEvent();
-
-                        newevent.xkey = xminextreme;
-                        newevent.ykey = CircleTop(leftvertex, midvertex, rightvertex, lefttest);
-                        newevent.otriEvent = lefttri;
-                        HeapInsert(eventheap, heapsize, newevent);
-                        heapsize++;
-                        lefttri.SetOrg(new SweepEventVertex(newevent));
-                    }
-                    leftvertex = righttri.Apex();
-                    midvertex = righttri.Org();
-                    rightvertex = farrighttri.Apex();
-                    righttest = RobustPredicates.CounterClockwise(leftvertex, midvertex, rightvertex);
-                    if (righttest > 0.0)
-                    {
-                        newevent = new SweepEvent();
-
-                        newevent.xkey = xminextreme;
-                        newevent.ykey = CircleTop(leftvertex, midvertex, rightvertex, righttest);
-                        newevent.otriEvent = farrighttri;
-                        HeapInsert(eventheap, heapsize, newevent);
-                        heapsize++;
-                        farrighttri.SetOrg(new SweepEventVertex(newevent));
-                    }
-                }
-            }
-
-            splaynodes.Clear();
-            bottommost.LprevSelf();
-            return RemoveGhosts(ref bottommost);
         }
 
         #region Internal classes

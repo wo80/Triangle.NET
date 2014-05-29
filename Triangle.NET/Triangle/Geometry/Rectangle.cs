@@ -34,16 +34,16 @@ namespace TriangleNet.Geometry
         /// Initializes a new instance of the <see cref="Rectangle" /> class
         /// with predefined bounds.
         /// </summary>
-        /// <param name="xmin">Minimum x value.</param>
-        /// <param name="ymin">Minimum y value.</param>
-        /// <param name="xmax">Maximum x value.</param>
-        /// <param name="ymax">Maximum y value.</param>
-        public Rectangle(double xmin, double ymin, double xmax, double ymax)
+        /// <param name="x">Minimum x value (left).</param>
+        /// <param name="y">Minimum y value (bottom).</param>
+        /// <param name="width">Width of the rectangle.</param>
+        /// <param name="height">Height of the rectangle.</param>
+        public Rectangle(double x, double y, double width, double height)
         {
-            this.xmin = xmin;
-            this.xmax = xmax;
-            this.ymin = ymin;
-            this.ymax = ymax;
+            this.xmin = x;
+            this.ymin = y;
+            this.xmax = x + width;
+            this.ymax = y + height;
         }
 
         /// <summary>

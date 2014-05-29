@@ -4,18 +4,16 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace TriangleNet.Geometry
+namespace TriangleNet.Meshing.Iterators
 {
-    using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using TriangleNet.Data;
+    using TriangleNet.Geometry;
 
     /// <summary>
     /// Enumerates the edges of a triangulation.
     /// </summary>
-    public class EdgeEnumerator : IEnumerator<Edge>
+    public class EdgeIterator : IEnumerator<Edge>
     {
         IEnumerator<Triangle> triangles;
         Otri tri = default(Otri);
@@ -25,9 +23,9 @@ namespace TriangleNet.Geometry
         Vertex p1, p2;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EdgeEnumerator" /> class.
+        /// Initializes a new instance of the <see cref="EdgeIterator" /> class.
         /// </summary>
-        public EdgeEnumerator(Mesh mesh)
+        public EdgeIterator(Mesh mesh)
         {
             triangles = mesh.triangles.Values.GetEnumerator();
             triangles.MoveNext();
