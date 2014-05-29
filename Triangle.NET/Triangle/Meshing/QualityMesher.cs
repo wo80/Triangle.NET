@@ -5,7 +5,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace TriangleNet
+namespace TriangleNet.Meshing
 {
     using System;
     using System.Collections.Generic;

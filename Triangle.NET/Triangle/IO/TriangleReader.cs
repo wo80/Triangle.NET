@@ -18,7 +18,7 @@ namespace TriangleNet.IO
     /// <summary>
     /// Helper methods for reading Triangle file formats.
     /// </summary>
-    public static class FileReader
+    public static class TriangleReader
     {
         static NumberFormatInfo nfi = CultureInfo.InvariantCulture.NumberFormat;
         static int startIndex = 0;
@@ -99,12 +99,12 @@ namespace TriangleNet.IO
 
             if (File.Exists(path))
             {
-                geometry = FileReader.ReadPolyFile(path);
+                geometry = TriangleReader.ReadPolyFile(path);
             }
             else
             {
                 path = Path.ChangeExtension(filename, ".node");
-                geometry = FileReader.ReadNodeFile(path);
+                geometry = TriangleReader.ReadNodeFile(path);
             }
         }
 
@@ -115,13 +115,13 @@ namespace TriangleNet.IO
         {
             triangles = null;
 
-            FileReader.Read(filename, out geometry);
+            TriangleReader.Read(filename, out geometry);
 
             string path = Path.ChangeExtension(filename, ".ele");
 
             if (File.Exists(path) && geometry != null)
             {
-                triangles = FileReader.ReadEleFile(path);
+                triangles = TriangleReader.ReadEleFile(path);
             }
         }
 
@@ -132,7 +132,7 @@ namespace TriangleNet.IO
         {
             InputGeometry geometry = null;
 
-            FileReader.Read(filename, out geometry);
+            TriangleReader.Read(filename, out geometry);
 
             return geometry;
         }

@@ -15,7 +15,7 @@ namespace TriangleNet.Geometry
     /// <summary>
     /// Represents a straight line segment in 2D space.
     /// </summary>
-    public class Edge
+    public class Edge : IEdge
     {
         /// <summary>
         /// Gets the first endpoints index.

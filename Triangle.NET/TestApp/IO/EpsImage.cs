@@ -319,12 +319,12 @@ namespace MeshExplorer.IO
             }
         }
 
-        private void UpdateMetrics(BoundingBox bounds)
+        private void UpdateMetrics(Rectangle bounds)
         {
-            x_max = bounds.MaxX;
-            x_min = bounds.MinX;
-            y_max = bounds.MaxY;
-            y_min = bounds.MinY;
+            x_max = bounds.Right;
+            x_min = bounds.Left;
+            y_max = bounds.Top;
+            y_min = bounds.Bottom;
 
             // Enlarge width 5% on each side
             x_scale = x_max - x_min;

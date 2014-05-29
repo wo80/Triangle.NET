@@ -1,32 +1,32 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="DataReader.cs" company="">
+// <copyright file="Converter.cs" company="">
 // Original Triangle code by Jonathan Richard Shewchuk, http://www.cs.cmu.edu/~quake/triangle.html
 // Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace TriangleNet.IO
+namespace TriangleNet.Meshing
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
-    using System.Globalization;
     using TriangleNet.Data;
-    using TriangleNet.Log;
     using TriangleNet.Geometry;
+    using TriangleNet.Log;
 
     /// <summary>
     /// The DataReader class provides methods for mesh reconstruction.
     /// </summary>
-    static class DataReader
+    public class Converter
     {
+        public Mesh ToMesh(InputGeometry polygon, IList<ITriangle> triangles)
+        {
+            return ToMesh(polygon, triangles.ToArray());
+        }
+
         /// <summary>
         /// Reconstruct a triangulation from its raw data representation.
         /// </summary>
-        /// <param name="mesh"></param>
-        /// <param name="input"></param>
-        /// <returns></returns>
         /// <remarks>
         /// Reads an .ele file and reconstructs the original mesh.  If the -p switch
         /// is used, this procedure will also read a .poly file and reconstruct the
@@ -46,43 +46,33 @@ namespace TriangleNet.IO
         /// the corresponding pointer is adjusted to refer to a subsegment rather
         /// than the next triangle of the stack.
         /// </remarks>
-        public static int Reconstruct(Mesh mesh, InputGeometry input, ITriangle[] triangles)
+        public Mesh ToMesh(InputGeometry polygon, ITriangle[] triangles)
         {
-            int hullsize = 0;
-
             Otri tri = default(Otri);
-            Otri triangleleft = default(Otri);
-            Otri checktri = default(Otri);
-            Otri checkleft = default(Otri);
-            Otri checkneighbor = default(Otri);
             Osub subseg = default(Osub);
-            List<Otri>[] vertexarray; // Triangle
-            Otri prevlink; // Triangle
-            Otri nexttri; // Triangle
-            Vertex tdest, tapex;
-            Vertex checkdest, checkapex;
-            Vertex shorg;
-            Vertex segmentorg, segmentdest;
-            int[] corner = new int[3];
-            int[] end = new int[2];
-            //bool segmentmarkers = false;
-            int boundmarker;
-            int aroundvertex;
-            bool notfound;
             int i = 0;
 
             int elements = triangles == null ? 0 : triangles.Length;
-            int numberofsegments = input.segments.Count;
+            int numberofsegments = polygon.Segments.Count;
+
+            var mesh = new Mesh();
+
+            mesh.TransferNodes(polygon);
 
             mesh.inelements = elements;
-            mesh.regions.AddRange(input.regions);
+            mesh.regions.AddRange(polygon.Regions);
+            mesh.behavior.useRegions = polygon.Regions.Count > 0;
+
+            if (polygon.Segments.Count > 0)
+            {
+                mesh.behavior.Poly = true;
+                mesh.holes.AddRange(polygon.Holes);
+            }
 
             // Create the triangles.
             for (i = 0; i < mesh.inelements; i++)
             {
                 mesh.MakeTriangle(ref tri);
-                // Mark the triangle as living.
-                //tri.triangle.neighbors[0].triangle = tri.triangle;
             }
 
             if (mesh.behavior.Poly)
@@ -93,15 +83,37 @@ namespace TriangleNet.IO
                 for (i = 0; i < mesh.insegments; i++)
                 {
                     mesh.MakeSegment(ref subseg);
-                    // Mark the subsegment as living.
-                    //subseg.ss.subsegs[0].ss = subseg.ss;
                 }
             }
 
+            var vertexarray = SetNeighbors(mesh, triangles);
+
+            SetSegments(mesh, polygon, vertexarray);
+
+            return mesh;
+        }
+
+        /// <summary>
+        /// Finds the adjacencies between triangles by forming a stack of triangles
+        /// for each vertex.
+        /// </summary>
+        private static List<Otri>[] SetNeighbors(Mesh mesh, ITriangle[] triangles)
+        {
+            Otri tri = default(Otri);
+            Otri triangleleft = default(Otri);
+            Otri checktri = default(Otri);
+            Otri checkleft = default(Otri);
+            Otri nexttri; // Triangle
+            Vertex tdest, tapex;
+            Vertex checkdest, checkapex;
+            int[] corner = new int[3];
+            int aroundvertex;
+            int i;
+
             // Allocate a temporary array that maps each vertex to some adjacent
-            // triangle. I took care to allocate all the permanent memory for
-            // triangles and subsegments first.
-            vertexarray = new List<Otri>[mesh.vertices.Count];
+            // triangle.
+            var vertexarray = new List<Otri>[mesh.vertices.Count];
+
             // Each vertex is initially unrepresented.
             for (i = 0; i < mesh.vertices.Count; i++)
             {
@@ -198,21 +210,41 @@ namespace TriangleNet.IO
                 i++;
             }
 
+            return vertexarray;
+        }
+
+        private static void SetSegments(Mesh mesh, InputGeometry polygon, List<Otri>[] vertexarray)
+        {
+            Otri checktri = default(Otri);
+            Otri nexttri; // Triangle
+            Vertex checkdest;
+            Otri checkneighbor = default(Otri);
+            Osub subseg = default(Osub);
+            Otri prevlink; // Triangle
+            Vertex shorg;
+            Vertex segmentorg, segmentdest;
+            int[] end = new int[2];
+            bool notfound;
+            //bool segmentmarkers = false;
+            int boundmarker;
+            int aroundvertex;
+            int i;
+
+            int hullsize = 0;
+
             // Prepare to count the boundary edges.
-            hullsize = 0;
             if (mesh.behavior.Poly)
             {
-                // Read the segments from the .poly file, and link them
-                // to their neighboring triangles.
+                // Link the segments to their neighboring triangles.
                 boundmarker = 0;
                 i = 0;
                 foreach (var item in mesh.subsegs.Values)
                 {
                     subseg.seg = item;
 
-                    end[0] = input.segments[i].P0;
-                    end[1] = input.segments[i].P1;
-                    boundmarker = input.segments[i].Boundary;
+                    end[0] = polygon.segments[i].P0;
+                    end[1] = polygon.segments[i].P1;
+                    boundmarker = polygon.segments[i].Boundary;
 
                     for (int j = 0; j < 2; j++)
                     {
@@ -316,7 +348,8 @@ namespace TriangleNet.IO
                 }
             }
 
-            return hullsize;
+            mesh.hullsize = hullsize;
+            mesh.edges = (3 * mesh.triangles.Count + hullsize) / 2;
         }
     }
 }

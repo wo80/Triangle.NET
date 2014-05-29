@@ -17,7 +17,7 @@ namespace TriangleNet.IO
     /// <summary>
     /// Helper methods for writing Triangle file formats.
     /// </summary>
-    public static class FileWriter
+    public static class TriangleWriter
     {
         static NumberFormatInfo nfi = CultureInfo.InvariantCulture.NumberFormat;
 
@@ -28,8 +28,8 @@ namespace TriangleNet.IO
         /// <param name="filename"></param>
         public static void Write(Mesh mesh, string filename)
         {
-            FileWriter.WritePoly(mesh, Path.ChangeExtension(filename, ".poly"));
-            FileWriter.WriteElements(mesh, Path.ChangeExtension(filename, ".ele"));
+            TriangleWriter.WritePoly(mesh, Path.ChangeExtension(filename, ".poly"));
+            TriangleWriter.WriteElements(mesh, Path.ChangeExtension(filename, ".ele"));
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace TriangleNet.IO
         {
             using (StreamWriter writer = new StreamWriter(filename))
             {
-                FileWriter.WriteNodes(writer, mesh);
+                TriangleWriter.WriteNodes(writer, mesh);
             }
         }
 
@@ -180,11 +180,74 @@ namespace TriangleNet.IO
         /// <summary>
         /// Write the segments and holes to a .poly file.
         /// </summary>
+        /// <param name="polygon">Data source.</param>
+        /// <param name="filename">File name.</param>
+        /// <param name="writeNodes">Write nodes into this file.</param>
+        /// <remarks>If the nodes should not be written into this file, 
+        /// make sure a .node file was written before, so that the nodes 
+        /// are numbered right.</remarks>
+        public static void WritePoly(InputGeometry polygon, string filename)
+        {
+            bool hasMarkers = true;
+
+            using (StreamWriter writer = new StreamWriter(filename))
+            {
+                // TODO: write vertex attributes
+
+                // Write nodes to this file.
+                TriangleWriter.WriteNodes(writer, polygon.points, true, 0, false);
+
+                // Number of segments, number of boundary markers (zero or one).
+                writer.WriteLine("{0} {1}", polygon.Segments.Count, hasMarkers ? "1" : "0");
+
+                int j = 0;
+                foreach (var seg in polygon.Segments)
+                {
+                    // Segment number, indices of its two endpoints, and possibly a marker.
+                    if (hasMarkers)
+                    {
+                        writer.WriteLine("{0} {1} {2} {3}", j, seg.P0, seg.P1, seg.Boundary);
+                    }
+                    else
+                    {
+                        writer.WriteLine("{0} {1} {2}", j, seg.P0, seg.P1);
+                    }
+
+                    j++;
+                }
+
+                // Holes
+                j = 0;
+                writer.WriteLine("{0}", polygon.Holes.Count);
+                foreach (var hole in polygon.Holes)
+                {
+                    writer.WriteLine("{0} {1} {2}", j++, hole.X.ToString(nfi), hole.Y.ToString(nfi));
+                }
+
+                // Regions
+                if (polygon.Regions.Count > 0)
+                {
+                    j = 0;
+                    writer.WriteLine("{0}", polygon.Regions.Count);
+                    foreach (var region in polygon.Regions)
+                    {
+                        writer.WriteLine("{0} {1} {2} {3}", j, region.point.X.ToString(nfi),
+                            region.point.Y.ToString(nfi), region.id);
+
+                        j++;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Write the segments and holes to a .poly file.
+        /// </summary>
         /// <param name="mesh"></param>
         /// <param name="filename"></param>
         public static void WritePoly(Mesh mesh, string filename)
         {
-            FileWriter.WritePoly(mesh, filename, true);
+            TriangleWriter.WritePoly(mesh, filename, true);
         }
 
         /// <summary>
@@ -208,7 +271,7 @@ namespace TriangleNet.IO
                 if (writeNodes)
                 {
                     // Write nodes to this file.
-                    FileWriter.WriteNodes(writer, mesh);
+                    TriangleWriter.WriteNodes(writer, mesh);
                 }
                 else
                 {

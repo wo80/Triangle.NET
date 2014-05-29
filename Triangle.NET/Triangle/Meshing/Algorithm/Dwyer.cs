@@ -5,7 +5,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace TriangleNet.Algorithm
+namespace TriangleNet.Meshing.Algorithm
 {
     using System;
     using TriangleNet.Data;

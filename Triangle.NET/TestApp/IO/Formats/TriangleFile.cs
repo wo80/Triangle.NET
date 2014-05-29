@@ -7,13 +7,10 @@
 namespace MeshExplorer.IO.Formats
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using TriangleNet.IO;
     using System.IO;
-    using TriangleNet.Geometry;
     using TriangleNet;
+    using TriangleNet.Geometry;
+    using TriangleNet.IO;
 
     /// <summary>
     /// Read and write files defined in classic Triangle format.
@@ -45,9 +42,24 @@ namespace MeshExplorer.IO.Formats
             return (ext == ".ele");
         }
 
+        public bool IsSupported(string file)
+        {
+            throw new NotImplementedException();
+        }
+
         public InputGeometry Read(string filename)
         {
             return format.Read(filename);
+        }
+
+        public void Write(InputGeometry polygon, string filename)
+        {
+            format.Write(polygon, filename);
+        }
+
+        public void Write(InputGeometry polygon, StreamWriter stream)
+        {
+            format.Write(polygon, stream);
         }
 
         public Mesh Import(string filename)
@@ -61,6 +73,11 @@ namespace MeshExplorer.IO.Formats
             {
                 format.Write(mesh, filename);
             }
+        }
+
+        public void Write(Mesh mesh, StreamWriter stream)
+        {
+            throw new NotImplementedException();
         }
     }
 }

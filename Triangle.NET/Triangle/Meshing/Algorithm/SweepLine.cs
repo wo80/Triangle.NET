@@ -5,7 +5,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace TriangleNet.Algorithm
+namespace TriangleNet.Meshing.Algorithm
 {
     using System;
     using System.Collections.Generic;
@@ -525,7 +525,7 @@ namespace TriangleNet.Algorithm
 
             // Nonexistent x value used as a flag to mark circle events in sweepline
             // Delaunay algorithm.
-            xminextreme = 10 * mesh.bounds.MinX - 9 * mesh.bounds.MaxX;
+            xminextreme = 10 * mesh.bounds.Left - 9 * mesh.bounds.Right;
 
             SweepEvent[] eventheap;
 
@@ -603,7 +603,7 @@ namespace TriangleNet.Algorithm
                 HeapDelete(eventheap, heapsize, 0);
                 heapsize--;
                 check4events = true;
-                if (nextevent.xkey < mesh.bounds.MinX)
+                if (nextevent.xkey < mesh.bounds.Left)
                 {
                     fliptri = nextevent.otriEvent;
                     fliptri.Oprev(ref farlefttri);

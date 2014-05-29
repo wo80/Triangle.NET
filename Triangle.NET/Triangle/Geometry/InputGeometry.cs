@@ -21,7 +21,7 @@ namespace TriangleNet.Geometry
         internal List<Point> holes;
         internal List<RegionPointer> regions;
 
-        BoundingBox bounds;
+        Rectangle bounds;
 
         // Used to check consitent use of point attributes.
         private int pointAttributes = -1;
@@ -46,7 +46,7 @@ namespace TriangleNet.Geometry
             holes = new List<Point>();
             regions = new List<RegionPointer>();
 
-            bounds = new BoundingBox();
+            bounds = new Rectangle();
 
             pointAttributes = -1;
         }
@@ -54,7 +54,7 @@ namespace TriangleNet.Geometry
         /// <summary>
         /// Gets the bounding box of the input geometry.
         /// </summary>
-        public BoundingBox Bounds
+        public Rectangle Bounds
         {
             get { return bounds; }
         }
@@ -138,8 +138,9 @@ namespace TriangleNet.Geometry
         /// <param name="boundary">Boundary marker.</param>
         public void AddPoint(double x, double y, int boundary)
         {
-            points.Add(new Vertex(x, y, boundary));
-            bounds.Expand(x, y);
+            var v = new Vertex(x, y, boundary);
+            points.Add(v);
+            bounds.Expand(v);
         }
 
         /// <summary>
@@ -176,8 +177,9 @@ namespace TriangleNet.Geometry
                 throw new ArgumentException("Inconsitent use of point attributes.");
             }
 
-            points.Add(new Vertex(x, y, boundary) { attributes = attribs });
-            bounds.Expand(x, y);
+            var v = new Vertex(x, y, boundary) { attributes = attribs };
+            points.Add(v);
+            bounds.Expand(v);
         }
 
         /// <summary>
@@ -202,7 +204,7 @@ namespace TriangleNet.Geometry
             }
 
             points.Add(v);
-            bounds.Expand(v.x, v.y);
+            bounds.Expand(v);
         }
 
         /// <summary>

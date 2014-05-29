@@ -7,36 +7,37 @@
 namespace TriangleNet.Geometry
 {
     using System;
+    using System.Collections.Generic;
 
     /// <summary>
     /// A simple bounding box class.
     /// </summary>
-    public class BoundingBox
+    public class Rectangle
     {
         double xmin, ymin, xmax, ymax;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BoundingBox" /> class.
+        /// Initializes a new instance of the <see cref="Rectangle" /> class.
         /// </summary>
-        public BoundingBox()
+        public Rectangle()
             : this(double.MaxValue, double.MaxValue, -double.MaxValue, -double.MaxValue)
         {
         }
 
-        public BoundingBox(BoundingBox other)
-            : this(other.MinX, other.MinY, other.MaxX, other.MaxY)
+        public Rectangle(Rectangle other)
+            : this(other.Left, other.Bottom, other.Right, other.Top)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BoundingBox" /> class
+        /// Initializes a new instance of the <see cref="Rectangle" /> class
         /// with predefined bounds.
         /// </summary>
         /// <param name="xmin">Minimum x value.</param>
         /// <param name="ymin">Minimum y value.</param>
         /// <param name="xmax">Maximum x value.</param>
         /// <param name="ymax">Maximum y value.</param>
-        public BoundingBox(double xmin, double ymin, double xmax, double ymax)
+        public Rectangle(double xmin, double ymin, double xmax, double ymax)
         {
             this.xmin = xmin;
             this.xmax = xmax;
@@ -47,7 +48,7 @@ namespace TriangleNet.Geometry
         /// <summary>
         /// Gets the minimum x value (left boundary).
         /// </summary>
-        public double MinX
+        public double Left
         {
             get { return xmin; }
         }
@@ -55,7 +56,7 @@ namespace TriangleNet.Geometry
         /// <summary>
         /// Gets the maximum x value (right boundary).
         /// </summary>
-        public double MaxX
+        public double Right
         {
             get { return xmax; }
         }
@@ -63,7 +64,7 @@ namespace TriangleNet.Geometry
         /// <summary>
         /// Gets the minimum y value (bottom boundary).
         /// </summary>
-        public double MinY
+        public double Bottom
         {
             get { return ymin; }
         }
@@ -71,7 +72,7 @@ namespace TriangleNet.Geometry
         /// <summary>
         /// Gets the maximum y value (top boundary).
         /// </summary>
-        public double MaxY
+        public double Top
         {
             get { return ymax; }
         }
@@ -109,13 +110,24 @@ namespace TriangleNet.Geometry
         /// Expand rectangle to include given point.
         /// </summary>
         /// <param name="x">X coordinate.</param>
-        /// <param name="y">Y coordinate.</param>
-        public void Expand(double x, double y)
+        /// <param name="p">Y coordinate.</param>
+        public void Expand(Point p)
         {
-            xmin = Math.Min(xmin, x);
-            ymin = Math.Min(ymin, y);
-            xmax = Math.Max(xmax, x);
-            ymax = Math.Max(ymax, y);
+            xmin = Math.Min(xmin, p.x);
+            ymin = Math.Min(ymin, p.y);
+            xmax = Math.Max(xmax, p.x);
+            ymax = Math.Max(ymax, p.y);
+        }
+
+        /// <summary>
+        /// Expand rectangle to include a list of points.
+        /// </summary>
+        public void Expand(IEnumerable<Point> points)
+        {
+            foreach (var p in points)
+            {
+                Expand(p);
+            }
         }
 
         /// <summary>
@@ -123,7 +135,7 @@ namespace TriangleNet.Geometry
         /// </summary>
         /// <param name="x">X coordinate.</param>
         /// <param name="y">Y coordinate.</param>
-        public void Expand(BoundingBox other)
+        public void Expand(Rectangle other)
         {
             xmin = Math.Min(xmin, other.xmin);
             ymin = Math.Min(ymin, other.ymin);
@@ -141,16 +153,16 @@ namespace TriangleNet.Geometry
             return ((pt.x >= xmin) && (pt.x <= xmax) && (pt.y >= ymin) && (pt.y <= ymax));
         }
 
-        public bool Contains(BoundingBox other)
+        public bool Contains(Rectangle other)
         {
-            return (xmin <= other.MinX && other.MaxX <= xmax
-                && ymin <= other.MinY && other.MaxY <= ymax);
+            return (xmin <= other.Left && other.Right <= xmax
+                && ymin <= other.Bottom && other.Top <= ymax);
         }
 
-        public bool Intersects(BoundingBox other)
+        public bool Intersects(Rectangle other)
         {
-            return (other.MinX < xmax && xmin < other.MaxX
-                && other.MinY < ymax && ymin < other.MaxY);
+            return (other.Left < xmax && xmin < other.Right
+                && other.Bottom < ymax && ymin < other.Top);
         }
     }
 }

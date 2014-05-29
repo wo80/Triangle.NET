@@ -16,7 +16,7 @@ namespace MeshExplorer.IO
     /// <summary>
     /// Defines an interface for mesh file formats.
     /// </summary>
-    public interface IMeshFile : IGeometryFormat, IMeshFormat
+    public interface IMeshFile : IPolygonFormat, IMeshFormat
     {
         /// <summary>
         /// The supported file extensions.

@@ -15,6 +15,7 @@ namespace MeshExplorer.IO.Formats
     using TriangleNet.Data;
     using TriangleNet.Geometry;
     using TriangleNet.IO;
+    using TriangleNet.Meshing;
 
     /// <summary>
     /// Read and write JSON files.
@@ -74,6 +75,11 @@ namespace MeshExplorer.IO.Formats
             return false;
         }
 
+        public bool IsSupported(string file)
+        {
+            throw new NotImplementedException();
+        }
+
         public Mesh Import(string filename)
         {
             InputGeometry geometry = this.Read(filename);
@@ -90,10 +96,9 @@ namespace MeshExplorer.IO.Formats
                 }
             }
 
-            Mesh mesh = new Mesh();
-            mesh.Load(geometry, triangles);
+            var converter = new Converter();
 
-            return mesh;
+            return converter.ToMesh(geometry, triangles);
         }
 
         public void Write(Mesh mesh, string filename)
@@ -149,6 +154,11 @@ namespace MeshExplorer.IO.Formats
 
                 writer.Write("}");
             }
+        }
+
+        public void Write(Mesh mesh, StreamWriter stream)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -211,6 +221,16 @@ namespace MeshExplorer.IO.Formats
             }
 
             return data;
+        }
+
+        public void Write(InputGeometry polygon, string filename)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Write(InputGeometry polygon, StreamWriter stream)
+        {
+            throw new NotImplementedException();
         }
 
         private void ParseJson(string filename)

@@ -115,7 +115,6 @@
     <Compile Include="IO\FileProcessor.cs" />
     <Compile Include="IO\Formats\JsonFile.cs" />
     <Compile Include="IO\Formats\TriangleFile.cs" />
-    <Compile Include="IO\GeometryWriter.cs" />
     <Compile Include="IO\IMeshFile.cs" />
     <Compile Include="IO\JsonParser.cs" />
     <Compile Include="IO\RasterImage.cs" />

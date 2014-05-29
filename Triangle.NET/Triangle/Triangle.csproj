@@ -41,10 +41,19 @@
     <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Algorithm\ITriangulator.cs" />
+    <Compile Include="Geometry\IEdge.cs" />
+    <Compile Include="Geometry\IPolygon.cs" />
+    <Compile Include="Geometry\Polygon.cs" />
+    <Compile Include="IO\FileProcessor.cs" />
+    <Compile Include="IO\IFileFormat.cs" />
+    <Compile Include="Meshing\ConstraintOptions.cs" />
+    <Compile Include="Meshing\Converter.cs" />
+    <Compile Include="Meshing\IConstraintMesher.cs" />
+    <Compile Include="Meshing\IQualityMesher.cs" />
+    <Compile Include="Meshing\ITriangulator.cs" />
     <Compile Include="BadTriQueue.cs" />
     <Compile Include="Behavior.cs" />
-    <Compile Include="ConstraintMesher.cs" />
+    <Compile Include="Meshing\ConstraintMesher.cs" />
     <Compile Include="Data\BadSubseg.cs" />
     <Compile Include="Data\BadTriangle.cs" />
     <Compile Include="Data\Osub.cs" />
@@ -52,8 +61,8 @@
     <Compile Include="Data\Segment.cs" />
     <Compile Include="Data\Triangle.cs" />
     <Compile Include="Data\Vertex.cs" />
-    <Compile Include="Algorithm\Dwyer.cs" />
-    <Compile Include="Geometry\BoundingBox.cs" />
+    <Compile Include="Meshing\Algorithm\Dwyer.cs" />
+    <Compile Include="Geometry\Rectangle.cs" />
     <Compile Include="Geometry\Edge.cs" />
     <Compile Include="Geometry\EdgeEnumerator.cs" />
     <Compile Include="Geometry\InputGeometry.cs" />
@@ -61,23 +70,23 @@
     <Compile Include="Geometry\Point.cs" />
     <Compile Include="Geometry\RegionPointer.cs" />
     <Compile Include="Geometry\ISegment.cs" />
-    <Compile Include="IO\DataReader.cs" />
     <Compile Include="IO\DebugWriter.cs" />
-    <Compile Include="IO\FileWriter.cs" />
-    <Compile Include="IO\IGeometryFormat.cs" />
+    <Compile Include="IO\TriangleWriter.cs" />
+    <Compile Include="IO\IPolygonFormat.cs" />
     <Compile Include="IO\IMeshFormat.cs" />
     <Compile Include="IO\InputTriangle.cs" />
-    <Compile Include="IO\FileReader.cs" />
+    <Compile Include="IO\TriangleReader.cs" />
     <Compile Include="IO\TriangleFormat.cs" />
     <Compile Include="Log\ILog.cs" />
     <Compile Include="Log\ILogItem.cs" />
     <Compile Include="Log\SimpleLog.cs" />
     <Compile Include="Log\SimpleLogItem.cs" />
+    <Compile Include="Meshing\QualityOptions.cs" />
     <Compile Include="MeshValidator.cs" />
     <Compile Include="NewLocation.cs" />
-    <Compile Include="QualityMesher.cs" />
+    <Compile Include="Meshing\QualityMesher.cs" />
     <Compile Include="Enums.cs" />
-    <Compile Include="Algorithm\Incremental.cs" />
+    <Compile Include="Meshing\Algorithm\Incremental.cs" />
     <Compile Include="Mesh.cs" />
     <Compile Include="Primitives.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -92,12 +101,14 @@
     <Compile Include="Tools\QualityMeasure.cs" />
     <Compile Include="Tools\RegionIterator.cs" />
     <Compile Include="Tools\Statistic.cs" />
-    <Compile Include="Algorithm\SweepLine.cs" />
+    <Compile Include="Meshing\Algorithm\SweepLine.cs" />
     <Compile Include="Tools\Voronoi.cs" />
     <Compile Include="Tools\VoronoiRegion.cs" />
     <Compile Include="TriangleLocator.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Algorithm\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

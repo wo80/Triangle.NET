@@ -27,7 +27,7 @@ namespace TriangleNet.Tools
         int rayIndex;
 
         // Bounding box of the triangles circumcenters.
-        BoundingBox bounds;
+        Rectangle bounds;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Voronoi" /> class.
@@ -82,7 +82,7 @@ namespace TriangleNet.Tools
             rayPoints = new Dictionary<int, Point>();
             rayIndex = 0;
 
-            bounds = new BoundingBox();
+            bounds = new Rectangle();
 
             // Compute triangles circumcenters and setup bounding box
             ComputeCircumCenters();
@@ -119,7 +119,7 @@ namespace TriangleNet.Tools
 
                 points[item.id] = pt;
 
-                bounds.Expand(pt.x, pt.y);
+                bounds.Expand(pt);
             }
 
             double ds = Math.Max(bounds.Width, bounds.Height);
@@ -269,10 +269,10 @@ namespace TriangleNet.Tools
             double t1, x1, y1, t2, x2, y2;
 
             // Bounding box
-            double minX = bounds.MinX;
-            double maxX = bounds.MaxX;
-            double minY = bounds.MinY;
-            double maxY = bounds.MaxY;
+            double minX = bounds.Left;
+            double maxX = bounds.Right;
+            double minY = bounds.Bottom;
+            double maxY = bounds.Top;
 
             // Check if point is inside the bounds
             if (x < minX || x > maxX || y < minY || y > maxY)

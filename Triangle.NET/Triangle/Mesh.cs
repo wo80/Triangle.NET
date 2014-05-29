@@ -13,7 +13,8 @@ namespace TriangleNet
     using TriangleNet.Data;
     using TriangleNet.Log;
     using TriangleNet.IO;
-    using TriangleNet.Algorithm;
+    using TriangleNet.Meshing;
+    using TriangleNet.Meshing.Algorithm;
     using TriangleNet.Smoothing;
     using TriangleNet.Geometry;
     using TriangleNet.Tools;
@@ -48,7 +49,7 @@ namespace TriangleNet
         internal List<RegionPointer> regions;
 
         // Other variables.
-        internal BoundingBox bounds; // x and y bounds.
+        internal Rectangle bounds; // x and y bounds.
         internal int invertices;     // Number of input vertices.
         internal int inelements;     // Number of input triangles.
         internal int insegments;     // Number of input segments.
@@ -95,7 +96,7 @@ namespace TriangleNet
         /// <summary>
         /// Gets the mesh bounding box.
         /// </summary>
-        public BoundingBox Bounds
+        public Rectangle Bounds
         {
             get { return this.bounds; }
         }
@@ -214,81 +215,12 @@ namespace TriangleNet
         }
 
         /// <summary>
-        /// Load a mesh from file (.node/poly and .ele).
-        /// </summary>
-        public void Load(string filename)
-        {
-            List<ITriangle> triangles;
-            InputGeometry geometry;
-
-            FileReader.Read(filename, out geometry, out triangles);
-
-            if (geometry != null && triangles != null)
-            {
-                Load(geometry, triangles);
-            }
-        }
-
-        /// <summary>
-        /// Reconstructs a mesh from raw input data.
-        /// </summary>
-        public void Load(InputGeometry input, List<ITriangle> triangles)
-        {
-            if (input == null || triangles == null)
-            {
-                throw new ArgumentException("Invalid input (argument is null).");
-            }
-
-            // Clear all data structures / reset hash seeds
-            this.ResetData();
-
-            if (input.HasSegments)
-            {
-                behavior.Poly = true;
-
-                this.holes.AddRange(input.Holes);
-            }
-
-            //if (input.EdgeMarkers != null)
-            //{
-            //    behavior.UseBoundaryMarkers = true;
-            //}
-
-            //if (input.TriangleAreas != null)
-            //{
-            //    behavior.VarArea = true;
-            //}
-
-            // TODO: remove
-            if (!behavior.Poly)
-            {
-                // Be careful not to allocate space for element area constraints that
-                // will never be assigned any value (other than the default -1.0).
-                behavior.VarArea = false;
-
-                // Be careful not to add an extra attribute to each element unless the
-                // input supports it (PSLG in, but not refining a preexisting mesh).
-                behavior.useRegions = false;
-            }
-
-            behavior.useRegions = input.Regions.Count > 0;
-
-            TransferNodes(input);
-
-            // Read and reconstruct a mesh.
-            hullsize = DataReader.Reconstruct(this, input, triangles.ToArray());
-
-            // Calculate the number of edges.
-            edges = (3 * triangles.Count + hullsize) / 2;
-        }
-
-        /// <summary>
         /// Triangulate given input file (.node or .poly).
         /// </summary>
         /// <param name="input"></param>
         public void Triangulate(string inputFile)
         {
-            InputGeometry input = FileReader.Read(inputFile);
+            InputGeometry input = TriangleReader.Read(inputFile);
 
             this.Triangulate(input);
         }
@@ -693,7 +625,7 @@ namespace TriangleNet
         /// Read the vertices from memory.
         /// </summary>
         /// <param name="data">The input data.</param>
-        private void TransferNodes(InputGeometry data)
+        internal void TransferNodes(InputGeometry data)
         {
             List<Vertex> points = data.points;
 
