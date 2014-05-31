@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Windows.Forms;
 using TriangleNet;
-using TriangleNet.Tools;
 using TriangleNet.Geometry;
+using TriangleNet.Tools;
 
 namespace MeshExplorer.Views
 {

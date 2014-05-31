@@ -5,8 +5,8 @@ namespace MeshExplorer.Topology
     using System.Drawing.Drawing2D;
     using System.Drawing.Text;
     using System.Windows.Forms;
-    using MeshRenderer.Core;
     using TriangleNet;
+    using TriangleNet.Rendering;
 
     public class TopologyRenderControl : Control
     {
@@ -14,12 +14,12 @@ namespace MeshExplorer.Topology
         private BufferedGraphics buffer;
         private BufferedGraphicsContext context;
 
-        Zoom zoom;
+        Projection zoom;
         TopologyRenderer renderer;
 
         bool initialized = false;
 
-        public Zoom Zoom
+        public Projection Zoom
         {
             get { return zoom; }
         }
@@ -33,7 +33,6 @@ namespace MeshExplorer.Topology
 
             this.BackColor = Color.Black;
 
-            zoom = new Zoom(true);
             context = new BufferedGraphicsContext();
         }
 
@@ -44,11 +43,11 @@ namespace MeshExplorer.Topology
         {
             renderer = new TopologyRenderer(mesh);
 
-            zoom.Initialize(this.ClientRectangle);
+            zoom = new Projection(this.ClientRectangle);
             //zoom.ClipMargin = 10.0f;
 
             var b = mesh.Bounds;
-            zoom.Update(new BoundingBox((float)b.Left, (float)b.Right,
+            zoom.Initialize(new BoundingBox((float)b.Left, (float)b.Right,
                 (float)b.Bottom, (float)b.Top));
 
             InitializeBuffer();

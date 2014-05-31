@@ -3,13 +3,13 @@ namespace MeshExplorer.Topology
 {
     using System;
     using System.Drawing;
-    using MeshRenderer.Core;
     using TriangleNet;
     using TriangleNet.Geometry;
+    using TriangleNet.Rendering;
 
     public class TopologyRenderer
     {
-        Zoom zoom;
+        Projection zoom;
         Mesh mesh;
         PointF[] points;
 
@@ -50,7 +50,7 @@ namespace MeshExplorer.Topology
         /// <summary>
         /// Renders the mesh.
         /// </summary>
-        public void Render(Graphics g, Zoom zoom)
+        public void Render(Graphics g, Projection zoom)
         {
             this.zoom = zoom;
 
@@ -142,7 +142,8 @@ namespace MeshExplorer.Topology
             {
                 var brush = i == id ? Brushes.DarkRed : Point;
 
-                pt = zoom.WorldToScreen(points[i].X, points[i].Y);
+                pt = points[i];
+                zoom.WorldToScreen(ref pt);
                 g.FillEllipse(brush, pt.X - 10f, pt.Y - 10f, 20, 20);
 
                 pt.X -= i > 9 ? 7 : 4;
@@ -164,9 +165,9 @@ namespace MeshExplorer.Topology
                 p1 = points[tri.P1];
                 p2 = points[tri.P2];
 
-                p0 = zoom.WorldToScreen(p0.X, p0.Y);
-                p1 = zoom.WorldToScreen(p1.X, p1.Y);
-                p2 = zoom.WorldToScreen(p2.X, p2.Y);
+                zoom.WorldToScreen(ref p0);
+                zoom.WorldToScreen(ref p1);
+                zoom.WorldToScreen(ref p2);
 
                 g.DrawLine(Line, p0, p1);
                 g.DrawLine(Line, p1, p2);
@@ -193,9 +194,9 @@ namespace MeshExplorer.Topology
                 p1 = points[tri.P1];
                 p2 = points[tri.P2];
 
-                p0 = zoom.WorldToScreen(p0.X, p0.Y);
-                p1 = zoom.WorldToScreen(p1.X, p1.Y);
-                p2 = zoom.WorldToScreen(p2.X, p2.Y);
+                zoom.WorldToScreen(ref p0);
+                zoom.WorldToScreen(ref p1);
+                zoom.WorldToScreen(ref p2);
 
                 center = GetIncenter(p0, p1, p2);
                 center.X -= 5;
@@ -217,8 +218,8 @@ namespace MeshExplorer.Topology
                 p0 = points[edge.P0];
                 p1 = points[edge.P1];
 
-                p0 = zoom.WorldToScreen(p0.X, p0.Y);
-                p1 = zoom.WorldToScreen(p1.X, p1.Y);
+                zoom.WorldToScreen(ref p0);
+                zoom.WorldToScreen(ref p1);
 
                 g.DrawLine(Line, p0, p1);
             }
@@ -235,8 +236,8 @@ namespace MeshExplorer.Topology
                 p0 = points[seg.P0];
                 p1 = points[seg.P1];
 
-                p0 = zoom.WorldToScreen(p0.X, p0.Y);
-                p1 = zoom.WorldToScreen(p1.X, p1.Y);
+                zoom.WorldToScreen(ref p0);
+                zoom.WorldToScreen(ref p1);
 
                 g.DrawLine(Segment, p0, p1);
             }
@@ -251,8 +252,8 @@ namespace MeshExplorer.Topology
                 p0 = points[selection.Org().ID];
                 p1 = points[selection.Dest().ID];
 
-                p0 = zoom.WorldToScreen(p0.X, p0.Y);
-                p1 = zoom.WorldToScreen(p1.X, p1.Y);
+                zoom.WorldToScreen(ref p0);
+                zoom.WorldToScreen(ref p1);
 
                 g.DrawLine(SelectedEdge, p0, p1);
             }
@@ -270,9 +271,9 @@ namespace MeshExplorer.Topology
                 p[1] = points[tri.P1];
                 p[2] = points[tri.P2];
 
-                p[0] = zoom.WorldToScreen(p[0].X, p[0].Y);
-                p[1] = zoom.WorldToScreen(p[1].X, p[1].Y);
-                p[2] = zoom.WorldToScreen(p[2].X, p[2].Y);
+                zoom.WorldToScreen(ref p[0]);
+                zoom.WorldToScreen(ref p[1]);
+                zoom.WorldToScreen(ref p[2]);
 
                 g.FillPolygon(SelectedTriangle, p);
             }

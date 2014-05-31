@@ -16,7 +16,7 @@ namespace MeshExplorer
 
         public void AddItem(string message, bool warning)
         {
-            ILog<LogItem> log = Log.Instance;
+            var log = Log.Instance;
 
             if (warning)
             {
@@ -32,7 +32,7 @@ namespace MeshExplorer
         {
             listLog.Items.Clear();
 
-            ILog<LogItem> log = Log.Instance;
+            var log = Log.Instance;
 
             foreach (var item in log.Data)
             {
@@ -73,7 +73,26 @@ namespace MeshExplorer
 
         private void listLog_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Delete)
+            if (e.KeyCode == Keys.C)
+            {
+                if (ModifierKeys == Keys.Control)
+                {
+                    var selection = listLog.SelectedItems;
+
+                    if (selection != null && selection.Count > 0)
+                    {
+                        StringBuilder sb = new StringBuilder();
+
+                        foreach (var item in selection)
+                        {
+                            GetRowText(sb, item);
+                        }
+
+                        Clipboard.SetText(sb.ToString());
+                    }
+                }
+            }
+            else if (e.KeyCode == Keys.Delete)
             {
                 if (ModifierKeys == Keys.Control)
                 {
@@ -110,7 +129,8 @@ namespace MeshExplorer
 
                     if (lvi != null)
                     {
-                        sb.AppendLine(lvi.Text);
+                        sb.Append(lvi.Text);
+                        sb.Append("; ");
                     }
                 }
             }

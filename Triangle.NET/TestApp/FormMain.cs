@@ -5,13 +5,13 @@ using System.IO;
 using System.Windows.Forms;
 using MeshExplorer.Controls;
 using MeshExplorer.IO;
-using MeshRenderer.Core;
 using TriangleNet;
 using TriangleNet.Geometry;
 using TriangleNet.Meshing;
 using TriangleNet.Meshing.Algorithm;
-using TriangleNet.Smoothing;
 using TriangleNet.Tools;
+using TriangleNet.Smoothing;
+using TriangleNet.Rendering;
 
 namespace MeshExplorer
 {
@@ -25,7 +25,6 @@ namespace MeshExplorer
         FormGenerator frmGenerator;
 
         RenderManager renderManager;
-        RenderData renderData;
 
         public FormMain()
         {
@@ -41,12 +40,14 @@ namespace MeshExplorer
             settings = new Settings();
 
             renderManager = new RenderManager();
-            renderManager.CreateDefaultControl();
+
+            IRenderControl control = new TriangleNet.Rendering.GDI.RenderControl();
 
             /*
-            if (!renderManager.CreateControl("MeshRenderer.SharpGL2.dll", new string[] { "SharpGL.dll" }))
+            if (!renderManager.TryCreateControl("Triangle.Rendering.SharpGL.dll",
+                new string[] { "SharpGL.dll" }, out control))
             {
-                renderManager.CreateDefaultControl();
+                control = new TriangleNet.Rendering.GDI.RenderControl();
 
                 if (frmLog == null)
                 {
@@ -55,34 +56,47 @@ namespace MeshExplorer
 
                 frmLog.AddItem("Failed to initialize OpenGL.", true);
             }
-            */
-
-            var control = renderManager.RenderControl;
+            //*/
 
             if (control != null)
             {
-                this.splitContainer1.Panel2.Controls.Add(control);
-
-                // Initialize control
-                control.BackColor = Color.Black;
-                control.Dock = DockStyle.Fill;
-                control.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(0)));
-                control.Location = new System.Drawing.Point(0, 0);
-                control.Name = "renderControl1";
-                control.Size = new Size(703, 612);
-                control.TabIndex = 0;
-                control.Text = "meshRenderer1";
-
-                renderManager.Initialize();
+                InitializeRenderControl((Control)control);
+                renderManager.Initialize(control);
             }
             else
             {
                 DarkMessageBox.Show("Ooops ...", "Failed to initialize renderer.");
             }
-
-            renderData = new RenderData();
         }
-        
+
+        private void InitializeRenderControl(Control control)
+        {
+            this.splitContainer1.SuspendLayout();
+            this.splitContainer1.Panel2.Controls.Add(control);
+
+            var size = this.splitContainer1.Panel2.ClientRectangle;
+
+            // Initialize control
+            control.BackColor = Color.Black;
+            control.Dock = DockStyle.Fill;
+            control.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(0)));
+            control.Location = new System.Drawing.Point(0, 0);
+            control.Name = "renderControl1";
+            control.Size = new Size(size.Width, size.Height);
+            control.TabIndex = 0;
+            control.Text = "renderControl1";
+            control.MouseClick += new MouseEventHandler(RenderControl_MouseClick);
+
+            this.splitContainer1.ResumeLayout();
+        }
+
+        private void RenderControl_MouseClick(object sender, MouseEventArgs e)
+        {
+            var pt = e.Location;
+
+            renderManager.Click(((float)pt.X), ((float)pt.Y), e.Button);
+        }
+
         private void Form1_KeyUp(object sender, KeyEventArgs e)
         {
             switch (e.KeyCode)
@@ -194,7 +208,7 @@ namespace MeshExplorer
             // Handle window minimize and maximize
             if (!isResizing)
             {
-                renderManager.HandleResize();
+                renderManager.Resize();
             }
         }
 
@@ -205,7 +219,7 @@ namespace MeshExplorer
             if (this.ClientSize != this.oldClientSize)
             {
                 this.oldClientSize = this.ClientSize;
-                renderManager.HandleResize();
+                renderManager.Resize();
             }
         }
 
@@ -260,8 +274,7 @@ namespace MeshExplorer
             menuToolsRcm.Enabled = false;
 
             // Render input
-            renderData.SetInputGeometry(input);
-            renderManager.SetData(renderData);
+            renderManager.Set(input);
 
             // Update window caption
             this.Text = "Triangle.NET - Mesh Explorer - " + settings.CurrentFile;
@@ -270,9 +283,7 @@ namespace MeshExplorer
         private void HandleMeshImport()
         {
             // Render mesh
-            renderData.SetMesh(mesh);
-            renderManager.SetData(renderData);
-            //renderManager.Initialize();
+            renderManager.Set(mesh, true);
 
             // Update window caption
             this.Text = "Triangle.NET - Mesh Explorer - " + settings.CurrentFile;
@@ -292,8 +303,7 @@ namespace MeshExplorer
         private void HandleMeshUpdate()
         {
             // Render mesh
-            renderData.SetMesh(mesh);
-            renderManager.SetData(renderData);
+            renderManager.Set(mesh, false);
 
             // Update Statistic view
             statisticView.HandleMeshUpdate(mesh);
@@ -675,7 +685,6 @@ namespace MeshExplorer
                     else
                     {
                         RasterImage img = new RasterImage();
-                        img.ColorScheme = ColorManager.LightScheme();
                         img.Export(this.mesh, export.ImageName, size);
                     }
                 }
@@ -696,7 +705,7 @@ namespace MeshExplorer
 
             if (menuViewVoronoi.Checked)
             {
-                renderManager.ShowVoronoi = false;
+                //renderManager.ShowVoronoi = false;
                 menuViewVoronoi.Checked = false;
                 return;
             }
@@ -712,8 +721,7 @@ namespace MeshExplorer
                 voronoi = new Voronoi(mesh);
             }
 
-            renderData.SetVoronoi(voronoi);
-            renderManager.SetData(renderData);
+            renderManager.Set(voronoi, false);
 
             menuViewVoronoi.Checked = true;
         }

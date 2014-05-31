@@ -57,7 +57,8 @@ namespace MeshExplorer
         private ITriangle FindTriangleAt(float x, float y)
         {
             // Get mesh coordinates
-            var p = renderControl.Zoom.ScreenToWorld(x, y);
+            var p = new System.Drawing.PointF(x, y);
+            renderControl.Zoom.ScreenToWorld(ref p);
 
             topoControlView.SetPosition(p);
 

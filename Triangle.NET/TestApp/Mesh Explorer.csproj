@@ -40,10 +40,8 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controls\ColorScheme.cs" />
@@ -183,9 +181,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MeshRenderer.Core\MeshRenderer.Core.csproj">
-      <Project>{9C5040DA-C739-43A1-8540-E6BD3ED6DB55}</Project>
-      <Name>MeshRenderer.Core</Name>
+    <ProjectReference Include="..\Triangle.Rendering\Triangle.Rendering.csproj">
+      <Project>{41022e0e-bd0f-439e-bc3a-aabb1b43471b}</Project>
+      <Name>Triangle.Rendering</Name>
     </ProjectReference>
     <ProjectReference Include="..\Triangle\Triangle.csproj">
       <Project>{F7907A0A-B75F-400B-9E78-BFAD00DB4D6B}</Project>
