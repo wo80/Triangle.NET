@@ -15,6 +15,7 @@ namespace TriangleNet.Meshing
 
         Rectangle Bounds { get; }
 
+        void Renumber();
         void Refine(QualityOptions quality);
     }
 }

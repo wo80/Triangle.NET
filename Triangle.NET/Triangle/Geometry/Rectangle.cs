@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="BoundingBox.cs" company="">
+// <copyright file="Rectangle.cs" company="">
 // Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
@@ -150,7 +150,7 @@ namespace TriangleNet.Geometry
         /// <returns>Return true, if bounding box contains given point.</returns>
         public bool Contains(Point pt)
         {
-            return ((pt.x >= xmin) && (pt.x <= xmax) && (pt.y >= ymin) && (pt.y <= ymax));
+            return ((pt.X >= xmin) && (pt.X <= xmax) && (pt.Y >= ymin) && (pt.Y <= ymax));
         }
 
         /// <summary>

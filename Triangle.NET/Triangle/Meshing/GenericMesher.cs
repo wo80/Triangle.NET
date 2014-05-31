@@ -79,6 +79,19 @@ namespace TriangleNet.Meshing
         }
 
         /// <summary>
+        /// Generates a structured mesh with bounds (0, 0, width, height).
+        /// </summary>
+        /// <param name="width">Width of the mesh (must be > 0).</param>
+        /// <param name="height">Height of the mesh (must be > 0).</param>
+        /// <param name="nx">Number of segments in x direction.</param>
+        /// <param name="ny">Number of segments in y direction.</param>
+        /// <returns>Mesh</returns>
+        public IMesh StructurdMesh(double width, double height, int nx, int ny)
+        {
+            return StructurdMesh(new Rectangle(0.0, 0.0, width, height), nx, ny);
+        }
+
+        /// <summary>
         /// Generates a structured mesh.
         /// </summary>
         /// <param name="bounds">Bounds of the mesh.</param>

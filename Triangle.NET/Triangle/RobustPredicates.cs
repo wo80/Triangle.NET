@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="Primitives.cs">
+// <copyright file="RobustPredicates.cs">
 // Original Triangle code by Jonathan Richard Shewchuk, http://www.cs.cmu.edu/~quake/triangle.html
 // Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
 // </copyright>

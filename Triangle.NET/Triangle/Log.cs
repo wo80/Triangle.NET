@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="SimpleLog.cs" company="">
+// <copyright file="Log.cs" company="">
 // Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------

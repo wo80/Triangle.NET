@@ -23,5 +23,10 @@ namespace TriangleNet.Tools
         /// Gets the list of Voronoi regions.
         /// </summary>
         ICollection<VoronoiRegion> Regions { get; }
+
+        /// <summary>
+        /// Gets the list of edges.
+        /// </summary>
+        IEnumerable<IEdge> Edges { get; }
     }
 }

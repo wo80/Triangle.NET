@@ -42,7 +42,7 @@ namespace TriangleNet.Meshing.Algorithm
                     if (Log.Verbose)
                     {
                         Log.Instance.Warning("A duplicate vertex appeared and was ignored.",
-                            "Incremental.IncrementalDelaunay()");
+                            "Incremental.Triangulate()");
                     }
                     v.type = VertexType.UndeadVertex;
                     mesh.undeads++;

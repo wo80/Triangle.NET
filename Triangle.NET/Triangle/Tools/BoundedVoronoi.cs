@@ -70,6 +70,11 @@ namespace TriangleNet.Tools
             get { return regions; }
         }
 
+        public IEnumerable<IEdge> Edges
+        {
+            get { return EnumerateEdges(); }
+        }
+
         /// <summary>
         /// Computes the bounded voronoi diagram.
         /// </summary>
@@ -643,6 +648,42 @@ namespace TriangleNet.Tools
 
             //  Success.
             return true;
+        }
+
+        // TODO: Voronoi enumerate edges
+
+        private IEnumerable<IEdge> EnumerateEdges()
+        {
+            // Copy edges
+            Point first, last;
+            var edges = new List<IEdge>(this.Regions.Count * 2);
+            foreach (var region in this.Regions)
+            {
+                first = null;
+                last = null;
+
+                foreach (var pt in region.Vertices)
+                {
+                    if (first == null)
+                    {
+                        first = pt;
+                        last = pt;
+                    }
+                    else
+                    {
+                        edges.Add(new Edge(last.ID, pt.ID));
+
+                        last = pt;
+                    }
+                }
+
+                if (region.Bounded && first != null)
+                {
+                    edges.Add(new Edge(last.ID, first.ID));
+                }
+            }
+
+            return edges;
         }
     }
 }
