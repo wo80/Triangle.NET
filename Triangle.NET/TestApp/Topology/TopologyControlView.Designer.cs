@@ -60,7 +60,7 @@
             this.lbS2.Location = new System.Drawing.Point(137, 122);
             this.lbS2.Name = "lbS2";
             this.lbS2.Size = new System.Drawing.Size(53, 13);
-            this.lbS2.TabIndex = 16;
+            this.lbS2.TabIndex = 1;
             this.lbS2.Text = "-";
             this.lbS2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
@@ -69,7 +69,7 @@
             this.lbS1.Location = new System.Drawing.Point(137, 107);
             this.lbS1.Name = "lbS1";
             this.lbS1.Size = new System.Drawing.Size(53, 13);
-            this.lbS1.TabIndex = 15;
+            this.lbS1.TabIndex = 1;
             this.lbS1.Text = "-";
             this.lbS1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
@@ -78,7 +78,7 @@
             this.lbS0.Location = new System.Drawing.Point(137, 92);
             this.lbS0.Name = "lbS0";
             this.lbS0.Size = new System.Drawing.Size(53, 13);
-            this.lbS0.TabIndex = 17;
+            this.lbS0.TabIndex = 1;
             this.lbS0.Text = "-";
             this.lbS0.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
@@ -88,7 +88,7 @@
             this.label6.Location = new System.Drawing.Point(134, 71);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(57, 13);
-            this.label6.TabIndex = 19;
+            this.label6.TabIndex = 1;
             this.label6.Text = "Segments";
             // 
             // lbN2
@@ -96,7 +96,7 @@
             this.lbN2.Location = new System.Drawing.Point(66, 122);
             this.lbN2.Name = "lbN2";
             this.lbN2.Size = new System.Drawing.Size(57, 13);
-            this.lbN2.TabIndex = 13;
+            this.lbN2.TabIndex = 1;
             this.lbN2.Text = "-";
             this.lbN2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
@@ -105,7 +105,7 @@
             this.lbN1.Location = new System.Drawing.Point(66, 107);
             this.lbN1.Name = "lbN1";
             this.lbN1.Size = new System.Drawing.Size(57, 13);
-            this.lbN1.TabIndex = 14;
+            this.lbN1.TabIndex = 1;
             this.lbN1.Text = "-";
             this.lbN1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
@@ -114,7 +114,7 @@
             this.lbN0.Location = new System.Drawing.Point(66, 92);
             this.lbN0.Name = "lbN0";
             this.lbN0.Size = new System.Drawing.Size(57, 13);
-            this.lbN0.TabIndex = 12;
+            this.lbN0.TabIndex = 1;
             this.lbN0.Text = "-";
             this.lbN0.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
@@ -124,7 +124,7 @@
             this.label5.Location = new System.Drawing.Point(63, 71);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(61, 13);
-            this.label5.TabIndex = 10;
+            this.label5.TabIndex = 1;
             this.label5.Text = "Neighbors";
             // 
             // lbPosition
@@ -133,7 +133,7 @@
             this.lbPosition.Location = new System.Drawing.Point(70, 15);
             this.lbPosition.Name = "lbPosition";
             this.lbPosition.Size = new System.Drawing.Size(11, 13);
-            this.lbPosition.TabIndex = 11;
+            this.lbPosition.TabIndex = 1;
             this.lbPosition.Text = "-";
             // 
             // lbV2
@@ -141,7 +141,7 @@
             this.lbV2.Location = new System.Drawing.Point(16, 122);
             this.lbV2.Name = "lbV2";
             this.lbV2.Size = new System.Drawing.Size(38, 13);
-            this.lbV2.TabIndex = 6;
+            this.lbV2.TabIndex = 1;
             this.lbV2.Text = "-";
             this.lbV2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
@@ -150,7 +150,7 @@
             this.lbV1.Location = new System.Drawing.Point(16, 107);
             this.lbV1.Name = "lbV1";
             this.lbV1.Size = new System.Drawing.Size(38, 13);
-            this.lbV1.TabIndex = 5;
+            this.lbV1.TabIndex = 1;
             this.lbV1.Text = "-";
             this.lbV1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
@@ -159,7 +159,7 @@
             this.lbV0.Location = new System.Drawing.Point(16, 92);
             this.lbV0.Name = "lbV0";
             this.lbV0.Size = new System.Drawing.Size(38, 13);
-            this.lbV0.TabIndex = 7;
+            this.lbV0.TabIndex = 1;
             this.lbV0.Text = "-";
             this.lbV0.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
@@ -169,7 +169,7 @@
             this.label4.Location = new System.Drawing.Point(8, 71);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(47, 13);
-            this.label4.TabIndex = 9;
+            this.label4.TabIndex = 1;
             this.label4.Text = "Vertices";
             // 
             // label1
@@ -178,7 +178,7 @@
             this.label1.Location = new System.Drawing.Point(6, 15);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(52, 13);
-            this.label1.TabIndex = 8;
+            this.label1.TabIndex = 1;
             this.label1.Text = "Position:";
             // 
             // label2
@@ -187,7 +187,7 @@
             this.label2.Location = new System.Drawing.Point(7, 37);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(51, 13);
-            this.label2.TabIndex = 8;
+            this.label2.TabIndex = 1;
             this.label2.Text = "Triangle:";
             // 
             // lbTriangle
@@ -196,7 +196,7 @@
             this.lbTriangle.Location = new System.Drawing.Point(70, 37);
             this.lbTriangle.Name = "lbTriangle";
             this.lbTriangle.Size = new System.Drawing.Size(11, 13);
-            this.lbTriangle.TabIndex = 11;
+            this.lbTriangle.TabIndex = 1;
             this.lbTriangle.Text = "-";
             // 
             // darkButton9
@@ -204,7 +204,7 @@
             this.darkButton9.Location = new System.Drawing.Point(99, 367);
             this.darkButton9.Name = "darkButton9";
             this.darkButton9.Size = new System.Drawing.Size(78, 23);
-            this.darkButton9.TabIndex = 21;
+            this.darkButton9.TabIndex = 10;
             this.darkButton9.Text = "Rprev";
             this.darkButton9.UseVisualStyleBackColor = true;
             this.darkButton9.Click += new System.EventHandler(this.btnPrimitive_Click);
@@ -214,7 +214,7 @@
             this.darkButton7.Location = new System.Drawing.Point(99, 338);
             this.darkButton7.Name = "darkButton7";
             this.darkButton7.Size = new System.Drawing.Size(78, 23);
-            this.darkButton7.TabIndex = 22;
+            this.darkButton7.TabIndex = 8;
             this.darkButton7.Text = "Dprev";
             this.darkButton7.UseVisualStyleBackColor = true;
             this.darkButton7.Click += new System.EventHandler(this.btnPrimitive_Click);
@@ -224,7 +224,7 @@
             this.darkButton5.Location = new System.Drawing.Point(99, 309);
             this.darkButton5.Name = "darkButton5";
             this.darkButton5.Size = new System.Drawing.Size(78, 23);
-            this.darkButton5.TabIndex = 23;
+            this.darkButton5.TabIndex = 6;
             this.darkButton5.Text = "Oprev";
             this.darkButton5.UseVisualStyleBackColor = true;
             this.darkButton5.Click += new System.EventHandler(this.btnPrimitive_Click);
@@ -234,7 +234,7 @@
             this.darkButton3.Location = new System.Drawing.Point(99, 280);
             this.darkButton3.Name = "darkButton3";
             this.darkButton3.Size = new System.Drawing.Size(78, 23);
-            this.darkButton3.TabIndex = 24;
+            this.darkButton3.TabIndex = 4;
             this.darkButton3.Text = "Lprev";
             this.darkButton3.UseVisualStyleBackColor = true;
             this.darkButton3.Click += new System.EventHandler(this.btnPrimitive_Click);
@@ -244,7 +244,7 @@
             this.darkButton8.Location = new System.Drawing.Point(11, 367);
             this.darkButton8.Name = "darkButton8";
             this.darkButton8.Size = new System.Drawing.Size(78, 23);
-            this.darkButton8.TabIndex = 25;
+            this.darkButton8.TabIndex = 9;
             this.darkButton8.Text = "Rnext";
             this.darkButton8.UseVisualStyleBackColor = true;
             this.darkButton8.Click += new System.EventHandler(this.btnPrimitive_Click);
@@ -254,7 +254,7 @@
             this.darkButton6.Location = new System.Drawing.Point(11, 338);
             this.darkButton6.Name = "darkButton6";
             this.darkButton6.Size = new System.Drawing.Size(78, 23);
-            this.darkButton6.TabIndex = 26;
+            this.darkButton6.TabIndex = 7;
             this.darkButton6.Text = "Dnext";
             this.darkButton6.UseVisualStyleBackColor = true;
             this.darkButton6.Click += new System.EventHandler(this.btnPrimitive_Click);
@@ -264,7 +264,7 @@
             this.darkButton4.Location = new System.Drawing.Point(11, 309);
             this.darkButton4.Name = "darkButton4";
             this.darkButton4.Size = new System.Drawing.Size(78, 23);
-            this.darkButton4.TabIndex = 27;
+            this.darkButton4.TabIndex = 5;
             this.darkButton4.Text = "Onext";
             this.darkButton4.UseVisualStyleBackColor = true;
             this.darkButton4.Click += new System.EventHandler(this.btnPrimitive_Click);
@@ -274,7 +274,7 @@
             this.darkButton2.Location = new System.Drawing.Point(11, 280);
             this.darkButton2.Name = "darkButton2";
             this.darkButton2.Size = new System.Drawing.Size(78, 23);
-            this.darkButton2.TabIndex = 28;
+            this.darkButton2.TabIndex = 3;
             this.darkButton2.Text = "Lnext";
             this.darkButton2.UseVisualStyleBackColor = true;
             this.darkButton2.Click += new System.EventHandler(this.btnPrimitive_Click);
@@ -284,12 +284,12 @@
             this.darkButton1.Location = new System.Drawing.Point(11, 251);
             this.darkButton1.Name = "darkButton1";
             this.darkButton1.Size = new System.Drawing.Size(166, 23);
-            this.darkButton1.TabIndex = 20;
+            this.darkButton1.TabIndex = 2;
             this.darkButton1.Text = "Sym";
             this.darkButton1.UseVisualStyleBackColor = true;
             this.darkButton1.Click += new System.EventHandler(this.btnPrimitive_Click);
             // 
-            // TopoControlView
+            // TopologyControlView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -321,7 +321,7 @@
             this.Controls.Add(this.label1);
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ForeColor = System.Drawing.Color.White;
-            this.Name = "TopoControlView";
+            this.Name = "TopologyControlView";
             this.Size = new System.Drawing.Size(195, 439);
             this.ResumeLayout(false);
             this.PerformLayout();

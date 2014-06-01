@@ -1,6 +1,7 @@
 ﻿
 namespace TriangleNet.Meshing
 {
+    using System;
     using System.Collections.Generic;
     using TriangleNet.Geometry;
     using TriangleNet.IO;
@@ -86,9 +87,19 @@ namespace TriangleNet.Meshing
         /// <param name="nx">Number of segments in x direction.</param>
         /// <param name="ny">Number of segments in y direction.</param>
         /// <returns>Mesh</returns>
-        public IMesh StructurdMesh(double width, double height, int nx, int ny)
+        public IMesh StructuredMesh(double width, double height, int nx, int ny)
         {
-            return StructurdMesh(new Rectangle(0.0, 0.0, width, height), nx, ny);
+            if (width <= 0.0)
+            {
+                throw new ArgumentException("width");
+            }
+
+            if (height <= 0.0)
+            {
+                throw new ArgumentException("height");
+            }
+
+            return StructuredMesh(new Rectangle(0.0, 0.0, width, height), nx, ny);
         }
 
         /// <summary>
@@ -98,7 +109,7 @@ namespace TriangleNet.Meshing
         /// <param name="nx">Number of segments in x direction.</param>
         /// <param name="ny">Number of segments in y direction.</param>
         /// <returns>Mesh</returns>
-        public IMesh StructurdMesh(Rectangle bounds, int nx, int ny)
+        public IMesh StructuredMesh(Rectangle bounds, int nx, int ny)
         {
             var polygon = new Polygon((nx + 1) * (ny + 1));
 
@@ -129,10 +140,10 @@ namespace TriangleNet.Meshing
 
             n = 0;
 
-            // Set vertex id and hash.
+            // Set vertex hash and id.
             foreach (var v in points)
             {
-                v.id = v.hash = n++;
+                v.hash = v.id = n++;
             }
 
             // Add boundary segments.
@@ -170,8 +181,20 @@ namespace TriangleNet.Meshing
                     k = j + (ny + 1) * i;
                     l = j + (ny + 1) * (i + 1);
 
-                    triangles[n++] = new InputTriangle(k, l, l + 1);
-                    triangles[n++] = new InputTriangle(k, l + 1, k + 1);
+                    // Create 2 triangles in rectangle [k, l, l + 1, k + 1].
+
+                    if ((i + j) % 2 == 0)
+                    {
+                        // Diagonal from bottom left to top right.
+                        triangles[n++] = new InputTriangle(k, l, l + 1);
+                        triangles[n++] = new InputTriangle(k, l + 1, k + 1);
+                    }
+                    else
+                    {
+                        // Diagonal from top left to bottom right.
+                        triangles[n++] = new InputTriangle(k, l, k + 1);
+                        triangles[n++] = new InputTriangle(l, l + 1, k + 1);
+                    }
                 }
             }
 
