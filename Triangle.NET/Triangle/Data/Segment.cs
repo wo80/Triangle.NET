@@ -13,11 +13,6 @@ namespace TriangleNet.Data
     /// <summary>
     /// The subsegment data structure.
     /// </summary>
-    /// <remarks>
-    /// Each subsegment contains two pointers to adjoining subsegments, plus
-    /// four pointers to vertices, plus two pointers to adjoining triangles,
-    /// plus one boundary marker.
-    /// </remarks>
     public class Segment : ISegment
     {
         // Hash for dictionary. Will be set by mesh instance.

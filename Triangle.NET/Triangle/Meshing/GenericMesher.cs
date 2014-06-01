@@ -7,6 +7,9 @@ namespace TriangleNet.Meshing
     using TriangleNet.IO;
     using TriangleNet.Meshing.Algorithm;
 
+    /// <summary>
+    /// Create meshes of point sets or polygons.
+    /// </summary>
     public class GenericMesher : ITriangulator, IConstraintMesher, IQualityMesher
     {
         ITriangulator triangulator;
@@ -21,55 +24,31 @@ namespace TriangleNet.Meshing
             this.triangulator = triangulator;
         }
 
-        /// <summary>
-        /// Triangulates a point set.
-        /// </summary>
-        /// <param name="points">Collection of points.</param>
-        /// <returns>Mesh</returns>
+        /// <inherit />
         public IMesh Triangulate(ICollection<Vertex> points)
         {
             return triangulator.Triangulate(points);
         }
 
-        /// <summary>
-        /// Triangulates a polygon.
-        /// </summary>
-        /// <param name="polygon">The polygon.</param>
-        /// <returns>Mesh</returns>
+        /// <inherit />
         public IMesh Triangulate(IPolygon polygon)
         {
             return Triangulate(polygon, null, null);
         }
 
-        /// <summary>
-        /// Triangulates a polygon, applying constraint options.
-        /// </summary>
-        /// <param name="polygon">The polygon.</param>
-        /// <param name="options">Constraint options.</param>
-        /// <returns>Mesh</returns>
+        /// <inherit />
         public IMesh Triangulate(IPolygon polygon, ConstraintOptions options)
         {
             return Triangulate(polygon, options, null);
         }
 
-        /// <summary>
-        /// Triangulates a polygon, applying quality options.
-        /// </summary>
-        /// <param name="polygon">The polygon.</param>
-        /// <param name="quality">Quality options.</param>
-        /// <returns>Mesh</returns>
+        /// <inherit />
         public IMesh Triangulate(IPolygon polygon, QualityOptions quality)
         {
             return Triangulate(polygon, null, quality);
         }
 
-        /// <summary>
-        /// Triangulates a polygon, applying quality and constraint options.
-        /// </summary>
-        /// <param name="polygon">The polygon.</param>
-        /// <param name="options">Constraint options.</param>
-        /// <param name="quality">Quality options.</param>
-        /// <returns>Mesh</returns>
+        /// <inherit />
         public IMesh Triangulate(IPolygon polygon, ConstraintOptions options, QualityOptions quality)
         {
             var mesh = (Mesh)triangulator.Triangulate(polygon.Points);
@@ -80,7 +59,7 @@ namespace TriangleNet.Meshing
         }
 
         /// <summary>
-        /// Generates a structured mesh with bounds (0, 0, width, height).
+        /// Generates a structured mesh with bounds [0, 0, width, height].
         /// </summary>
         /// <param name="width">Width of the mesh (must be > 0).</param>
         /// <param name="height">Height of the mesh (must be > 0).</param>

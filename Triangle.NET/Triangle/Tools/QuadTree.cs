@@ -55,20 +55,17 @@ namespace TriangleNet.Tools
             var point = new Point(x, y);
             var indices = root.FindTriangles(point);
 
-            var result = new List<ITriangle>();
-
             foreach (var i in indices)
             {
                 var tri = this.triangles[i];
 
                 if (IsPointInTriangle(point, tri.GetVertex(0), tri.GetVertex(1), tri.GetVertex(2)))
                 {
-                    result.Add(tri);
-                    break;
+                    return tri;
                 }
             }
 
-            return result.FirstOrDefault();
+            return null;
         }
 
         /// <summary>

@@ -34,8 +34,6 @@ namespace TriangleNet.Data
 
         public BadTriQueue()
         {
-            //badtriangles = new List<BadTriangle>();
-
             queuefront = new BadTriangle[4096];
             queuetail = new BadTriangle[4096];
             nextnonemptyq = new int[4096];
@@ -147,19 +145,19 @@ namespace TriangleNet.Data
         /// </summary>
         /// <param name="enqtri"></param>
         /// <param name="minedge"></param>
-        /// <param name="enqapex"></param>
-        /// <param name="enqorg"></param>
-        /// <param name="enqdest"></param>
-        public void Enqueue(ref Otri enqtri, double minedge, Vertex enqapex, Vertex enqorg, Vertex enqdest)
+        /// <param name="apex"></param>
+        /// <param name="org"></param>
+        /// <param name="dest"></param>
+        public void Enqueue(ref Otri enqtri, double minedge, Vertex apex, Vertex org, Vertex dest)
         {
             // Allocate space for the bad triangle.
             BadTriangle newbad = new BadTriangle();
 
             newbad.poortri = enqtri;
             newbad.key = minedge;
-            newbad.apex = enqapex;
-            newbad.org = enqorg;
-            newbad.dest = enqdest;
+            newbad.apex = apex;
+            newbad.org = org;
+            newbad.dest = dest;
 
             Enqueue(newbad);
         }

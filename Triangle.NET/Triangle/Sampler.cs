@@ -1,5 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="Sampler.cs">
+// Original Triangle code by Jonathan Richard Shewchuk, http://www.cs.cmu.edu/~quake/triangle.html
 // Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
@@ -11,7 +12,7 @@ namespace TriangleNet
     using System.Linq;
 
     /// <summary>
-    /// Used for triangle sampling in the Mesh.Locate method.
+    /// Used for triangle sampling in the <see cref="TriangleLocator"/> class.
     /// </summary>
     class Sampler
     {

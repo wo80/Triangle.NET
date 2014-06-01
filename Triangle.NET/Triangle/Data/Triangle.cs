@@ -13,12 +13,6 @@ namespace TriangleNet.Data
     /// <summary>
     /// The triangle data structure.
     /// </summary>
-    /// <remarks>
-    /// Each triangle contains three pointers to adjoining triangles, plus three 
-    /// pointers to vertices, plus three pointers to subsegments (declared below;
-    /// these pointers are usually 'dummysub'). It may or may not also contain 
-    /// user-defined attributes and/or a floating-point "area constraint".
-    /// </remarks>
     public class Triangle : ITriangle
     {
         // Hash for dictionary. Will be set by mesh instance.

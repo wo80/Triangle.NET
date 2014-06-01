@@ -13,12 +13,14 @@ namespace TriangleNet
     using TriangleNet.Tools;
 
     /// <summary>
+    /// Adaptive exact arithmetic geometric predicates.
+    /// </summary>
+    /// <remarks>
     /// The adaptive exact arithmetic geometric predicates implemented herein are described in
     /// detail in the paper "Adaptive Precision Floating-Point Arithmetic and Fast Robust
     /// Geometric Predicates." by Jonathan Richard Shewchuk, see
     /// http://www.cs.cmu.edu/~quake/robust.html
-    /// </summary>
-    /// <remarks>
+    /// 
     /// The macros of the original C code were automatically expanded using the Visual Studio
     /// command prompt with the command "CL /P /C EXACT.C", see
     /// http://msdn.microsoft.com/en-us/library/8z9z0bx6.aspx
@@ -28,7 +30,7 @@ namespace TriangleNet
         private static double epsilon, splitter, resulterrbound;
         private static double ccwerrboundA, ccwerrboundB, ccwerrboundC;
         private static double iccerrboundA, iccerrboundB, iccerrboundC;
-        private static double o3derrboundA, o3derrboundB, o3derrboundC;
+        //private static double o3derrboundA, o3derrboundB, o3derrboundC;
 
         /// <summary>
         /// Initialize the variables used for exact arithmetic.  
@@ -82,9 +84,9 @@ namespace TriangleNet
             iccerrboundA = (10.0 + 96.0 * epsilon) * epsilon;
             iccerrboundB = (4.0 + 48.0 * epsilon) * epsilon;
             iccerrboundC = (44.0 + 576.0 * epsilon) * epsilon * epsilon;
-            o3derrboundA = (7.0 + 56.0 * epsilon) * epsilon;
-            o3derrboundB = (3.0 + 28.0 * epsilon) * epsilon;
-            o3derrboundC = (26.0 + 288.0 * epsilon) * epsilon * epsilon;
+            //o3derrboundA = (7.0 + 56.0 * epsilon) * epsilon;
+            //o3derrboundB = (3.0 + 28.0 * epsilon) * epsilon;
+            //o3derrboundC = (26.0 + 288.0 * epsilon) * epsilon * epsilon;
         }
 
         /// <summary>
@@ -237,15 +239,15 @@ namespace TriangleNet
         /// <summary>
         /// Find the circumcenter of a triangle.
         /// </summary>
-        /// <param name="torg">Triangle point.</param>
-        /// <param name="tdest">Triangle point.</param>
-        /// <param name="tapex">Triangle point.</param>
+        /// <param name="org">Triangle point.</param>
+        /// <param name="dest">Triangle point.</param>
+        /// <param name="apex">Triangle point.</param>
         /// <param name="xi">Relative coordinate of new location.</param>
         /// <param name="eta">Relative coordinate of new location.</param>
         /// <param name="offconstant">Off-center constant.</param>
         /// <returns>Coordinates of the circumcenter (or off-center)</returns>
-        public static Point FindCircumcenter(Point torg, Point tdest, Point tapex,
-                              ref double xi, ref double eta, double offconstant)
+        public static Point FindCircumcenter(Point org, Point dest, Point apex,
+            ref double xi, ref double eta, double offconstant)
         {
             double xdo, ydo, xao, yao;
             double dodist, aodist, dadist;
@@ -255,14 +257,14 @@ namespace TriangleNet
             Statistic.CircumcenterCount++;
 
             // Compute the circumcenter of the triangle.
-            xdo = tdest.x - torg.x;
-            ydo = tdest.y - torg.y;
-            xao = tapex.x - torg.x;
-            yao = tapex.y - torg.y;
+            xdo = dest.x - org.x;
+            ydo = dest.y - org.y;
+            xao = apex.x - org.x;
+            yao = apex.y - org.y;
             dodist = xdo * xdo + ydo * ydo;
             aodist = xao * xao + yao * yao;
-            dadist = (tdest.x - tapex.x) * (tdest.x - tapex.x) +
-                     (tdest.y - tapex.y) * (tdest.y - tapex.y);
+            dadist = (dest.x - apex.x) * (dest.x - apex.x) +
+                     (dest.y - apex.y) * (dest.y - apex.y);
 
             if (Behavior.NoExact)
             {
@@ -273,7 +275,7 @@ namespace TriangleNet
                 // Use the counterclockwise() routine to ensure a positive (and
                 // reasonably accurate) result, avoiding any possibility of
                 // division by zero.
-                denominator = 0.5 / CounterClockwise(tdest, tapex, torg);
+                denominator = 0.5 / CounterClockwise(dest, apex, org);
                 // Don't count the above as an orientation test.
                 Statistic.CounterClockwiseCount--;
             }
@@ -321,8 +323,8 @@ namespace TriangleNet
             {
                 if (offconstant > 0.0)
                 {
-                    dxoff = 0.5 * (tapex.x - tdest.x) - offconstant * (tapex.y - tdest.y);
-                    dyoff = 0.5 * (tapex.y - tdest.y) + offconstant * (tapex.x - tdest.x);
+                    dxoff = 0.5 * (apex.x - dest.x) - offconstant * (apex.y - dest.y);
+                    dyoff = 0.5 * (apex.y - dest.y) + offconstant * (apex.x - dest.x);
                     // If the off-center is closer to the destination than the
                     // circumcenter, use the off-center instead.
                     if (dxoff * dxoff + dyoff * dyoff <
@@ -342,15 +344,15 @@ namespace TriangleNet
             xi = (yao * dx - xao * dy) * (2.0 * denominator);
             eta = (xdo * dy - ydo * dx) * (2.0 * denominator);
 
-            return new Point(torg.x + dx, torg.y + dy);
+            return new Point(org.x + dx, org.y + dy);
         }
 
         /// <summary>
         /// Find the circumcenter of a triangle.
         /// </summary>
-        /// <param name="torg">Triangle point.</param>
-        /// <param name="tdest">Triangle point.</param>
-        /// <param name="tapex">Triangle point.</param>
+        /// <param name="org">Triangle point.</param>
+        /// <param name="dest">Triangle point.</param>
+        /// <param name="apex">Triangle point.</param>
         /// <param name="xi">Relative coordinate of new location.</param>
         /// <param name="eta">Relative coordinate of new location.</param>
         /// <returns>Coordinates of the circumcenter</returns>
@@ -363,8 +365,8 @@ namespace TriangleNet
         /// This procedure also returns the square of the length of the triangle's
         /// shortest edge.
         /// </remarks>
-        public static Point FindCircumcenter(Point torg, Point tdest, Point tapex,
-                              ref double xi, ref double eta)
+        public static Point FindCircumcenter(Point org, Point dest, Point apex,
+            ref double xi, ref double eta)
         {
             double xdo, ydo, xao, yao;
             double dodist, aodist;
@@ -374,10 +376,10 @@ namespace TriangleNet
             Statistic.CircumcenterCount++;
 
             // Compute the circumcenter of the triangle.
-            xdo = tdest.x - torg.x;
-            ydo = tdest.y - torg.y;
-            xao = tapex.x - torg.x;
-            yao = tapex.y - torg.y;
+            xdo = dest.x - org.x;
+            ydo = dest.y - org.y;
+            xao = apex.x - org.x;
+            yao = apex.y - org.y;
             dodist = xdo * xdo + ydo * ydo;
             aodist = xao * xao + yao * yao;
 
@@ -390,7 +392,7 @@ namespace TriangleNet
                 // Use the counterclockwise() routine to ensure a positive (and
                 // reasonably accurate) result, avoiding any possibility of
                 // division by zero.
-                denominator = 0.5 / CounterClockwise(tdest, tapex, torg);
+                denominator = 0.5 / CounterClockwise(dest, apex, org);
                 // Don't count the above as an orientation test.
                 Statistic.CounterClockwiseCount--;
             }
@@ -406,7 +408,7 @@ namespace TriangleNet
             xi = (yao * dx - xao * dy) * (2.0 * denominator);
             eta = (xdo * dy - ydo * dx) * (2.0 * denominator);
 
-            return new Point(torg.x + dx, torg.y + dy);
+            return new Point(org.x + dx, org.y + dy);
         }
 
         #region Exact arithmetics

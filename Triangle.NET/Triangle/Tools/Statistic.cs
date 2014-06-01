@@ -8,7 +8,6 @@
 namespace TriangleNet.Tools
 {
     using System;
-    using System.Text;
     using TriangleNet.Data;
     using TriangleNet.Geometry;
 
@@ -109,66 +108,6 @@ namespace TriangleNet.Tools
         /// </summary>
         public double LargestAngle { get { return maxAngle; } }
 
-        int inVetrices = 0;
-        /// <summary>
-        /// Gets the number of input vertices.
-        /// </summary>
-        public int InputVertices { get { return inVetrices; } }
-
-        int inTriangles = 0;
-        /// <summary>
-        /// Gets the number of input triangles.
-        /// </summary>
-        public int InputTriangles { get { return inTriangles; } }
-
-        int inSegments = 0;
-        /// <summary>
-        /// Gets the number of input segments.
-        /// </summary>
-        public int InputSegments { get { return inSegments; } }
-
-        int inHoles = 0;
-        /// <summary>
-        /// Gets the number of input holes.
-        /// </summary>
-        public int InputHoles { get { return inHoles; } }
-
-        int outVertices = 0;
-        /// <summary>
-        /// Gets the number of mesh vertices.
-        /// </summary>
-        public int Vertices { get { return outVertices; } }
-
-        int outTriangles = 0;
-        /// <summary>
-        /// Gets the number of mesh triangles.
-        /// </summary>
-        public int Triangles { get { return outTriangles; } }
-
-        int outEdges = 0;
-        /// <summary>
-        /// Gets the number of mesh edges.
-        /// </summary>
-        public int Edges { get { return outEdges; } }
-
-        int boundaryEdges = 0;
-        /// <summary>
-        /// Gets the number of exterior boundary edges.
-        /// </summary>
-        public int BoundaryEdges { get { return boundaryEdges; } }
-
-        int intBoundaryEdges = 0;
-        /// <summary>
-        /// Gets the number of interior boundary edges.
-        /// </summary>
-        public int InteriorBoundaryEdges { get { return intBoundaryEdges; } }
-
-        int constrainedEdges = 0;
-        /// <summary>
-        /// Gets the number of constrained edges.
-        /// </summary>
-        public int ConstrainedEdges { get { return constrainedEdges; } }
-
         int[] angleTable;
         /// <summary>
         /// Gets the angle histogram.
@@ -264,17 +203,6 @@ namespace TriangleNet.Tools
         /// <param name="mesh"></param>
         public void Update(Mesh mesh, int sampleDegrees)
         {
-            inVetrices = mesh.invertices;
-            inTriangles = mesh.inelements;
-            inSegments = mesh.insegments;
-            inHoles = mesh.holes.Count;
-            outVertices = mesh.vertices.Count - mesh.undeads;
-            outTriangles = mesh.triangles.Count;
-            outEdges = (int)mesh.edges;
-            boundaryEdges = (int)mesh.hullsize;
-            intBoundaryEdges = mesh.subsegs.Count - (int)mesh.hullsize;
-            constrainedEdges = mesh.subsegs.Count;
-
             Point[] p = new Point[3];
 
             int k1, k2;

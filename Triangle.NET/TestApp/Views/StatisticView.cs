@@ -75,9 +75,9 @@ namespace MeshExplorer.Views
         public void HandleMeshChange(Mesh mesh)
         {
             // New mesh stats
-            lbNumVert.Text = statistic.Vertices.ToString();
-            lbNumSeg.Text = statistic.ConstrainedEdges.ToString();
-            lbNumTri.Text = statistic.Triangles.ToString();
+            lbNumVert.Text = mesh.Vertices.Count.ToString();
+            lbNumSeg.Text = mesh.Segments.Count.ToString();
+            lbNumTri.Text = mesh.Triangles.Count.ToString();
 
             // Update statistics tab
             angleHistogram1.SetData(statistic.MinAngleHistogram, statistic.MaxAngleHistogram);

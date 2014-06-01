@@ -14,10 +14,13 @@ namespace TriangleNet.Meshing
     using TriangleNet.Geometry;
 
     /// <summary>
-    /// The DataReader class provides methods for mesh reconstruction.
+    /// The Converter class provides methods for mesh reconstruction.
     /// </summary>
     public class Converter
     {
+        /// <summary>
+        /// Reconstruct a triangulation from its raw data representation.
+        /// </summary>
         public Mesh ToMesh(Polygon polygon, IList<ITriangle> triangles)
         {
             return ToMesh(polygon, triangles.ToArray());
@@ -26,25 +29,6 @@ namespace TriangleNet.Meshing
         /// <summary>
         /// Reconstruct a triangulation from its raw data representation.
         /// </summary>
-        /// <remarks>
-        /// Reads an .ele file and reconstructs the original mesh.  If the -p switch
-        /// is used, this procedure will also read a .poly file and reconstruct the
-        /// subsegments of the original mesh.  If the -a switch is used, this
-        /// procedure will also read an .area file and set a maximum area constraint
-        /// on each triangle.
-        ///
-        /// Vertices that are not corners of triangles, such as nodes on edges of
-        /// subparametric elements, are discarded.
-        ///
-        /// This routine finds the adjacencies between triangles (and subsegments)
-        /// by forming one stack of triangles for each vertex. Each triangle is on
-        /// three different stacks simultaneously. Each triangle's subsegment
-        /// pointers are used to link the items in each stack. This memory-saving
-        /// feature makes the code harder to read. The most important thing to keep
-        /// in mind is that each triangle is removed from a stack precisely when
-        /// the corresponding pointer is adjusted to refer to a subsegment rather
-        /// than the next triangle of the stack.
-        /// </remarks>
         public Mesh ToMesh(Polygon polygon, ITriangle[] triangles)
         {
             Otri tri = default(Otri);
@@ -93,8 +77,8 @@ namespace TriangleNet.Meshing
         }
 
         /// <summary>
-        /// Finds the adjacencies between triangles by forming a stack of triangles
-        /// for each vertex.
+        /// Finds the adjacencies between triangles by forming a stack of triangles for
+        /// each vertex. Each triangle is on three different stacks simultaneously.
         /// </summary>
         private static List<Otri>[] SetNeighbors(Mesh mesh, ITriangle[] triangles)
         {
@@ -102,15 +86,14 @@ namespace TriangleNet.Meshing
             Otri triangleleft = default(Otri);
             Otri checktri = default(Otri);
             Otri checkleft = default(Otri);
-            Otri nexttri; // Triangle
+            Otri nexttri;
             Vertex tdest, tapex;
             Vertex checkdest, checkapex;
             int[] corner = new int[3];
             int aroundvertex;
             int i;
 
-            // Allocate a temporary array that maps each vertex to some adjacent
-            // triangle.
+            // Allocate a temporary array that maps each vertex to some adjacent triangle.
             var vertexarray = new List<Otri>[mesh.vertices.Count];
 
             // Each vertex is initially unrepresented.
@@ -164,11 +147,12 @@ namespace TriangleNet.Meshing
                 {
                     // Take the number for the origin of triangleloop.
                     aroundvertex = corner[tri.orient];
+
                     int index = vertexarray[aroundvertex].Count - 1;
+
                     // Look for other triangles having this vertex.
                     nexttri = vertexarray[aroundvertex][index];
-                    // Link the current triangle to the next one in the stack.
-                    //tri.triangle.neighbors[tri.orient] = nexttri;
+
                     // Push the current triangle onto the stack.
                     vertexarray[aroundvertex].Add(tri);
 
@@ -212,6 +196,9 @@ namespace TriangleNet.Meshing
             return vertexarray;
         }
 
+        /// <summary>
+        /// Finds the adjacencies between triangles and subsegments.
+        /// </summary>
         private static void SetSegments(Mesh mesh, Polygon polygon, List<Otri>[] vertexarray)
         {
             Otri checktri = default(Otri);

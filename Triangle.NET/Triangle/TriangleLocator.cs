@@ -11,8 +11,12 @@ namespace TriangleNet
     using TriangleNet.Geometry;
 
     /// <summary>
-    /// TODO: Update summary.
+    /// Locate triangles in a mesh.
     /// </summary>
+    /// <remarks>
+    /// WARNING: This routine is designed for convex triangulations, and will
+    /// not generally work after the holes and concavities have been carved.
+    /// </remarks>
     class TriangleLocator
     {
         Sampler sampler;

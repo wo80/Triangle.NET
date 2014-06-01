@@ -5,6 +5,9 @@ namespace TriangleNet.Geometry
     using System.Collections.Generic;
     using TriangleNet.Data;
 
+    /// <summary>
+    /// A polygon represented as a planar straight line graph.
+    /// </summary>
     public class Polygon : IPolygon
     {
         List<Vertex> points;
@@ -13,30 +16,37 @@ namespace TriangleNet.Geometry
 
         List<IEdge> segments;
 
+        /// <inherit />
         public List<Vertex> Points
         {
             get { return points; }
         }
 
+        /// <inherit />
         public List<Point> Holes
         {
             get { return holes; }
         }
 
+        /// <inherit />
         public List<RegionPointer> Regions
         {
             get { return regions; }
         }
 
+        /// <inherit />
         public List<IEdge> Segments
         {
             get { return segments; }
         }
 
+        /// <inherit />
         public bool HasPointMarkers { get; set; }
 
+        /// <inherit />
         public bool HasSegmentMarkers { get; set; }
 
+        /// <inherit />
         public int Count
         {
             get { return points.Count; }
@@ -59,6 +69,7 @@ namespace TriangleNet.Geometry
             HasSegmentMarkers = false;
         }
 
+        /// <inherit />
         public void AddContour(IEnumerable<Vertex> points, int marker = 0,
             bool hole = false, bool convex = false)
         {
@@ -106,6 +117,7 @@ namespace TriangleNet.Geometry
             }
         }
 
+        /// <inherit />
         public void AddContour(IEnumerable<Vertex> points, int marker, Point hole)
         {
             // Copy input to list.
@@ -130,9 +142,11 @@ namespace TriangleNet.Geometry
                 this.segments.Add(new Edge(offset + i, offset + ((i + 1) % count), marker));
             }
 
+            // TODO: check if hole is actually inside contour?
             this.holes.Add(hole);
         }
 
+        /// <inherit />
         public Rectangle Bounds()
         {
             var bounds = new Rectangle();
@@ -141,11 +155,17 @@ namespace TriangleNet.Geometry
             return bounds;
         }
 
+        /// <summary>
+        /// Add a vertex to the polygon.
+        /// </summary>
         public void Add(Vertex vertex)
         {
             this.points.Add(vertex);
         }
 
+        /// <summary>
+        /// Add a vertex to the polygon.
+        /// </summary>
         public void Add(Vertex vertex, double[] attributes)
         {
             // TODO: check attibutes
@@ -155,6 +175,9 @@ namespace TriangleNet.Geometry
             this.points.Add(vertex);
         }
 
+        /// <summary>
+        /// Add a segment to the polygon.
+        /// </summary>
         public void Add(Edge edge)
         {
             this.segments.Add(edge);

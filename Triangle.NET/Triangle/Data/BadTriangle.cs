@@ -21,7 +21,7 @@ namespace TriangleNet.Data
     class BadTriangle
     {
         public Otri poortri; // A skinny or too-large triangle.
-        public double key;       // cos^2 of smallest (apical) angle.
+        public double key; // cos^2 of smallest (apical) angle.
         public Vertex org, dest, apex; // Its three vertices.
         public BadTriangle next; // Pointer to next bad triangle.
 

@@ -14,10 +14,9 @@ namespace TriangleNet.Data
     /// An oriented subsegment.
     /// </summary>
     /// <remarks>
-    /// Iincludes a pointer to a subsegment and an orientation. The orientation
-    /// denotes a side of the edge.  Hence, there are two possible orientations.
-    /// By convention, the edge is always directed so that the "side" denoted
-    /// is the right side of the edge.
+    /// Includes a pointer to a subsegment and an orientation. The orientation denotes a
+    /// side of the edge. Hence, there are two possible orientations. By convention, the
+    /// edge is always directed so that the "side" denoted is the right side of the edge.
     /// </remarks>
     struct Osub
     {

@@ -315,7 +315,7 @@ namespace TriangleNet.Tools
                         sfn.seg = subsegMap[f_next.triangle.hash];
 
                         // Insert point Lf,f_next /\ Sf_next into P
-                        if (SegmentsIntersect(sfn.SegOrg(), sfn.SegDest(), cc_f, cc_f_next, out p, true))
+                        if (SegmentsIntersect(sfn.Org(), sfn.Dest(), cc_f, cc_f_next, out p, true))
                         {
                             p.id = n + segIndex++;
                             segPoints.Add(p);
@@ -332,7 +332,7 @@ namespace TriangleNet.Tools
                     if (!f_next.triangle.infected)
                     {
                         // Insert point Lf,f_next /\ Sf into P
-                        if (SegmentsIntersect(sf.SegOrg(), sf.SegDest(), cc_f, cc_f_next, out p, true))
+                        if (SegmentsIntersect(sf.Org(), sf.Dest(), cc_f, cc_f_next, out p, true))
                         {
                             p.id = n + segIndex++;
                             segPoints.Add(p);
@@ -348,14 +348,14 @@ namespace TriangleNet.Tools
                         if (!sf.Equal(sfn))
                         {
                             // Insert Lf,fnext /\ Sf and Lf,fnext /\ Sfnext into P
-                            if (SegmentsIntersect(sf.SegOrg(), sf.SegDest(), cc_f, cc_f_next, out p, true))
+                            if (SegmentsIntersect(sf.Org(), sf.Dest(), cc_f, cc_f_next, out p, true))
                             {
                                 p.id = n + segIndex++;
                                 segPoints.Add(p);
                                 vpoints.Add(p);
                             }
 
-                            if (SegmentsIntersect(sfn.SegOrg(), sfn.SegDest(), cc_f, cc_f_next, out p, true))
+                            if (SegmentsIntersect(sfn.Org(), sfn.Dest(), cc_f, cc_f_next, out p, true))
                             {
                                 p.id = n + segIndex++;
                                 segPoints.Add(p);
@@ -486,7 +486,7 @@ namespace TriangleNet.Tools
                         sfn.seg = subsegMap[f_next.triangle.hash];
 
                         // Insert point Lf,f_next /\ Sf_next into P
-                        if (SegmentsIntersect(sfn.SegOrg(), sfn.SegDest(), cc_f, cc_f_next, out p, true))
+                        if (SegmentsIntersect(sfn.Org(), sfn.Dest(), cc_f, cc_f_next, out p, true))
                         {
                             p.id = n + segIndex++;
                             segPoints.Add(p);
@@ -499,8 +499,8 @@ namespace TriangleNet.Tools
                     // Call Sf the constrained edge blinding f
                     sf.seg = subsegMap[f.triangle.hash];
 
-                    sorg = sf.SegOrg();
-                    sdest = sf.SegDest();
+                    sorg = sf.Org();
+                    sdest = sf.Dest();
 
                     // if f_next is tagged non-blind then
                     if (!f_next.triangle.infected)
@@ -546,7 +546,7 @@ namespace TriangleNet.Tools
                                 vpoints.Add(p);
                             }
 
-                            if (SegmentsIntersect(sfn.SegOrg(), sfn.SegDest(), cc_f, cc_f_next, out p, true))
+                            if (SegmentsIntersect(sfn.Org(), sfn.Dest(), cc_f, cc_f_next, out p, true))
                             {
                                 p.id = n + segIndex++;
                                 segPoints.Add(p);

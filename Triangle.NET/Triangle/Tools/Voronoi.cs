@@ -5,13 +5,13 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using TriangleNet.Data;
-using TriangleNet.Geometry;
-
 namespace TriangleNet.Tools
 {
+    using System;
+    using System.Collections.Generic;
+    using TriangleNet.Data;
+    using TriangleNet.Geometry;
+
     /// <summary>
     /// The Voronoi Diagram is the dual of a pointset triangulation.
     /// </summary>
@@ -103,7 +103,7 @@ namespace TriangleNet.Tools
             {
                 //if (item.Boundary == 0)
                 {
-                    ConstructVoronoiRegion(region);
+                    ConstructCell(region);
                 }
             }
         }
@@ -134,9 +134,8 @@ namespace TriangleNet.Tools
         /// <summary>
         /// Construct Voronoi region for given vertex.
         /// </summary>
-        /// <param name="vertex"></param>
-        /// <returns>The circumcenter indices which make up the cell.</returns>
-        private void ConstructVoronoiRegion(VoronoiRegion region)
+        /// <param name="region"></param>
+        private void ConstructCell(VoronoiRegion region)
         {
             var vertex = region.Generator as Vertex;
 

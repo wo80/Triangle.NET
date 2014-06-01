@@ -10,10 +10,15 @@ namespace TriangleNet.Meshing
     using TriangleNet.Geometry;
 
     /// <summary>
-    /// TODO: Update summary.
+    /// Interface for point set triangulation.
     /// </summary>
     public interface ITriangulator
     {
+        /// <summary>
+        /// Triangulates a point set.
+        /// </summary>
+        /// <param name="points">Collection of points.</param>
+        /// <returns>Mesh</returns>
         IMesh Triangulate(ICollection<Vertex> points);
     }
 }
