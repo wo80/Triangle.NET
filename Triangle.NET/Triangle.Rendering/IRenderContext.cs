@@ -26,5 +26,7 @@ namespace TriangleNet.Rendering
 
         void Add(float[] values);
         void Add(int[] partition);
+
+        void Enable(int layer, bool enabled);
     }
 }

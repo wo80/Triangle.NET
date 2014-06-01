@@ -18,8 +18,10 @@ namespace MeshExplorer
     public partial class FormMain : Form
     {
         Settings settings;
-        IPolygon input;
+
         Mesh mesh;
+        IPolygon input;
+        IVoronoi voronoi;
 
         FormLog frmLog;
         FormGenerator frmGenerator;
@@ -250,6 +252,7 @@ namespace MeshExplorer
         {
             // Reset mesh
             mesh = null;
+            voronoi = null;
 
             // Reset state
             settings.RefineMode = false;
@@ -282,6 +285,8 @@ namespace MeshExplorer
 
         private void HandleMeshImport()
         {
+            voronoi = null;
+
             // Render mesh
             renderManager.Set(mesh, true);
 
@@ -317,6 +322,7 @@ namespace MeshExplorer
             statisticView.HandleMeshChange(mesh);
 
             // TODO: Should the Voronoi diagram automatically update?
+            voronoi = null;
             menuViewVoronoi.Checked = false;
 
             // Enable menu items
@@ -452,8 +458,6 @@ namespace MeshExplorer
         {
             if (input == null) return;
 
-            //Stopwatch sw = new Stopwatch();
-
             var options = new ConstraintOptions();
             var quality = new QualityOptions();
 
@@ -464,8 +468,6 @@ namespace MeshExplorer
 
             if (meshControlView.ParamQualityChecked)
             {
-                //mesh.Behavior.Quality = true;
-
                 quality.MinimumAngle = meshControlView.ParamMinAngleValue;
 
                 double maxAngle = meshControlView.ParamMaxAngleValue;
@@ -493,7 +495,6 @@ namespace MeshExplorer
 
             try
             {
-                //sw.Start();
                 if (meshControlView.ParamSweeplineChecked)
                 {
                     mesh = (Mesh)input.Triangulate(options, quality, new SweepLine());
@@ -502,7 +503,6 @@ namespace MeshExplorer
                 {
                     mesh = (Mesh)input.Triangulate(options, quality);
                 }
-                //sw.Stop();
 
                 statisticView.UpdateStatistic(mesh);
 
@@ -526,8 +526,6 @@ namespace MeshExplorer
         {
             if (mesh == null) return;
 
-            Stopwatch sw = new Stopwatch();
-
             double area = meshControlView.ParamMaxAreaValue;
 
             var quality = new QualityOptions();
@@ -548,9 +546,7 @@ namespace MeshExplorer
 
             try
             {
-                sw.Start();
                 mesh.Refine(quality);
-                sw.Stop();
 
                 statisticView.UpdateStatistic(mesh);
 
@@ -587,15 +583,11 @@ namespace MeshExplorer
                 return;
             }
 
-            Stopwatch sw = new Stopwatch();
-
             var smoother = new SimpleSmoother();
 
             try
             {
-                sw.Start();
                 smoother.Smooth(this.mesh);
-                sw.Stop();
 
                 statisticView.UpdateStatistic(mesh);
 
@@ -608,6 +600,25 @@ namespace MeshExplorer
             }
 
             UpdateLog();
+        }
+
+        private void CreateVoronoi()
+        {
+            if (mesh == null)
+            {
+                return;
+            }
+
+            if (mesh.IsPolygon)
+            {
+                this.voronoi = new BoundedVoronoi(mesh);
+            }
+            else
+            {
+                this.voronoi = new Voronoi(mesh);
+            }
+
+            renderManager.Set(voronoi, false);
         }
 
         private void ShowLog()
@@ -698,32 +709,18 @@ namespace MeshExplorer
 
         private void menuViewVoronoi_Click(object sender, EventArgs e)
         {
-            if (mesh == null)
+            if (this.voronoi == null)
             {
-                return;
-            }
-
-            if (menuViewVoronoi.Checked)
-            {
-                //renderManager.ShowVoronoi = false;
-                menuViewVoronoi.Checked = false;
-                return;
-            }
-
-            IVoronoi voronoi;
-
-            if (mesh.IsPolygon)
-            {
-                voronoi = new BoundedVoronoi(mesh);
+                CreateVoronoi();
+                menuViewVoronoi.Checked = true;
             }
             else
             {
-                voronoi = new Voronoi(mesh);
+                bool visible = menuViewVoronoi.Checked;
+
+                renderManager.Enable(4, !visible);
+                menuViewVoronoi.Checked = !visible;
             }
-
-            renderManager.Set(voronoi, false);
-
-            menuViewVoronoi.Checked = true;
         }
 
         private void menuViewLog_Click(object sender, EventArgs e)

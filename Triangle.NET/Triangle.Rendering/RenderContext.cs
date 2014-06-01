@@ -77,6 +77,9 @@ namespace TriangleNet.Rendering
                 layer.Reset(true);
             }
 
+            // Always clear voronoi layer.
+            RenderLayers[4].Reset(true);
+
             this.bounds = RenderLayers[2].SetPoints(data);
             this.zoom.Initialize(bounds);
 
@@ -93,6 +96,9 @@ namespace TriangleNet.Rendering
             {
                 layer.Reset(reset);
             }
+
+            // Always clear voronoi layer.
+            RenderLayers[4].Reset(true);
 
             // Save reference to mesh.
             this.mesh = data;
@@ -137,6 +143,11 @@ namespace TriangleNet.Rendering
             RenderLayers[0].AttachLayerData(data);
 
             RenderLayers[0].IsActive = true;
+        }
+
+        public void Enable(int layer, bool enabled)
+        {
+            renderLayers[layer].IsActive = enabled;
         }
     }
 }

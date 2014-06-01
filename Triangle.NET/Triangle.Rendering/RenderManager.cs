@@ -85,6 +85,13 @@ namespace TriangleNet.Rendering
             control.HandleMouseWheel(x, y, delta);
         }
 
+        public void Enable(int layer, bool enabled)
+        {
+            context.Enable(layer, enabled);
+
+            control.Refresh();
+        }
+
         public void Set(IPolygon data, bool refresh = true)
         {
             context.Add(data);
