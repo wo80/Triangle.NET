@@ -31,66 +31,19 @@ namespace MeshExplorer.Generators
 
         public override IPolygon Generate(double param0, double param1, double param2)
         {
-            int numPoints = GetParamValueInt(1, param1);
+            int n = GetParamValueInt(1, param1);
 
-            var input = new Polygon(numPoints + 4);
-
-            double x, y, step = 2 * Math.PI / numPoints;
+            var input = new Polygon(n + 4);
 
             double r = GetParamValueInt(2, param2);
 
-            // Generate circle
-            for (int i = 0; i < numPoints; i++)
-            {
-                x = r * Math.Cos(i * step);
-                y = r * Math.Sin(i * step);
+            // Generate circle (hole)
+            input.AddContour(CreateCircle(r, n, 1), 1, new Point(0, 0));
 
-                input.Add(new Vertex(x, y, 2));
-                input.Add(new Edge(i, (i + 1) % numPoints, 2));
-            }
+            n = GetParamValueInt(0, param0);
 
-            numPoints = input.Points.Count;
-
-            int numPointsB = GetParamValueInt(0, param0);
-
-            // Box sides are 100 units long
-            step = 100.0 / numPointsB;
-
-            // Left box boundary points
-            for (int i = 0; i < numPointsB; i++)
-            {
-                input.Add(new Vertex(-50, -50 + i * step, 1));
-            }
-
-            // Top box boundary points
-            for (int i = 0; i < numPointsB; i++)
-            {
-                input.Add(new Vertex(-50 + i * step, 50, 1));
-            }
-
-            // Right box boundary points
-            for (int i = 0; i < numPointsB; i++)
-            {
-                input.Add(new Vertex(50, 50 - i * step, 1));
-            }
-
-            // Bottom box boundary points
-            for (int i = 0; i < numPointsB; i++)
-            {
-                input.Add(new Vertex(50 - i * step, -50, 1));
-            }
-
-            // Add box segments
-            for (int i = numPoints; i < input.Count - 1; i++)
-            {
-                input.Add(new Edge(i, i + 1, 1));
-            }
-
-            // Add last segments which closes the box
-            input.Add(new Edge(input.Count - 1, numPoints, 1));
-
-            // Add hole
-            input.Holes.Add(new Point(0, 0));
+            // Generate box
+            input.AddContour(CreateRectangle(new Rectangle(-50, -50, 100, 100), n, 2), 2);
 
             return input;
         }

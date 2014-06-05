@@ -6,10 +6,6 @@
 
 namespace MeshExplorer.Generators
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using TriangleNet.Geometry;
 
     /// <summary>
@@ -34,53 +30,27 @@ namespace MeshExplorer.Generators
         {
             // Number of points on the outer circle
             int n = GetParamValueInt(0, param0);
-            int count, npoints;
 
             double radius = GetParamValueInt(1, param1);
 
-            // Step size on the outer circle
-            double h = 2 * Math.PI * radius / n;
-
             // Current radius and step size
-            double r, dphi;
+            double r, h = radius / n;
 
             var input = new Polygon(n + 1);
 
-            // Inner cirlce (radius = 1)
+            // Inner cirlce (radius = 1) (hole)
             r = 1;
-            npoints = (int)(2 * Math.PI * r / h);
-            dphi = 2 * Math.PI / npoints;
-            for (int i = 0; i < npoints; i++)
-            {
-                input.Add(new Vertex(r * Math.Cos(i * dphi), r * Math.Sin(i * dphi), 1));
-                input.Add(new Edge(i, (i + 1) % npoints, 1));
-            }
-
-            count = input.Count;
+            input.AddContour(CreateCircle(r, (int)(r / h), 1), 1, new Point(0, 0));
 
             // Center cirlce
-            r = (radius + 1) / 2.0;
-            npoints = (int)(2 * Math.PI * r / h);
-            dphi = 2 * Math.PI / npoints;
-            for (int i = 0; i < npoints; i++)
-            {
-                input.Add(new Vertex(r * Math.Cos(i * dphi), r * Math.Sin(i * dphi), 2));
-                input.Add(new Edge(count + i, count + (i + 1) % npoints, 2));
-            }
+            r = (radius + 1.0) / 2.0;
+            input.AddContour(CreateCircle(r, (int)(r / h), 2), 2);
 
-            count = input.Count;
+            //count = input.Count;
 
             // Outer cirlce
             r = radius;
-            npoints = (int)(2 * Math.PI * r / h);
-            dphi = 2 * Math.PI / npoints;
-            for (int i = 0; i < npoints; i++)
-            {
-                input.Add(new Vertex(r * Math.Cos(i * dphi), r * Math.Sin(i * dphi), 3));
-                input.Add(new Edge(count + i, count + (i + 1) % npoints, 3));
-            }
-
-            input.Holes.Add(new Point(0, 0));
+            input.AddContour(CreateCircle(r, (int)(r / h), 3), 3);
 
             // Regions: |++++++|++++++|---|
             //          r             1   0
