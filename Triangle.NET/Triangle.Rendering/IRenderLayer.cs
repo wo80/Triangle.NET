@@ -6,7 +6,7 @@ namespace TriangleNet.Rendering
     using TriangleNet.Meshing;
     using TriangleNet.Rendering.Buffer;
     using TriangleNet.Rendering.Util;
-    using TriangleNet.Tools;
+    using TriangleNet.Voronoi.Legacy;
 
     public interface IRenderLayer
     {

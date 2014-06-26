@@ -8,7 +8,7 @@ namespace TriangleNet.Smoothing
 {
     using TriangleNet.Geometry;
     using TriangleNet.Meshing;
-    using TriangleNet.Tools;
+    using TriangleNet.Voronoi.Legacy;
 
     /// <summary>
     /// Simple mesh smoother implementation.
@@ -54,7 +54,7 @@ namespace TriangleNet.Smoothing
         /// </summary>
         private void Step(Mesh mesh)
         {
-            BoundedVoronoi voronoi = new BoundedVoronoi(mesh, false);
+            BoundedVoronoiLegacy voronoi = new BoundedVoronoiLegacy(mesh, false);
 
             var cells = voronoi.Regions;
 

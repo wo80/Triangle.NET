@@ -5,7 +5,7 @@ namespace TriangleNet.Rendering
     using System.Linq;
     using TriangleNet.Geometry;
     using TriangleNet.Meshing;
-    using TriangleNet.Tools;
+    using TriangleNet.Voronoi.Legacy;
 
     /// <summary>
     /// The RenderContext class brings all the rendering parts together.

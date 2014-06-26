@@ -5,7 +5,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace TriangleNet.Tools
+namespace TriangleNet.Voronoi.Legacy
 {
     using System;
     using System.Collections.Generic;

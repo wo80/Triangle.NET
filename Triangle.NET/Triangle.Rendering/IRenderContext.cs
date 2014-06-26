@@ -4,7 +4,7 @@ namespace TriangleNet.Rendering
     using System.Collections.Generic;
     using TriangleNet.Geometry;
     using TriangleNet.Meshing;
-    using TriangleNet.Tools;
+    using TriangleNet.Voronoi.Legacy;
 
     public interface IRenderContext
     {

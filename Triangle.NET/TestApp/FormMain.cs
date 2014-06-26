@@ -12,6 +12,7 @@ using TriangleNet.Meshing.Algorithm;
 using TriangleNet.Tools;
 using TriangleNet.Smoothing;
 using TriangleNet.Rendering;
+using TriangleNet.Voronoi.Legacy;
 
 namespace MeshExplorer
 {
@@ -611,7 +612,7 @@ namespace MeshExplorer
 
             if (mesh.IsPolygon)
             {
-                this.voronoi = new BoundedVoronoi(mesh);
+                this.voronoi = new BoundedVoronoiLegacy(mesh);
             }
             else
             {

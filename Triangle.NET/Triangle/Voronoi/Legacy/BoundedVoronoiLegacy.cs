@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace TriangleNet.Tools
+namespace TriangleNet.Voronoi.Legacy
 {
     using System;
     using System.Collections.Generic;
@@ -18,7 +18,7 @@ namespace TriangleNet.Tools
     /// 2D Centroidal Voronoi Tessellations with Constraints, 2010,
     /// Jane Tournois, Pierre Alliez and Olivier Devillers
     /// </remarks>
-    public class BoundedVoronoi : IVoronoi
+    public class BoundedVoronoiLegacy : IVoronoi
     {
         Mesh mesh;
 
@@ -34,19 +34,19 @@ namespace TriangleNet.Tools
         bool includeBoundary = true;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BoundedVoronoi" /> class.
+        /// Initializes a new instance of the <see cref="BoundedVoronoiLegacy" /> class.
         /// </summary>
         /// <param name="mesh">Mesh instance.</param>
-        public BoundedVoronoi(Mesh mesh)
+        public BoundedVoronoiLegacy(Mesh mesh)
             : this(mesh, true)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BoundedVoronoi" /> class.
+        /// Initializes a new instance of the <see cref="BoundedVoronoiLegacy" /> class.
         /// </summary>
         /// <param name="mesh">Mesh instance.</param>
-        public BoundedVoronoi(Mesh mesh, bool includeBoundary)
+        public BoundedVoronoiLegacy(Mesh mesh, bool includeBoundary)
         {
             this.mesh = mesh;
             this.includeBoundary = includeBoundary;

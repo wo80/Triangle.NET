@@ -1,13 +1,13 @@
 ﻿
 namespace TriangleNet.Rendering
 {
+    using System.Collections.Generic;
     using System.Windows.Forms;
     using TriangleNet.Geometry;
     using TriangleNet.Meshing;
     using TriangleNet.Rendering.GDI;
-    using TriangleNet.Tools;
-    using System.Collections.Generic;
     using TriangleNet.Rendering.Util;
+    using TriangleNet.Voronoi.Legacy;
 
     public class RenderManager
     {

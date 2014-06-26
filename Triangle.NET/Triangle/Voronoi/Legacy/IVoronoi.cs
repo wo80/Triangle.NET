@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace TriangleNet.Tools
+namespace TriangleNet.Voronoi.Legacy
 {
     using System.Collections.Generic;
     using TriangleNet.Geometry;
