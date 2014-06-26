@@ -20,7 +20,6 @@ namespace TriangleNet.Geometry
         internal double x;
         internal double y;
         internal int mark;
-        internal double[] attributes;
 
         public Point()
             : this(0, 0, 0)
@@ -71,14 +70,6 @@ namespace TriangleNet.Geometry
         public int Boundary
         {
             get { return this.mark; }
-        }
-
-        /// <summary>
-        /// Gets the vertex attributes (may be null).
-        /// </summary>
-        public double[] Attributes
-        {
-            get { return this.attributes; }
         }
 
         #endregion
@@ -154,7 +145,11 @@ namespace TriangleNet.Geometry
 
         public override int GetHashCode()
         {
-            return x.GetHashCode() ^ y.GetHashCode();
+            int hash = 19;
+            hash = hash * 31 + x.GetHashCode();
+            hash = hash * 31 + y.GetHashCode();
+
+            return hash;
         }
 
         public override string ToString()

@@ -193,7 +193,7 @@ namespace TriangleNet.Data
         /// connected to this subsegment.</remarks>
         public void Dissolve()
         {
-            seg.subsegs[orient].seg = Mesh.dummysub;
+            seg.subsegs[orient].seg = Segment.Empty;
         }
 
         /// <summary>
@@ -244,7 +244,7 @@ namespace TriangleNet.Data
         /// </summary>
         public void TriDissolve()
         {
-            seg.triangles[orient].triangle = Mesh.dummytri;
+            seg.triangles[orient].triangle = Triangle.Empty;
         }
 
         #endregion

@@ -365,7 +365,7 @@ namespace TriangleNet.IO
                     for (tri.orient = 0; tri.orient < 3; tri.orient++)
                     {
                         tri.Sym(ref trisym);
-                        if ((tri.triangle.id < trisym.triangle.id) || (trisym.triangle == Mesh.dummytri))
+                        if ((tri.triangle.id < trisym.triangle.id) || (trisym.triangle.id == Triangle.EmptyID))
                         {
                             p1 = tri.Org();
                             p2 = tri.Dest();
@@ -378,7 +378,7 @@ namespace TriangleNet.IO
                                 {
                                     tri.SegPivot(ref checkmark);
 
-                                    if (checkmark.seg == Mesh.dummysub)
+                                    if (checkmark.seg == Segment.Empty)
                                     {
                                         writer.WriteLine("{0} {1} {2} {3}", index, p1.id, p2.id, 0);
                                     }
@@ -391,7 +391,7 @@ namespace TriangleNet.IO
                                 else
                                 {
                                     writer.WriteLine("{0} {1} {2} {3}", index, p1.id, p2.id,
-                                            trisym.triangle == Mesh.dummytri ? "1" : "0");
+                                            trisym.triangle.id == Triangle.EmptyID ? "1" : "0");
                                 }
                             }
                             else
@@ -424,8 +424,6 @@ namespace TriangleNet.IO
             {
                 // Number of triangles, three neighbors per triangle.
                 writer.WriteLine("{0} 3", mesh.triangles.Count);
-
-                Mesh.dummytri.id = -1;
 
                 foreach (var item in mesh.triangles.Values)
                 {
@@ -522,12 +520,12 @@ namespace TriangleNet.IO
                     for (tri.orient = 0; tri.orient < 3; tri.orient++)
                     {
                         tri.Sym(ref trisym);
-                        if ((tri.triangle.id < trisym.triangle.id) || (trisym.triangle == Mesh.dummytri))
+                        if ((tri.triangle.id < trisym.triangle.id) || (trisym.triangle.id == Triangle.EmptyID))
                         {
                             // Find the number of this triangle (and Voronoi vertex).
                             p1 = tri.triangle.id;
 
-                            if (trisym.triangle == Mesh.dummytri)
+                            if (trisym.triangle.id == Triangle.EmptyID)
                             {
                                 torg = tri.Org();
                                 tdest = tri.Dest();

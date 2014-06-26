@@ -616,7 +616,7 @@ namespace MeshExplorer
             }
             else
             {
-                this.voronoi = new Voronoi(mesh);
+                this.voronoi = new SimpleVoronoi(mesh);
             }
 
             renderManager.Set(voronoi, false);

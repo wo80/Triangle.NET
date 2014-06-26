@@ -15,7 +15,7 @@ namespace TriangleNet.Voronoi.Legacy
     /// <summary>
     /// The Voronoi Diagram is the dual of a pointset triangulation.
     /// </summary>
-    public class Voronoi : IVoronoi
+    public class SimpleVoronoi : IVoronoi
     {
         Mesh mesh;
 
@@ -30,13 +30,13 @@ namespace TriangleNet.Voronoi.Legacy
         Rectangle bounds;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Voronoi" /> class.
+        /// Initializes a new instance of the <see cref="SimpleVoronoi" /> class.
         /// </summary>
         /// <param name="mesh"></param>
         /// <remarks>
         /// Be sure MakeVertexMap has been called (should always be the case).
         /// </remarks>
-        public Voronoi(Mesh mesh)
+        public SimpleVoronoi(Mesh mesh)
         {
             this.mesh = mesh;
 
@@ -155,11 +155,11 @@ namespace TriangleNet.Voronoi.Legacy
             f_init.Onext(ref f_next);
 
             // Check if f_init lies on the boundary of the triangulation.
-            if (f_next.triangle == Mesh.dummytri)
+            if (f_next.triangle.id == Triangle.EmptyID)
             {
                 f_init.Oprev(ref f_prev);
 
-                if (f_prev.triangle != Mesh.dummytri)
+                if (f_prev.triangle.id != Triangle.EmptyID)
                 {
                     f_init.Copy(ref f_next);
                     // Move one triangle clockwise
@@ -169,7 +169,7 @@ namespace TriangleNet.Voronoi.Legacy
             }
 
             // Go counterclockwise until we reach the border or the initial triangle.
-            while (f_next.triangle != Mesh.dummytri)
+            while (f_next.triangle.id != Triangle.EmptyID)
             {
                 // Add circumcenter of current triangle
                 vpoints.Add(points[f.triangle.id]);
@@ -227,7 +227,7 @@ namespace TriangleNet.Voronoi.Legacy
             f_init.Copy(ref f);
             f.Oprev(ref f_prev);
 
-            while (f_prev.triangle != Mesh.dummytri)
+            while (f_prev.triangle.id != Triangle.EmptyID)
             {
                 vpoints.Add(points[f_prev.triangle.id]);
                 region.AddNeighbor(f_prev.triangle.id, regions[f_prev.Apex().id]);

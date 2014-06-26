@@ -15,6 +15,31 @@ namespace TriangleNet.Data
     /// </summary>
     public class Segment : ISegment
     {
+        #region Static initialization of "omnipresent" subsegment
+
+        // Set up 'dummysub', the omnipresent subsegment pointed to by any
+        // triangle side or subsegment end that isn't attached to a real
+        // subsegment.
+
+        internal static Segment Empty;
+
+        static Segment()
+        {
+            Empty = new Segment();
+            Empty.hash = -1;
+
+            // Initialize the two adjoining subsegments to be the omnipresent
+            // subsegment. These will eventually be changed by various bonding
+            // operations, but their values don't really matter, as long as they
+            // can legally be dereferenced.
+            Empty.subsegs[0].seg = Empty;
+            Empty.subsegs[1].seg = Empty;
+
+            Triangle.Initialize();
+        }
+
+        #endregion
+
         // Hash for dictionary. Will be set by mesh instance.
         internal int hash;
 
@@ -28,16 +53,16 @@ namespace TriangleNet.Data
             // Initialize the two adjoining subsegments to be the omnipresent
             // subsegment.
             subsegs = new Osub[2];
-            subsegs[0].seg = Mesh.dummysub;
-            subsegs[1].seg = Mesh.dummysub;
+            subsegs[0].seg = Empty;
+            subsegs[1].seg = Empty;
 
             // Four NULL vertices.
             vertices = new Vertex[4];
 
             // Initialize the two adjoining triangles to be "outer space."
             triangles = new Otri[2];
-            triangles[0].triangle = Mesh.dummytri;
-            triangles[1].triangle = Mesh.dummytri;
+            triangles[0].triangle = Triangle.Empty;
+            triangles[1].triangle = Triangle.Empty;
 
             // Set the boundary marker to zero.
             boundary = 0;
@@ -84,7 +109,7 @@ namespace TriangleNet.Data
         /// </summary>
         public ITriangle GetTriangle(int index)
         {
-            return triangles[index].triangle == Mesh.dummytri ? null : triangles[index].triangle;
+            return triangles[index].triangle.id == Triangle.EmptyID ? null : triangles[index].triangle;
         }
 
         public override int GetHashCode()

@@ -13,7 +13,7 @@ namespace TriangleNet
     using TriangleNet.Tools;
 
     /// <summary>
-    /// Find new Steiner Point locations.
+    /// Find new Steiner point locations.
     /// </summary>
     /// <remarks>
     /// http://www.cise.ufl.edu/~ungor/aCute/index.html
@@ -51,25 +51,25 @@ namespace TriangleNet
         /// <summary>
         /// Find a new location for a Steiner point.
         /// </summary>
-        /// <param name="torg"></param>
-        /// <param name="tdest"></param>
-        /// <param name="tapex"></param>
+        /// <param name="org"></param>
+        /// <param name="dest"></param>
+        /// <param name="apex"></param>
         /// <param name="xi"></param>
         /// <param name="eta"></param>
         /// <param name="offcenter"></param>
         /// <param name="badotri"></param>
         /// <returns></returns>
-        public Point FindLocation(Vertex torg, Vertex tdest, Vertex tapex,
+        public Point FindLocation(Vertex org, Vertex dest, Vertex apex,
             ref double xi, ref double eta, bool offcenter, Otri badotri)
         {
             // Based on using -U switch, call the corresponding function
             if (behavior.MaxAngle == 0.0)
             {
-                return FindNewLocationWithoutMaxAngle(torg, tdest, tapex, ref xi, ref eta, true, badotri);
+                return FindNewLocationWithoutMaxAngle(org, dest, apex, ref xi, ref eta, true, badotri);
             }
 
             // With max angle
-            return FindNewLocation(torg, tdest, tapex, ref xi, ref eta, true, badotri);
+            return FindNewLocation(org, dest, apex, ref xi, ref eta, true, badotri);
         }
 
         /// <summary>
@@ -2364,7 +2364,7 @@ namespace TriangleNet
                 badotri.Sym(ref neighbor);
                 // check if it is the one we are looking for by checking the corners			
                 // first check if the neighbor is nonexistent, since it can be on the border
-                if ((neighbor.triangle != Mesh.dummytri))
+                if (neighbor.triangle.id != Triangle.EmptyID)
                 {
                     // then check if two wanted corners are also in this triangle
                     // take the vertices of the candidate neighbor		

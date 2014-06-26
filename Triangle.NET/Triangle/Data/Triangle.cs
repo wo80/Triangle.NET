@@ -15,6 +15,57 @@ namespace TriangleNet.Data
     /// </summary>
     public class Triangle : ITriangle
     {
+        #region Static initialization of "Outer Space" triangle
+
+        // The triangle that fills "outer space," called 'dummytri', is pointed to
+        // by every triangle and subsegment on a boundary (be it outer or inner) of
+        // the triangulation. Also, 'dummytri' points to one of the triangles on
+        // the convex hull (until the holes and concavities are carved), making it
+        // possible to find a starting triangle for point location.
+
+        // 'dummytri' and 'dummysub' are generally required to fulfill only a few
+        // invariants: their vertices must remain NULL and 'dummytri' must always
+        // be bonded (at offset zero) to some triangle on the convex hull of the
+        // mesh, via a boundary edge. Otherwise, the connections of 'dummytri' and
+        // 'dummysub' may change willy-nilly. This makes it possible to avoid
+        // writing a good deal of special-case code (in the edge flip, for example)
+        // for dealing with the boundary of the mesh, places where no subsegment is
+        // present, and so forth.  Other entities are frequently bonded to
+        // 'dummytri' and 'dummysub' as if they were real mesh entities, with no
+        // harm done.
+
+        internal const int EmptyID = -1;
+
+        internal static Triangle Empty;
+
+        /// <summary>
+        /// Initializes the dummytri (Triangle.Empty). The method is called by the static Segment
+        /// constructor (which ensures that dummysub (Segment.Empty) will not be null).
+        /// </summary>
+        internal static void Initialize()
+        {
+            // Set up 'dummytri', the 'triangle' that occupies "outer space."
+            Empty = new Triangle();
+            Empty.hash = EmptyID;
+            Empty.id = EmptyID;
+
+            // Initialize the three adjoining triangles to be "outer space." These
+            // will eventually be changed by various bonding operations, but their
+            // values don't really matter, as long as they can legally be
+            // dereferenced.
+            Empty.neighbors[0].triangle = Empty;
+            Empty.neighbors[1].triangle = Empty;
+            Empty.neighbors[2].triangle = Empty;
+
+            // Initialize the three adjoining subsegments of 'dummytri' to be
+            // the omnipresent subsegment.
+            Empty.subsegs[0].seg = Segment.Empty;
+            Empty.subsegs[1].seg = Segment.Empty;
+            Empty.subsegs[2].seg = Segment.Empty;
+        }
+
+        #endregion
+
         // Hash for dictionary. Will be set by mesh instance.
         internal int hash;
 
@@ -32,9 +83,9 @@ namespace TriangleNet.Data
         {
             // Initialize the three adjoining triangles to be "outer space".
             neighbors = new Otri[3];
-            neighbors[0].triangle = Mesh.dummytri;
-            neighbors[1].triangle = Mesh.dummytri;
-            neighbors[2].triangle = Mesh.dummytri;
+            neighbors[0].triangle = Empty;
+            neighbors[1].triangle = Empty;
+            neighbors[2].triangle = Empty;
 
             // Three NULL vertices.
             vertices = new Vertex[3];
@@ -44,9 +95,9 @@ namespace TriangleNet.Data
                 // Initialize the three adjoining subsegments to be the
                 // omnipresent subsegment.
                 subsegs = new Osub[3];
-                subsegs[0].seg = Mesh.dummysub;
-                subsegs[1].seg = Mesh.dummysub;
-                subsegs[2].seg = Mesh.dummysub;
+                subsegs[0].seg = Segment.Empty;
+                subsegs[1].seg = Segment.Empty;
+                subsegs[2].seg = Segment.Empty;
             }
 
             // TODO:
@@ -134,7 +185,7 @@ namespace TriangleNet.Data
         /// <returns>The neigbbor opposite of vertex with given index.</returns>
         public ITriangle GetNeighbor(int index)
         {
-            return neighbors[index].triangle == Mesh.dummytri ? null : neighbors[index].triangle;
+            return neighbors[index].triangle.id == EmptyID ? null : neighbors[index].triangle;
         }
 
         /// <summary>
@@ -144,7 +195,7 @@ namespace TriangleNet.Data
         /// <returns>The segment opposite of vertex with given index.</returns>
         public ISegment GetSegment(int index)
         {
-            return subsegs[index].seg == Mesh.dummysub ? null : subsegs[index].seg;
+            return subsegs[index].seg == Segment.Empty ? null : subsegs[index].seg;
         }
 
         /// <summary>

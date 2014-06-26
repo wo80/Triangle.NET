@@ -64,7 +64,7 @@ namespace TriangleNet.Meshing
                     if (mesh.bounds.Contains(hole))
                     {
                         // Start searching from some triangle on the outer boundary.
-                        searchtri.triangle = Mesh.dummytri;
+                        searchtri.triangle = Triangle.Empty;
                         searchtri.orient = 0;
                         searchtri.SymSelf();
                         // Ensure that the hole is to the left of this boundary edge;
@@ -101,12 +101,12 @@ namespace TriangleNet.Meshing
                 // Find the starting triangle for each region.
                 foreach (var region in mesh.regions)
                 {
-                    regionTris[i] = Mesh.dummytri;
+                    regionTris[i] = Triangle.Empty;
                     // Ignore region points that aren't within the bounds of the mesh.
                     if (mesh.bounds.Contains(region.point))
                     {
                         // Start searching from some triangle on the outer boundary.
-                        searchtri.triangle = Mesh.dummytri;
+                        searchtri.triangle = Triangle.Empty;
                         searchtri.orient = 0;
                         searchtri.SymSelf();
                         // Ensure that the region point is to the left of this boundary
@@ -144,7 +144,7 @@ namespace TriangleNet.Meshing
 
                 for (int i = 0; i < regionTris.Length; i++)
                 {
-                    if (regionTris[i] != Mesh.dummytri)
+                    if (regionTris[i].id != Triangle.EmptyID)
                     {
                         // Make sure the triangle under consideration still exists.
                         // It may have been eaten by the virus.
@@ -261,7 +261,7 @@ namespace TriangleNet.Meshing
             Vertex horg, hdest;
 
             // Find a triangle handle on the hull.
-            hulltri.triangle = Mesh.dummytri;
+            hulltri.triangle = Triangle.Empty;
             hulltri.orient = 0;
             hulltri.SymSelf();
             // Remember where we started so we know when to stop.
@@ -274,7 +274,7 @@ namespace TriangleNet.Meshing
                 {
                     // Is the triangle protected by a subsegment?
                     hulltri.SegPivot(ref hullsubseg);
-                    if (hullsubseg.seg == Mesh.dummysub)
+                    if (hullsubseg.seg == Segment.Empty)
                     {
                         // The triangle is not protected; infect it.
                         if (!hulltri.IsInfected())
@@ -305,7 +305,7 @@ namespace TriangleNet.Meshing
                 // To find the next hull edge, go clockwise around the next vertex.
                 hulltri.LnextSelf();
                 hulltri.Oprev(ref nexttri);
-                while (nexttri.triangle != Mesh.dummytri)
+                while (nexttri.triangle.id != Triangle.EmptyID)
                 {
                     nexttri.Copy(ref hulltri);
                     hulltri.Oprev(ref nexttri);
@@ -361,15 +361,15 @@ namespace TriangleNet.Meshing
                     // Check for a subsegment between the triangle and its neighbor.
                     testtri.SegPivot(ref neighborsubseg);
                     // Check if the neighbor is nonexistent or already infected.
-                    if ((neighbor.triangle == Mesh.dummytri) || neighbor.IsInfected())
+                    if ((neighbor.triangle.id == Triangle.EmptyID) || neighbor.IsInfected())
                     {
-                        if (neighborsubseg.seg != Mesh.dummysub)
+                        if (neighborsubseg.seg != Segment.Empty)
                         {
                             // There is a subsegment separating the triangle from its
                             // neighbor, but both triangles are dying, so the subsegment
                             // dies too.
                             mesh.SubsegDealloc(neighborsubseg.seg);
-                            if (neighbor.triangle != Mesh.dummytri)
+                            if (neighbor.triangle.id != Triangle.EmptyID)
                             {
                                 // Make sure the subsegment doesn't get deallocated again
                                 // later when the infected neighbor is visited.
@@ -381,7 +381,7 @@ namespace TriangleNet.Meshing
                     }
                     else
                     {   // The neighbor exists and is not infected.
-                        if (neighborsubseg.seg == Mesh.dummysub)
+                        if (neighborsubseg.seg == Segment.Empty)
                         {
                             // There is no subsegment protecting the neighbor, so
                             // the neighbor becomes infected.
@@ -436,7 +436,7 @@ namespace TriangleNet.Meshing
                         // Walk counterclockwise about the vertex.
                         testtri.Onext(ref neighbor);
                         // Stop upon reaching a boundary or the starting triangle.
-                        while ((neighbor.triangle != Mesh.dummytri) &&
+                        while ((neighbor.triangle.id != Triangle.EmptyID) &&
                                (!neighbor.Equal(testtri)))
                         {
                             if (neighbor.IsInfected())
@@ -453,12 +453,12 @@ namespace TriangleNet.Meshing
                             neighbor.OnextSelf();
                         }
                         // If we reached a boundary, we must walk clockwise as well.
-                        if (neighbor.triangle == Mesh.dummytri)
+                        if (neighbor.triangle.id == Triangle.EmptyID)
                         {
                             // Walk clockwise about the vertex.
                             testtri.Oprev(ref neighbor);
                             // Stop upon reaching a boundary.
-                            while (neighbor.triangle != Mesh.dummytri)
+                            while (neighbor.triangle.id != Triangle.EmptyID)
                             {
                                 if (neighbor.IsInfected())
                                 {
@@ -488,7 +488,7 @@ namespace TriangleNet.Meshing
                 for (testtri.orient = 0; testtri.orient < 3; testtri.orient++)
                 {
                     testtri.Sym(ref neighbor);
-                    if (neighbor.triangle == Mesh.dummytri)
+                    if (neighbor.triangle.id == Triangle.EmptyID)
                     {
                         // There is no neighboring triangle on this edge, so this edge
                         // is a boundary edge. This triangle is being deleted, so this
@@ -554,7 +554,7 @@ namespace TriangleNet.Meshing
                 // 'searchtri' faces directly away from 'searchpoint'. We could go left
                 // or right. Ask whether it's a triangle or a boundary on the left.
                 searchtri.Onext(ref checktri);
-                if (checktri.triangle == Mesh.dummytri)
+                if (checktri.triangle.id == Triangle.EmptyID)
                 {
                     leftflag = false;
                 }
@@ -567,7 +567,7 @@ namespace TriangleNet.Meshing
             {
                 // Turn left until satisfied.
                 searchtri.OnextSelf();
-                if (searchtri.triangle == Mesh.dummytri)
+                if (searchtri.triangle.id == Triangle.EmptyID)
                 {
                     logger.Error("Unable to find a triangle on path.", "Mesh.FindDirection().1");
                     throw new Exception("Unable to find a triangle on path.");
@@ -581,7 +581,7 @@ namespace TriangleNet.Meshing
             {
                 // Turn right until satisfied.
                 searchtri.OprevSelf();
-                if (searchtri.triangle == Mesh.dummytri)
+                if (searchtri.triangle.id == Triangle.EmptyID)
                 {
                     logger.Error("Unable to find a triangle on path.", "Mesh.FindDirection().2");
                     throw new Exception("Unable to find a triangle on path.");
@@ -696,12 +696,12 @@ namespace TriangleNet.Meshing
             {
                 splitsubseg.SetSegOrg(newvertex);
                 splitsubseg.NextSelf();
-            } while (splitsubseg.seg != Mesh.dummysub);
+            } while (splitsubseg.seg != Segment.Empty);
             do
             {
                 opposubseg.SetSegOrg(newvertex);
                 opposubseg.NextSelf();
-            } while (opposubseg.seg != Mesh.dummysub);
+            } while (opposubseg.seg != Segment.Empty);
 
             // Inserting the vertex may have caused edge flips.  We wish to rediscover
             // the edge connecting endpoint1 to the new intersection vertex.
@@ -789,7 +789,7 @@ namespace TriangleNet.Meshing
                 searchtri.Lnext(ref crosstri);
                 crosstri.SegPivot(ref crosssubseg);
                 // Check for a crossing segment.
-                if (crosssubseg.seg == Mesh.dummysub)
+                if (crosssubseg.seg == Segment.Empty)
                 {
                     return false;
                 }
@@ -850,12 +850,12 @@ namespace TriangleNet.Meshing
             fixuptri.Lnext(ref neartri);
             neartri.Sym(ref fartri);
             // Check if the edge opposite the origin of fixuptri can be flipped.
-            if (fartri.triangle == Mesh.dummytri)
+            if (fartri.triangle.id == Triangle.EmptyID)
             {
                 return;
             }
             neartri.SegPivot(ref faredge);
-            if (faredge.seg != Mesh.dummysub)
+            if (faredge.seg != Segment.Empty)
             {
                 return;
             }
@@ -1027,7 +1027,7 @@ namespace TriangleNet.Meshing
                         }
                         // Check for two intersecting segments.
                         fixuptri.SegPivot(ref crosssubseg);
-                        if (crosssubseg.seg == Mesh.dummysub)
+                        if (crosssubseg.seg == Segment.Empty)
                         {
                             mesh.Flip(ref fixuptri);    // May create inverted triangle at left.
                         }
@@ -1077,7 +1077,7 @@ namespace TriangleNet.Meshing
             if (checkvertex != endpoint1)
             {
                 // Find a boundary triangle to search from.
-                searchtri1.triangle = Mesh.dummytri;
+                searchtri1.triangle = Triangle.Empty;
                 searchtri1.orient = 0;
                 searchtri1.SymSelf();
                 // Search for the segment's first endpoint by point location.
@@ -1111,7 +1111,7 @@ namespace TriangleNet.Meshing
             if (checkvertex != endpoint2)
             {
                 // Find a boundary triangle to search from.
-                searchtri2.triangle = Mesh.dummytri;
+                searchtri2.triangle = Triangle.Empty;
                 searchtri2.orient = 0;
                 searchtri2.SymSelf();
                 // Search for the segment's second endpoint by point location.
@@ -1148,7 +1148,7 @@ namespace TriangleNet.Meshing
             Otri starttri = default(Otri);
 
             // Find a triangle handle on the hull.
-            hulltri.triangle = Mesh.dummytri;
+            hulltri.triangle = Triangle.Empty;
             hulltri.orient = 0;
             hulltri.SymSelf();
             // Remember where we started so we know when to stop.
@@ -1161,7 +1161,7 @@ namespace TriangleNet.Meshing
                 // To find the next hull edge, go clockwise around the next vertex.
                 hulltri.LnextSelf();
                 hulltri.Oprev(ref nexttri);
-                while (nexttri.triangle != Mesh.dummytri)
+                while (nexttri.triangle.id != Triangle.EmptyID)
                 {
                     nexttri.Copy(ref hulltri);
                     hulltri.Oprev(ref nexttri);

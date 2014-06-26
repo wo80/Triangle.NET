@@ -60,7 +60,7 @@ namespace TriangleNet
 
                     // Find the neighboring triangle on this edge.
                     tri.Sym(ref oppotri);
-                    if (oppotri.triangle != Mesh.dummytri)
+                    if (oppotri.triangle.id != Triangle.EmptyID)
                     {
                         // Check that the triangle's neighbor knows it's a neighbor.
                         oppotri.Sym(ref oppooppotri);
@@ -170,7 +170,7 @@ namespace TriangleNet
                     // adjoining triangle whose pointer is larger (to ensure that
                     // each pair isn't tested twice).
                     shouldbedelaunay = (loop.triangle.id < oppotri.triangle.id) &&
-                           !Otri.IsDead(oppotri.triangle) && (oppotri.triangle != Mesh.dummytri) &&
+                           !Otri.IsDead(oppotri.triangle) && (oppotri.triangle.id != Triangle.EmptyID) &&
                           (org != inf1) && (org != inf2) && (org != inf3) &&
                           (dest != inf1) && (dest != inf2) && (dest != inf3) &&
                           (apex != inf1) && (apex != inf2) && (apex != inf3) &&
@@ -182,7 +182,7 @@ namespace TriangleNet
                         // constrained, so no local Delaunay test should be done.
                         loop.SegPivot(ref opposubseg);
 
-                        if (opposubseg.seg != Mesh.dummysub)
+                        if (opposubseg.seg != Segment.Empty)
                         {
                             shouldbedelaunay = false;
                         }

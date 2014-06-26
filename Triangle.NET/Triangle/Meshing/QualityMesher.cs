@@ -89,7 +89,7 @@ namespace TriangleNet.Meshing
             // Check one neighbor of the subsegment.
             testsubseg.TriPivot(ref neighbortri);
             // Does the neighbor exist, or is this a boundary edge?
-            if (neighbortri.triangle != Mesh.dummytri)
+            if (neighbortri.triangle.id != Triangle.EmptyID)
             {
                 sides++;
                 // Find a vertex opposite this subsegment.
@@ -119,7 +119,7 @@ namespace TriangleNet.Meshing
             testsubseg.Sym(ref testsym);
             testsym.TriPivot(ref neighbortri);
             // Does the neighbor exist, or is this a boundary edge?
-            if (neighbortri.triangle != Mesh.dummytri)
+            if (neighbortri.triangle.id != Triangle.EmptyID)
             {
                 sides++;
                 // Find the other vertex opposite this subsegment.
@@ -318,7 +318,7 @@ namespace TriangleNet.Meshing
                     // Check if both points lie in a common segment. If they do, the
                     // skinny triangle is enqueued to be split as usual.
                     tri1.SegPivot(ref testsub);
-                    if (testsub.seg == Mesh.dummysub)
+                    if (testsub.seg == Segment.Empty)
                     {
                         // No common segment.  Find a subsegment that contains 'torg'.
                         tri1.Copy(ref tri2);
@@ -326,7 +326,7 @@ namespace TriangleNet.Meshing
                         {
                             tri1.OprevSelf();
                             tri1.SegPivot(ref testsub);
-                        } while (testsub.seg == Mesh.dummysub);
+                        } while (testsub.seg == Segment.Empty);
                         // Find the endpoints of the containing segment.
                         org1 = testsub.SegOrg();
                         dest1 = testsub.SegDest();
@@ -335,7 +335,7 @@ namespace TriangleNet.Meshing
                         {
                             tri2.DnextSelf();
                             tri2.SegPivot(ref testsub);
-                        } while (testsub.seg == Mesh.dummysub);
+                        } while (testsub.seg == Segment.Empty);
                         // Find the endpoints of the containing segment.
                         org2 = testsub.SegOrg();
                         dest2 = testsub.SegDest();
@@ -458,11 +458,11 @@ namespace TriangleNet.Meshing
                     currentenc.TriPivot(ref enctri);
                     enctri.Lnext(ref testtri);
                     testtri.SegPivot(ref testsh);
-                    acuteorg = testsh.seg != Mesh.dummysub;
+                    acuteorg = testsh.seg != Segment.Empty;
                     // Is the destination shared with another segment?
                     testtri.LnextSelf();
                     testtri.SegPivot(ref testsh);
-                    acutedest = testsh.seg != Mesh.dummysub;
+                    acutedest = testsh.seg != Segment.Empty;
 
                     // If we're using Chew's algorithm (rather than Ruppert's)
                     // to define encroachment, delete free vertices from the
@@ -483,17 +483,17 @@ namespace TriangleNet.Meshing
 
                     // Now, check the other side of the segment, if there's a triangle there.
                     enctri.Sym(ref testtri);
-                    if (testtri.triangle != Mesh.dummytri)
+                    if (testtri.triangle.id != Triangle.EmptyID)
                     {
                         // Is the destination shared with another segment?
                         testtri.LnextSelf();
                         testtri.SegPivot(ref testsh);
-                        acutedest2 = testsh.seg != Mesh.dummysub;
+                        acutedest2 = testsh.seg != Segment.Empty;
                         acutedest = acutedest || acutedest2;
                         // Is the origin shared with another segment?
                         testtri.LnextSelf();
                         testtri.SegPivot(ref testsh);
-                        acuteorg2 = testsh.seg != Mesh.dummysub;
+                        acuteorg2 = testsh.seg != Segment.Empty;
                         acuteorg = acuteorg || acuteorg2;
 
                         // Delete free vertices from the subsegment's diametral circle.

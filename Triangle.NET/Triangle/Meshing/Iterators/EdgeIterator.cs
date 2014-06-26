@@ -76,7 +76,7 @@ namespace TriangleNet.Meshing.Iterators
 
                 tri.Sym(ref neighbor);
 
-                if ((tri.triangle.id < neighbor.triangle.id) || (neighbor.triangle == Mesh.dummytri))
+                if ((tri.triangle.id < neighbor.triangle.id) || (neighbor.triangle.id == Triangle.EmptyID))
                 {
                     p1 = tri.Org();
                     p2 = tri.Dest();

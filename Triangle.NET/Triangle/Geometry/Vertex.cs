@@ -18,6 +18,8 @@ namespace TriangleNet.Geometry
         // Hash for dictionary. Will be set by mesh instance.
         internal int hash;
 
+        internal double[] attributes;
+
         internal VertexType type;
         internal Otri tri;
 
@@ -69,6 +71,14 @@ namespace TriangleNet.Geometry
         }
 
         #region Public properties
+
+        /// <summary>
+        /// Gets the vertex attributes (may be null).
+        /// </summary>
+        public double[] Attributes
+        {
+            get { return this.attributes; }
+        }
 
         /// <summary>
         /// Gets the vertex type.

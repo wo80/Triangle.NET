@@ -176,7 +176,7 @@ namespace TriangleNet.Voronoi.Legacy
                 e.orient = 0;
                 e.TriPivot(ref f);
 
-                if (f.triangle != Mesh.dummytri && !f.triangle.infected)
+                if (f.triangle.id != Triangle.EmptyID && !f.triangle.infected)
                 {
                     triangles.Push(f.triangle);
                 }
@@ -184,7 +184,7 @@ namespace TriangleNet.Voronoi.Legacy
                 e.SymSelf();
                 e.TriPivot(ref f);
 
-                if (f.triangle != Mesh.dummytri && !f.triangle.infected)
+                if (f.triangle.id != Triangle.EmptyID && !f.triangle.infected)
                 {
                     triangles.Push(f.triangle);
                 }
@@ -215,7 +215,7 @@ namespace TriangleNet.Voronoi.Legacy
 
                             // if f0 is finite and tagged non-blind & the common edge 
                             // between f and f0 is unconstrained then
-                            if (f0.triangle != Mesh.dummytri && !f0.triangle.infected && sub1.seg == Mesh.dummysub)
+                            if (f0.triangle.id != Triangle.EmptyID && !f0.triangle.infected && sub1.seg == Segment.Empty)
                             {
                                 // Push f0 into triangles.
                                 triangles.Push(f0.triangle);
@@ -412,10 +412,10 @@ namespace TriangleNet.Voronoi.Legacy
             f_init.Oprev(ref f_prev);
 
             // Is the border to the left?
-            if (f_prev.triangle != Mesh.dummytri)
+            if (f_prev.triangle.id != Triangle.EmptyID)
             {
                 // Go clockwise until we reach the border (or the initial triangle)
-                while (f_prev.triangle != Mesh.dummytri && !f_prev.Equal(f_init))
+                while (f_prev.triangle.id != Triangle.EmptyID && !f_prev.Equal(f_init))
                 {
                     f_prev.Copy(ref f);
                     f_prev.OprevSelf();
@@ -425,7 +425,7 @@ namespace TriangleNet.Voronoi.Legacy
                 f.Onext(ref f_next);
             }
 
-            if (f_prev.triangle == Mesh.dummytri)
+            if (f_prev.triangle.id == Triangle.EmptyID)
             {
                 // For vertices on the domain boundaray, add the vertex. For 
                 // internal boundaries don't add it.
@@ -451,7 +451,7 @@ namespace TriangleNet.Voronoi.Legacy
                 // Call Lffnext the line going through the circumcenters of f and f_next
                 cc_f = this.points[f.triangle.id];
 
-                if (f_next.triangle == Mesh.dummytri)
+                if (f_next.triangle.id == Triangle.EmptyID)
                 {
                     if (!f.triangle.infected)
                     {

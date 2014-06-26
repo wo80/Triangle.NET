@@ -96,6 +96,7 @@
     <Compile Include="Smoothing\ISmoother.cs" />
     <Compile Include="Smoothing\SimpleSmoother.cs" />
     <Compile Include="Tools\AdjacencyMatrix.cs" />
+    <Compile Include="Tools\PointSorter.cs" />
     <Compile Include="Voronoi\Legacy\BoundedVoronoiLegacy.cs" />
     <Compile Include="Tools\CuthillMcKee.cs" />
     <Compile Include="Voronoi\Legacy\IVoronoi.cs" />
@@ -104,7 +105,7 @@
     <Compile Include="Meshing\Iterators\RegionIterator.cs" />
     <Compile Include="Tools\Statistic.cs" />
     <Compile Include="Meshing\Algorithm\SweepLine.cs" />
-    <Compile Include="Voronoi\Legacy\Voronoi.cs" />
+    <Compile Include="Voronoi\Legacy\SimpleVoronoi.cs" />
     <Compile Include="Voronoi\Legacy\VoronoiRegion.cs" />
     <Compile Include="TriangleLocator.cs" />
     <Compile Include="Voronoi\BoundedVoronoi.cs" />

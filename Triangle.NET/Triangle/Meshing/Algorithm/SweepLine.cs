@@ -701,7 +701,7 @@ namespace TriangleNet.Meshing.Algorithm
             // Find an edge on the convex hull to start point location from.
             startghost.Lprev(ref searchedge);
             searchedge.SymSelf();
-            Mesh.dummytri.neighbors[0] = searchedge;
+            Triangle.Empty.neighbors[0] = searchedge;
             // Remove the bounding box and count the convex hull edges.
             startghost.Copy(ref dissolveedge);
             hullsize = 0;
@@ -717,7 +717,7 @@ namespace TriangleNet.Meshing.Algorithm
                 if (noPoly)
                 {
                     // Watch out for the case where all the input vertices are collinear.
-                    if (dissolveedge.triangle != Mesh.dummytri)
+                    if (dissolveedge.triangle.id != Triangle.EmptyID)
                     {
                         markorg = dissolveedge.Org();
                         if (markorg.mark == 0)
