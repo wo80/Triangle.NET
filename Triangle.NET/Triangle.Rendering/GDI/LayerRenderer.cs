@@ -104,7 +104,15 @@ namespace TriangleNet.Rendering.GDI
 
         private void RenderVoronoi(IRenderLayer layer)
         {
-            meshRenderer.RenderEdges(layer.Points.Data, layer.Indices.Data, Context.ColorManager.VoronoiLine);
+            if (RenderManager.VORONOI_DEBUG)
+            {
+                meshRenderer.RenderEdges(layer.Points.Data, layer.Indices.Data, Pens.Purple);
+                meshRenderer.RenderPoints(layer.Points.Data, layer.Points.Size, 0, layer.Count, Brushes.Red);
+            }
+            else
+            {
+                meshRenderer.RenderEdges(layer.Points.Data, layer.Indices.Data, Context.ColorManager.VoronoiLine);
+            }
         }
     }
 }

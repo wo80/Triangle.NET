@@ -117,11 +117,10 @@ namespace TriangleNet.Rendering
             RenderLayers[3].IsActive = true;
         }
 
-        // Voronoi
-        public void Add(IVoronoi voronoi, bool reset)
+        public void Add(Point[] points, IEnumerable<IEdge> edges, bool reset)
         {
-            RenderLayers[4].SetPoints(voronoi);
-            RenderLayers[4].SetMesh(voronoi);
+            RenderLayers[4].SetPoints(points);
+            RenderLayers[4].SetMesh(edges);
             RenderLayers[4].IsActive = true;
         }
 

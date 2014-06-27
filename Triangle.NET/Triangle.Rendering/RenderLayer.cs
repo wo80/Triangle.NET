@@ -1,12 +1,13 @@
 ﻿
 namespace TriangleNet.Rendering
 {
-    using System.Drawing;
+    using System.Collections.Generic;
     using TriangleNet.Geometry;
     using TriangleNet.Meshing;
     using TriangleNet.Rendering.Buffer;
     using TriangleNet.Rendering.Util;
-    using TriangleNet.Voronoi.Legacy;
+
+    using Color = System.Drawing.Color;
 
     public class RenderLayer : IRenderLayer
     {
@@ -107,11 +108,11 @@ namespace TriangleNet.Rendering
             return bounds;
         }
 
-        public BoundingBox SetPoints(IVoronoi voronoi)
+        public BoundingBox SetPoints(Point[] vertices)
         {
             BoundingBox bounds = new BoundingBox();
 
-            points = BufferHelper.CreateVertexBuffer(voronoi.Points, ref bounds);
+            points = BufferHelper.CreateVertexBuffer(vertices, ref bounds);
             count = points.Count / points.Size;
 
             return bounds;
@@ -127,9 +128,9 @@ namespace TriangleNet.Rendering
             indices = BufferHelper.CreateIndexBuffer(mesh.Segments, 2);
         }
 
-        public void SetMesh(IVoronoi voronoi)
+        public void SetMesh(IEnumerable<IEdge> edges)
         {
-            indices = BufferHelper.CreateIndexBuffer(voronoi.Edges, 2);
+            indices = BufferHelper.CreateIndexBuffer(edges, 2);
         }
 
         public void SetMesh(IMesh mesh, bool elements)

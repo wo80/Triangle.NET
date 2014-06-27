@@ -22,7 +22,7 @@ namespace TriangleNet.Rendering
 
         void Add(IPolygon data);
         void Add(IMesh data, bool reset);
-        void Add(IVoronoi voronoi, bool reset);
+        void Add(Point[] points, IEnumerable<IEdge> edges, bool reset);
 
         void Add(float[] values);
         void Add(int[] partition);

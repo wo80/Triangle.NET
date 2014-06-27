@@ -7,10 +7,12 @@ namespace TriangleNet.Rendering
     using TriangleNet.Meshing;
     using TriangleNet.Rendering.GDI;
     using TriangleNet.Rendering.Util;
-    using TriangleNet.Voronoi.Legacy;
 
     public class RenderManager
     {
+        // TODO: delete
+        public static bool VORONOI_DEBUG = false;
+
         IRenderControl control;
         IRenderContext context;
         IRenderer renderer;
@@ -112,10 +114,12 @@ namespace TriangleNet.Rendering
             }
         }
 
-        // Voronoi
-        public void Set(IVoronoi voronoi, bool reset, bool refresh = true)
+        /// <summary>
+        /// Set data for Voronoi layer.
+        /// </summary>
+        public void Set(Point[] points, IEnumerable<IEdge> edges, bool reset, bool refresh = true)
         {
-            context.Add(voronoi, reset);
+            context.Add(points, edges, reset);
 
             if (refresh)
             {

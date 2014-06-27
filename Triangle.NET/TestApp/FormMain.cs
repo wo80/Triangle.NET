@@ -619,7 +619,7 @@ namespace MeshExplorer
                 this.voronoi = new SimpleVoronoi(mesh);
             }
 
-            renderManager.Set(voronoi, false);
+            renderManager.Set(voronoi.Points, voronoi.Edges, false);
         }
 
         private void ShowLog()

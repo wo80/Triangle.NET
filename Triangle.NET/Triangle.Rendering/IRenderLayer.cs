@@ -1,12 +1,13 @@
 ﻿
 namespace TriangleNet.Rendering
 {
-    using System.Drawing;
+    using System.Collections.Generic;
     using TriangleNet.Geometry;
     using TriangleNet.Meshing;
     using TriangleNet.Rendering.Buffer;
     using TriangleNet.Rendering.Util;
-    using TriangleNet.Voronoi.Legacy;
+
+    using Color = System.Drawing.Color;
 
     public interface IRenderLayer
     {
@@ -25,11 +26,11 @@ namespace TriangleNet.Rendering
         BoundingBox SetPoints(IBuffer<float> buffer);
         BoundingBox SetPoints(IPolygon poly);
         BoundingBox SetPoints(IMesh mesh);
-        BoundingBox SetPoints(IVoronoi voronoi);
+        BoundingBox SetPoints(Point[] points);
         void SetPolygon(IPolygon poly);
         void SetPolygon(IMesh mesh);
         void SetMesh(IMesh mesh, bool elements);
-        void SetMesh(IVoronoi voronoi);
+        void SetMesh(IEnumerable<IEdge> edges);
 
 
         // TODO: better put these into a subclass.
