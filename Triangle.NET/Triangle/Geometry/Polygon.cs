@@ -52,12 +52,29 @@ namespace TriangleNet.Geometry
             get { return points.Count; }
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Polygon" /> class.
+        /// </summary>
         public Polygon()
-            : this(3)
+            : this(3, false)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Polygon" /> class.
+        /// </summary>
+        /// <param name="capacity">The default capacity for the points list.</param>
         public Polygon(int capacity)
+            : this(3, false)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Polygon" /> class.
+        /// </summary>
+        /// <param name="capacity">The default capacity for the points list.</param>
+        /// <param name="markers">Use point and segment markers.</param>
+        public Polygon(int capacity, bool markers)
         {
             points = new List<Vertex>(capacity);
             holes = new List<Point>();
@@ -65,8 +82,8 @@ namespace TriangleNet.Geometry
 
             segments = new List<IEdge>();
 
-            HasPointMarkers = false;
-            HasSegmentMarkers = false;
+            HasPointMarkers = markers;
+            HasSegmentMarkers = markers;
         }
 
         /// <inherit />
@@ -236,12 +253,14 @@ namespace TriangleNet.Geometry
         /// <summary>
         /// Return true if the given point is inside the polygon, or false if it is not.
         /// </summary>
-        /// <param name="point"></param>
-        /// <param name="poly"></param>
+        /// <param name="point">The point to check.</param>
+        /// <param name="poly">The polygon (list of contour points).</param>
         /// <returns></returns>
         /// <remarks>
         /// WARNING: If the point is exactly on the edge of the polygon, then the function
         /// may return true or false.
+        /// 
+        /// See http://alienryderflex.com/polygon/
         /// </remarks>
         private bool IsPointInPolygon(Point point, List<Vertex> poly)
         {

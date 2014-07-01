@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="FileWriter.cs" company="">
+// <copyright file="TriangleWriter.cs" company="">
 // Original Triangle code by Jonathan Richard Shewchuk, http://www.cs.cmu.edu/~quake/triangle.html
 // Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
 // </copyright>
@@ -193,6 +193,8 @@ namespace TriangleNet.IO
             using (StreamWriter writer = new StreamWriter(filename))
             {
                 // TODO: write vertex attributes
+
+                writer.WriteLine("{0} 2 0 {1}", polygon.Points.Count, polygon.HasPointMarkers ? "1" : "0");
 
                 // Write nodes to this file.
                 TriangleWriter.WriteNodes(writer, polygon.Points, polygon.HasPointMarkers, 0, false);
