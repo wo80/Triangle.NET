@@ -42,5 +42,14 @@ namespace TriangleNet.Meshing
         /// be used to check if a triangle needs refinement.
         /// </remarks>
         public bool VariableArea { get; set; }
+
+        /// <summary>
+        /// Gets or sets the maximum number of Steiner points to be inserted into the mesh.
+        /// </summary>
+        /// <remarks>
+        /// If the value is 0 (default), an unknown number of Steiner points may be inserted
+        /// to meet the other qulaity constraints.
+        /// </remarks>
+        public int SteinerPoints { get; set; }
     }
 }

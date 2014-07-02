@@ -13,7 +13,15 @@ namespace TriangleNet.IO
 
     public static class FileProcessor
     {
-        static List<IFileFormat> formats = new List<IFileFormat>();
+        static List<IFileFormat> formats;
+
+        static FileProcessor()
+        {
+            formats = new List<IFileFormat>();
+
+            // Add Triangle file format as default.
+            formats.Add(new TriangleFormat());
+        }
 
         public static void Add(IFileFormat format)
         {

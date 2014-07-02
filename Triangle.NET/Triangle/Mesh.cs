@@ -345,6 +345,8 @@ namespace TriangleNet
                 behavior.MaxArea = quality.MaximumArea;
                 behavior.UserTest = quality.UserTest;
 
+                behavior.SteinerPoints = quality.SteinerPoints == 0 ? -1 : quality.SteinerPoints;
+
                 behavior.Quality = true;
             }
 

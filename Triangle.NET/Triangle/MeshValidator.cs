@@ -20,17 +20,16 @@ namespace TriangleNet
         {
             Otri tri = default(Otri);
             Otri oppotri = default(Otri), oppooppotri = default(Otri);
-            Vertex triorg, tridest, triapex;
+            Vertex org, dest, apex;
             Vertex oppoorg, oppodest;
-            int horrors;
-            bool saveexact;
 
             var logger = Log.Instance;
 
             // Temporarily turn on exact arithmetic if it's off.
-            saveexact = Behavior.NoExact;
+            bool saveexact = Behavior.NoExact;
             Behavior.NoExact = false;
-            horrors = 0;
+
+            int horrors = 0;
 
             // Run through the list of triangles, checking each one.
             foreach (var t in mesh.triangles.Values)
@@ -40,14 +39,14 @@ namespace TriangleNet
                 // Check all three edges of the triangle.
                 for (tri.orient = 0; tri.orient < 3; tri.orient++)
                 {
-                    triorg = tri.Org();
-                    tridest = tri.Dest();
+                    org = tri.Org();
+                    dest = tri.Dest();
                     if (tri.orient == 0)
                     {
                         // Only test for inversion once.
                         // Test if the triangle is flat or inverted.
-                        triapex = tri.Apex();
-                        if (RobustPredicates.CounterClockwise(triorg, tridest, triapex) <= 0.0)
+                        apex = tri.Apex();
+                        if (RobustPredicates.CounterClockwise(org, dest, apex) <= 0.0)
                         {
                             if (Log.Verbose)
                             {
@@ -78,7 +77,7 @@ namespace TriangleNet
                         // of their shared vertices.
                         oppoorg = oppotri.Org();
                         oppodest = oppotri.Dest();
-                        if ((triorg != oppodest) || (tridest != oppoorg))
+                        if ((org != oppodest) || (dest != oppoorg))
                         {
                             if (Log.Verbose)
                             {
@@ -135,21 +134,20 @@ namespace TriangleNet
             Osub opposubseg = default(Osub);
             Vertex org, dest, apex;
             Vertex oppoapex;
-            Vertex inf1, inf2, inf3;
+
             bool shouldbedelaunay;
-            int horrors;
-            bool saveexact;
 
             var logger = Log.Instance;
 
             // Temporarily turn on exact arithmetic if it's off.
-            saveexact = Behavior.NoExact;
+            bool saveexact = Behavior.NoExact;
             Behavior.NoExact = false;
-            horrors = 0;
 
-            inf1 = mesh.infvertex1;
-            inf2 = mesh.infvertex2;
-            inf3 = mesh.infvertex3;
+            int horrors = 0;
+
+            var inf1 = mesh.infvertex1;
+            var inf2 = mesh.infvertex2;
+            var inf3 = mesh.infvertex3;
 
             // Run through the list of triangles, checking each one.
             foreach (var tri in mesh.triangles.Values)
