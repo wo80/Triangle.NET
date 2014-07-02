@@ -48,7 +48,7 @@ namespace TriangleNet.Meshing
         /// </summary>
         /// <remarks>
         /// If the value is 0 (default), an unknown number of Steiner points may be inserted
-        /// to meet the other qulaity constraints.
+        /// to meet the other quality constraints.
         /// </remarks>
         public int SteinerPoints { get; set; }
     }

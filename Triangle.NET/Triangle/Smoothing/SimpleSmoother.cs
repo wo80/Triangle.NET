@@ -35,6 +35,9 @@ namespace TriangleNet.Smoothing
         {
             var smoothedMesh = (Mesh)mesh;
 
+            // The smoother should respect the mesh segment splitting behavior.
+            this.options.SegmentSplitting = smoothedMesh.behavior.NoBisect;
+
             // Take a few smoothing rounds.
             for (int i = 0; i < limit; i++)
             {
