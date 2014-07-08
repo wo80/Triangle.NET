@@ -270,7 +270,7 @@ namespace TriangleNet.Voronoi
             }
         }
 
-        protected IEnumerable<IEdge> EnumerateEdges()
+        protected virtual IEnumerable<IEdge> EnumerateEdges()
         {
             var edges = new List<IEdge>(this.edges.Count / 2);
 

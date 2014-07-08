@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
@@ -9,10 +8,9 @@ using TriangleNet;
 using TriangleNet.Geometry;
 using TriangleNet.Meshing;
 using TriangleNet.Meshing.Algorithm;
-using TriangleNet.Tools;
-using TriangleNet.Smoothing;
 using TriangleNet.Rendering;
-using TriangleNet.Voronoi.Legacy;
+using TriangleNet.Smoothing;
+using TriangleNet.Voronoi;
 
 namespace MeshExplorer
 {
@@ -22,7 +20,7 @@ namespace MeshExplorer
 
         Mesh mesh;
         IPolygon input;
-        IVoronoi voronoi;
+        VoronoiBase voronoi;
 
         FormLog frmLog;
         FormGenerator frmGenerator;
@@ -612,14 +610,14 @@ namespace MeshExplorer
 
             if (mesh.IsPolygon)
             {
-                this.voronoi = new BoundedVoronoiLegacy(mesh);
+                this.voronoi = new BoundedVoronoi(mesh);
             }
             else
             {
-                this.voronoi = new SimpleVoronoi(mesh);
+                this.voronoi = new StandardVoronoi(mesh);
             }
 
-            renderManager.Set(voronoi.Points, voronoi.Edges, false);
+            renderManager.Set(voronoi.Vertices, voronoi.Edges, false);
         }
 
         private void ShowLog()

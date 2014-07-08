@@ -81,30 +81,22 @@ namespace TriangleNet.Data
 
         public Triangle()
         {
+            // Three NULL vertices.
+            vertices = new Vertex[3];
+
+            // Initialize the three adjoining subsegments to be the omnipresent subsegment.
+            subsegs = new Osub[3];
+            subsegs[0].seg = Segment.Empty;
+            subsegs[1].seg = Segment.Empty;
+            subsegs[2].seg = Segment.Empty;
+
             // Initialize the three adjoining triangles to be "outer space".
             neighbors = new Otri[3];
             neighbors[0].triangle = Empty;
             neighbors[1].triangle = Empty;
             neighbors[2].triangle = Empty;
 
-            // Three NULL vertices.
-            vertices = new Vertex[3];
-
-            // TODO: if (Behavior.UseSegments)
-            {
-                // Initialize the three adjoining subsegments to be the
-                // omnipresent subsegment.
-                subsegs = new Osub[3];
-                subsegs[0].seg = Segment.Empty;
-                subsegs[1].seg = Segment.Empty;
-                subsegs[2].seg = Segment.Empty;
-            }
-
-            // TODO:
-            //if (Behavior.VarArea)
-            //{
-            //    area = -1.0;
-            //}
+            // area = -1.0;
         }
 
         #region Public properties
