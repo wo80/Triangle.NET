@@ -6,6 +6,7 @@
 
 namespace TriangleNet.Smoothing
 {
+    using System.Collections.Generic;
     using TriangleNet.Geometry;
     using TriangleNet.Meshing;
     using TriangleNet.Voronoi.Legacy;
@@ -62,24 +63,45 @@ namespace TriangleNet.Smoothing
             var cells = voronoi.Regions;
 
             double x, y;
-            int n;
 
             foreach (var cell in cells)
             {
-                n = 0;
-                x = y = 0.0;
-                foreach (var p in cell.Vertices)
-                {
-                    n++;
-                    x += p.x;
-                    y += p.y;
-                }
+                Centroid((List<Point>)cell.Vertices, out x, out y);
 
-                cell.Generator.x = x / n;
-                cell.Generator.y = y / n;
+                cell.Generator.x = x;
+                cell.Generator.y = y;
             }
         }
 
+        /// <summary>
+        /// Calculate the centroid of a polygon.
+        /// </summary>
+        /// <param name="points">Points of the polygon.</param>
+        /// <param name="x">Centroid x coordinate.</param>
+        /// <param name="y">Centroid y coordinate.</param>
+        /// <remarks>
+        /// Based on ANSI C code from the article "Centroid of a Polygon" by Gerard Bashein
+        /// and Paul R. Detmer in "Graphics Gems IV", Academic Press, 1994
+        /// </remarks>
+        private void Centroid(List<Point> points, out double x, out double y)
+        {
+            int i, j, n = points.Count;
+            double ai, atmp = 0, xtmp = 0, ytmp = 0;
+
+            for (i = n - 1, j = 0; j < n; i = j, j++)
+            {
+                ai = points[i].X * points[j].Y - points[j].X * points[i].Y;
+                atmp += ai;
+                xtmp += (points[j].X + points[i].X) * ai;
+                ytmp += (points[j].Y + points[i].Y) * ai;
+            }
+
+            x = xtmp / (3 * atmp);
+            y = ytmp / (3 * atmp);
+
+            //area = atmp / 2;
+        }
+        
         /// <summary>
         /// Rebuild the input geometry.
         /// </summary>
