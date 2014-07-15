@@ -2,7 +2,7 @@
 namespace TriangleNet.Geometry
 {
     using System.Collections.Generic;
-    using TriangleNet.Data;
+    using TriangleNet.Topology;
 
     /// <summary>
     /// Polygon interface.

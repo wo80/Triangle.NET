@@ -9,9 +9,10 @@ namespace TriangleNet.Meshing
 {
     using System;
     using System.Collections.Generic;
-    using TriangleNet.Data;
     using TriangleNet.Geometry;
     using TriangleNet.Logging;
+    using TriangleNet.Meshing.Data;
+    using TriangleNet.Topology;
 
     /// <summary>
     /// Provides methods for mesh quality enforcement and testing.

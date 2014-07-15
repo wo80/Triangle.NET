@@ -2,7 +2,7 @@
 namespace TriangleNet.Rendering.Util
 {
     using System.Collections.Generic;
-    using TriangleNet.Data;
+    using TriangleNet.Topology;
     using TriangleNet.Geometry;
     using TriangleNet.Rendering.Buffer;
 
@@ -36,9 +36,9 @@ namespace TriangleNet.Rendering.Util
             return buffer as IBuffer<float>;
         }
 
-        public static IBuffer<float> CreateVertexBuffer(Point[] points, ref BoundingBox bounds)
+        public static IBuffer<float> CreateVertexBuffer(ICollection<Point> points, ref BoundingBox bounds)
         {
-            var buffer = new VertexBuffer(2 * points.Length);
+            var buffer = new VertexBuffer(2 * points.Count);
 
             bounds.Reset();
 

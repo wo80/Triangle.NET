@@ -6,7 +6,7 @@
 
 namespace TriangleNet.IO
 {
-    using TriangleNet.Data;
+    using TriangleNet.Topology;
     using TriangleNet.Geometry;
 
     /// <summary>

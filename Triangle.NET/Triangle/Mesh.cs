@@ -9,12 +9,13 @@ namespace TriangleNet
 {
     using System;
     using System.Collections.Generic;
-    using TriangleNet.Data;
     using TriangleNet.Geometry;
     using TriangleNet.Logging;
     using TriangleNet.Meshing;
+    using TriangleNet.Meshing.Data;
     using TriangleNet.Meshing.Iterators;
     using TriangleNet.Tools;
+    using TriangleNet.Topology;
 
     /// <summary>
     /// Mesh data structure.

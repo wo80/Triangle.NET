@@ -6,9 +6,12 @@
 
 namespace TriangleNet.Voronoi
 {
-    using System;
     using System.Collections.Generic;
     using TriangleNet.Geometry;
+    using TriangleNet.Topology.DCEL;
+
+    using HVertex = TriangleNet.Topology.DCEL.Vertex;
+    using TVertex = TriangleNet.Geometry.Vertex;
 
     public class BoundedVoronoi : VoronoiBase
     {
@@ -19,26 +22,23 @@ namespace TriangleNet.Voronoi
         {
             // We explicitly told the base constructor to call the Generate method, so
             // at this point the basic Voronoi diagram is already created.
-            offset = base.vertices.Length;
+            offset = base.vertices.Count;
 
             // Each vertex of the hull will be part of a Voronoi cell.
-            Array.Resize(ref base.vertices, offset + mesh.hullsize);
+            base.vertices.Capacity = offset + mesh.hullsize;
 
             // Create bounded Voronoi diagram.
             PostProcess();
 
-            Array.Resize(ref base.vertices, offset);
+            ResolveBoundaryEdges();
         }
 
+        /// <summary>
+        /// Computes edge intersections with mesh boundary edges.
+        /// </summary>
         private void PostProcess()
         {
-            // Compute edge intersections with mesh boundary edges.
-            ProcessBoundaryEdges();
-        }
-
-        private void ProcessBoundaryEdges()
-        {
-            var infEdges = new List<DCEL.HalfEdge>();
+            var infEdges = new List<HalfEdge>();
 
             // TODO: save the half-infinite boundary edge in base class
             // so we don't have to process the complete list here.
@@ -52,8 +52,8 @@ namespace TriangleNet.Voronoi
 
             foreach (var edge in infEdges)
             {
-                var v1 = (Vertex)edge.face.generator;
-                var v2 = (Vertex)edge.twin.face.generator;
+                var v1 = (TVertex)edge.face.generator;
+                var v2 = (TVertex)edge.twin.face.generator;
 
                 double dir = RobustPredicates.CounterClockwise(v1, v2, edge.origin);
 
@@ -68,7 +68,7 @@ namespace TriangleNet.Voronoi
             }
         }
 
-        private void HandleCase1(DCEL.HalfEdge edge, Vertex v1, Vertex v2)
+        private void HandleCase1(HalfEdge edge, TVertex v1, TVertex v2)
         {
             //int mark = GetBoundaryMark(v1);
 
@@ -81,10 +81,10 @@ namespace TriangleNet.Voronoi
             v.y = (v1.y + v2.y) / 2.0;
 
             // Close the cell connected to edge.
-            var gen = new DCEL.Vertex(v1.x, v1.y);
+            var gen = new HVertex(v1.x, v1.y);
 
-            var h1 = new DCEL.HalfEdge(edge.twin.origin, edge.face);
-            var h2 = new DCEL.HalfEdge(gen, edge.face);
+            var h1 = new HalfEdge(edge.twin.origin, edge.face);
+            var h2 = new HalfEdge(gen, edge.face);
 
             h1.next = h2;
             h2.next = edge.face.edge;
@@ -100,49 +100,50 @@ namespace TriangleNet.Voronoi
             h1.id = count;
             h2.id = count + 1;
 
-            base.vertices[offset] = gen;
             gen.id = offset++;
+            base.vertices.Add(gen);
         }
 
-        private void HandleCase2(DCEL.HalfEdge e1, Vertex v1, Vertex v2)
+        private void HandleCase2(HalfEdge edge, TVertex v1, TVertex v2)
         {
-            var e2 = e1.twin.next;
-            var ei = e2.twin.next;
-
             // The vertices of the infinite edge.
-            var p1 = (Point)e1.origin;
-            var pi = (Point)e1.twin.origin;
+            var p1 = (Point)edge.origin;
+            var p2 = (Point)edge.twin.origin;
+
+            // The two edges leaving p1, pointing into the mesh.
+            var e1 = edge.twin.next;
+            var e2 = e1.twin.next;
 
             // Find the two intersections with boundary edge.
-            IntersectSegments(v1, v2, e2.origin, e2.twin.origin, ref pi);
-            IntersectSegments(v1, v2, ei.origin, ei.twin.origin, ref p1);
+            IntersectSegments(v1, v2, e1.origin, e1.twin.origin, ref p2);
+            IntersectSegments(v1, v2, e2.origin, e2.twin.origin, ref p1);
 
             // The infinite edge will now lie on the boundary. Update pointers:
-            e2.twin.next = e1.twin;
-            e1.twin.next = ei;
-            e1.twin.face = ei.face;
+            e1.twin.next = edge.twin;
+            edge.twin.next = e2;
+            edge.twin.face = e2.face;
 
-            e2.origin = e1.twin.origin;
+            e1.origin = edge.twin.origin;
 
-            e1.twin.twin = null;
-            e1.twin = null;
+            edge.twin.twin = null;
+            edge.twin = null;
 
             // Close the cell.
-            var gen = new DCEL.Vertex(v1.x, v1.y);
-            var he = new DCEL.HalfEdge(gen, e1.face);
+            var gen = new HVertex(v1.x, v1.y);
+            var he = new HalfEdge(gen, edge.face);
 
-            e1.next = he;
-            he.next = e1.face.edge;
+            edge.next = he;
+            he.next = edge.face.edge;
 
             // Let the face edge point to the edge leaving at generator.
-            e1.face.edge = he;
+            edge.face.edge = he;
 
             base.edges.Add(he);
 
             he.id = base.edges.Count;
 
-            base.vertices[offset] = gen;
             gen.id = offset++;
+            base.vertices.Add(gen);
         }
 
         /*

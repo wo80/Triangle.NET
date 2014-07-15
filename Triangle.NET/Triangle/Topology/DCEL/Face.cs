@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace TriangleNet.Voronoi.DCEL
+namespace TriangleNet.Topology.DCEL
 {
     using TriangleNet.Geometry;
 
@@ -13,6 +13,8 @@ namespace TriangleNet.Voronoi.DCEL
     /// </summary>
     public class Face
     {
+        internal int id;
+
         internal Point generator;
 
         internal HalfEdge edge;

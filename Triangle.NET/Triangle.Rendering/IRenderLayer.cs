@@ -26,7 +26,7 @@ namespace TriangleNet.Rendering
         BoundingBox SetPoints(IBuffer<float> buffer);
         BoundingBox SetPoints(IPolygon poly);
         BoundingBox SetPoints(IMesh mesh);
-        BoundingBox SetPoints(Point[] points);
+        BoundingBox SetPoints(ICollection<Point> points);
         void SetPolygon(IPolygon poly);
         void SetPolygon(IMesh mesh);
         void SetMesh(IMesh mesh, bool elements);

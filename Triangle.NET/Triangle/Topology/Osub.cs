@@ -5,7 +5,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace TriangleNet.Data
+namespace TriangleNet.Topology
 {
     using System;
     using TriangleNet.Geometry;

@@ -11,7 +11,7 @@ namespace MeshExplorer.IO
     using System.IO;
     using System.Text;
     using TriangleNet;
-    using TriangleNet.Data;
+    using TriangleNet.Topology;
     using TriangleNet.Geometry;
 
     /// <summary>

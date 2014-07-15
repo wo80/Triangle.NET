@@ -8,7 +8,7 @@ namespace TriangleNet.Voronoi.Legacy
 {
     using System;
     using System.Collections.Generic;
-    using TriangleNet.Data;
+    using TriangleNet.Topology;
     using TriangleNet.Geometry;
 
     /// <summary>
@@ -18,6 +18,7 @@ namespace TriangleNet.Voronoi.Legacy
     /// 2D Centroidal Voronoi Tessellations with Constraints, 2010,
     /// Jane Tournois, Pierre Alliez and Olivier Devillers
     /// </remarks>
+    [Obsolete("Use TriangleNet.Voronoi.BoundedVoronoi class instead.")]
     public class BoundedVoronoiLegacy : IVoronoi
     {
         Mesh mesh;

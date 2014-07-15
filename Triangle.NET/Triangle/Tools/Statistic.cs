@@ -8,7 +8,7 @@
 namespace TriangleNet.Tools
 {
     using System;
-    using TriangleNet.Data;
+    using TriangleNet.Topology;
     using TriangleNet.Geometry;
 
     /// <summary>

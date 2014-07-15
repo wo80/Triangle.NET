@@ -5,10 +5,11 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace TriangleNet.Data
+namespace TriangleNet.Meshing.Data
 {
     using System;
     using TriangleNet.Geometry;
+    using TriangleNet.Topology;
 
     /// <summary>
     /// A queue used to store bad triangles.

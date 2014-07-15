@@ -117,7 +117,7 @@ namespace TriangleNet.Rendering
         /// <summary>
         /// Set data for Voronoi layer.
         /// </summary>
-        public void Set(Point[] points, IEnumerable<IEdge> edges, bool reset, bool refresh = true)
+        public void Set(ICollection<Point> points, IEnumerable<IEdge> edges, bool reset, bool refresh = true)
         {
             context.Add(points, edges, reset);
 

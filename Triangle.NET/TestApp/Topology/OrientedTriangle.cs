@@ -1,7 +1,7 @@
 ﻿
 namespace MeshExplorer.Topology
 {
-    using TriangleNet.Data;
+    using TriangleNet.Topology;
     using TriangleNet.Geometry;
 
     public class OrientedTriangle

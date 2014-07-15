@@ -6,7 +6,7 @@
 
 namespace TriangleNet.Geometry
 {
-    using TriangleNet.Data;
+    using TriangleNet.Topology;
 
     /// <summary>
     /// Triangle interface.

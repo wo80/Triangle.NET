@@ -35,7 +35,7 @@ namespace TriangleNet.Meshing
         public Func<ITriangle, double, bool> UserTest { get; set; }
 
         /// <summary>
-        /// Gets or sets a area constraint per triangle.
+        /// Gets or sets an area constraint per triangle.
         /// </summary>
         /// <remarks>
         /// If this flag is set to true, the <see cref="ITriangle.Area"/> value will

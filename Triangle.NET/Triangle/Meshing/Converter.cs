@@ -10,7 +10,7 @@ namespace TriangleNet.Meshing
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using TriangleNet.Data;
+    using TriangleNet.Topology;
     using TriangleNet.Geometry;
 
     /// <summary>

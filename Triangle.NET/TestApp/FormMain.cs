@@ -617,7 +617,9 @@ namespace MeshExplorer
                 this.voronoi = new StandardVoronoi(mesh);
             }
 
-            renderManager.Set(voronoi.Vertices, voronoi.Edges, false);
+            // HACK: List<Vertex> -> ICollection<Point> ? Nope, no way.
+            //           Vertex[] -> ICollection<Point> ? Well, ok.
+            renderManager.Set(voronoi.Vertices.ToArray(), voronoi.Edges, false);
         }
 
         private void ShowLog()

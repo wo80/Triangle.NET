@@ -108,7 +108,7 @@ namespace TriangleNet.Rendering
             return bounds;
         }
 
-        public BoundingBox SetPoints(Point[] vertices)
+        public BoundingBox SetPoints(ICollection<Point> vertices)
         {
             BoundingBox bounds = new BoundingBox();
 

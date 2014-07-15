@@ -4,11 +4,9 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace TriangleNet.Voronoi.DCEL
+namespace TriangleNet.Topology.DCEL
 {
-    using TriangleNet.Geometry;
-
-    public class Vertex : Point
+    public class Vertex : TriangleNet.Geometry.Point
     {
         internal HalfEdge leaving;
 

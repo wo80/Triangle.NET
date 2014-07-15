@@ -43,7 +43,7 @@
   <ItemGroup>
     <Compile Include="Geometry\IEdge.cs" />
     <Compile Include="Geometry\IPolygon.cs" />
-    <Compile Include="Geometry\IPolygonExtensions.cs" />
+    <Compile Include="Geometry\ExtensionMethods.cs" />
     <Compile Include="Geometry\Polygon.cs" />
     <Compile Include="IO\FileProcessor.cs" />
     <Compile Include="IO\IFileFormat.cs" />
@@ -54,15 +54,16 @@
     <Compile Include="Meshing\IMesh.cs" />
     <Compile Include="Meshing\IQualityMesher.cs" />
     <Compile Include="Meshing\ITriangulator.cs" />
-    <Compile Include="Data\BadTriQueue.cs" />
+    <Compile Include="Meshing\Data\BadTriQueue.cs" />
     <Compile Include="Behavior.cs" />
     <Compile Include="Meshing\ConstraintMesher.cs" />
-    <Compile Include="Data\BadSubseg.cs" />
-    <Compile Include="Data\BadTriangle.cs" />
-    <Compile Include="Data\Osub.cs" />
-    <Compile Include="Data\Otri.cs" />
-    <Compile Include="Data\Segment.cs" />
-    <Compile Include="Data\Triangle.cs" />
+    <Compile Include="Meshing\Data\BadSubseg.cs" />
+    <Compile Include="Meshing\Data\BadTriangle.cs" />
+    <Compile Include="Topology\DCEL\DcelMesh.cs" />
+    <Compile Include="Topology\Osub.cs" />
+    <Compile Include="Topology\Otri.cs" />
+    <Compile Include="Topology\Segment.cs" />
+    <Compile Include="Topology\Triangle.cs" />
     <Compile Include="Geometry\Vertex.cs" />
     <Compile Include="Meshing\Algorithm\Dwyer.cs" />
     <Compile Include="Geometry\Rectangle.cs" />
@@ -109,13 +110,16 @@
     <Compile Include="Voronoi\Legacy\VoronoiRegion.cs" />
     <Compile Include="TriangleLocator.cs" />
     <Compile Include="Voronoi\BoundedVoronoi.cs" />
-    <Compile Include="Voronoi\DCEL\Face.cs" />
-    <Compile Include="Voronoi\DCEL\HalfEdge.cs" />
-    <Compile Include="Voronoi\DCEL\Vertex.cs" />
+    <Compile Include="Topology\DCEL\Face.cs" />
+    <Compile Include="Topology\DCEL\HalfEdge.cs" />
+    <Compile Include="Topology\DCEL\Vertex.cs" />
     <Compile Include="Voronoi\StandardVoronoi.cs" />
     <Compile Include="Voronoi\VoronoiBase.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Data\" />
+    <Folder Include="Voronoi\DCEL\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

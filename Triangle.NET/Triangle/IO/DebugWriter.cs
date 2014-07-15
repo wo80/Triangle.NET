@@ -11,7 +11,7 @@ namespace TriangleNet.IO
     using System.IO;
     using System.IO.Compression;
     using System.Text;
-    using TriangleNet.Data;
+    using TriangleNet.Topology;
     using TriangleNet.Geometry;
 
     /// <summary>

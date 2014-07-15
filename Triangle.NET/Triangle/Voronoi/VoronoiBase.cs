@@ -9,53 +9,17 @@ namespace TriangleNet.Voronoi
 {
     using System.Collections.Generic;
 
-    using TriangleNet.Data;
+    using TriangleNet.Topology;
     using TriangleNet.Geometry;
-    using TriangleNet.Voronoi.DCEL;
+    using TriangleNet.Topology.DCEL;
 
-    using Vertex = TriangleNet.Voronoi.DCEL.Vertex;
+    using Vertex = TriangleNet.Topology.DCEL.Vertex;
 
     /// <summary>
     /// The Voronoi diagram is the dual of a pointset triangulation.
     /// </summary>
-    public abstract class VoronoiBase
+    public abstract class VoronoiBase : DcelMesh
     {
-        protected Vertex[] vertices;
-        protected List<HalfEdge> edges;
-        protected Face[] faces;
-
-        /// <summary>
-        /// Gets the vertices of the Voronoi diagram.
-        /// </summary>
-        public Vertex[] Vertices
-        {
-            get { return vertices; }
-        }
-
-        /// <summary>
-        /// Gets the list of half-edges specify the Voronoi diagram topology.
-        /// </summary>
-        public List<HalfEdge> HalfEdges
-        {
-            get { return edges; }
-        }
-
-        /// <summary>
-        /// Gets the faces of the Voronoi diagram.
-        /// </summary>
-        public Face[] Faces
-        {
-            get { return faces; }
-        }
-
-        /// <summary>
-        /// Gets the collection of edges of the Voronoi diagram.
-        /// </summary>
-        public IEnumerable<IEdge> Edges
-        {
-            get { return EnumerateEdges(); }
-        }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="VoronoiBase" /> class.
         /// </summary>
@@ -63,6 +27,7 @@ namespace TriangleNet.Voronoi
         /// <param name="generate">If set to true, the constuctor will call the Generate
         /// method, which builds the Voronoi diagram.</param>
         protected VoronoiBase(Mesh mesh, bool generate)
+            : base(false)
         {
             if (generate)
             {
@@ -79,13 +44,14 @@ namespace TriangleNet.Voronoi
             mesh.Renumber();
             mesh.MakeVertexMap();
 
+            base.edges = new List<HalfEdge>();
+
             // Allocate space for voronoi diagram
-            this.vertices = new Vertex[mesh.triangles.Count + mesh.hullsize];
-            this.faces = new Face[mesh.vertices.Count];
-            this.edges = new List<HalfEdge>();
+            var vertices = new Vertex[mesh.triangles.Count + mesh.hullsize];
+            var faces = new Face[mesh.vertices.Count];
 
             // Compute triangles circumcenters and setup bounding box
-            var map = ComputeVertices(mesh);
+            var map = ComputeVertices(mesh, vertices);
 
             // Create all Voronoi faces.
             foreach (var vertex in mesh.vertices.Values)
@@ -93,17 +59,20 @@ namespace TriangleNet.Voronoi
                 faces[vertex.id] = new Face(vertex);
             }
 
-            ComputeEdges(mesh, map);
+            ComputeEdges(mesh, vertices, faces, map);
 
             // At this point all edges are computed, but the (edge.next) pointers aren't set.
             ConnectEdges(map);
+
+            base.vertices = new List<Vertex>(vertices);
+            base.faces = new List<Face>(faces);
         }
 
         /// <summary>
         /// Compute the Voronoi vertices (the circumcenters of the triangles).
         /// </summary>
         /// <returns>An empty map, which will map all vertices to a list of leaving edges.</returns>
-        protected List<HalfEdge>[] ComputeVertices(Mesh mesh)
+        protected List<HalfEdge>[] ComputeVertices(Mesh mesh, Vertex[] vertices)
         {
             Otri tri = default(Otri);
             double xi = 0, eta = 0;
@@ -136,7 +105,7 @@ namespace TriangleNet.Voronoi
         /// Compute the edges of the Voronoi diagram.
         /// </summary>
         /// <param name="map">Empty vertex map.</param>
-        protected void ComputeEdges(Mesh mesh, List<HalfEdge>[] map)
+        protected void ComputeEdges(Mesh mesh, Vertex[] vertices, Face[] faces, List<HalfEdge>[] map)
         {
             Otri tri, neighbor = default(Otri);
             TriangleNet.Geometry.Vertex org, dest;
@@ -268,24 +237,6 @@ namespace TriangleNet.Voronoi
                     }
                 }
             }
-        }
-
-        protected virtual IEnumerable<IEdge> EnumerateEdges()
-        {
-            var edges = new List<IEdge>(this.edges.Count / 2);
-
-            foreach (var edge in this.edges)
-            {
-                var twin = edge.twin;
-
-                // Report edge only once.
-                if (edge.id < twin.id)
-                {
-                    edges.Add(new Edge(edge.origin.id, twin.origin.id));
-                }
-            }
-
-            return edges;
         }
     }
 }

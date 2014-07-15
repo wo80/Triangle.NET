@@ -3,7 +3,7 @@ namespace TriangleNet.Geometry
 {
     using System;
     using System.Collections.Generic;
-    using TriangleNet.Data;
+    using TriangleNet.Topology;
 
     /// <summary>
     /// A polygon represented as a planar straight line graph.

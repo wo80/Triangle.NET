@@ -8,7 +8,7 @@
 namespace TriangleNet.Geometry
 {
     using System;
-    using TriangleNet.Data;
+    using TriangleNet.Topology;
 
     /// <summary>
     /// The vertex data structure.

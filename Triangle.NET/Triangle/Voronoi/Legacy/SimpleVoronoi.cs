@@ -9,12 +9,13 @@ namespace TriangleNet.Voronoi.Legacy
 {
     using System;
     using System.Collections.Generic;
-    using TriangleNet.Data;
+    using TriangleNet.Topology;
     using TriangleNet.Geometry;
 
     /// <summary>
     /// The Voronoi Diagram is the dual of a pointset triangulation.
     /// </summary>
+    [Obsolete("Use TriangleNet.Voronoi.StandardVoronoi class instead.")]
     public class SimpleVoronoi : IVoronoi
     {
         Mesh mesh;

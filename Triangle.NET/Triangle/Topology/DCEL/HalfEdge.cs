@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace TriangleNet.Voronoi.DCEL
+namespace TriangleNet.Topology.DCEL
 {
     public class HalfEdge
     {

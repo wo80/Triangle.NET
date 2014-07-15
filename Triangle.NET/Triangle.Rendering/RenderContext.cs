@@ -117,7 +117,7 @@ namespace TriangleNet.Rendering
             RenderLayers[3].IsActive = true;
         }
 
-        public void Add(Point[] points, IEnumerable<IEdge> edges, bool reset)
+        public void Add(ICollection<Point> points, IEnumerable<IEdge> edges, bool reset)
         {
             RenderLayers[4].SetPoints(points);
             RenderLayers[4].SetMesh(edges);

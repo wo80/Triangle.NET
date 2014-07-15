@@ -9,7 +9,7 @@ namespace TriangleNet.Meshing.Iterators
 {
     using System;
     using System.Collections.Generic;
-    using TriangleNet.Data;
+    using TriangleNet.Topology;
 
     /// <summary>
     /// Iterates the region a given triangle belongs to and applies an action

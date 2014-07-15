@@ -5,7 +5,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace TriangleNet.Data
+namespace TriangleNet.Topology
 {
     using System;
     using TriangleNet.Geometry;
@@ -36,18 +36,16 @@ namespace TriangleNet.Data
 
         internal const int EmptyID = -1;
 
-        internal static Triangle Empty;
+        internal static readonly Triangle Empty;
 
         /// <summary>
-        /// Initializes the dummytri (Triangle.Empty). The method is called by the static Segment
-        /// constructor (which ensures that dummysub (Segment.Empty) will not be null).
+        /// Initializes the dummytri (Triangle.Empty).
         /// </summary>
-        internal static void Initialize()
+        static Triangle()
         {
             // Set up 'dummytri', the 'triangle' that occupies "outer space."
             Empty = new Triangle();
-            Empty.hash = EmptyID;
-            Empty.id = EmptyID;
+            Empty.hash = Empty.id = EmptyID;
 
             // Initialize the three adjoining triangles to be "outer space." These
             // will eventually be changed by various bonding operations, but their
@@ -56,6 +54,12 @@ namespace TriangleNet.Data
             Empty.neighbors[0].triangle = Empty;
             Empty.neighbors[1].triangle = Empty;
             Empty.neighbors[2].triangle = Empty;
+
+            if (Segment.Empty == null)
+            {
+                // In case the static Segment constructor hasn't been called yet.
+                Empty.subsegs[0].seg = new Segment();
+            }
 
             // Initialize the three adjoining subsegments of 'dummytri' to be
             // the omnipresent subsegment.

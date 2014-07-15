@@ -2,7 +2,7 @@
 namespace TriangleNet.Meshing
 {
     using System.Collections.Generic;
-    using TriangleNet.Data;
+    using TriangleNet.Topology;
     using TriangleNet.Geometry;
 
     /// <summary>

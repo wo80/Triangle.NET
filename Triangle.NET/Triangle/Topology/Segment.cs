@@ -5,7 +5,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace TriangleNet.Data
+namespace TriangleNet.Topology
 {
     using System;
     using TriangleNet.Geometry;
@@ -21,7 +21,7 @@ namespace TriangleNet.Data
         // triangle side or subsegment end that isn't attached to a real
         // subsegment.
 
-        internal static Segment Empty;
+        internal static readonly Segment Empty;
 
         static Segment()
         {
@@ -34,8 +34,6 @@ namespace TriangleNet.Data
             // can legally be dereferenced.
             Empty.subsegs[0].seg = Empty;
             Empty.subsegs[1].seg = Empty;
-
-            Triangle.Initialize();
         }
 
         #endregion
