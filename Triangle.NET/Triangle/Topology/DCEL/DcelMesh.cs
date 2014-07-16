@@ -1,4 +1,9 @@
-﻿
+﻿// -----------------------------------------------------------------------
+// <copyright file="DcelMesh.cs">
+// Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
+// </copyright>
+// -----------------------------------------------------------------------
+
 namespace TriangleNet.Topology.DCEL
 {
     using System.Collections.Generic;
@@ -10,11 +15,18 @@ namespace TriangleNet.Topology.DCEL
         protected List<HalfEdge> edges;
         protected List<Face> faces;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DcelMesh" /> class.
+        /// </summary>
         public DcelMesh()
             : this(true)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="" /> class.
+        /// </summary>
+        /// <param name="initialize">If false, lists will not be initialized.</param>
         protected DcelMesh(bool initialize)
         {
             if (initialize)
@@ -58,6 +70,74 @@ namespace TriangleNet.Topology.DCEL
         }
 
         /// <summary>
+        /// Check if the DCEL ist consistend.
+        /// </summary>
+        /// <param name="closed">If true, faces are assumed to be closed (i.e. all edges must have
+        /// a valid next pointer).</param>
+        /// <returns></returns>
+        public bool IsConsistent(bool closed = true)
+        {
+            int horrors = 0;
+
+            // Check faces
+            foreach (var face in faces)
+            {
+                if (face.edge == null)
+                {
+                    horrors++;
+                }
+            }
+
+            // Check half-edges
+            foreach (var edge in edges)
+            {
+                var twin = edge.twin;
+
+                if (edge.origin == null)
+                {
+                    horrors++;
+                }
+
+                if (twin == null)
+                {
+                    horrors++;
+                }
+                else if (twin.twin != null && edge.id != twin.twin.id)
+                {
+                    horrors++;
+                }
+
+                if (closed)
+                {
+                    if (edge.next == null)
+                    {
+                        horrors++;
+                    }
+                    else if (twin != null && edge.next.origin.id != twin.origin.id)
+                    {
+                        horrors++;
+                    }
+                }
+
+                if (edge.face == null)
+                {
+                    horrors++;
+                }
+            }
+
+            // Check vertices
+            foreach (var vertex in vertices)
+            {
+                if (vertex.leaving == null)
+                {
+                    horrors++;
+                }
+            }
+
+            return horrors == 0;
+        }
+
+        /// <summary>
         /// Search for half-edge without twin and add a twin. Connect twins to form connected
         /// boundary contours.
         /// </summary>
@@ -74,7 +154,7 @@ namespace TriangleNet.Topology.DCEL
             {
                 if (edge.twin == null)
                 {
-                    var twin = edge.twin = new HalfEdge(edge.next.origin);
+                    var twin = edge.twin = new HalfEdge(edge.next.origin, Face.Empty);
                     twin.twin = edge;
 
                     map.Add(twin.origin.id, twin);

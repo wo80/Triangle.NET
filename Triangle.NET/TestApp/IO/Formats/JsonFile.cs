@@ -96,9 +96,7 @@ namespace MeshExplorer.IO.Formats
                 }
             }
 
-            var converter = new Converter();
-
-            return converter.ToMesh(geometry, triangles);
+            return Converter.ToMesh(geometry, triangles);
         }
 
         public void Write(IMesh mesh, string filename)

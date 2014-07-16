@@ -68,6 +68,9 @@ namespace TriangleNet.Voronoi
             }
         }
 
+        /// <summary>
+        /// Case 1: edge origin lies inside the domain.
+        /// </summary>
         private void HandleCase1(HalfEdge edge, TVertex v1, TVertex v2)
         {
             //int mark = GetBoundaryMark(v1);
@@ -86,8 +89,11 @@ namespace TriangleNet.Voronoi
             var h1 = new HalfEdge(edge.twin.origin, edge.face);
             var h2 = new HalfEdge(gen, edge.face);
 
+            edge.next = h1;
             h1.next = h2;
             h2.next = edge.face.edge;
+
+            gen.leaving = h2;
 
             // Let the face edge point to the edge leaving at generator.
             edge.face.edge = h2;
@@ -104,6 +110,9 @@ namespace TriangleNet.Voronoi
             base.vertices.Add(gen);
         }
 
+        /// <summary>
+        /// Case 1: edge origin lies outside the domain.
+        /// </summary>
         private void HandleCase2(HalfEdge edge, TVertex v1, TVertex v2)
         {
             // The vertices of the infinite edge.

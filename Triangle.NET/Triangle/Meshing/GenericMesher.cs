@@ -177,9 +177,7 @@ namespace TriangleNet.Meshing
                 }
             }
 
-            var converter = new Converter();
-
-            return converter.ToMesh(polygon, triangles);
+            return Converter.ToMesh(polygon, triangles);
         }
     }
 }

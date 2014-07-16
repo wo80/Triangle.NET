@@ -13,12 +13,32 @@ namespace TriangleNet.Topology.DCEL
     /// </summary>
     public class Face
     {
+        #region Static initialization of "Outer Space" face
+
+        public static readonly Face Empty;
+
+        static Face()
+        {
+            Empty = new Face(null);
+            Empty.id = -1;
+        }
+
+        #endregion
+
         internal int id;
 
         internal Point generator;
 
         internal HalfEdge edge;
         internal bool bounded;
+
+        /// <summary>
+        /// Gets the face id.
+        /// </summary>
+        public int ID
+        {
+            get { return id; }
+        }
 
         /// <summary>
         /// Gets or sets a half-edge connected to the face.

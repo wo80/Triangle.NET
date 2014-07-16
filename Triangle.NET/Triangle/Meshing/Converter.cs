@@ -10,18 +10,24 @@ namespace TriangleNet.Meshing
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using TriangleNet.Topology;
     using TriangleNet.Geometry;
+    using TriangleNet.Topology;
+    using TriangleNet.Topology.DCEL;
+
+    using HVertex = TriangleNet.Topology.DCEL.Vertex;
+    using TVertex = TriangleNet.Geometry.Vertex;
 
     /// <summary>
     /// The Converter class provides methods for mesh reconstruction.
     /// </summary>
-    public class Converter
+    public static class Converter
     {
+        #region Triangle mesh conversion
+
         /// <summary>
         /// Reconstruct a triangulation from its raw data representation.
         /// </summary>
-        public Mesh ToMesh(Polygon polygon, IList<ITriangle> triangles)
+        public static Mesh ToMesh(Polygon polygon, IList<ITriangle> triangles)
         {
             return ToMesh(polygon, triangles.ToArray());
         }
@@ -29,14 +35,14 @@ namespace TriangleNet.Meshing
         /// <summary>
         /// Reconstruct a triangulation from its raw data representation.
         /// </summary>
-        public Mesh ToMesh(Polygon polygon, ITriangle[] triangles)
+        public static Mesh ToMesh(Polygon polygon, ITriangle[] triangles)
         {
             Otri tri = default(Otri);
             Osub subseg = default(Osub);
             int i = 0;
 
             int elements = triangles == null ? 0 : triangles.Length;
-            int numberofsegments = polygon.Segments.Count;
+            int segments = polygon.Segments.Count;
 
             var mesh = new Mesh();
 
@@ -53,17 +59,17 @@ namespace TriangleNet.Meshing
             }
 
             // Create the triangles.
-            for (i = 0; i < mesh.inelements; i++)
+            for (i = 0; i < elements; i++)
             {
                 mesh.MakeTriangle(ref tri);
             }
 
             if (mesh.behavior.Poly)
             {
-                mesh.insegments = numberofsegments;
+                mesh.insegments = segments;
 
                 // Create the subsegments.
-                for (i = 0; i < mesh.insegments; i++)
+                for (i = 0; i < segments; i++)
                 {
                     mesh.MakeSegment(ref subseg);
                 }
@@ -87,8 +93,8 @@ namespace TriangleNet.Meshing
             Otri checktri = default(Otri);
             Otri checkleft = default(Otri);
             Otri nexttri;
-            Vertex tdest, tapex;
-            Vertex checkdest, checkapex;
+            TVertex tdest, tapex;
+            TVertex checkdest, checkapex;
             int[] corner = new int[3];
             int aroundvertex;
             int i;
@@ -203,12 +209,12 @@ namespace TriangleNet.Meshing
         {
             Otri checktri = default(Otri);
             Otri nexttri; // Triangle
-            Vertex checkdest;
+            TVertex checkdest;
             Otri checkneighbor = default(Otri);
             Osub subseg = default(Osub);
             Otri prevlink; // Triangle
-            Vertex shorg;
-            Vertex segmentorg, segmentdest;
+            TVertex shorg;
+            TVertex segmentorg, segmentdest;
             int[] end = new int[2];
             bool notfound;
             //bool segmentmarkers = false;
@@ -337,5 +343,148 @@ namespace TriangleNet.Meshing
             mesh.hullsize = hullsize;
             mesh.edges = (3 * mesh.triangles.Count + hullsize) / 2;
         }
+
+        #endregion
+
+        #region DCEL conversion
+
+        public static DcelMesh ToDCEL(Mesh mesh)
+        {
+            var dcel = new DcelMesh();
+
+            var vertices = new HVertex[mesh.vertices.Count];
+            var faces = new Face[mesh.triangles.Count];
+
+            dcel.HalfEdges.Capacity = 2 * mesh.edges;
+
+            mesh.Renumber();
+
+            HVertex vertex;
+
+            foreach (var v in mesh.vertices.Values)
+            {
+                vertex = new HVertex(v.x, v.y);
+                vertex.id = v.id;
+                vertex.mark = v.mark;
+
+                vertices[v.id] = vertex;
+            }
+
+            // Maps a triangle to its 3 edges (used to set next pointers).
+            var map = new List<HalfEdge>[mesh.triangles.Count];
+
+            Face face;
+
+            foreach (var t in mesh.triangles.Values)
+            {
+                face = new Face(null);
+                face.id = t.id;
+
+                faces[t.id] = face;
+
+                map[t.id] = new List<HalfEdge>(3);
+            }
+
+            Otri tri = default(Otri), neighbor = default(Otri);
+            TriangleNet.Geometry.Vertex org, dest;
+
+            int id, nid, count = mesh.triangles.Count;
+
+            HalfEdge edge, twin, next;
+
+            var edges = dcel.HalfEdges;
+
+            // Count half-edges (edge ids).
+            int k = 0;
+
+            // Maps a vertex to its leaving boundary edge.
+            var boundary = new Dictionary<int, HalfEdge>();
+
+            foreach (var t in mesh.triangles.Values)
+            {
+                id = t.id;
+
+                tri.triangle = t;
+
+                for (int i = 0; i < 3; i++)
+                {
+                    tri.orient = i;
+                    tri.Sym(ref neighbor);
+
+                    nid = neighbor.triangle.id;
+
+                    if (id < nid || nid < 0)
+                    {
+                        face = faces[id];
+
+                        // Get the endpoints of the current triangle edge.
+                        org = tri.Org();
+                        dest = tri.Dest();
+
+                        // Create half-edges.
+                        edge = new HalfEdge(vertices[org.id], face);
+                        twin = new HalfEdge(vertices[dest.id], nid < 0 ? Face.Empty : faces[nid]);
+
+                        map[id].Add(edge);
+
+                        if (nid >= 0)
+                        {
+                            map[nid].Add(twin);
+                        }
+                        else
+                        {
+                            boundary.Add(dest.id, twin);
+                        }
+
+                        // Set leaving edges.
+                        edge.origin.leaving = edge;
+                        twin.origin.leaving = twin;
+
+                        // Set twin edges.
+                        edge.twin = twin;
+                        twin.twin = edge;
+
+                        edge.id = k++;
+                        twin.id = k++;
+
+                        edges.Add(edge);
+                        edges.Add(twin);
+                    }
+                }
+            }
+
+            // Set next pointers for each triangle face.
+            foreach (var t in map)
+            {
+                edge = t[0];
+                next = t[1];
+
+                if (edge.twin.origin.id == next.origin.id)
+                {
+                    edge.next = next;
+                    next.next = t[2];
+                    t[2].next = edge;
+                }
+                else
+                {
+                    edge.next = t[2];
+                    next.next = edge;
+                    t[2].next = next;
+                }
+            }
+
+            // Resolve boundary edges.
+            foreach (var e in boundary.Values)
+            {
+                e.next = boundary[e.twin.origin.id];
+            }
+
+            dcel.Vertices.AddRange(vertices);
+            dcel.Faces.AddRange(faces);
+
+            return dcel;
+        }
+
+        #endregion
     }
 }

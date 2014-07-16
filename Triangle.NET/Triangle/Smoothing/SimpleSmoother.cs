@@ -22,6 +22,9 @@ namespace TriangleNet.Smoothing
     {
         ConstraintOptions options;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SimpleSmoother" /> class.
+        /// </summary>
         public SimpleSmoother()
         {
             this.options = new ConstraintOptions() { ConformingDelaunay = true };
@@ -39,7 +42,7 @@ namespace TriangleNet.Smoothing
             // The smoother should respect the mesh segment splitting behavior.
             this.options.SegmentSplitting = smoothedMesh.behavior.NoBisect;
 
-            // Take a few smoothing rounds.
+            // Take a few smoothing rounds (Lloyd's algorithm).
             for (int i = 0; i < limit; i++)
             {
                 Step(smoothedMesh);
@@ -58,7 +61,7 @@ namespace TriangleNet.Smoothing
         /// </summary>
         private void Step(Mesh mesh)
         {
-            BoundedVoronoiLegacy voronoi = new BoundedVoronoiLegacy(mesh, false);
+            var voronoi = new BoundedVoronoiLegacy(mesh, false);
 
             var cells = voronoi.Regions;
 
@@ -101,7 +104,7 @@ namespace TriangleNet.Smoothing
 
             //area = atmp / 2;
         }
-        
+
         /// <summary>
         /// Rebuild the input geometry.
         /// </summary>

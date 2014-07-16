@@ -16,6 +16,14 @@ namespace TriangleNet.Topology.DCEL
         internal HalfEdge next;
 
         /// <summary>
+        /// Gets the half-edge id.
+        /// </summary>
+        public int ID
+        {
+            get { return id; }
+        }
+
+        /// <summary>
         /// Gets or sets the origin of the half-edge.
         /// </summary>
         public Vertex Origin
@@ -70,8 +78,8 @@ namespace TriangleNet.Topology.DCEL
             this.origin = origin;
             this.face = face;
 
-            // IMPORTANT: do not remove the (this.face == null) check!
-            if (face != null && this.face.edge == null)
+            // IMPORTANT: do not remove the (face.edge == null) check!
+            if (face != null && face.edge == null)
             {
                 face.edge = this;
             }

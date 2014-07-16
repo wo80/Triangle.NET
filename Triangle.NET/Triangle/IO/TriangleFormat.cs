@@ -42,9 +42,7 @@ namespace TriangleNet.IO
 
                 if (geometry != null && triangles != null)
                 {
-                    var converter = new Converter();
-
-                    return converter.ToMesh(geometry, triangles.ToArray());
+                    return Converter.ToMesh(geometry, triangles.ToArray());
                 }
             }
 
