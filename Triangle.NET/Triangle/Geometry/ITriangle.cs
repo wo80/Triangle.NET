@@ -16,7 +16,7 @@ namespace TriangleNet.Geometry
         /// <summary>
         /// The triangle id.
         /// </summary>
-        int ID { get; }
+        int ID { get; set; }
 
         /// <summary>
         /// First vertex id of the triangle.

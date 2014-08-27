@@ -26,6 +26,7 @@ namespace TriangleNet.Topology.DCEL
         #endregion
 
         internal int id;
+        internal int mark;
 
         internal Point generator;
 
@@ -33,11 +34,12 @@ namespace TriangleNet.Topology.DCEL
         internal bool bounded;
 
         /// <summary>
-        /// Gets the face id.
+        /// Gets or sets the face id.
         /// </summary>
         public int ID
         {
             get { return id; }
+            set { id = value; }
         }
 
         /// <summary>
@@ -81,7 +83,7 @@ namespace TriangleNet.Topology.DCEL
 
         public override string ToString()
         {
-            return string.Format("F-ID {0}", generator.id);
+            return string.Format("F-ID {0}", generator == null ? id : generator.id);
         }
     }
 }

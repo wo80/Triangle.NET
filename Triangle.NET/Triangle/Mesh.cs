@@ -187,7 +187,7 @@ namespace TriangleNet
             behavior.MaxAngle = quality.MaximumAngle;
 
             behavior.MaxArea = quality.MaximumArea;
-            // TODO: behavior.VarArea = quality.VariableArea;
+            behavior.VarArea = quality.VariableArea;
 
             this.Refine();
         }

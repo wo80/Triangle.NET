@@ -7,9 +7,6 @@
 namespace TriangleNet.Geometry
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
 
     /// <summary>
     /// Represents a 2D point.
@@ -41,35 +38,39 @@ namespace TriangleNet.Geometry
         #region Public properties
 
         /// <summary>
-        /// Gets the vertex id.
+        /// Gets or sets the vertex id.
         /// </summary>
         public int ID
         {
             get { return this.id; }
+            set { this.id = value; }
         }
 
         /// <summary>
-        /// Gets the vertex x coordinate.
+        /// Gets or sets the vertex x coordinate.
         /// </summary>
         public double X
         {
             get { return this.x; }
+            set { this.x = value; }
         }
 
         /// <summary>
-        /// Gets the vertex y coordinate.
+        /// Gets or sets the vertex y coordinate.
         /// </summary>
         public double Y
         {
             get { return this.y; }
+            set { this.y = value; }
         }
 
         /// <summary>
-        /// Gets the vertex boundary mark.
+        /// Gets or sets the vertex boundary mark.
         /// </summary>
         public int Boundary
         {
             get { return this.mark; }
+            set { this.mark = value; }
         }
 
         #endregion

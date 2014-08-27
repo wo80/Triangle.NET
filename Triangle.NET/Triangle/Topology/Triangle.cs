@@ -106,11 +106,12 @@ namespace TriangleNet.Topology
         #region Public properties
 
         /// <summary>
-        /// Gets the triangle id.
+        /// Gets or sets the triangle id.
         /// </summary>
         public int ID
         {
             get { return this.id; }
+            set { this.id = value; }
         }
 
         /// <summary>

@@ -9,6 +9,7 @@ namespace TriangleNet.Topology.DCEL
     public class HalfEdge
     {
         internal int id;
+        internal int mark;
 
         internal Vertex origin;
         internal Face face;
@@ -16,11 +17,18 @@ namespace TriangleNet.Topology.DCEL
         internal HalfEdge next;
 
         /// <summary>
-        /// Gets the half-edge id.
+        /// Gets or sets the half-edge id.
         /// </summary>
         public int ID
         {
             get { return id; }
+            set { id = value; }
+        }
+
+        public int Boundary
+        {
+            get { return mark; }
+            set { mark = value; }
         }
 
         /// <summary>

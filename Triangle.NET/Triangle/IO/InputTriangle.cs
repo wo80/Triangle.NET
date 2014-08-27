@@ -31,6 +31,7 @@ namespace TriangleNet.IO
         public int ID
         {
             get { return 0; }
+            set { }
         }
 
         /// <summary>

@@ -6,6 +6,8 @@
 
 namespace TriangleNet.Topology.DCEL
 {
+    using System.Collections.Generic;
+
     public class Vertex : TriangleNet.Geometry.Point
     {
         internal HalfEdge leaving;
@@ -39,6 +41,28 @@ namespace TriangleNet.Topology.DCEL
             : base(x, y)
         {
             this.leaving = leaving;
+        }
+
+        /// <summary>
+        /// Enumerates all half-edges leaving this vertex.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<HalfEdge> EnumerateEdges()
+        {
+            var edge = this.Leaving;
+            int first = edge.ID;
+
+            do
+            {
+                yield return edge;
+
+                edge = edge.Twin.Next;
+            } while (edge.ID != first);
+        }
+
+        public override string ToString()
+        {
+            return string.Format("V-ID {0}", base.id);
         }
     }
 }
