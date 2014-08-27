@@ -6,6 +6,7 @@ namespace MeshExplorer.Topology
     using TriangleNet;
     using TriangleNet.Geometry;
     using TriangleNet.Rendering;
+    using TriangleNet.Topology;
 
     public class TopologyRenderer
     {
@@ -25,7 +26,8 @@ namespace MeshExplorer.Topology
 
         Font font, fontTri;
 
-        OrientedTriangle selection;
+        ITriangle currentTri;
+        Vertex currentOrg, currentDest;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MeshRenderer" /> class.
@@ -78,9 +80,11 @@ namespace MeshExplorer.Topology
             }
         }
 
-        public void SelectTriangle(OrientedTriangle tri)
+        public void SelectTriangle(ITriangle tri, Vertex org, Vertex dest)
         {
-            selection = tri;
+            currentTri = tri;
+            currentOrg = org;
+            currentDest = dest;
         }
 
         #region Helpers
@@ -136,7 +140,7 @@ namespace MeshExplorer.Topology
             int n = points.Length;
             PointF pt;
 
-            int id = selection != null ? selection.Org().ID : -1;
+            int id = currentOrg != null ? currentOrg.ID : -1;
 
             for (int i = 0; i < n; i++)
             {
@@ -245,12 +249,12 @@ namespace MeshExplorer.Topology
 
         private void RenderSelectedEdge(Graphics g)
         {
-            if (selection != null)
+            if (currentTri != null)
             {
                 PointF p0, p1;
 
-                p0 = points[selection.Org().ID];
-                p1 = points[selection.Dest().ID];
+                p0 = points[currentOrg.ID];
+                p1 = points[currentDest.ID];
 
                 zoom.WorldToScreen(ref p0);
                 zoom.WorldToScreen(ref p1);
@@ -261,15 +265,13 @@ namespace MeshExplorer.Topology
 
         private void RenderSelectedTriangle(Graphics g)
         {
-            if (selection != null)
+            if (currentTri != null)
             {
-                var tri = selection.Triangle;
-
                 var p = new PointF[3];
 
-                p[0] = points[tri.P0];
-                p[1] = points[tri.P1];
-                p[2] = points[tri.P2];
+                p[0] = points[currentTri.P0];
+                p[1] = points[currentTri.P1];
+                p[2] = points[currentTri.P2];
 
                 zoom.WorldToScreen(ref p[0]);
                 zoom.WorldToScreen(ref p[1]);

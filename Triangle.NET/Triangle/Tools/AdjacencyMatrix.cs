@@ -137,7 +137,7 @@ namespace TriangleNet.Tools
                 // Add edge (1,2) if this is the first occurrence, that is, if 
                 // the edge (1,2) is on a boundary (nid <= 0) or if this triangle
                 // is the first of the pair in which the edge occurs (tid < nid).
-                neigh_id = tri.neighbors[2].triangle.id;
+                neigh_id = tri.neighbors[2].tri.id;
 
                 if (neigh_id < 0 || tri_id < neigh_id)
                 {
@@ -146,7 +146,7 @@ namespace TriangleNet.Tools
                 }
 
                 // Add edge (2,3).
-                neigh_id = tri.neighbors[0].triangle.id;
+                neigh_id = tri.neighbors[0].tri.id;
 
                 if (neigh_id < 0 || tri_id < neigh_id)
                 {
@@ -155,7 +155,7 @@ namespace TriangleNet.Tools
                 }
 
                 // Add edge (3,1).
-                neigh_id = tri.neighbors[1].triangle.id;
+                neigh_id = tri.neighbors[1].tri.id;
 
                 if (neigh_id < 0 || tri_id < neigh_id)
                 {
@@ -227,7 +227,7 @@ namespace TriangleNet.Tools
                 // Add edge (1,2) if this is the first occurrence, that is, if 
                 // the edge (1,2) is on a boundary (nid <= 0) or if this triangle
                 // is the first of the pair in which the edge occurs (tid < nid).
-                nid = tri.neighbors[2].triangle.id;
+                nid = tri.neighbors[2].tri.id;
 
                 if (nid < 0 || tid < nid)
                 {
@@ -238,7 +238,7 @@ namespace TriangleNet.Tools
                 }
 
                 // Add edge (2,3).
-                nid = tri.neighbors[0].triangle.id;
+                nid = tri.neighbors[0].tri.id;
 
                 if (nid < 0 || tid < nid)
                 {
@@ -249,7 +249,7 @@ namespace TriangleNet.Tools
                 }
 
                 // Add edge (3,1).
-                nid = tri.neighbors[1].triangle.id;
+                nid = tri.neighbors[1].tri.id;
 
                 if (nid < 0 || tid < nid)
                 {

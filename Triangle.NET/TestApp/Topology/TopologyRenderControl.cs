@@ -7,6 +7,7 @@ namespace MeshExplorer.Topology
     using System.Windows.Forms;
     using TriangleNet;
     using TriangleNet.Rendering;
+    using TriangleNet.Topology;
 
     public class TopologyRenderControl : Control
     {
@@ -57,9 +58,17 @@ namespace MeshExplorer.Topology
             this.Render();
         }
 
-        public void Update(OrientedTriangle otri)
+        public void Update(Otri otri)
         {
-            renderer.SelectTriangle(otri.Triangle == null ? null : otri);
+            if (otri.Triangle == null || otri.Triangle.ID < 0)
+            {
+                renderer.SelectTriangle(null, null, null);
+            }
+            else
+            {
+                renderer.SelectTriangle(otri.Triangle, otri.Org(), otri.Dest());
+            }
+
             this.Render();
         }
 

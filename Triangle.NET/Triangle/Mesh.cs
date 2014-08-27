@@ -569,7 +569,7 @@ namespace TriangleNet
 
             foreach (var t in this.triangles.Values)
             {
-                tri.triangle = t;
+                tri.tri = t;
                 // Check all three vertices of the triangle.
                 for (tri.orient = 0; tri.orient < 3; tri.orient++)
                 {
@@ -593,7 +593,7 @@ namespace TriangleNet
             tri.hash = this.hash_tri++;
             tri.id = tri.hash;
 
-            newotri.triangle = tri;
+            newotri.tri = tri;
             newotri.orient = 0;
 
             triangles.Add(tri.hash, tri);
@@ -702,12 +702,12 @@ namespace TriangleNet
             {
                 // Find the location of the vertex to be inserted.  Check if a good
                 // starting triangle has already been provided by the caller.
-                if (searchtri.triangle.id == Triangle.EmptyID)
+                if (searchtri.tri.id == Triangle.EmptyID)
                 {
                     // Find a boundary triangle.
-                    horiz.triangle = Triangle.Empty;
+                    horiz.tri = Triangle.Empty;
                     horiz.orient = 0;
-                    horiz.SymSelf();
+                    horiz.Sym();
                     // Search for a triangle containing 'newvertex'.
                     intersect = locator.Locate(newvertex, ref horiz);
                 }
@@ -740,7 +740,7 @@ namespace TriangleNet
                 if (checksegments && (splitseg.seg == null))
                 {
                     // Check whether the vertex falls on a subsegment.
-                    horiz.SegPivot(ref brokensubseg);
+                    horiz.Pivot(ref brokensubseg);
                     if (brokensubseg.seg != Segment.Empty)
                     {
                         // The vertex falls on a subsegment, and hence will not be inserted.
@@ -752,7 +752,7 @@ namespace TriangleNet
                                 // This subsegment may be split only if it is an
                                 // internal boundary.
                                 horiz.Sym(ref testtri);
-                                enq = testtri.triangle.id != Triangle.EmptyID;
+                                enq = testtri.tri.id != Triangle.EmptyID;
                             }
                             if (enq)
                             {
@@ -779,10 +779,10 @@ namespace TriangleNet
                 botright.Sym(ref botrcasing);
                 horiz.Sym(ref topright);
                 // Is there a second triangle?  (Or does this edge lie on a boundary?)
-                mirrorflag = topright.triangle.id != Triangle.EmptyID;
+                mirrorflag = topright.tri.id != Triangle.EmptyID;
                 if (mirrorflag)
                 {
-                    topright.LnextSelf();
+                    topright.Lnext();
                     topright.Sym(ref toprcasing);
                     MakeTriangle(ref newtopright);
                 }
@@ -803,12 +803,12 @@ namespace TriangleNet
                 horiz.SetOrg(newvertex);
 
                 // Set the region of a new triangle.
-                newbotright.triangle.region = botright.triangle.region;
+                newbotright.tri.region = botright.tri.region;
 
                 if (behavior.VarArea)
                 {
                     // Set the area constraint of a new triangle.
-                    newbotright.triangle.area = botright.triangle.area;
+                    newbotright.tri.area = botright.tri.area;
                 }
 
                 if (mirrorflag)
@@ -820,12 +820,12 @@ namespace TriangleNet
                     topright.SetOrg(newvertex);
 
                     // Set the region of another new triangle.
-                    newtopright.triangle.region = topright.triangle.region;
+                    newtopright.tri.region = topright.tri.region;
 
                     if (behavior.VarArea)
                     {
                         // Set the area constraint of another new triangle.
-                        newtopright.triangle.area = topright.triangle.area;
+                        newtopright.tri.area = topright.tri.area;
                     }
                 }
 
@@ -833,7 +833,7 @@ namespace TriangleNet
                 // to the new triangle(s).
                 if (checksegments)
                 {
-                    botright.SegPivot(ref botrsubseg);
+                    botright.Pivot(ref botrsubseg);
 
                     if (botrsubseg.seg != Segment.Empty)
                     {
@@ -843,7 +843,7 @@ namespace TriangleNet
 
                     if (mirrorflag)
                     {
-                        topright.SegPivot(ref toprsubseg);
+                        topright.Pivot(ref toprsubseg);
                         if (toprsubseg.seg != Segment.Empty)
                         {
                             topright.SegDissolve();
@@ -854,16 +854,16 @@ namespace TriangleNet
 
                 // Bond the new triangle(s) to the surrounding triangles.
                 newbotright.Bond(ref botrcasing);
-                newbotright.LprevSelf();
+                newbotright.Lprev();
                 newbotright.Bond(ref botright);
-                newbotright.LprevSelf();
+                newbotright.Lprev();
 
                 if (mirrorflag)
                 {
                     newtopright.Bond(ref toprcasing);
-                    newtopright.LnextSelf();
+                    newtopright.Lnext();
                     newtopright.Bond(ref topright);
-                    newtopright.LnextSelf();
+                    newtopright.Lnext();
                     newtopright.Bond(ref newbotright);
                 }
 
@@ -873,16 +873,16 @@ namespace TriangleNet
                     splitseg.SetDest(newvertex);
                     segmentorg = splitseg.SegOrg();
                     segmentdest = splitseg.SegDest();
-                    splitseg.SymSelf();
+                    splitseg.Sym();
                     splitseg.Pivot(ref rightsubseg);
                     InsertSubseg(ref newbotright, splitseg.seg.boundary);
-                    newbotright.SegPivot(ref newsubseg);
+                    newbotright.Pivot(ref newsubseg);
                     newsubseg.SetSegOrg(segmentorg);
                     newsubseg.SetSegDest(segmentdest);
                     splitseg.Bond(ref newsubseg);
-                    newsubseg.SymSelf();
+                    newsubseg.Sym();
                     newsubseg.Bond(ref rightsubseg);
-                    splitseg.SymSelf();
+                    splitseg.Sym();
 
                     // Transfer the subsegment's boundary marker to the vertex if required.
                     if (newvertex.mark == 0)
@@ -901,7 +901,7 @@ namespace TriangleNet
 
                 // Position 'horiz' on the first edge to check for
                 // the Delaunay property.
-                horiz.LnextSelf();
+                horiz.Lnext();
             }
             else
             {
@@ -926,28 +926,28 @@ namespace TriangleNet
                 horiz.SetApex(newvertex);
 
                 // Set the region of the new triangles.
-                newbotleft.triangle.region = horiz.triangle.region;
-                newbotright.triangle.region = horiz.triangle.region;
+                newbotleft.tri.region = horiz.tri.region;
+                newbotright.tri.region = horiz.tri.region;
 
                 if (behavior.VarArea)
                 {
                     // Set the area constraint of the new triangles.
-                    area = horiz.triangle.area;
-                    newbotleft.triangle.area = area;
-                    newbotright.triangle.area = area;
+                    area = horiz.tri.area;
+                    newbotleft.tri.area = area;
+                    newbotright.tri.area = area;
                 }
 
                 // There may be subsegments that need to be bonded
                 // to the new triangles.
                 if (checksegments)
                 {
-                    botleft.SegPivot(ref botlsubseg);
+                    botleft.Pivot(ref botlsubseg);
                     if (botlsubseg.seg != Segment.Empty)
                     {
                         botleft.SegDissolve();
                         newbotleft.SegBond(ref botlsubseg);
                     }
-                    botright.SegPivot(ref botrsubseg);
+                    botright.Pivot(ref botrsubseg);
                     if (botrsubseg.seg != Segment.Empty)
                     {
                         botright.SegDissolve();
@@ -958,12 +958,12 @@ namespace TriangleNet
                 // Bond the new triangles to the surrounding triangles.
                 newbotleft.Bond(ref botlcasing);
                 newbotright.Bond(ref botrcasing);
-                newbotleft.LnextSelf();
-                newbotright.LprevSelf();
+                newbotleft.Lnext();
+                newbotright.Lprev();
                 newbotleft.Bond(ref newbotright);
-                newbotleft.LnextSelf();
+                newbotleft.Lnext();
                 botleft.Bond(ref newbotleft);
-                newbotright.LprevSelf();
+                newbotright.Lprev();
                 botright.Bond(ref newbotright);
 
                 if (checkquality)
@@ -991,7 +991,7 @@ namespace TriangleNet
                 if (checksegments)
                 {
                     // Check for a subsegment, which cannot be flipped.
-                    horiz.SegPivot(ref checksubseg);
+                    horiz.Pivot(ref checksubseg);
                     if (checksubseg.seg != Segment.Empty)
                     {
                         // The edge is a subsegment and cannot be flipped.
@@ -1012,7 +1012,7 @@ namespace TriangleNet
                 {
                     // Check if the edge is a boundary edge.
                     horiz.Sym(ref top);
-                    if (top.triangle.id == Triangle.EmptyID)
+                    if (top.tri.id == Triangle.EmptyID)
                     {
                         // The edge is a boundary edge and cannot be flipped.
                         doflip = false;
@@ -1079,10 +1079,10 @@ namespace TriangleNet
                             if (checksegments)
                             {
                                 // Check for subsegments and rebond them to the quadrilateral.
-                                topleft.SegPivot(ref toplsubseg);
-                                botleft.SegPivot(ref botlsubseg);
-                                botright.SegPivot(ref botrsubseg);
-                                topright.SegPivot(ref toprsubseg);
+                                topleft.Pivot(ref toplsubseg);
+                                botleft.Pivot(ref botlsubseg);
+                                botright.Pivot(ref botrsubseg);
+                                topright.Pivot(ref toprsubseg);
                                 if (toplsubseg.seg == Segment.Empty)
                                 {
                                     topright.SegDissolve();
@@ -1126,13 +1126,13 @@ namespace TriangleNet
 
                             // Assign region.
                             // TODO: check region ok (no Math.Min necessary)
-                            region = Math.Min(top.triangle.region, horiz.triangle.region);
-                            top.triangle.region = region;
-                            horiz.triangle.region = region;
+                            region = Math.Min(top.tri.region, horiz.tri.region);
+                            top.tri.region = region;
+                            horiz.tri.region = region;
 
                             if (behavior.VarArea)
                             {
-                                if ((top.triangle.area <= 0.0) || (horiz.triangle.area <= 0.0))
+                                if ((top.tri.area <= 0.0) || (horiz.tri.area <= 0.0))
                                 {
                                     area = -1.0;
                                 }
@@ -1141,11 +1141,11 @@ namespace TriangleNet
                                     // Take the average of the two triangles' area constraints.
                                     // This prevents small area constraints from migrating a
                                     // long, long way from their original location due to flips.
-                                    area = 0.5 * (top.triangle.area + horiz.triangle.area);
+                                    area = 0.5 * (top.tri.area + horiz.tri.area);
                                 }
 
-                                top.triangle.area = area;
-                                horiz.triangle.area = area;
+                                top.tri.area = area;
+                                horiz.tri.area = area;
                             }
 
                             if (checkquality)
@@ -1155,7 +1155,7 @@ namespace TriangleNet
 
                             // On the next iterations, consider the two edges that were exposed (this
                             // is, are now visible to the newly inserted vertex) by the edge flip.
-                            horiz.LprevSelf();
+                            horiz.Lprev();
                             leftvertex = farvertex;
                         }
                     }
@@ -1170,12 +1170,12 @@ namespace TriangleNet
                     }
 
                     // Look for the next edge around the newly inserted vertex.
-                    horiz.LnextSelf();
+                    horiz.Lnext();
                     horiz.Sym(ref testtri);
                     // Check for finishing a complete revolution about the new vertex, or
                     // falling outside of the triangulation. The latter will happen when
                     // a vertex is inserted at a boundary.
-                    if ((leftvertex == first) || (testtri.triangle.id == Triangle.EmptyID))
+                    if ((leftvertex == first) || (testtri.tri.id == Triangle.EmptyID))
                     {
                         // We're done. Return a triangle whose origin is the new vertex.
                         horiz.Lnext(ref searchtri);
@@ -1220,7 +1220,7 @@ namespace TriangleNet
                 tridest.mark = subsegmark;
             }
             // Check if there's already a subsegment here.
-            tri.SegPivot(ref newsubseg);
+            tri.Pivot(ref newsubseg);
             if (newsubseg.seg == Segment.Empty)
             {
                 // Make new subsegment and initialize its vertices.
@@ -1234,7 +1234,7 @@ namespace TriangleNet
                 // (outer space), but the new subsegment is bonded to it all the same.
                 tri.SegBond(ref newsubseg);
                 tri.Sym(ref oppotri);
-                newsubseg.SymSelf();
+                newsubseg.Sym();
                 oppotri.SegBond(ref newsubseg);
                 newsubseg.seg.boundary = subsegmark;
             }
@@ -1344,10 +1344,10 @@ namespace TriangleNet
             if (checksegments)
             {
                 // Check for subsegments and rebond them to the quadrilateral.
-                topleft.SegPivot(ref toplsubseg);
-                botleft.SegPivot(ref botlsubseg);
-                botright.SegPivot(ref botrsubseg);
-                topright.SegPivot(ref toprsubseg);
+                topleft.Pivot(ref toplsubseg);
+                botleft.Pivot(ref botlsubseg);
+                botright.Pivot(ref botrsubseg);
+                topright.Pivot(ref toprsubseg);
 
                 if (toplsubseg.seg == Segment.Empty)
                 {
@@ -1447,10 +1447,10 @@ namespace TriangleNet
             if (checksegments)
             {
                 // Check for subsegments and rebond them to the quadrilateral.
-                topleft.SegPivot(ref toplsubseg);
-                botleft.SegPivot(ref botlsubseg);
-                botright.SegPivot(ref botrsubseg);
-                topright.SegPivot(ref toprsubseg);
+                topleft.Pivot(ref toplsubseg);
+                botleft.Pivot(ref botlsubseg);
+                botright.Pivot(ref botrsubseg);
+                topright.Pivot(ref toprsubseg);
                 if (toplsubseg.seg == Segment.Empty)
                 {
                     botleft.SegDissolve();
@@ -1580,7 +1580,7 @@ namespace TriangleNet
 
             for (int i = 2; i <= edgecount - 2; i++)
             {
-                testtri.OnextSelf();
+                testtri.Onext();
                 testvertex = testtri.Dest();
                 // Is this a better vertex?
                 if (RobustPredicates.InCircle(leftbasevertex, rightbasevertex, bestvertex, testvertex) > 0.0)
@@ -1656,7 +1656,7 @@ namespace TriangleNet
             while (!deltri.Equal(countingtri))
             {
                 edgecount++;
-                countingtri.OnextSelf();
+                countingtri.Onext();
             }
 
             if (edgecount > 3)
@@ -1676,12 +1676,12 @@ namespace TriangleNet
             righttri.Sym(ref rightcasing);
             deltri.Bond(ref leftcasing);
             deltriright.Bond(ref rightcasing);
-            lefttri.SegPivot(ref leftsubseg);
+            lefttri.Pivot(ref leftsubseg);
             if (leftsubseg.seg != Segment.Empty)
             {
                 deltri.SegBond(ref leftsubseg);
             }
-            righttri.SegPivot(ref rightsubseg);
+            righttri.Pivot(ref rightsubseg);
             if (rightsubseg.seg != Segment.Empty)
             {
                 deltriright.SegBond(ref rightsubseg);
@@ -1696,8 +1696,8 @@ namespace TriangleNet
             }
 
             // Delete the two spliced-out triangles.
-            TriangleDealloc(lefttri.triangle);
-            TriangleDealloc(righttri.triangle);
+            TriangleDealloc(lefttri.tri);
+            TriangleDealloc(righttri.tri);
         }
 
         /// <summary>
@@ -1735,59 +1735,59 @@ namespace TriangleNet
                     // Restore a triangle that was split into three triangles,
                     // so it is again one triangle.
                     fliptri.Dprev(ref botleft);
-                    botleft.LnextSelf();
+                    botleft.Lnext();
                     fliptri.Onext(ref botright);
-                    botright.LprevSelf();
+                    botright.Lprev();
                     botleft.Sym(ref botlcasing);
                     botright.Sym(ref botrcasing);
                     botvertex = botleft.Dest();
 
                     fliptri.SetApex(botvertex);
-                    fliptri.LnextSelf();
+                    fliptri.Lnext();
                     fliptri.Bond(ref botlcasing);
-                    botleft.SegPivot(ref botlsubseg);
+                    botleft.Pivot(ref botlsubseg);
                     fliptri.SegBond(ref botlsubseg);
-                    fliptri.LnextSelf();
+                    fliptri.Lnext();
                     fliptri.Bond(ref botrcasing);
-                    botright.SegPivot(ref botrsubseg);
+                    botright.Pivot(ref botrsubseg);
                     fliptri.SegBond(ref botrsubseg);
 
                     // Delete the two spliced-out triangles.
-                    TriangleDealloc(botleft.triangle);
-                    TriangleDealloc(botright.triangle);
+                    TriangleDealloc(botleft.tri);
+                    TriangleDealloc(botright.tri);
                 }
-                else if (flipstack.Peek().triangle == null) // Dummy flip
+                else if (flipstack.Peek().tri == null) // Dummy flip
                 {
                     // Restore two triangles that were split into four triangles,
                     // so they are again two triangles.
                     fliptri.Lprev(ref gluetri);
                     gluetri.Sym(ref botright);
-                    botright.LnextSelf();
+                    botright.Lnext();
                     botright.Sym(ref botrcasing);
                     rightvertex = botright.Dest();
 
                     fliptri.SetOrg(rightvertex);
                     gluetri.Bond(ref botrcasing);
-                    botright.SegPivot(ref botrsubseg);
+                    botright.Pivot(ref botrsubseg);
                     gluetri.SegBond(ref botrsubseg);
 
                     // Delete the spliced-out triangle.
-                    TriangleDealloc(botright.triangle);
+                    TriangleDealloc(botright.tri);
 
                     fliptri.Sym(ref gluetri);
-                    if (gluetri.triangle.id != Triangle.EmptyID)
+                    if (gluetri.tri.id != Triangle.EmptyID)
                     {
-                        gluetri.LnextSelf();
+                        gluetri.Lnext();
                         gluetri.Dnext(ref topright);
                         topright.Sym(ref toprcasing);
 
                         gluetri.SetOrg(rightvertex);
                         gluetri.Bond(ref toprcasing);
-                        topright.SegPivot(ref toprsubseg);
+                        topright.Pivot(ref toprsubseg);
                         gluetri.SegBond(ref toprsubseg);
 
                         // Delete the spliced-out triangle.
-                        TriangleDealloc(topright.triangle);
+                        TriangleDealloc(topright.tri);
                     }
 
                     flipstack.Clear();

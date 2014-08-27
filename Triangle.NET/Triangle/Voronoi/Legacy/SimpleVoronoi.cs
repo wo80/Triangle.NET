@@ -118,7 +118,7 @@ namespace TriangleNet.Voronoi.Legacy
             // Compue triangle circumcenters
             foreach (var item in mesh.triangles.Values)
             {
-                tri.triangle = item;
+                tri.tri = item;
 
                 pt = RobustPredicates.FindCircumcenter(tri.Org(), tri.Dest(), tri.Apex(), ref xi, ref eta);
                 pt.id = item.id;
@@ -156,26 +156,26 @@ namespace TriangleNet.Voronoi.Legacy
             f_init.Onext(ref f_next);
 
             // Check if f_init lies on the boundary of the triangulation.
-            if (f_next.triangle.id == Triangle.EmptyID)
+            if (f_next.tri.id == Triangle.EmptyID)
             {
                 f_init.Oprev(ref f_prev);
 
-                if (f_prev.triangle.id != Triangle.EmptyID)
+                if (f_prev.tri.id != Triangle.EmptyID)
                 {
                     f_init.Copy(ref f_next);
                     // Move one triangle clockwise
-                    f_init.OprevSelf();
+                    f_init.Oprev();
                     f_init.Copy(ref f);
                 }
             }
 
             // Go counterclockwise until we reach the border or the initial triangle.
-            while (f_next.triangle.id != Triangle.EmptyID)
+            while (f_next.tri.id != Triangle.EmptyID)
             {
                 // Add circumcenter of current triangle
-                vpoints.Add(points[f.triangle.id]);
+                vpoints.Add(points[f.tri.id]);
 
-                region.AddNeighbor(f.triangle.id, regions[f.Apex().id]);
+                region.AddNeighbor(f.tri.id, regions[f.Apex().id]);
 
                 if (f_next.Equal(f_init))
                 {
@@ -185,7 +185,7 @@ namespace TriangleNet.Voronoi.Legacy
                 }
 
                 f_next.Copy(ref f);
-                f_next.OnextSelf();
+                f_next.Onext();
             }
 
             // Voronoi cell is unbounded
@@ -197,19 +197,19 @@ namespace TriangleNet.Voronoi.Legacy
 
             // Find the boundary segment id (we use this id to number the endpoints of infinit rays).
             f.Lprev(ref f_next);
-            f_next.SegPivot(ref sub);
+            f_next.Pivot(ref sub);
             sid = sub.seg.hash;
 
             // Last valid f lies at the boundary. Add the circumcenter.
-            vpoints.Add(points[f.triangle.id]);
-            region.AddNeighbor(f.triangle.id, regions[f.Apex().id]);
+            vpoints.Add(points[f.tri.id]);
+            region.AddNeighbor(f.tri.id, regions[f.Apex().id]);
 
             // Check if the intersection with the bounding box has already been computed.
             if (!rayPoints.TryGetValue(sid, out intersection))
             {
                 torg = f.Org();
                 tapex = f.Apex();
-                BoxRayIntersection(points[f.triangle.id], torg.y - tapex.y, tapex.x - torg.x, out intersection);
+                BoxRayIntersection(points[f.tri.id], torg.y - tapex.y, tapex.x - torg.x, out intersection);
 
                 // Set the correct id for the vertex
                 intersection.id = n + rayIndex;
@@ -228,17 +228,17 @@ namespace TriangleNet.Voronoi.Legacy
             f_init.Copy(ref f);
             f.Oprev(ref f_prev);
 
-            while (f_prev.triangle.id != Triangle.EmptyID)
+            while (f_prev.tri.id != Triangle.EmptyID)
             {
-                vpoints.Add(points[f_prev.triangle.id]);
-                region.AddNeighbor(f_prev.triangle.id, regions[f_prev.Apex().id]);
+                vpoints.Add(points[f_prev.tri.id]);
+                region.AddNeighbor(f_prev.tri.id, regions[f_prev.Apex().id]);
 
                 f_prev.Copy(ref f);
-                f_prev.OprevSelf();
+                f_prev.Oprev();
             }
 
             // Find the boundary segment id.
-            f.SegPivot(ref sub);
+            f.Pivot(ref sub);
             sid = sub.seg.hash;
 
             if (!rayPoints.TryGetValue(sid, out intersection))
@@ -247,7 +247,7 @@ namespace TriangleNet.Voronoi.Legacy
                 torg = f.Org();
                 tdest = f.Dest();
 
-                BoxRayIntersection(points[f.triangle.id], tdest.y - torg.y, torg.x - tdest.x, out intersection);
+                BoxRayIntersection(points[f.tri.id], tdest.y - torg.y, torg.x - tdest.x, out intersection);
 
                 // Set the correct id for the vertex
                 intersection.id = n + rayIndex;

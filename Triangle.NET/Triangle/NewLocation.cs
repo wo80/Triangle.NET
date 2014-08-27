@@ -411,12 +411,12 @@ namespace TriangleNet
                             break;
                         case 2:
                             //printf("Relocate: (%f,%f)\n", tdest[0],tdest[1]);			
-                            delotri.LnextSelf();
+                            delotri.Lnext();
                             mesh.DeleteVertex(ref delotri);
                             break;
                         case 3:
                             //printf("Relocate: (%f,%f)\n", tapex[0],tapex[1]);						
-                            delotri.LprevSelf();
+                            delotri.Lprev();
                             mesh.DeleteVertex(ref delotri);
                             break;
 
@@ -1124,12 +1124,12 @@ namespace TriangleNet
                             break;
                         case 2:
                             //printf("Relocate: (%f,%f)\n", tdest[0],tdest[1]);			
-                            delotri.LnextSelf();
+                            delotri.Lnext();
                             mesh.DeleteVertex(ref delotri);
                             break;
                         case 3:
                             //printf("Relocate: (%f,%f)\n", tapex[0],tapex[1]);						
-                            delotri.LprevSelf();
+                            delotri.Lprev();
                             mesh.DeleteVertex(ref delotri);
                             break;
                     }
@@ -2364,7 +2364,7 @@ namespace TriangleNet
                 badotri.Sym(ref neighbor);
                 // check if it is the one we are looking for by checking the corners			
                 // first check if the neighbor is nonexistent, since it can be on the border
-                if (neighbor.triangle.id != Triangle.EmptyID)
+                if (neighbor.tri.id != Triangle.EmptyID)
                 {
                     // then check if two wanted corners are also in this triangle
                     // take the vertices of the candidate neighbor		
@@ -4092,7 +4092,7 @@ namespace TriangleNet
             }
             else if ((tdest.x == newvertex.x) && (tdest.y == newvertex.y))
             {
-                searchtri.LnextSelf();
+                searchtri.Lnext();
                 intersect = LocateResult.OnVertex;
                 searchtri.Copy(ref horiz);
             }
@@ -4104,7 +4104,7 @@ namespace TriangleNet
                 {
                     // Turn around so that 'searchpoint' is to the left of the
                     // edge specified by 'searchtri'.
-                    searchtri.SymSelf();
+                    searchtri.Sym();
                     searchtri.Copy(ref horiz);
                     intersect = mesh.locator.PreciseLocate(newvertex, ref horiz, false);
                 }

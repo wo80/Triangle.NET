@@ -70,11 +70,11 @@ namespace TriangleNet.Meshing.Algorithm
             mesh.MakeTriangle(ref lefttri);
             mesh.MakeTriangle(ref righttri);
             lefttri.Bond(ref righttri);
-            lefttri.LnextSelf();
-            righttri.LprevSelf();
+            lefttri.Lnext();
+            righttri.Lprev();
             lefttri.Bond(ref righttri);
-            lefttri.LnextSelf();
-            righttri.LprevSelf();
+            lefttri.Lnext();
+            righttri.Lprev();
             lefttri.Bond(ref righttri);
             firstvertex = eventheap[0].vertexEvent;
 
@@ -136,7 +136,7 @@ namespace TriangleNet.Meshing.Algorithm
 
                     if (randomnation(SAMPLERATE) == 0)
                     {
-                        fliptri.SymSelf();
+                        fliptri.Sym();
                         leftvertex = fliptri.Dest();
                         midvertex = fliptri.Apex();
                         rightvertex = fliptri.Org();
@@ -184,11 +184,11 @@ namespace TriangleNet.Meshing.Algorithm
                         righttri.SetOrg(nextvertex);
                         righttri.SetDest(connectvertex);
                         lefttri.Bond(ref righttri);
-                        lefttri.LnextSelf();
-                        righttri.LprevSelf();
+                        lefttri.Lnext();
+                        righttri.Lprev();
                         lefttri.Bond(ref righttri);
-                        lefttri.LnextSelf();
-                        righttri.LprevSelf();
+                        lefttri.Lnext();
+                        righttri.Lprev();
                         lefttri.Bond(ref farlefttri);
                         righttri.Bond(ref farrighttri);
                         if (!farrightflag && farrighttri.Equal(bottommost))
@@ -244,7 +244,7 @@ namespace TriangleNet.Meshing.Algorithm
             }
 
             splaynodes.Clear();
-            bottommost.LprevSelf();
+            bottommost.Lprev();
 
             this.mesh.hullsize = RemoveGhosts(ref bottommost);
 
@@ -584,7 +584,7 @@ namespace TriangleNet.Meshing.Algorithm
             farrightflag = false;
             while (!farrightflag && RightOfHyperbola(ref searchtri, searchvertex))
             {
-                searchtri.OnextSelf();
+                searchtri.Onext();
                 farrightflag = searchtri.Equal(bottommost);
             }
             farright = farrightflag;
@@ -700,7 +700,7 @@ namespace TriangleNet.Meshing.Algorithm
 
             // Find an edge on the convex hull to start point location from.
             startghost.Lprev(ref searchedge);
-            searchedge.SymSelf();
+            searchedge.Sym();
             Triangle.Empty.neighbors[0] = searchedge;
             // Remove the bounding box and count the convex hull edges.
             startghost.Copy(ref dissolveedge);
@@ -709,15 +709,15 @@ namespace TriangleNet.Meshing.Algorithm
             {
                 hullsize++;
                 dissolveedge.Lnext(ref deadtriangle);
-                dissolveedge.LprevSelf();
-                dissolveedge.SymSelf();
+                dissolveedge.Lprev();
+                dissolveedge.Sym();
 
                 // If no PSLG is involved, set the boundary markers of all the vertices
                 // on the convex hull.  If a PSLG is used, this step is done later.
                 if (noPoly)
                 {
                     // Watch out for the case where all the input vertices are collinear.
-                    if (dissolveedge.triangle.id != Triangle.EmptyID)
+                    if (dissolveedge.tri.id != Triangle.EmptyID)
                     {
                         markorg = dissolveedge.Org();
                         if (markorg.mark == 0)
@@ -732,7 +732,7 @@ namespace TriangleNet.Meshing.Algorithm
                 deadtriangle.Sym(ref dissolveedge);
 
                 // Delete the bounding triangle.
-                mesh.TriangleDealloc(deadtriangle.triangle);
+                mesh.TriangleDealloc(deadtriangle.tri);
             } while (!dissolveedge.Equal(startghost));
 
             return hullsize;

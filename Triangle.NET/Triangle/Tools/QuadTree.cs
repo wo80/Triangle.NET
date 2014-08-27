@@ -12,7 +12,7 @@ namespace TriangleNet.Tools
     using TriangleNet.Geometry;
 
     /// <summary>
-    /// A Quadtree implementation optimised for triangles.
+    /// A Quadtree implementation optimized for triangles.
     /// </summary>
     public class QuadTree
     {
@@ -181,9 +181,9 @@ namespace TriangleNet.Tools
             {
                 // The four sub regions of the quad tree
                 //   +--------------+
-                //   |  nw  |  ne   |
+                //   | nw 2 | ne 3  |
                 //   |------+pivot--|
-                //   |  sw  |  se   |
+                //   | sw 0 | se 1  |
                 //   +--------------+
                 Rectangle box;
 

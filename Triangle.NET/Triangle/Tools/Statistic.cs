@@ -156,7 +156,7 @@ namespace TriangleNet.Tools
             tri.orient = 0;
             foreach (var t in mesh.triangles.Values)
             {
-                tri.triangle = t;
+                tri.tri = t;
                 p[0] = tri.Org();
                 p[1] = tri.Dest();
                 p[2] = tri.Apex();

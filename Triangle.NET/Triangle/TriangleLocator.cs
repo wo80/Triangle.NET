@@ -40,7 +40,7 @@ namespace TriangleNet
 
         public void Reset()
         {
-            recenttri.triangle = null; // No triangle has been visited yet.
+            recenttri.tri = null; // No triangle has been visited yet.
         }
 
         /// <summary>
@@ -127,7 +127,7 @@ namespace TriangleNet
                 // Check whether the apex is the point we seek.
                 if ((fapex.x == searchpoint.X) && (fapex.y == searchpoint.Y))
                 {
-                    searchtri.LprevSelf();
+                    searchtri.Lprev();
                     return LocateResult.OnVertex;
                 }
                 // Does the point lie on the other side of the line defined by the
@@ -165,12 +165,12 @@ namespace TriangleNet
                         // triangle.
                         if (destorient == 0.0)
                         {
-                            searchtri.LprevSelf();
+                            searchtri.Lprev();
                             return LocateResult.OnEdge;
                         }
                         if (orgorient == 0.0)
                         {
-                            searchtri.LnextSelf();
+                            searchtri.Lnext();
                             return LocateResult.OnEdge;
                         }
                         return LocateResult.InTriangle;
@@ -195,7 +195,7 @@ namespace TriangleNet
                 if (mesh.checksegments && stopatsubsegment)
                 {
                     // Check for walking through a subsegment.
-                    backtracktri.SegPivot(ref checkedge);
+                    backtracktri.Pivot(ref checkedge);
                     if (checkedge.seg != Segment.Empty)
                     {
                         // Go back to the last triangle.
@@ -204,7 +204,7 @@ namespace TriangleNet
                     }
                 }
                 // Check for walking right out of the triangulation.
-                if (searchtri.triangle.id == Triangle.EmptyID)
+                if (searchtri.tri.id == Triangle.EmptyID)
                 {
                     // Go back to the last triangle.
                     backtracktri.Copy(ref searchtri);
@@ -267,9 +267,9 @@ namespace TriangleNet
 
             // If a recently encountered triangle has been recorded and has not been
             // deallocated, test it as a good starting point.
-            if (recenttri.triangle != null)
+            if (recenttri.tri != null)
             {
-                if (!Otri.IsDead(recenttri.triangle))
+                if (!Otri.IsDead(recenttri.tri))
                 {
                     torg = recenttri.Org();
                     if ((torg.x == searchpoint.X) && (torg.y == searchpoint.Y))
@@ -293,8 +293,8 @@ namespace TriangleNet
 
             foreach (var key in samples)
             {
-                sampletri.triangle = mesh.triangles[key];
-                if (!Otri.IsDead(sampletri.triangle))
+                sampletri.tri = mesh.triangles[key];
+                if (!Otri.IsDead(sampletri.tri))
                 {
                     torg = sampletri.Org();
                     dist = (searchpoint.X - torg.x) * (searchpoint.X - torg.x) +
@@ -317,7 +317,7 @@ namespace TriangleNet
             }
             if ((tdest.x == searchpoint.X) && (tdest.y == searchpoint.Y))
             {
-                searchtri.LnextSelf();
+                searchtri.Lnext();
                 return LocateResult.OnVertex;
             }
             // Orient 'searchtri' to fit the preconditions of calling preciselocate().
@@ -326,7 +326,7 @@ namespace TriangleNet
             {
                 // Turn around so that 'searchpoint' is to the left of the
                 // edge specified by 'searchtri'.
-                searchtri.SymSelf();
+                searchtri.Sym();
             }
             else if (ahead == 0.0)
             {

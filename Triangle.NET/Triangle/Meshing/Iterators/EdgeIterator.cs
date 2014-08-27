@@ -30,7 +30,7 @@ namespace TriangleNet.Meshing.Iterators
             triangles = mesh.triangles.Values.GetEnumerator();
             triangles.MoveNext();
 
-            tri.triangle = triangles.Current;
+            tri.tri = triangles.Current;
             tri.orient = 0;
         }
 
@@ -51,7 +51,7 @@ namespace TriangleNet.Meshing.Iterators
 
         public bool MoveNext()
         {
-            if (tri.triangle == null)
+            if (tri.tri == null)
             {
                 return false;
             }
@@ -64,7 +64,7 @@ namespace TriangleNet.Meshing.Iterators
                 {
                     if (triangles.MoveNext())
                     {
-                        tri.triangle = triangles.Current;
+                        tri.tri = triangles.Current;
                         tri.orient = 0;
                     }
                     else
@@ -76,12 +76,12 @@ namespace TriangleNet.Meshing.Iterators
 
                 tri.Sym(ref neighbor);
 
-                if ((tri.triangle.id < neighbor.triangle.id) || (neighbor.triangle.id == Triangle.EmptyID))
+                if ((tri.tri.id < neighbor.tri.id) || (neighbor.tri.id == Triangle.EmptyID))
                 {
                     p1 = tri.Org();
                     p2 = tri.Dest();
 
-                    tri.SegPivot(ref sub);
+                    tri.Pivot(ref sub);
 
                     // Boundary mark of dummysub is 0, so we don't need to worry about that.
                     current = new Edge(p1.id, p2.id, sub.seg.boundary);

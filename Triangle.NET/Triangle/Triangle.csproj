@@ -59,6 +59,7 @@
     <Compile Include="Meshing\ConstraintMesher.cs" />
     <Compile Include="Meshing\Data\BadSubseg.cs" />
     <Compile Include="Meshing\Data\BadTriangle.cs" />
+    <Compile Include="Tools\IntersectionHelper.cs" />
     <Compile Include="Topology\DCEL\DcelMesh.cs" />
     <Compile Include="Topology\Osub.cs" />
     <Compile Include="Topology\Otri.cs" />

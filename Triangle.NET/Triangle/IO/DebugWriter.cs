@@ -197,7 +197,7 @@ namespace TriangleNet.IO
 
             foreach (var item in mesh.triangles.Values)
             {
-                tri.triangle = item;
+                tri.tri = item;
 
                 p1 = tri.Org();
                 p2 = tri.Dest();
@@ -208,19 +208,19 @@ namespace TriangleNet.IO
                 h3 = (p3 == null) ? -1 : p3.hash;
 
                 // Triangle number, indices for three vertices.
-                stream.Write("{0} {1} {2} {3}", tri.triangle.hash, h1, h2, h3);
+                stream.Write("{0} {1} {2} {3}", tri.tri.hash, h1, h2, h3);
 
                 tri.orient = 1;
                 tri.Sym(ref trisym);
-                n1 = trisym.triangle.hash;
+                n1 = trisym.tri.hash;
 
                 tri.orient = 2;
                 tri.Sym(ref trisym);
-                n2 = trisym.triangle.hash;
+                n2 = trisym.tri.hash;
 
                 tri.orient = 0;
                 tri.Sym(ref trisym);
-                n3 = trisym.triangle.hash;
+                n3 = trisym.tri.hash;
 
                 // Neighboring triangle numbers.
                 stream.WriteLine(" {0} {1} {2}", n1, n2, n3);

@@ -155,7 +155,7 @@ namespace TriangleNet.IO
 
                 foreach (var item in mesh.triangles.Values)
                 {
-                    tri.triangle = item;
+                    tri.tri = item;
 
                     p1 = tri.Org();
                     p2 = tri.Dest();
@@ -166,7 +166,7 @@ namespace TriangleNet.IO
 
                     if (regions)
                     {
-                        writer.Write(" {0}", tri.triangle.region);
+                        writer.Write(" {0}", tri.tri.region);
                     }
 
                     writer.WriteLine();
@@ -362,12 +362,12 @@ namespace TriangleNet.IO
                 // considered only once.
                 foreach (var item in mesh.triangles.Values)
                 {
-                    tri.triangle = item;
+                    tri.tri = item;
 
                     for (tri.orient = 0; tri.orient < 3; tri.orient++)
                     {
                         tri.Sym(ref trisym);
-                        if ((tri.triangle.id < trisym.triangle.id) || (trisym.triangle.id == Triangle.EmptyID))
+                        if ((tri.tri.id < trisym.tri.id) || (trisym.tri.id == Triangle.EmptyID))
                         {
                             p1 = tri.Org();
                             p2 = tri.Dest();
@@ -378,7 +378,7 @@ namespace TriangleNet.IO
                                 // If there's no subsegment, the boundary marker is zero.
                                 if (behavior.useSegments)
                                 {
-                                    tri.SegPivot(ref checkmark);
+                                    tri.Pivot(ref checkmark);
 
                                     if (checkmark.seg == Segment.Empty)
                                     {
@@ -393,7 +393,7 @@ namespace TriangleNet.IO
                                 else
                                 {
                                     writer.WriteLine("{0} {1} {2} {3}", index, p1.id, p2.id,
-                                            trisym.triangle.id == Triangle.EmptyID ? "1" : "0");
+                                            trisym.tri.id == Triangle.EmptyID ? "1" : "0");
                                 }
                             }
                             else
@@ -429,19 +429,19 @@ namespace TriangleNet.IO
 
                 foreach (var item in mesh.triangles.Values)
                 {
-                    tri.triangle = item;
+                    tri.tri = item;
 
                     tri.orient = 1;
                     tri.Sym(ref trisym);
-                    n1 = trisym.triangle.id;
+                    n1 = trisym.tri.id;
 
                     tri.orient = 2;
                     tri.Sym(ref trisym);
-                    n2 = trisym.triangle.id;
+                    n2 = trisym.tri.id;
 
                     tri.orient = 0;
                     tri.Sym(ref trisym);
-                    n3 = trisym.triangle.id;
+                    n3 = trisym.tri.id;
 
                     // Triangle number, neighboring triangle numbers.
                     writer.WriteLine("{0} {1} {2} {3}", i++, n1, n2, n3);
@@ -481,7 +481,7 @@ namespace TriangleNet.IO
 
                 foreach (var item in mesh.triangles.Values)
                 {
-                    tri.triangle = item;
+                    tri.tri = item;
                     torg = tri.Org();
                     tdest = tri.Dest();
                     tapex = tri.Apex();
@@ -501,7 +501,7 @@ namespace TriangleNet.IO
                     }
                     writer.WriteLine();
 
-                    tri.triangle.id = index++;
+                    tri.tri.id = index++;
                 }
 
 
@@ -517,17 +517,17 @@ namespace TriangleNet.IO
                 // considered only once.
                 foreach (var item in mesh.triangles.Values)
                 {
-                    tri.triangle = item;
+                    tri.tri = item;
 
                     for (tri.orient = 0; tri.orient < 3; tri.orient++)
                     {
                         tri.Sym(ref trisym);
-                        if ((tri.triangle.id < trisym.triangle.id) || (trisym.triangle.id == Triangle.EmptyID))
+                        if ((tri.tri.id < trisym.tri.id) || (trisym.tri.id == Triangle.EmptyID))
                         {
                             // Find the number of this triangle (and Voronoi vertex).
-                            p1 = tri.triangle.id;
+                            p1 = tri.tri.id;
 
-                            if (trisym.triangle.id == Triangle.EmptyID)
+                            if (trisym.tri.id == Triangle.EmptyID)
                             {
                                 torg = tri.Org();
                                 tdest = tri.Dest();
@@ -542,7 +542,7 @@ namespace TriangleNet.IO
                             else
                             {
                                 // Find the number of the adjacent triangle (and Voronoi vertex).
-                                p2 = trisym.triangle.id;
+                                p2 = trisym.tri.id;
                                 // Finite edge.  Write indices of two endpoints.
                                 writer.WriteLine("{0} {1} {2}", index, p1, p2);
                             }
@@ -599,7 +599,7 @@ namespace TriangleNet.IO
                 tri.orient = 0;
                 foreach (var item in mesh.triangles.Values)
                 {
-                    tri.triangle = item;
+                    tri.tri = item;
 
                     p1 = tri.Org();
                     p2 = tri.Dest();

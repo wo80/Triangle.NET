@@ -70,71 +70,141 @@ namespace TriangleNet.Topology.DCEL
         }
 
         /// <summary>
-        /// Check if the DCEL ist consistend.
+        /// Check if the DCEL is consistend.
         /// </summary>
         /// <param name="closed">If true, faces are assumed to be closed (i.e. all edges must have
         /// a valid next pointer).</param>
+        /// <param name="depth">Maximum edge count of faces (default = 0 means skip check).</param>
         /// <returns></returns>
-        public bool IsConsistent(bool closed = true)
+        public virtual bool IsConsistent(bool closed = true, int depth = 0)
         {
-            int horrors = 0;
-
-            // Check faces
-            foreach (var face in faces)
+            // Check vertices for null pointers.
+            foreach (var vertex in vertices)
             {
-                if (face.edge == null)
+                if (vertex.id < 0)
                 {
-                    horrors++;
+                    continue;
+                }
+
+                if (vertex.leaving == null)
+                {
+                    return false;
+                }
+
+                if (vertex.Leaving.Origin.id != vertex.id)
+                {
+                    return false;
                 }
             }
 
-            // Check half-edges
+            // Check faces for null pointers.
+            foreach (var face in faces)
+            {
+                if (face.ID < 0)
+                {
+                    continue;
+                }
+
+                if (face.edge == null)
+                {
+                    return false;
+                }
+
+                if (face.id != face.edge.face.id)
+                {
+                    return false;
+                }
+            }
+
+            // Check half-edges for null pointers.
             foreach (var edge in edges)
             {
-                var twin = edge.twin;
+                if (edge.id < 0)
+                {
+                    continue;
+                }
+
+                if (edge.twin == null)
+                {
+                    return false;
+                }
 
                 if (edge.origin == null)
                 {
-                    horrors++;
-                }
-
-                if (twin == null)
-                {
-                    horrors++;
-                }
-                else if (twin.twin != null && edge.id != twin.twin.id)
-                {
-                    horrors++;
-                }
-
-                if (closed)
-                {
-                    if (edge.next == null)
-                    {
-                        horrors++;
-                    }
-                    else if (twin != null && edge.next.origin.id != twin.origin.id)
-                    {
-                        horrors++;
-                    }
+                    return false;
                 }
 
                 if (edge.face == null)
                 {
-                    horrors++;
+                    return false;
                 }
-            }
 
-            // Check vertices
-            foreach (var vertex in vertices)
-            {
-                if (vertex.leaving == null)
+                if (closed && edge.next == null)
                 {
-                    horrors++;
+                    return false;
                 }
             }
 
-            return horrors == 0;
+            // Check half-edges (topology).
+            foreach (var edge in edges)
+            {
+                if (edge.id < 0)
+                {
+                    continue;
+                }
+
+                var twin = edge.twin;
+                var next = edge.next;
+
+                if (edge.id != twin.twin.id)
+                {
+                    return false;
+                }
+
+                if (closed)
+                {
+                    if (next.origin.id != twin.origin.id)
+                    {
+                        return false;
+                    }
+
+                    if (next.twin.next.origin.id != edge.twin.origin.id)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            if (closed && depth > 0)
+            {
+                // Check if faces are closed.
+                foreach (var face in faces)
+                {
+                    if (face.id < 0)
+                    {
+                        continue;
+                    }
+
+                    var edge = face.edge;
+                    var next = edge.next;
+
+                    int id = edge.id;
+                    int k = 0;
+
+                    while (next.id != id && k < depth)
+                    {
+                        next = next.next;
+                        k++;
+                    }
+
+                    if (next.id != id)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -144,7 +214,7 @@ namespace TriangleNet.Topology.DCEL
         /// <remarks>
         /// This method assumes that all faces are closed (i.e. no edge.next pointers are null).
         /// </remarks>
-        internal void ResolveBoundaryEdges()
+        public void ResolveBoundaryEdges()
         {
             // Maps vertices to leaving boundary edge.
             var map = new Dictionary<int, HalfEdge>();

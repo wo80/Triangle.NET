@@ -20,6 +20,10 @@ namespace TriangleNet.Voronoi
     /// </summary>
     public abstract class VoronoiBase : DcelMesh
     {
+        // List of infinite half-edges, i.e. half-edges that start at circumcenters of triangles
+        // which lie on the domain boundary.
+        protected List<HalfEdge> rays;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="VoronoiBase" /> class.
         /// </summary>
@@ -39,18 +43,19 @@ namespace TriangleNet.Voronoi
         /// Generate the Voronoi diagram from given triangle mesh..
         /// </summary>
         /// <param name="mesh"></param>
+        /// <param name="bounded"></param>
         protected void Generate(Mesh mesh)
         {
             mesh.Renumber();
-            mesh.MakeVertexMap();
 
             base.edges = new List<HalfEdge>();
+            this.rays = new List<HalfEdge>();
 
-            // Allocate space for voronoi diagram
+            // Allocate space for Voronoi diagram.
             var vertices = new Vertex[mesh.triangles.Count + mesh.hullsize];
             var faces = new Face[mesh.vertices.Count];
 
-            // Compute triangles circumcenters and setup bounding box
+            // Compute triangles circumcenters.
             var map = ComputeVertices(mesh, vertices);
 
             // Create all Voronoi faces.
@@ -87,7 +92,7 @@ namespace TriangleNet.Voronoi
             foreach (var t in mesh.triangles.Values)
             {
                 id = t.id;
-                tri.triangle = t;
+                tri.tri = t;
 
                 pt = RobustPredicates.FindCircumcenter(tri.Org(), tri.Dest(), tri.Apex(), ref xi, ref eta);
 
@@ -104,6 +109,9 @@ namespace TriangleNet.Voronoi
         /// <summary>
         /// Compute the edges of the Voronoi diagram.
         /// </summary>
+        /// <param name="mesh"></param>
+        /// <param name="vertices"></param>
+        /// <param name="faces"></param>
         /// <param name="map">Empty vertex map.</param>
         protected void ComputeEdges(Mesh mesh, Vertex[] vertices, Face[] faces, List<HalfEdge>[] map)
         {
@@ -132,14 +140,14 @@ namespace TriangleNet.Voronoi
             {
                 id = t.id;
 
-                tri.triangle = t;
+                tri.tri = t;
 
                 for (int i = 0; i < 3; i++)
                 {
                     tri.orient = i;
                     tri.Sym(ref neighbor);
 
-                    nid = neighbor.triangle.id;
+                    nid = neighbor.tri.id;
 
                     if (id < nid || nid < 0)
                     {
@@ -156,7 +164,7 @@ namespace TriangleNet.Voronoi
                         // in the Voronoi diagram, i.e. two half-edges will be created.
                         if (nid < 0)
                         {
-                            // Undounded edge, direction perpendicular to the boundary edge,
+                            // Unbounded edge, direction perpendicular to the boundary edge,
                             // pointing outwards.
                             px = dest.y - org.y;
                             py = org.x - dest.x;
@@ -169,31 +177,31 @@ namespace TriangleNet.Voronoi
                             edge = new HalfEdge(end, face);
                             twin = new HalfEdge(vertex, neighborFace);
 
-                            end.leaving = edge;
-
                             // Make (face.edge) always point to an edge that starts at an infinite
                             // vertex. This will allow traversing of unbounded faces.
                             face.edge = edge;
                             face.bounded = false;
 
                             map[id].Add(twin);
+
+                            rays.Add(twin);
                         }
                         else
                         {
-                            // Create half-edges.
-                            edge = new HalfEdge(vertices[nid], face);
-                            twin = new HalfEdge(vertex, neighborFace);
+                            end = vertices[nid];
 
-                            // Set leaving edges.
-                            vertices[nid].leaving = edge;
-                            vertex.leaving = twin;
+                            // Create half-edges.
+                            edge = new HalfEdge(end, face);
+                            twin = new HalfEdge(vertex, neighborFace);
 
                             // Add to vertex map.
                             map[nid].Add(edge);
                             map[id].Add(twin);
                         }
 
-                        // Setup twin edges.
+                        vertex.leaving = twin;
+                        end.leaving = edge;
+
                         edge.twin = twin;
                         twin.twin = edge;
 
@@ -211,11 +219,11 @@ namespace TriangleNet.Voronoi
         /// Connect all edges of the Voronoi diagram.
         /// </summary>
         /// <param name="map">Maps all vertices to a list of leaving edges.</param>
-        protected void ConnectEdges(List<HalfEdge>[] map)
+        protected virtual void ConnectEdges(List<HalfEdge>[] map)
         {
             int length = map.Length;
 
-            // For each halfe-edge, find its successor in the connected face.
+            // For each half-edge, find its successor in the connected face.
             foreach (var edge in this.edges)
             {
                 var face = edge.face.generator.id;
@@ -223,6 +231,8 @@ namespace TriangleNet.Voronoi
                 // The id of the dest vertex of current edge.
                 int id = edge.twin.origin.id;
 
+                // The edge origin can also be an infinite vertex. Sort them out
+                // by checking the id.
                 if (id < length)
                 {
                     // Look for the edge that is connected to the current face. Each
@@ -237,6 +247,28 @@ namespace TriangleNet.Voronoi
                     }
                 }
             }
+        }
+
+        protected override IEnumerable<IEdge> EnumerateEdges()
+        {
+            var edges = new List<IEdge>(this.edges.Count / 2);
+
+            foreach (var edge in this.edges)
+            {
+                var twin = edge.twin;
+
+                // Report edge only once.
+                if (twin == null)
+                {
+                    edges.Add(new Edge(edge.origin.id, edge.next.origin.id));
+                }
+                else if (edge.id < twin.id)
+                {
+                    edges.Add(new Edge(edge.origin.id, twin.origin.id));
+                }
+            }
+
+            return edges;
         }
     }
 }

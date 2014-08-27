@@ -88,9 +88,9 @@ namespace TriangleNet.Meshing
             eorg = testsubseg.Org();
             edest = testsubseg.Dest();
             // Check one neighbor of the subsegment.
-            testsubseg.TriPivot(ref neighbortri);
+            testsubseg.Pivot(ref neighbortri);
             // Does the neighbor exist, or is this a boundary edge?
-            if (neighbortri.triangle.id != Triangle.EmptyID)
+            if (neighbortri.tri.id != Triangle.EmptyID)
             {
                 sides++;
                 // Find a vertex opposite this subsegment.
@@ -118,9 +118,9 @@ namespace TriangleNet.Meshing
             }
             // Check the other neighbor of the subsegment.
             testsubseg.Sym(ref testsym);
-            testsym.TriPivot(ref neighbortri);
+            testsym.Pivot(ref neighbortri);
             // Does the neighbor exist, or is this a boundary edge?
-            if (neighbortri.triangle.id != Triangle.EmptyID)
+            if (neighbortri.tri.id != Triangle.EmptyID)
             {
                 sides++;
                 // Find the other vertex opposite this subsegment.
@@ -260,7 +260,7 @@ namespace TriangleNet.Meshing
                 }
 
                 // Nonpositive area constraints are treated as unconstrained.
-                if ((behavior.VarArea) && (area > testtri.triangle.area) && (testtri.triangle.area > 0.0))
+                if ((behavior.VarArea) && (area > testtri.tri.area) && (testtri.tri.area > 0.0))
                 {
                     // Add this triangle to the list of bad triangles.
                     queue.Enqueue(ref testtri, minedge, tapex, torg, tdest);
@@ -270,7 +270,7 @@ namespace TriangleNet.Meshing
                 // Check whether the user thinks this triangle is too large.
                 if (behavior.UserTest != null)
                 {
-                    if (behavior.UserTest(testtri.triangle, area))
+                    if (behavior.UserTest(testtri.tri, area))
                     {
                         queue.Enqueue(ref testtri, minedge, tapex, torg, tdest);
                         return;
@@ -318,15 +318,15 @@ namespace TriangleNet.Meshing
                 {
                     // Check if both points lie in a common segment. If they do, the
                     // skinny triangle is enqueued to be split as usual.
-                    tri1.SegPivot(ref testsub);
+                    tri1.Pivot(ref testsub);
                     if (testsub.seg == Segment.Empty)
                     {
                         // No common segment.  Find a subsegment that contains 'torg'.
                         tri1.Copy(ref tri2);
                         do
                         {
-                            tri1.OprevSelf();
-                            tri1.SegPivot(ref testsub);
+                            tri1.Oprev();
+                            tri1.Pivot(ref testsub);
                         } while (testsub.seg == Segment.Empty);
                         // Find the endpoints of the containing segment.
                         org1 = testsub.SegOrg();
@@ -334,8 +334,8 @@ namespace TriangleNet.Meshing
                         // Find a subsegment that contains 'tdest'.
                         do
                         {
-                            tri2.DnextSelf();
-                            tri2.SegPivot(ref testsub);
+                            tri2.Dnext();
+                            tri2.Pivot(ref testsub);
                         } while (testsub.seg == Segment.Empty);
                         // Find the endpoints of the containing segment.
                         org2 = testsub.SegOrg();
@@ -456,13 +456,13 @@ namespace TriangleNet.Meshing
                     // concentric circles for later splittings.)
 
                     // Is the origin shared with another segment?
-                    currentenc.TriPivot(ref enctri);
+                    currentenc.Pivot(ref enctri);
                     enctri.Lnext(ref testtri);
-                    testtri.SegPivot(ref testsh);
+                    testtri.Pivot(ref testsh);
                     acuteorg = testsh.seg != Segment.Empty;
                     // Is the destination shared with another segment?
-                    testtri.LnextSelf();
-                    testtri.SegPivot(ref testsh);
+                    testtri.Lnext();
+                    testtri.Pivot(ref testsh);
                     acutedest = testsh.seg != Segment.Empty;
 
                     // If we're using Chew's algorithm (rather than Ruppert's)
@@ -476,7 +476,7 @@ namespace TriangleNet.Meshing
                                 (eorg.y - eapex.y) * (edest.y - eapex.y) < 0.0))
                         {
                             mesh.DeleteVertex(ref testtri);
-                            currentenc.TriPivot(ref enctri);
+                            currentenc.Pivot(ref enctri);
                             eapex = enctri.Apex();
                             enctri.Lprev(ref testtri);
                         }
@@ -484,16 +484,16 @@ namespace TriangleNet.Meshing
 
                     // Now, check the other side of the segment, if there's a triangle there.
                     enctri.Sym(ref testtri);
-                    if (testtri.triangle.id != Triangle.EmptyID)
+                    if (testtri.tri.id != Triangle.EmptyID)
                     {
                         // Is the destination shared with another segment?
-                        testtri.LnextSelf();
-                        testtri.SegPivot(ref testsh);
+                        testtri.Lnext();
+                        testtri.Pivot(ref testsh);
                         acutedest2 = testsh.seg != Segment.Empty;
                         acutedest = acutedest || acutedest2;
                         // Is the origin shared with another segment?
-                        testtri.LnextSelf();
-                        testtri.SegPivot(ref testsh);
+                        testtri.Lnext();
+                        testtri.Pivot(ref testsh);
                         acuteorg2 = testsh.seg != Segment.Empty;
                         acuteorg = acuteorg || acuteorg2;
 
@@ -508,7 +508,7 @@ namespace TriangleNet.Meshing
                                 mesh.DeleteVertex(ref testtri);
                                 enctri.Sym(ref testtri);
                                 eapex = testtri.Apex();
-                                testtri.LprevSelf();
+                                testtri.Lprev();
                             }
                         }
                     }
@@ -548,7 +548,7 @@ namespace TriangleNet.Meshing
                     newvertex = new Vertex(
                         eorg.x + split * (edest.x - eorg.x),
                         eorg.y + split * (edest.y - eorg.y),
-                        currentenc.Mark(),
+                        currentenc.seg.boundary,
                         mesh.nextras);
 
                     newvertex.type = VertexType.SegmentVertex;
@@ -610,7 +610,7 @@ namespace TriangleNet.Meshing
                     }
                     // Check the two new subsegments to see if they're encroached.
                     CheckSeg4Encroach(ref currentenc);
-                    currentenc.NextSelf();
+                    currentenc.Next();
                     CheckSeg4Encroach(ref currentenc);
                 }
 
@@ -630,7 +630,7 @@ namespace TriangleNet.Meshing
 
             foreach (var tri in mesh.triangles.Values)
             {
-                triangleloop.triangle = tri;
+                triangleloop.tri = tri;
 
                 // If the triangle is bad, enqueue it.
                 TestTriangle(ref triangleloop);
@@ -659,7 +659,7 @@ namespace TriangleNet.Meshing
             // Make sure that this triangle is still the same triangle it was
             // when it was tested and determined to be of bad quality.
             // Subsequent transformations may have made it a different triangle.
-            if (!Otri.IsDead(badotri.triangle) && (borg == badtri.org) &&
+            if (!Otri.IsDead(badotri.tri) && (borg == badtri.org) &&
                 (bdest == badtri.dest) && (bapex == badtri.apex))
             {
                 errorflag = false;
@@ -713,7 +713,7 @@ namespace TriangleNet.Meshing
                     // negative when it should be, so I test eta against xi.)
                     if (eta < xi)
                     {
-                        badotri.LprevSelf();
+                        badotri.Lprev();
                     }
 
                     // Insert the circumcenter, searching from the edge of the triangle,

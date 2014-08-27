@@ -34,7 +34,7 @@ namespace TriangleNet
             // Run through the list of triangles, checking each one.
             foreach (var t in mesh.triangles.Values)
             {
-                tri.triangle = t;
+                tri.tri = t;
 
                 // Check all three edges of the triangle.
                 for (tri.orient = 0; tri.orient < 3; tri.orient++)
@@ -59,13 +59,13 @@ namespace TriangleNet
 
                     // Find the neighboring triangle on this edge.
                     tri.Sym(ref oppotri);
-                    if (oppotri.triangle.id != Triangle.EmptyID)
+                    if (oppotri.tri.id != Triangle.EmptyID)
                     {
                         // Check that the triangle's neighbor knows it's a neighbor.
                         oppotri.Sym(ref oppooppotri);
-                        if ((tri.triangle != oppooppotri.triangle) || (tri.orient != oppooppotri.orient))
+                        if ((tri.tri != oppooppotri.tri) || (tri.orient != oppooppotri.orient))
                         {
-                            if (tri.triangle == oppooppotri.triangle && Log.Verbose)
+                            if (tri.tri == oppooppotri.tri && Log.Verbose)
                             {
                                 logger.Warning("Asymmetric triangle-triangle bond: (Right triangle, wrong orientation)",
                                     "MeshValidator.IsConsistent()");
@@ -95,7 +95,7 @@ namespace TriangleNet
             mesh.MakeVertexMap();
             foreach (var v in mesh.vertices.Values)
             {
-                if (v.tri.triangle == null && Log.Verbose)
+                if (v.tri.tri == null && Log.Verbose)
                 {
                     logger.Warning("Vertex (ID " + v.id + ") not connected to mesh (duplicate input vertex?)",
                                 "MeshValidator.IsConsistent()");
@@ -152,7 +152,7 @@ namespace TriangleNet
             // Run through the list of triangles, checking each one.
             foreach (var tri in mesh.triangles.Values)
             {
-                loop.triangle = tri;
+                loop.tri = tri;
 
                 // Check all three edges of the triangle.
                 for (loop.orient = 0; loop.orient < 3; loop.orient++)
@@ -167,8 +167,8 @@ namespace TriangleNet
                     // Only test that the edge is locally Delaunay if there is an
                     // adjoining triangle whose pointer is larger (to ensure that
                     // each pair isn't tested twice).
-                    shouldbedelaunay = (loop.triangle.id < oppotri.triangle.id) &&
-                           !Otri.IsDead(oppotri.triangle) && (oppotri.triangle.id != Triangle.EmptyID) &&
+                    shouldbedelaunay = (loop.tri.id < oppotri.tri.id) &&
+                           !Otri.IsDead(oppotri.tri) && (oppotri.tri.id != Triangle.EmptyID) &&
                           (org != inf1) && (org != inf2) && (org != inf3) &&
                           (dest != inf1) && (dest != inf2) && (dest != inf3) &&
                           (apex != inf1) && (apex != inf2) && (apex != inf3) &&
@@ -178,7 +178,7 @@ namespace TriangleNet
                     {
                         // If a subsegment separates the triangles, then the edge is
                         // constrained, so no local Delaunay test should be done.
-                        loop.SegPivot(ref opposubseg);
+                        loop.Pivot(ref opposubseg);
 
                         if (opposubseg.seg != Segment.Empty)
                         {
@@ -193,7 +193,7 @@ namespace TriangleNet
                             if (Log.Verbose)
                             {
                                 logger.Warning(String.Format("Non-regular pair of triangles found (IDs {0}/{1}).",
-                                    loop.triangle.id, oppotri.triangle.id), "MeshValidator.IsDelaunay()");
+                                    loop.tri.id, oppotri.tri.id), "MeshValidator.IsDelaunay()");
                             }
 
                             horrors++;

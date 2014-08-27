@@ -6,10 +6,10 @@
 
 namespace TriangleNet.Smoothing
 {
-    using System.Collections.Generic;
     using TriangleNet.Geometry;
     using TriangleNet.Meshing;
-    using TriangleNet.Voronoi.Legacy;
+    using TriangleNet.Topology.DCEL;
+    using TriangleNet.Voronoi;
 
     /// <summary>
     /// Simple mesh smoother implementation.
@@ -56,48 +56,49 @@ namespace TriangleNet.Smoothing
             smoothedMesh.CopyTo((Mesh)mesh);
         }
 
-        /// <summary>
-        /// Smooth all free nodes.
-        /// </summary>
         private void Step(Mesh mesh)
         {
-            var voronoi = new BoundedVoronoiLegacy(mesh, false);
-
-            var cells = voronoi.Regions;
+            var voronoi = new BoundedVoronoi(mesh);
 
             double x, y;
 
-            foreach (var cell in cells)
+            foreach (var face in voronoi.Faces)
             {
-                Centroid((List<Point>)cell.Vertices, out x, out y);
+                if (face.generator.mark == 0)
+                {
+                    Centroid(face, out x, out y);
 
-                cell.Generator.x = x;
-                cell.Generator.y = y;
+                    face.generator.x = x;
+                    face.generator.y = y;
+                }
             }
         }
 
         /// <summary>
         /// Calculate the centroid of a polygon.
         /// </summary>
-        /// <param name="points">Points of the polygon.</param>
-        /// <param name="x">Centroid x coordinate.</param>
-        /// <param name="y">Centroid y coordinate.</param>
-        /// <remarks>
-        /// Based on ANSI C code from the article "Centroid of a Polygon" by Gerard Bashein
-        /// and Paul R. Detmer in "Graphics Gems IV", Academic Press, 1994
-        /// </remarks>
-        private void Centroid(List<Point> points, out double x, out double y)
+        private void Centroid(Face face, out double x, out double y)
         {
-            int i, j, n = points.Count;
             double ai, atmp = 0, xtmp = 0, ytmp = 0;
 
-            for (i = n - 1, j = 0; j < n; i = j, j++)
+            var edge = face.Edge;
+            var first = edge.Next.ID;
+
+            Point p, q;
+
+            do
             {
-                ai = points[i].X * points[j].Y - points[j].X * points[i].Y;
+                p = edge.Origin;
+                q = edge.Twin.Origin;
+
+                ai = p.X * q.Y - q.X * p.Y;
                 atmp += ai;
-                xtmp += (points[j].X + points[i].X) * ai;
-                ytmp += (points[j].Y + points[i].Y) * ai;
-            }
+                xtmp += (q.X + p.X) * ai;
+                ytmp += (q.Y + p.Y) * ai;
+
+                edge = edge.Next;
+
+            } while (edge.Next.ID != first);
 
             x = xtmp / (3 * atmp);
             y = ytmp / (3 * atmp);

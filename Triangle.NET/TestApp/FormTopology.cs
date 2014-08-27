@@ -5,6 +5,7 @@ using TriangleNet;
 using TriangleNet.Geometry;
 using TriangleNet.Meshing;
 using TriangleNet.Tools;
+using TriangleNet.Topology;
 
 namespace MeshExplorer
 {
@@ -12,7 +13,7 @@ namespace MeshExplorer
     {
         Mesh mesh;
         QuadTree tree;
-        OrientedTriangle current;
+        Otri current;
 
         public FormTopology()
         {
@@ -28,7 +29,7 @@ namespace MeshExplorer
 
             topoControlView.PrimitiveCommandInvoked += PrimitiveCommandHandler;
 
-            current = new OrientedTriangle();
+            current = default(Otri);
         }
 
         void PrimitiveCommandHandler(object sender, GenericEventArgs<string> e)
@@ -46,12 +47,10 @@ namespace MeshExplorer
 
             var tri = FindTriangleAt(((float)p.X) / size.Width, ((float)p.Y) / size.Height);
 
-            current.Triangle = tri;
-            current.Orientation = 0;
+            current.Triangle = (Triangle)tri;
 
             renderControl.Update(current);
-
-            topoControlView.SetTriangle(current);
+            topoControlView.SetTriangle(current.Triangle);
         }
 
         private ITriangle FindTriangleAt(float x, float y)
@@ -110,7 +109,7 @@ namespace MeshExplorer
             }
 
             renderControl.Update(current);
-            topoControlView.SetTriangle(current);
+            topoControlView.SetTriangle(current.Triangle);
         }
     }
 }

@@ -400,8 +400,8 @@ namespace TriangleNet.Meshing.Algorithm
                 // leftmost and rightmost vertices.
                 while (farleftapex.y < farleftpt.y)
                 {
-                    farleft.LnextSelf();
-                    farleft.SymSelf();
+                    farleft.Lnext();
+                    farleft.Sym();
                     farleftpt = farleftapex;
                     farleftapex = farleft.Apex();
                 }
@@ -417,8 +417,8 @@ namespace TriangleNet.Meshing.Algorithm
                 }
                 while (innerrightapex.y < innerrightorg.y)
                 {
-                    innerright.LnextSelf();
-                    innerright.SymSelf();
+                    innerright.Lnext();
+                    innerright.Sym();
                     innerrightorg = innerrightapex;
                     innerrightapex = innerright.Apex();
                 }
@@ -440,8 +440,8 @@ namespace TriangleNet.Meshing.Algorithm
                 // Make innerleftdest the "bottommost" vertex of the left hull.
                 if (RobustPredicates.CounterClockwise(innerleftdest, innerleftapex, innerrightorg) > 0.0)
                 {
-                    innerleft.LprevSelf();
-                    innerleft.SymSelf();
+                    innerleft.Lprev();
+                    innerleft.Sym();
                     innerleftdest = innerleftapex;
                     innerleftapex = innerleft.Apex();
                     changemade = true;
@@ -449,8 +449,8 @@ namespace TriangleNet.Meshing.Algorithm
                 // Make innerrightorg the "bottommost" vertex of the right hull.
                 if (RobustPredicates.CounterClockwise(innerrightapex, innerrightorg, innerleftdest) > 0.0)
                 {
-                    innerright.LnextSelf();
-                    innerright.SymSelf();
+                    innerright.Lnext();
+                    innerright.Sym();
                     innerrightorg = innerrightapex;
                     innerrightapex = innerright.Apex();
                     changemade = true;
@@ -464,9 +464,9 @@ namespace TriangleNet.Meshing.Algorithm
             mesh.MakeTriangle(ref baseedge);
             // Connect it to the bounding boxes of the left and right triangulations.
             baseedge.Bond(ref innerleft);
-            baseedge.LnextSelf();
+            baseedge.Lnext();
             baseedge.Bond(ref innerright);
-            baseedge.LnextSelf();
+            baseedge.Lnext();
             baseedge.SetOrg(innerrightorg);
             baseedge.SetDest(innerleftdest);
             // Apex is intentionally left NULL.
@@ -506,9 +506,9 @@ namespace TriangleNet.Meshing.Algorithm
                     // Apex is intentionally left NULL.
                     // Connect it to the bounding boxes of the two triangulations.
                     nextedge.Bond(ref baseedge);
-                    nextedge.LnextSelf();
+                    nextedge.Lnext();
                     nextedge.Bond(ref rightcand);
-                    nextedge.LnextSelf();
+                    nextedge.Lnext();
                     nextedge.Bond(ref leftcand);
 
                     // Special treatment for horizontal cuts.
@@ -533,8 +533,8 @@ namespace TriangleNet.Meshing.Algorithm
                         }
                         while (farrightapex.x > farrightpt.x)
                         {
-                            farright.LprevSelf();
-                            farright.SymSelf();
+                            farright.Lprev();
+                            farright.Sym();
                             farrightpt = farrightapex;
                             farrightapex = farright.Apex();
                         }
@@ -546,7 +546,7 @@ namespace TriangleNet.Meshing.Algorithm
                 {
                     // What vertex would be exposed if an edge were deleted?
                     leftcand.Lprev(ref nextedge);
-                    nextedge.SymSelf();
+                    nextedge.Sym();
                     nextapex = nextedge.Apex();
                     // If nextapex is NULL, then no vertex would be exposed; the
                     // triangulation would have been eaten right through.
@@ -558,15 +558,15 @@ namespace TriangleNet.Meshing.Algorithm
                         {
                             // Eliminate the edge with an edge flip.  As a result, the
                             // left triangulation will have one more boundary triangle.
-                            nextedge.LnextSelf();
+                            nextedge.Lnext();
                             nextedge.Sym(ref topcasing);
-                            nextedge.LnextSelf();
+                            nextedge.Lnext();
                             nextedge.Sym(ref sidecasing);
                             nextedge.Bond(ref topcasing);
                             leftcand.Bond(ref sidecasing);
-                            leftcand.LnextSelf();
+                            leftcand.Lnext();
                             leftcand.Sym(ref outercasing);
-                            nextedge.LprevSelf();
+                            nextedge.Lprev();
                             nextedge.Bond(ref outercasing);
                             // Correct the vertices to reflect the edge flip.
                             leftcand.SetOrg(lowerleft);
@@ -598,7 +598,7 @@ namespace TriangleNet.Meshing.Algorithm
                 {
                     // What vertex would be exposed if an edge were deleted?
                     rightcand.Lnext(ref nextedge);
-                    nextedge.SymSelf();
+                    nextedge.Sym();
                     nextapex = nextedge.Apex();
                     // If nextapex is NULL, then no vertex would be exposed; the
                     // triangulation would have been eaten right through.
@@ -610,15 +610,15 @@ namespace TriangleNet.Meshing.Algorithm
                         {
                             // Eliminate the edge with an edge flip.  As a result, the
                             // right triangulation will have one more boundary triangle.
-                            nextedge.LprevSelf();
+                            nextedge.Lprev();
                             nextedge.Sym(ref topcasing);
-                            nextedge.LprevSelf();
+                            nextedge.Lprev();
                             nextedge.Sym(ref sidecasing);
                             nextedge.Bond(ref topcasing);
                             rightcand.Bond(ref sidecasing);
-                            rightcand.LprevSelf();
+                            rightcand.Lprev();
                             rightcand.Sym(ref outercasing);
-                            nextedge.LnextSelf();
+                            nextedge.Lnext();
                             nextedge.Bond(ref outercasing);
                             // Correct the vertices to reflect the edge flip.
                             rightcand.SetOrg(null);
@@ -715,11 +715,11 @@ namespace TriangleNet.Meshing.Algorithm
                 farright.SetDest(sortarray[left]);
                 // The apex is intentionally left NULL.
                 farleft.Bond(ref farright);
-                farleft.LprevSelf();
-                farright.LnextSelf();
+                farleft.Lprev();
+                farright.Lnext();
                 farleft.Bond(ref farright);
-                farleft.LprevSelf();
-                farright.LnextSelf();
+                farleft.Lprev();
+                farright.Lnext();
                 farleft.Bond(ref farright);
 
                 // Ensure that the origin of 'farleft' is sortarray[0].
@@ -750,16 +750,16 @@ namespace TriangleNet.Meshing.Algorithm
                     // All apices are intentionally left NULL.
                     midtri.Bond(ref tri1);
                     tri2.Bond(ref tri3);
-                    midtri.LnextSelf();
-                    tri1.LprevSelf();
-                    tri2.LnextSelf();
-                    tri3.LprevSelf();
+                    midtri.Lnext();
+                    tri1.Lprev();
+                    tri2.Lnext();
+                    tri3.Lprev();
                     midtri.Bond(ref tri3);
                     tri1.Bond(ref tri2);
-                    midtri.LnextSelf();
-                    tri1.LprevSelf();
-                    tri2.LnextSelf();
-                    tri3.LprevSelf();
+                    midtri.Lnext();
+                    tri1.Lprev();
+                    tri2.Lnext();
+                    tri3.Lprev();
                     midtri.Bond(ref tri1);
                     tri2.Bond(ref tri3);
                     // Ensure that the origin of 'farleft' is sortarray[0].
@@ -797,18 +797,18 @@ namespace TriangleNet.Meshing.Algorithm
                     }
                     // The topology does not depend on how the vertices are ordered.
                     midtri.Bond(ref tri1);
-                    midtri.LnextSelf();
+                    midtri.Lnext();
                     midtri.Bond(ref tri2);
-                    midtri.LnextSelf();
+                    midtri.Lnext();
                     midtri.Bond(ref tri3);
-                    tri1.LprevSelf();
-                    tri2.LnextSelf();
+                    tri1.Lprev();
+                    tri2.Lnext();
                     tri1.Bond(ref tri2);
-                    tri1.LprevSelf();
-                    tri3.LprevSelf();
+                    tri1.Lprev();
+                    tri3.Lprev();
                     tri1.Bond(ref tri3);
-                    tri2.LnextSelf();
-                    tri3.LprevSelf();
+                    tri2.Lnext();
+                    tri3.Lprev();
                     tri2.Bond(ref tri3);
                     // Ensure that the origin of 'farleft' is sortarray[0].
                     tri1.Copy(ref farleft);
@@ -859,7 +859,7 @@ namespace TriangleNet.Meshing.Algorithm
 
             // Find an edge on the convex hull to start point location from.
             startghost.Lprev(ref searchedge);
-            searchedge.SymSelf();
+            searchedge.Sym();
             Triangle.Empty.neighbors[0] = searchedge;
             // Remove the bounding box and count the convex hull edges.
             startghost.Copy(ref dissolveedge);
@@ -868,15 +868,15 @@ namespace TriangleNet.Meshing.Algorithm
             {
                 hullsize++;
                 dissolveedge.Lnext(ref deadtriangle);
-                dissolveedge.LprevSelf();
-                dissolveedge.SymSelf();
+                dissolveedge.Lprev();
+                dissolveedge.Sym();
 
                 // If no PSLG is involved, set the boundary markers of all the vertices
                 // on the convex hull.  If a PSLG is used, this step is done later.
                 if (noPoly)
                 {
                     // Watch out for the case where all the input vertices are collinear.
-                    if (dissolveedge.triangle.id != Triangle.EmptyID)
+                    if (dissolveedge.tri.id != Triangle.EmptyID)
                     {
                         markorg = dissolveedge.Org();
                         if (markorg.mark == 0)
@@ -891,7 +891,7 @@ namespace TriangleNet.Meshing.Algorithm
                 deadtriangle.Sym(ref dissolveedge);
 
                 // Delete the bounding triangle.
-                mesh.TriangleDealloc(deadtriangle.triangle);
+                mesh.TriangleDealloc(deadtriangle.tri);
             } while (!dissolveedge.Equal(startghost));
 
             return hullsize;

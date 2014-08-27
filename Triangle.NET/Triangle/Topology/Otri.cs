@@ -18,73 +18,97 @@ namespace TriangleNet.Topology
     /// of the triangle. Hence, there are three possible orientations. By convention, each
     /// edge always points counterclockwise about the corresponding triangle.
     /// </remarks>
-    struct Otri
+    public struct Otri
     {
-        public Triangle triangle;
-        public int orient; // Ranges from 0 to 2.
+        internal Triangle tri;
+        internal int orient; // Ranges from 0 to 2.
+
+        public Triangle Triangle
+        {
+            get { return tri; }
+            set { tri = value; }
+        }
 
         public override string ToString()
         {
-            if (triangle == null)
+            if (tri == null)
             {
                 return "O-TID [null]";
             }
-            return String.Format("O-TID {0}", triangle.hash);
+            return String.Format("O-TID {0}", tri.hash);
         }
 
-        #region Otri primitives
+        #region Otri primitives (public)
 
         // For fast access
         static readonly int[] plus1Mod3 = { 1, 2, 0 };
         static readonly int[] minus1Mod3 = { 2, 0, 1 };
 
-        // The following handle manipulation primitives are all described by Guibas
-        // and Stolfi. However, Guibas and Stolfi use an edge-based data structure,
+        // The following primitives are all described by Guibas and Stolfi.
+        // However, Guibas and Stolfi use an edge-based data structure,
         // whereas I use a triangle-based data structure.
+        //
+        // lnext: finds the next edge (counterclockwise) of a triangle.
+        //
+        // onext: spins counterclockwise around a vertex; that is, it finds 
+        // the next edge with the same origin in the counterclockwise direction. This
+        // edge is part of a different triangle.
+        //
+        // oprev: spins clockwise around a vertex; that is, it finds the 
+        // next edge with the same origin in the clockwise direction.  This edge is 
+        // part of a different triangle.
+        //
+        // dnext: spins counterclockwise around a vertex; that is, it finds 
+        // the next edge with the same destination in the counterclockwise direction.
+        // This edge is part of a different triangle.
+        //
+        // dprev: spins clockwise around a vertex; that is, it finds the 
+        // next edge with the same destination in the clockwise direction. This edge 
+        // is part of a different triangle.
+        //
+        // rnext: moves one edge counterclockwise about the adjacent 
+        // triangle. (It's best understood by reading Guibas and Stolfi. It 
+        // involves changing triangles twice.)
+        //
+        // rprev: moves one edge clockwise about the adjacent triangle.
+        // (It's best understood by reading Guibas and Stolfi.  It involves
+        // changing triangles twice.)
 
         /// <summary>
         /// Find the abutting triangle; same edge. [sym(abc) -> ba*]
         /// </summary>
-        /// <remarks>
         /// Note that the edge direction is necessarily reversed, because the handle specified 
         /// by an oriented triangle is directed counterclockwise around the triangle.
         /// </remarks>
-        public void Sym(ref Otri o2)
+        public void Sym(ref Otri ot)
         {
-            //o2 = tri.triangles[orient];
-            // decode(ptr, otri2);
-
-            o2.triangle = triangle.neighbors[orient].triangle;
-            o2.orient = triangle.neighbors[orient].orient;
+            ot.tri = tri.neighbors[orient].tri;
+            ot.orient = tri.neighbors[orient].orient;
         }
 
         /// <summary>
         /// Find the abutting triangle; same edge. [sym(abc) -> ba*]
         /// </summary>
-        public void SymSelf()
+        public void Sym()
         {
-            //this = tri.triangles[orient];
-            // decode(ptr, otri);
-
             int tmp = orient;
-            orient = triangle.neighbors[tmp].orient;
-            triangle = triangle.neighbors[tmp].triangle;
+            orient = tri.neighbors[tmp].orient;
+            tri = tri.neighbors[tmp].tri;
         }
-        // lnext() finds the next edge (counterclockwise) of a triangle.
 
         /// <summary>
         /// Find the next edge (counterclockwise) of a triangle. [lnext(abc) -> bca]
         /// </summary>
-        public void Lnext(ref Otri o2)
+        public void Lnext(ref Otri ot)
         {
-            o2.triangle = triangle;
-            o2.orient = plus1Mod3[orient];
+            ot.tri = tri;
+            ot.orient = plus1Mod3[orient];
         }
 
         /// <summary>
         /// Find the next edge (counterclockwise) of a triangle. [lnext(abc) -> bca]
         /// </summary>
-        public void LnextSelf()
+        public void Lnext()
         {
             orient = plus1Mod3[orient];
         }
@@ -92,16 +116,16 @@ namespace TriangleNet.Topology
         /// <summary>
         /// Find the previous edge (clockwise) of a triangle. [lprev(abc) -> cab]
         /// </summary>
-        public void Lprev(ref Otri o2)
+        public void Lprev(ref Otri ot)
         {
-            o2.triangle = triangle;
-            o2.orient = minus1Mod3[orient];
+            ot.tri = tri;
+            ot.orient = minus1Mod3[orient];
         }
 
         /// <summary>
         /// Find the previous edge (clockwise) of a triangle. [lprev(abc) -> cab]
         /// </summary>
-        public void LprevSelf()
+        public void Lprev()
         {
             orient = minus1Mod3[orient];
         }
@@ -109,62 +133,54 @@ namespace TriangleNet.Topology
         /// <summary>
         /// Find the next edge counterclockwise with the same origin. [onext(abc) -> ac*]
         /// </summary>
-        /// <remarks>onext() spins counterclockwise around a vertex; that is, it finds 
-        /// the next edge with the same origin in the counterclockwise direction. This
-        /// edge is part of a different triangle.
-        /// </remarks>
-        public void Onext(ref Otri o2)
+        public void Onext(ref Otri ot)
         {
-            //Lprev(ref o2);
-            o2.triangle = triangle;
-            o2.orient = minus1Mod3[orient];
+            //Lprev(ref ot);
+            ot.tri = tri;
+            ot.orient = minus1Mod3[orient];
 
-            //o2.SymSelf();
-            int tmp = o2.orient;
-            o2.orient = o2.triangle.neighbors[tmp].orient;
-            o2.triangle = o2.triangle.neighbors[tmp].triangle;
+            //ot.SymSelf();
+            int tmp = ot.orient;
+            ot.orient = ot.tri.neighbors[tmp].orient;
+            ot.tri = ot.tri.neighbors[tmp].tri;
         }
 
         /// <summary>
         /// Find the next edge counterclockwise with the same origin. [onext(abc) -> ac*]
         /// </summary>
-        public void OnextSelf()
+        public void Onext()
         {
             //LprevSelf();
             orient = minus1Mod3[orient];
 
             //SymSelf();
             int tmp = orient;
-            orient = triangle.neighbors[tmp].orient;
-            triangle = triangle.neighbors[tmp].triangle;
+            orient = tri.neighbors[tmp].orient;
+            tri = tri.neighbors[tmp].tri;
         }
 
         /// <summary>
         /// Find the next edge clockwise with the same origin. [oprev(abc) -> a*b]
         /// </summary>
-        /// <remarks>oprev() spins clockwise around a vertex; that is, it finds the 
-        /// next edge with the same origin in the clockwise direction.  This edge is 
-        /// part of a different triangle.
-        /// </remarks>
-        public void Oprev(ref Otri o2)
+        public void Oprev(ref Otri ot)
         {
-            //Sym(ref o2);
-            o2.triangle = triangle.neighbors[orient].triangle;
-            o2.orient = triangle.neighbors[orient].orient;
+            //Sym(ref ot);
+            ot.tri = tri.neighbors[orient].tri;
+            ot.orient = tri.neighbors[orient].orient;
 
-            //o2.LnextSelf();
-            o2.orient = plus1Mod3[o2.orient];
+            //ot.LnextSelf();
+            ot.orient = plus1Mod3[ot.orient];
         }
 
         /// <summary>
         /// Find the next edge clockwise with the same origin. [oprev(abc) -> a*b]
         /// </summary>
-        public void OprevSelf()
+        public void Oprev()
         {
             //SymSelf();
             int tmp = orient;
-            orient = triangle.neighbors[tmp].orient;
-            triangle = triangle.neighbors[tmp].triangle;
+            orient = tri.neighbors[tmp].orient;
+            tri = tri.neighbors[tmp].tri;
 
             //LnextSelf();
             orient = plus1Mod3[orient];
@@ -173,29 +189,25 @@ namespace TriangleNet.Topology
         /// <summary>
         /// Find the next edge counterclockwise with the same destination. [dnext(abc) -> *ba]
         /// </summary>
-        /// <remarks>dnext() spins counterclockwise around a vertex; that is, it finds 
-        /// the next edge with the same destination in the counterclockwise direction.
-        /// This edge is part of a different triangle.
-        /// </remarks>
-        public void Dnext(ref Otri o2)
+        public void Dnext(ref Otri ot)
         {
-            //Sym(ref o2);
-            o2.triangle = triangle.neighbors[orient].triangle;
-            o2.orient = triangle.neighbors[orient].orient;
+            //Sym(ref ot);
+            ot.tri = tri.neighbors[orient].tri;
+            ot.orient = tri.neighbors[orient].orient;
 
-            //o2.LprevSelf();
-            o2.orient = minus1Mod3[o2.orient];
+            //ot.LprevSelf();
+            ot.orient = minus1Mod3[ot.orient];
         }
 
         /// <summary>
         /// Find the next edge counterclockwise with the same destination. [dnext(abc) -> *ba]
         /// </summary>
-        public void DnextSelf()
+        public void Dnext()
         {
             //SymSelf();
             int tmp = orient;
-            orient = triangle.neighbors[tmp].orient;
-            triangle = triangle.neighbors[tmp].triangle;
+            orient = tri.neighbors[tmp].orient;
+            tri = tri.neighbors[tmp].tri;
 
             //LprevSelf();
             orient = minus1Mod3[orient];
@@ -204,116 +216,104 @@ namespace TriangleNet.Topology
         /// <summary>
         /// Find the next edge clockwise with the same destination. [dprev(abc) -> cb*]
         /// </summary>
-        /// <remarks>dprev() spins clockwise around a vertex; that is, it finds the 
-        /// next edge with the same destination in the clockwise direction. This edge 
-        /// is part of a different triangle.
-        /// </remarks>
-        public void Dprev(ref Otri o2)
+        public void Dprev(ref Otri ot)
         {
-            //Lnext(ref o2);
-            o2.triangle = triangle;
-            o2.orient = plus1Mod3[orient];
+            //Lnext(ref ot);
+            ot.tri = tri;
+            ot.orient = plus1Mod3[orient];
 
-            //o2.SymSelf();
-            int tmp = o2.orient;
-            o2.orient = o2.triangle.neighbors[tmp].orient;
-            o2.triangle = o2.triangle.neighbors[tmp].triangle;
+            //ot.SymSelf();
+            int tmp = ot.orient;
+            ot.orient = ot.tri.neighbors[tmp].orient;
+            ot.tri = ot.tri.neighbors[tmp].tri;
         }
 
         /// <summary>
         /// Find the next edge clockwise with the same destination. [dprev(abc) -> cb*]
         /// </summary>
-        public void DprevSelf()
+        public void Dprev()
         {
             //LnextSelf();
             orient = plus1Mod3[orient];
 
             //SymSelf();
             int tmp = orient;
-            orient = triangle.neighbors[tmp].orient;
-            triangle = triangle.neighbors[tmp].triangle;
+            orient = tri.neighbors[tmp].orient;
+            tri = tri.neighbors[tmp].tri;
         }
 
         /// <summary>
         /// Find the next edge (counterclockwise) of the adjacent triangle. [rnext(abc) -> *a*]
         /// </summary>
-        /// <remarks>rnext() moves one edge counterclockwise about the adjacent 
-        /// triangle. (It's best understood by reading Guibas and Stolfi. It 
-        /// involves changing triangles twice.)
-        /// </remarks>
-        public void Rnext(ref Otri o2)
+        public void Rnext(ref Otri ot)
         {
-            //Sym(ref o2);
-            o2.triangle = triangle.neighbors[orient].triangle;
-            o2.orient = triangle.neighbors[orient].orient;
+            //Sym(ref ot);
+            ot.tri = tri.neighbors[orient].tri;
+            ot.orient = tri.neighbors[orient].orient;
 
-            //o2.LnextSelf();
-            o2.orient = plus1Mod3[o2.orient];
+            //ot.LnextSelf();
+            ot.orient = plus1Mod3[ot.orient];
 
-            //o2.SymSelf();
-            int tmp = o2.orient;
-            o2.orient = o2.triangle.neighbors[tmp].orient;
-            o2.triangle = o2.triangle.neighbors[tmp].triangle;
+            //ot.SymSelf();
+            int tmp = ot.orient;
+            ot.orient = ot.tri.neighbors[tmp].orient;
+            ot.tri = ot.tri.neighbors[tmp].tri;
         }
 
         /// <summary>
         /// Find the next edge (counterclockwise) of the adjacent triangle. [rnext(abc) -> *a*]
         /// </summary>
-        public void RnextSelf()
+        public void Rnext()
         {
             //SymSelf();
             int tmp = orient;
-            orient = triangle.neighbors[tmp].orient;
-            triangle = triangle.neighbors[tmp].triangle;
+            orient = tri.neighbors[tmp].orient;
+            tri = tri.neighbors[tmp].tri;
 
             //LnextSelf();
             orient = plus1Mod3[orient];
 
             //SymSelf();
             tmp = orient;
-            orient = triangle.neighbors[tmp].orient;
-            triangle = triangle.neighbors[tmp].triangle;
+            orient = tri.neighbors[tmp].orient;
+            tri = tri.neighbors[tmp].tri;
         }
 
         /// <summary>
         /// Find the previous edge (clockwise) of the adjacent triangle. [rprev(abc) -> b**]
         /// </summary>
-        /// <remarks>rprev() moves one edge clockwise about the adjacent triangle.
-        /// (It's best understood by reading Guibas and Stolfi.  It involves
-        /// changing triangles twice.)
-        /// </remarks>
-        public void Rprev(ref Otri o2)
+        public void Rprev(ref Otri ot)
         {
-            //Sym(ref o2);
-            o2.triangle = triangle.neighbors[orient].triangle;
-            o2.orient = triangle.neighbors[orient].orient;
+            //Sym(ref ot);
+            ot.tri = tri.neighbors[orient].tri;
+            ot.orient = tri.neighbors[orient].orient;
 
-            //o2.LprevSelf();
-            o2.orient = minus1Mod3[o2.orient];
+            //ot.LprevSelf();
+            ot.orient = minus1Mod3[ot.orient];
 
-            //o2.SymSelf();
-            int tmp = o2.orient;
-            o2.orient = o2.triangle.neighbors[tmp].orient;
-            o2.triangle = o2.triangle.neighbors[tmp].triangle;
+            //ot.SymSelf();
+            int tmp = ot.orient;
+            ot.orient = ot.tri.neighbors[tmp].orient;
+            ot.tri = ot.tri.neighbors[tmp].tri;
         }
 
         /// <summary>
         /// Find the previous edge (clockwise) of the adjacent triangle. [rprev(abc) -> b**]
         /// </summary>
-        public void RprevSelf()
+        public void Rprev()
         {
             //SymSelf();
             int tmp = orient;
-            orient = triangle.neighbors[tmp].orient;
-            triangle = triangle.neighbors[tmp].triangle;
+            orient = tri.neighbors[tmp].orient;
+            tri = tri.neighbors[tmp].tri;
 
             //LprevSelf();
             orient = minus1Mod3[orient];
 
             //SymSelf();
             tmp = orient;
-            orient = triangle.neighbors[tmp].orient;
-            triangle = triangle.neighbors[tmp].triangle;
+            orient = tri.neighbors[tmp].orient;
+            tri = tri.neighbors[tmp].tri;
         }
 
         /// <summary>
@@ -321,7 +321,7 @@ namespace TriangleNet.Topology
         /// </summary>
         public Vertex Org()
         {
-            return triangle.vertices[plus1Mod3[orient]];
+            return tri.vertices[plus1Mod3[orient]];
         }
 
         /// <summary>
@@ -329,7 +329,7 @@ namespace TriangleNet.Topology
         /// </summary>
         public Vertex Dest()
         {
-            return triangle.vertices[minus1Mod3[orient]];
+            return tri.vertices[minus1Mod3[orient]];
         }
 
         /// <summary>
@@ -337,46 +337,56 @@ namespace TriangleNet.Topology
         /// </summary>
         public Vertex Apex()
         {
-            return triangle.vertices[orient];
+            return tri.vertices[orient];
         }
+
+        /// <summary>
+        /// Copy an oriented triangle.
+        /// </summary>
+        public void Copy(ref Otri ot)
+        {
+            ot.tri = tri;
+            ot.orient = orient;
+        }
+
+        #endregion
+
+        #region Otri primitives (internal)
 
         /// <summary>
         /// Set Origin
         /// </summary>
-        public void SetOrg(Vertex ptr)
+        internal void SetOrg(Vertex v)
         {
-            triangle.vertices[plus1Mod3[orient]] = ptr;
+            tri.vertices[plus1Mod3[orient]] = v;
         }
 
         /// <summary>
         /// Set Destination
         /// </summary>
-        public void SetDest(Vertex ptr)
+        internal void SetDest(Vertex v)
         {
-            triangle.vertices[minus1Mod3[orient]] = ptr;
+            tri.vertices[minus1Mod3[orient]] = v;
         }
 
         /// <summary>
         /// Set Apex
         /// </summary>
-        public void SetApex(Vertex ptr)
+        internal void SetApex(Vertex v)
         {
-            triangle.vertices[orient] = ptr;
+            tri.vertices[orient] = v;
         }
 
         /// <summary>
         /// Bond two triangles together at the resepective handles. [bond(abc, bad)]
         /// </summary>
-        public void Bond(ref Otri o2)
+        internal void Bond(ref Otri ot)
         {
-            //triangle.neighbors[orient]= o2;
-            //o2.triangle.neighbors[o2.orient] = this;
+            tri.neighbors[orient].tri = ot.tri;
+            tri.neighbors[orient].orient = ot.orient;
 
-            triangle.neighbors[orient].triangle = o2.triangle;
-            triangle.neighbors[orient].orient = o2.orient;
-
-            o2.triangle.neighbors[o2.orient].triangle = this.triangle;
-            o2.triangle.neighbors[o2.orient].orient = this.orient;
+            ot.tri.neighbors[ot.orient].tri = this.tri;
+            ot.tri.neighbors[ot.orient].orient = this.orient;
         }
 
         /// <summary>
@@ -386,94 +396,84 @@ namespace TriangleNet.Topology
         /// this triangle. Usually, however, the other triangle is being deleted 
         /// entirely, or bonded to another triangle, so it doesn't matter.
         /// </remarks>
-        public void Dissolve()
+        internal void Dissolve()
         {
-            triangle.neighbors[orient].triangle = Triangle.Empty;
-            triangle.neighbors[orient].orient = 0;
-        }
-
-        /// <summary>
-        /// Copy an oriented triangle.
-        /// </summary>
-        public void Copy(ref Otri o2)
-        {
-            o2.triangle = triangle;
-            o2.orient = orient;
+            tri.neighbors[orient].tri = Triangle.Empty;
+            tri.neighbors[orient].orient = 0;
         }
 
         /// <summary>
         /// Test for equality of oriented triangles.
         /// </summary>
-        public bool Equal(Otri o2)
+        internal bool Equal(Otri ot)
         {
-            return ((triangle == o2.triangle) && (orient == o2.orient));
+            return ((tri == ot.tri) && (orient == ot.orient));
         }
 
         /// <summary>
         /// Infect a triangle with the virus.
         /// </summary>
-        public void Infect()
+        internal void Infect()
         {
-            triangle.infected = true;
+            tri.infected = true;
         }
 
         /// <summary>
         /// Cure a triangle from the virus.
         /// </summary>
-        public void Uninfect()
+        internal void Uninfect()
         {
-            triangle.infected = false;
+            tri.infected = false;
         }
 
         /// <summary>
         /// Test a triangle for viral infection.
         /// </summary>
-        public bool IsInfected()
+        internal bool IsInfected()
         {
-            return triangle.infected;
-        }
-
-        /// <summary>
-        /// Check a triangle's deallocation.
-        /// </summary>
-        public static bool IsDead(Triangle tria)
-        {
-            return tria.neighbors[0].triangle == null;
-        }
-
-        /// <summary>
-        /// Set a triangle's deallocation.
-        /// </summary>
-        public static void Kill(Triangle tria)
-        {
-            tria.neighbors[0].triangle = null;
-            tria.neighbors[2].triangle = null;
+            return tri.infected;
         }
 
         /// <summary>
         /// Finds a subsegment abutting a triangle.
         /// </summary>
-        public void SegPivot(ref Osub os)
+        internal void Pivot(ref Osub os)
         {
-            os = triangle.subsegs[orient];
-            //sdecode(sptr, osub)
+            os = tri.subsegs[orient];
         }
 
         /// <summary>
         /// Bond a triangle to a subsegment.
         /// </summary>
-        public void SegBond(ref Osub os)
+        internal void SegBond(ref Osub os)
         {
-            triangle.subsegs[orient] = os;
+            tri.subsegs[orient] = os;
             os.seg.triangles[os.orient] = this;
         }
 
         /// <summary>
         /// Dissolve a bond (from the triangle side).
         /// </summary>
-        public void SegDissolve()
+        internal void SegDissolve()
         {
-            triangle.subsegs[orient].seg = Segment.Empty;
+            tri.subsegs[orient].seg = Segment.Empty;
+        }
+
+        /// <summary>
+        /// Check a triangle's deallocation.
+        /// </summary>
+        internal static bool IsDead(Triangle tria)
+        {
+            return tria.neighbors[0].tri == null;
+        }
+
+        /// <summary>
+        /// Set a triangle's deallocation.
+        /// </summary>
+        internal static void Kill(Triangle tri)
+        {
+            tri.neighbors[0].tri = null;
+            tri.neighbors[2].tri = null;
         }
 
         #endregion

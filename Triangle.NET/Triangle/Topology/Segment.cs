@@ -59,8 +59,8 @@ namespace TriangleNet.Topology
 
             // Initialize the two adjoining triangles to be "outer space."
             triangles = new Otri[2];
-            triangles[0].triangle = Triangle.Empty;
-            triangles[1].triangle = Triangle.Empty;
+            triangles[0].tri = Triangle.Empty;
+            triangles[1].tri = Triangle.Empty;
 
             // Set the boundary marker to zero.
             boundary = 0;
@@ -107,7 +107,7 @@ namespace TriangleNet.Topology
         /// </summary>
         public ITriangle GetTriangle(int index)
         {
-            return triangles[index].triangle.id == Triangle.EmptyID ? null : triangles[index].triangle;
+            return triangles[index].tri.id == Triangle.EmptyID ? null : triangles[index].tri;
         }
 
         public override int GetHashCode()

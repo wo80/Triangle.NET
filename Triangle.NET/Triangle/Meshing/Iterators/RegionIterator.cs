@@ -46,7 +46,7 @@ namespace TriangleNet.Meshing.Iterators
             {
                 // WARNING: Don't use foreach, viri list gets modified.
 
-                testtri.triangle = viri[i];
+                testtri.tri = viri[i];
                 // A triangle is marked as infected by messing with one of its pointers
                 // to subsegments, setting it to an illegal value.  Hence, we have to
                 // temporarily uninfect this triangle so that we can examine its
@@ -55,7 +55,7 @@ namespace TriangleNet.Meshing.Iterators
                 testtri.Uninfect();
 
                 // Apply function.
-                func(testtri.triangle);
+                func(testtri.tri);
 
                 // Check each of the triangle's three neighbors.
                 for (testtri.orient = 0; testtri.orient < 3; testtri.orient++)
@@ -63,16 +63,16 @@ namespace TriangleNet.Meshing.Iterators
                     // Find the neighbor.
                     testtri.Sym(ref neighbor);
                     // Check for a subsegment between the triangle and its neighbor.
-                    testtri.SegPivot(ref neighborsubseg);
+                    testtri.Pivot(ref neighborsubseg);
                     // Make sure the neighbor exists, is not already infected, and
                     // isn't protected by a subsegment.
-                    if ((neighbor.triangle.id != Triangle.EmptyID) && !neighbor.IsInfected()
+                    if ((neighbor.tri.id != Triangle.EmptyID) && !neighbor.IsInfected()
                         && (neighborsubseg.seg == Segment.Empty))
                     {
                         // Infect the neighbor.
                         neighbor.Infect();
                         // Ensure that the neighbor's neighbors will be infected.
-                        viri.Add(neighbor.triangle);
+                        viri.Add(neighbor.tri);
                     }
                 }
                 // Remark the triangle as infected, so it doesn't get added to the

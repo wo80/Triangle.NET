@@ -28,7 +28,7 @@ namespace TriangleNet.Meshing.Data
 
         public override string ToString()
         {
-            return String.Format("B-TID {0}", poortri.triangle.hash);
+            return String.Format("B-TID {0}", poortri.tri.hash);
         }
     }
 }

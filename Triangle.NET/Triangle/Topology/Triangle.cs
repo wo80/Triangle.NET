@@ -51,9 +51,9 @@ namespace TriangleNet.Topology
             // will eventually be changed by various bonding operations, but their
             // values don't really matter, as long as they can legally be
             // dereferenced.
-            Empty.neighbors[0].triangle = Empty;
-            Empty.neighbors[1].triangle = Empty;
-            Empty.neighbors[2].triangle = Empty;
+            Empty.neighbors[0].tri = Empty;
+            Empty.neighbors[1].tri = Empty;
+            Empty.neighbors[2].tri = Empty;
 
             if (Segment.Empty == null)
             {
@@ -83,6 +83,9 @@ namespace TriangleNet.Topology
         internal double area;
         internal bool infected;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Triangle" /> class.
+        /// </summary>
         public Triangle()
         {
             // Three NULL vertices.
@@ -96,9 +99,9 @@ namespace TriangleNet.Topology
 
             // Initialize the three adjoining triangles to be "outer space".
             neighbors = new Otri[3];
-            neighbors[0].triangle = Empty;
-            neighbors[1].triangle = Empty;
-            neighbors[2].triangle = Empty;
+            neighbors[0].tri = Empty;
+            neighbors[1].tri = Empty;
+            neighbors[2].tri = Empty;
 
             // area = -1.0;
         }
@@ -131,19 +134,19 @@ namespace TriangleNet.Topology
         }
 
         /// <summary>
-        /// Gets the specified corners vertex.
-        /// </summary>
-        public Vertex GetVertex(int index)
-        {
-            return this.vertices[index]; // TODO: Check range?
-        }
-
-        /// <summary>
         /// Gets the third corners vertex id.
         /// </summary>
         public int P2
         {
             get { return this.vertices[2] == null ? -1 : this.vertices[2].id; }
+        }
+
+        /// <summary>
+        /// Gets the specified corners vertex.
+        /// </summary>
+        public Vertex GetVertex(int index)
+        {
+            return this.vertices[index]; // TODO: Check range?
         }
 
         public bool SupportsNeighbors
@@ -156,7 +159,7 @@ namespace TriangleNet.Topology
         /// </summary>
         public int N0
         {
-            get { return this.neighbors[0].triangle.id; }
+            get { return this.neighbors[0].tri.id; }
         }
 
         /// <summary>
@@ -164,7 +167,7 @@ namespace TriangleNet.Topology
         /// </summary>
         public int N1
         {
-            get { return this.neighbors[1].triangle.id; }
+            get { return this.neighbors[1].tri.id; }
         }
 
         /// <summary>
@@ -172,7 +175,7 @@ namespace TriangleNet.Topology
         /// </summary>
         public int N2
         {
-            get { return this.neighbors[2].triangle.id; }
+            get { return this.neighbors[2].tri.id; }
         }
 
         /// <summary>
@@ -182,7 +185,7 @@ namespace TriangleNet.Topology
         /// <returns>The neigbbor opposite of vertex with given index.</returns>
         public ITriangle GetNeighbor(int index)
         {
-            return neighbors[index].triangle.id == EmptyID ? null : neighbors[index].triangle;
+            return neighbors[index].tri.id == EmptyID ? null : neighbors[index].tri;
         }
 
         /// <summary>

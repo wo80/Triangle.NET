@@ -22,25 +22,23 @@ namespace MeshExplorer.Topology
             lbPosition.Text = String.Format(nfi, "X: {0:0.0}, Y: {1:0.0}", p.X, p.Y);
         }
 
-        public void SetTriangle(OrientedTriangle tri)
+        public void SetTriangle(ITriangle tri)
         {
-            var t = tri.Triangle;
-
-            if (t != null)
+            if (tri != null)
             {
-                lbTriangle.Text = t.ID.ToString();
+                lbTriangle.Text = tri.ID.ToString();
 
-                lbV0.Text = t.P0.ToString();
-                lbV1.Text = t.P1.ToString();
-                lbV2.Text = t.P2.ToString();
+                lbV0.Text = tri.P0.ToString();
+                lbV1.Text = tri.P1.ToString();
+                lbV2.Text = tri.P2.ToString();
 
-                lbN0.Text = t.N0.ToString();
-                lbN1.Text = t.N1.ToString();
-                lbN2.Text = t.N2.ToString();
+                lbN0.Text = tri.N0.ToString();
+                lbN1.Text = tri.N1.ToString();
+                lbN2.Text = tri.N2.ToString();
 
-                lbS0.Text = GetSegmentString(t.GetSegment(0));
-                lbS1.Text = GetSegmentString(t.GetSegment(1));
-                lbS2.Text = GetSegmentString(t.GetSegment(2));
+                lbS0.Text = GetSegmentString(tri.GetSegment(0));
+                lbS1.Text = GetSegmentString(tri.GetSegment(1));
+                lbS2.Text = GetSegmentString(tri.GetSegment(2));
             }
             else
             {

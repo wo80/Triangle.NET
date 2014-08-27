@@ -35,7 +35,7 @@ namespace TriangleNet.Meshing.Algorithm
 
             foreach (var v in mesh.vertices.Values)
             {
-                starttri.triangle = Triangle.Empty;
+                starttri.tri = Triangle.Empty;
                 Osub tmp = default(Osub);
                 if (mesh.InsertVertex(v, ref starttri, ref tmp, false, false) == InsertVertexResult.Duplicate)
                 {
@@ -115,28 +115,28 @@ namespace TriangleNet.Meshing.Algorithm
             bool noPoly = !mesh.behavior.Poly;
 
             // Find a boundary triangle.
-            nextedge.triangle = Triangle.Empty;
+            nextedge.tri = Triangle.Empty;
             nextedge.orient = 0;
-            nextedge.SymSelf();
+            nextedge.Sym();
             // Mark a place to stop.
             nextedge.Lprev(ref finaledge);
-            nextedge.LnextSelf();
-            nextedge.SymSelf();
+            nextedge.Lnext();
+            nextedge.Sym();
             // Find a triangle (on the boundary of the vertex set) that isn't
             // a bounding box triangle.
             nextedge.Lprev(ref searchedge);
-            searchedge.SymSelf();
+            searchedge.Sym();
             // Check whether nextedge is another boundary triangle
             // adjacent to the first one.
             nextedge.Lnext(ref checkedge);
-            checkedge.SymSelf();
-            if (checkedge.triangle.id == Triangle.EmptyID)
+            checkedge.Sym();
+            if (checkedge.tri.id == Triangle.EmptyID)
             {
                 // Go on to the next triangle.  There are only three boundary
                 // triangles, and this next triangle cannot be the third one,
                 // so it's safe to stop here.
-                searchedge.LprevSelf();
-                searchedge.SymSelf();
+                searchedge.Lprev();
+                searchedge.Sym();
             }
             // Find a new boundary edge to search from, as the current search
             // edge lies on a bounding box triangle and will be deleted.
@@ -146,7 +146,7 @@ namespace TriangleNet.Meshing.Algorithm
             {
                 hullsize++;
                 nextedge.Lprev(ref dissolveedge);
-                dissolveedge.SymSelf();
+                dissolveedge.Sym();
                 // If not using a PSLG, the vertices should be marked now.
                 // (If using a PSLG, markhull() will do the job.)
                 if (noPoly)
@@ -155,7 +155,7 @@ namespace TriangleNet.Meshing.Algorithm
                     // vertices are collinear, and thus all the triangles are part of
                     // the bounding box.  Otherwise, the setvertexmark() call below
                     // will cause a bad pointer reference.
-                    if (dissolveedge.triangle.id != Triangle.EmptyID)
+                    if (dissolveedge.tri.id != Triangle.EmptyID)
                     {
                         markorg = dissolveedge.Org();
                         if (markorg.mark == 0)
@@ -169,15 +169,15 @@ namespace TriangleNet.Meshing.Algorithm
                 nextedge.Lnext(ref deadtriangle);
                 deadtriangle.Sym(ref nextedge);
                 // Get rid of the bounding box triangle.
-                mesh.TriangleDealloc(deadtriangle.triangle);
+                mesh.TriangleDealloc(deadtriangle.tri);
                 // Do we need to turn the corner?
-                if (nextedge.triangle.id == Triangle.EmptyID)
+                if (nextedge.tri.id == Triangle.EmptyID)
                 {
                     // Turn the corner.
                     dissolveedge.Copy(ref nextedge);
                 }
             }
-            mesh.TriangleDealloc(finaledge.triangle);
+            mesh.TriangleDealloc(finaledge.tri);
 
             return hullsize;
         }

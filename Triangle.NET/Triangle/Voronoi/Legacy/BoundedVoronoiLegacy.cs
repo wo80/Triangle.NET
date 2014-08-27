@@ -130,7 +130,7 @@ namespace TriangleNet.Voronoi.Legacy
             // Compue triangle circumcenters
             foreach (var item in mesh.triangles.Values)
             {
-                tri.triangle = item;
+                tri.tri = item;
 
                 pt = RobustPredicates.FindCircumcenter(tri.Org(), tri.Dest(), tri.Apex(), ref xi, ref eta);
                 pt.id = item.id;
@@ -175,51 +175,51 @@ namespace TriangleNet.Voronoi.Legacy
                 // Push fe into triangles
                 e.seg = ss;
                 e.orient = 0;
-                e.TriPivot(ref f);
+                e.Pivot(ref f);
 
-                if (f.triangle.id != Triangle.EmptyID && !f.triangle.infected)
+                if (f.tri.id != Triangle.EmptyID && !f.tri.infected)
                 {
-                    triangles.Push(f.triangle);
+                    triangles.Push(f.tri);
                 }
 
-                e.SymSelf();
-                e.TriPivot(ref f);
+                e.Sym();
+                e.Pivot(ref f);
 
-                if (f.triangle.id != Triangle.EmptyID && !f.triangle.infected)
+                if (f.tri.id != Triangle.EmptyID && !f.tri.infected)
                 {
-                    triangles.Push(f.triangle);
+                    triangles.Push(f.tri);
                 }
 
                 // while triangles is non-empty
                 while (triangles.Count > 0)
                 {
                     // Pop f from stack triangles
-                    f.triangle = triangles.Pop();
+                    f.tri = triangles.Pop();
                     f.orient = 0;
 
                     // if f is blinded by e (use P) then
                     if (TriangleIsBlinded(ref f, ref e))
                     {
                         // Tag f as blinded by e
-                        f.triangle.infected = true;
+                        f.tri.infected = true;
                         blinded++;
 
                         // Store association triangle -> subseg
-                        subsegMap.Add(f.triangle.hash, e.seg);
+                        subsegMap.Add(f.tri.hash, e.seg);
 
                         // for each adjacent triangle f0 to f do
                         for (f.orient = 0; f.orient < 3; f.orient++)
                         {
                             f.Sym(ref f0);
 
-                            f0.SegPivot(ref sub1);
+                            f0.Pivot(ref sub1);
 
                             // if f0 is finite and tagged non-blind & the common edge 
                             // between f and f0 is unconstrained then
-                            if (f0.triangle.id != Triangle.EmptyID && !f0.triangle.infected && sub1.seg == Segment.Empty)
+                            if (f0.tri.id != Triangle.EmptyID && !f0.tri.infected && sub1.seg == Segment.Empty)
                             {
                                 // Push f0 into triangles.
-                                triangles.Push(f0.triangle);
+                                triangles.Push(f0.tri);
                             }
                         }
                     }
@@ -246,7 +246,7 @@ namespace TriangleNet.Voronoi.Legacy
             Vertex sorg = seg.Org();
             Vertex sdest = seg.Dest();
 
-            c = this.points[tri.triangle.id];
+            c = this.points[tri.tri.id];
 
             if (SegmentsIntersect(sorg, sdest, c, torg, out pt, true))
             {
@@ -301,19 +301,19 @@ namespace TriangleNet.Voronoi.Legacy
             do
             {
                 // Call Lffnext the line going through the circumcenters of f and f_next
-                cc_f = this.points[f.triangle.id];
-                cc_f_next = this.points[f_next.triangle.id];
+                cc_f = this.points[f.tri.id];
+                cc_f_next = this.points[f_next.tri.id];
 
                 // if f is tagged non-blind then
-                if (!f.triangle.infected)
+                if (!f.tri.infected)
                 {
                     // Insert the circumcenter of f into P
                     vpoints.Add(cc_f);
 
-                    if (f_next.triangle.infected)
+                    if (f_next.tri.infected)
                     {
                         // Call S_fnext the constrained edge blinding f_next
-                        sfn.seg = subsegMap[f_next.triangle.hash];
+                        sfn.seg = subsegMap[f_next.tri.hash];
 
                         // Insert point Lf,f_next /\ Sf_next into P
                         if (SegmentsIntersect(sfn.Org(), sfn.Dest(), cc_f, cc_f_next, out p, true))
@@ -327,10 +327,10 @@ namespace TriangleNet.Voronoi.Legacy
                 else
                 {
                     // Call Sf the constrained edge blinding f
-                    sf.seg = subsegMap[f.triangle.hash];
+                    sf.seg = subsegMap[f.tri.hash];
 
                     // if f_next is tagged non-blind then
-                    if (!f_next.triangle.infected)
+                    if (!f_next.tri.infected)
                     {
                         // Insert point Lf,f_next /\ Sf into P
                         if (SegmentsIntersect(sf.Org(), sf.Dest(), cc_f, cc_f_next, out p, true))
@@ -343,7 +343,7 @@ namespace TriangleNet.Voronoi.Legacy
                     else
                     {
                         // Call Sf_next the constrained edge blinding f_next
-                        sfn.seg = subsegMap[f_next.triangle.hash];
+                        sfn.seg = subsegMap[f_next.tri.hash];
 
                         // if Sf != Sf_next then
                         if (!sf.Equal(sfn))
@@ -370,7 +370,7 @@ namespace TriangleNet.Voronoi.Legacy
                 f_next.Copy(ref f);
 
                 // Call f_next the next triangle counterclockwise around x
-                f_next.OnextSelf();
+                f_next.Onext();
             }
             while (!f.Equal(f_init));
 
@@ -413,20 +413,20 @@ namespace TriangleNet.Voronoi.Legacy
             f_init.Oprev(ref f_prev);
 
             // Is the border to the left?
-            if (f_prev.triangle.id != Triangle.EmptyID)
+            if (f_prev.tri.id != Triangle.EmptyID)
             {
                 // Go clockwise until we reach the border (or the initial triangle)
-                while (f_prev.triangle.id != Triangle.EmptyID && !f_prev.Equal(f_init))
+                while (f_prev.tri.id != Triangle.EmptyID && !f_prev.Equal(f_init))
                 {
                     f_prev.Copy(ref f);
-                    f_prev.OprevSelf();
+                    f_prev.Oprev();
                 }
 
                 f.Copy(ref f_init);
                 f.Onext(ref f_next);
             }
 
-            if (f_prev.triangle.id == Triangle.EmptyID)
+            if (f_prev.tri.id == Triangle.EmptyID)
             {
                 // For vertices on the domain boundaray, add the vertex. For 
                 // internal boundaries don't add it.
@@ -450,11 +450,11 @@ namespace TriangleNet.Voronoi.Legacy
             do
             {
                 // Call Lffnext the line going through the circumcenters of f and f_next
-                cc_f = this.points[f.triangle.id];
+                cc_f = this.points[f.tri.id];
 
-                if (f_next.triangle.id == Triangle.EmptyID)
+                if (f_next.tri.id == Triangle.EmptyID)
                 {
-                    if (!f.triangle.infected)
+                    if (!f.tri.infected)
                     {
                         // Add last circumcenter
                         vpoints.Add(cc_f);
@@ -473,18 +473,18 @@ namespace TriangleNet.Voronoi.Legacy
                     break;
                 }
 
-                cc_f_next = this.points[f_next.triangle.id];
+                cc_f_next = this.points[f_next.tri.id];
 
                 // if f is tagged non-blind then
-                if (!f.triangle.infected)
+                if (!f.tri.infected)
                 {
                     // Insert the circumcenter of f into P
                     vpoints.Add(cc_f);
 
-                    if (f_next.triangle.infected)
+                    if (f_next.tri.infected)
                     {
                         // Call S_fnext the constrained edge blinding f_next
-                        sfn.seg = subsegMap[f_next.triangle.hash];
+                        sfn.seg = subsegMap[f_next.tri.hash];
 
                         // Insert point Lf,f_next /\ Sf_next into P
                         if (SegmentsIntersect(sfn.Org(), sfn.Dest(), cc_f, cc_f_next, out p, true))
@@ -498,13 +498,13 @@ namespace TriangleNet.Voronoi.Legacy
                 else
                 {
                     // Call Sf the constrained edge blinding f
-                    sf.seg = subsegMap[f.triangle.hash];
+                    sf.seg = subsegMap[f.tri.hash];
 
                     sorg = sf.Org();
                     sdest = sf.Dest();
 
                     // if f_next is tagged non-blind then
-                    if (!f_next.triangle.infected)
+                    if (!f_next.tri.infected)
                     {
                         tdest = f.Dest();
                         tapex = f.Apex();
@@ -534,7 +534,7 @@ namespace TriangleNet.Voronoi.Legacy
                     else
                     {
                         // Call Sf_next the constrained edge blinding f_next
-                        sfn.seg = subsegMap[f_next.triangle.hash];
+                        sfn.seg = subsegMap[f_next.tri.hash];
 
                         // if Sf != Sf_next then
                         if (!sf.Equal(sfn))
@@ -577,7 +577,7 @@ namespace TriangleNet.Voronoi.Legacy
                 f_next.Copy(ref f);
 
                 // Call f_next the next triangle counterclockwise around x
-                f_next.OnextSelf();
+                f_next.Onext();
             }
             while (!f.Equal(f_init));
 
