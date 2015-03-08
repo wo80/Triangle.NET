@@ -156,11 +156,75 @@ namespace TriangleNet
 
         #endregion
 
+        #region "Outer space" variables
+
+        internal const int DUMMY = -1;
+
+        // The triangle that fills "outer space," called 'dummytri', is pointed to
+        // by every triangle and subsegment on a boundary (be it outer or inner) of
+        // the triangulation. Also, 'dummytri' points to one of the triangles on
+        // the convex hull (until the holes and concavities are carved), making it
+        // possible to find a starting triangle for point location.
+
+        // 'dummytri' and 'dummysub' are generally required to fulfill only a few
+        // invariants: their vertices must remain NULL and 'dummytri' must always
+        // be bonded (at offset zero) to some triangle on the convex hull of the
+        // mesh, via a boundary edge. Otherwise, the connections of 'dummytri' and
+        // 'dummysub' may change willy-nilly. This makes it possible to avoid
+        // writing a good deal of special-case code (in the edge flip, for example)
+        // for dealing with the boundary of the mesh, places where no subsegment is
+        // present, and so forth.  Other entities are frequently bonded to
+        // 'dummytri' and 'dummysub' as if they were real mesh entities, with no
+        // harm done.
+
+        internal Triangle dummytri;
+
+        // Set up 'dummysub', the omnipresent subsegment pointed to by any
+        // triangle side or subsegment end that isn't attached to a real
+        // subsegment.
+
+        internal Segment dummysub;
+
+        private void Initialize()
+        {
+            dummysub = new Segment();
+            dummysub.hash = DUMMY;
+
+            // Initialize the two adjoining subsegments to be the omnipresent
+            // subsegment. These will eventually be changed by various bonding
+            // operations, but their values don't really matter, as long as they
+            // can legally be dereferenced.
+            dummysub.subsegs[0].seg = dummysub;
+            dummysub.subsegs[1].seg = dummysub;
+
+            // Set up 'dummytri', the 'triangle' that occupies "outer space."
+            dummytri = new Triangle();
+            dummytri.hash = dummytri.id = DUMMY;
+
+            // Initialize the three adjoining triangles to be "outer space." These
+            // will eventually be changed by various bonding operations, but their
+            // values don't really matter, as long as they can legally be
+            // dereferenced.
+            dummytri.neighbors[0].tri = dummytri;
+            dummytri.neighbors[1].tri = dummytri;
+            dummytri.neighbors[2].tri = dummytri;
+
+            // Initialize the three adjoining subsegments of 'dummytri' to be
+            // the omnipresent subsegment.
+            dummytri.subsegs[0].seg = dummysub;
+            dummytri.subsegs[1].seg = dummysub;
+            dummytri.subsegs[2].seg = dummysub;
+        }
+
+        #endregion
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Mesh" /> class.
         /// </summary>
         public Mesh()
         {
+            Initialize();
+
             logger = Log.Instance;
 
             behavior = new Behavior();
@@ -590,8 +654,16 @@ namespace TriangleNet
         internal void MakeTriangle(ref Otri newotri)
         {
             Triangle tri = new Triangle();
-            tri.hash = this.hash_tri++;
-            tri.id = tri.hash;
+
+            tri.hash = tri.id = this.hash_tri++;
+
+            tri.subsegs[0].seg = dummysub;
+            tri.subsegs[1].seg = dummysub;
+            tri.subsegs[2].seg = dummysub;
+
+            tri.neighbors[0].tri = dummytri;
+            tri.neighbors[1].tri = dummytri;
+            tri.neighbors[2].tri = dummytri;
 
             newotri.tri = tri;
             newotri.orient = 0;
@@ -606,7 +678,14 @@ namespace TriangleNet
         internal void MakeSegment(ref Osub newsubseg)
         {
             Segment seg = new Segment();
+
             seg.hash = this.hash_seg++;
+
+            seg.subsegs[0].seg = dummysub;
+            seg.subsegs[1].seg = dummysub;
+
+            seg.triangles[0].tri = dummytri;
+            seg.triangles[1].tri = dummytri;
 
             newsubseg.seg = seg;
             newsubseg.orient = 0;
@@ -702,12 +781,13 @@ namespace TriangleNet
             {
                 // Find the location of the vertex to be inserted.  Check if a good
                 // starting triangle has already been provided by the caller.
-                if (searchtri.tri.id == Triangle.EmptyID)
+                if (searchtri.tri.id == DUMMY)
                 {
                     // Find a boundary triangle.
-                    horiz.tri = Triangle.Empty;
+                    horiz.tri = dummytri;
                     horiz.orient = 0;
                     horiz.Sym();
+
                     // Search for a triangle containing 'newvertex'.
                     intersect = locator.Locate(newvertex, ref horiz);
                 }
@@ -741,7 +821,7 @@ namespace TriangleNet
                 {
                     // Check whether the vertex falls on a subsegment.
                     horiz.Pivot(ref brokensubseg);
-                    if (brokensubseg.seg != Segment.Empty)
+                    if (brokensubseg.seg.hash != DUMMY)
                     {
                         // The vertex falls on a subsegment, and hence will not be inserted.
                         if (segmentflaws)
@@ -752,7 +832,7 @@ namespace TriangleNet
                                 // This subsegment may be split only if it is an
                                 // internal boundary.
                                 horiz.Sym(ref testtri);
-                                enq = testtri.tri.id != Triangle.EmptyID;
+                                enq = testtri.tri.id != DUMMY;
                             }
                             if (enq)
                             {
@@ -779,7 +859,7 @@ namespace TriangleNet
                 botright.Sym(ref botrcasing);
                 horiz.Sym(ref topright);
                 // Is there a second triangle?  (Or does this edge lie on a boundary?)
-                mirrorflag = topright.tri.id != Triangle.EmptyID;
+                mirrorflag = topright.tri.id != DUMMY;
                 if (mirrorflag)
                 {
                     topright.Lnext();
@@ -835,18 +915,18 @@ namespace TriangleNet
                 {
                     botright.Pivot(ref botrsubseg);
 
-                    if (botrsubseg.seg != Segment.Empty)
+                    if (botrsubseg.seg.hash != DUMMY)
                     {
-                        botright.SegDissolve();
+                        botright.SegDissolve(dummysub);
                         newbotright.SegBond(ref botrsubseg);
                     }
 
                     if (mirrorflag)
                     {
                         topright.Pivot(ref toprsubseg);
-                        if (toprsubseg.seg != Segment.Empty)
+                        if (toprsubseg.seg.hash != DUMMY)
                         {
-                            topright.SegDissolve();
+                            topright.SegDissolve(dummysub);
                             newtopright.SegBond(ref toprsubseg);
                         }
                     }
@@ -942,15 +1022,15 @@ namespace TriangleNet
                 if (checksegments)
                 {
                     botleft.Pivot(ref botlsubseg);
-                    if (botlsubseg.seg != Segment.Empty)
+                    if (botlsubseg.seg.hash != DUMMY)
                     {
-                        botleft.SegDissolve();
+                        botleft.SegDissolve(dummysub);
                         newbotleft.SegBond(ref botlsubseg);
                     }
                     botright.Pivot(ref botrsubseg);
-                    if (botrsubseg.seg != Segment.Empty)
+                    if (botrsubseg.seg.hash != DUMMY)
                     {
-                        botright.SegDissolve();
+                        botright.SegDissolve(dummysub);
                         newbotright.SegBond(ref botrsubseg);
                     }
                 }
@@ -992,7 +1072,7 @@ namespace TriangleNet
                 {
                     // Check for a subsegment, which cannot be flipped.
                     horiz.Pivot(ref checksubseg);
-                    if (checksubseg.seg != Segment.Empty)
+                    if (checksubseg.seg.hash != DUMMY)
                     {
                         // The edge is a subsegment and cannot be flipped.
                         doflip = false;
@@ -1012,7 +1092,7 @@ namespace TriangleNet
                 {
                     // Check if the edge is a boundary edge.
                     horiz.Sym(ref top);
-                    if (top.tri.id == Triangle.EmptyID)
+                    if (top.tri.id == DUMMY)
                     {
                         // The edge is a boundary edge and cannot be flipped.
                         doflip = false;
@@ -1083,33 +1163,33 @@ namespace TriangleNet
                                 botleft.Pivot(ref botlsubseg);
                                 botright.Pivot(ref botrsubseg);
                                 topright.Pivot(ref toprsubseg);
-                                if (toplsubseg.seg == Segment.Empty)
+                                if (toplsubseg.seg.hash == DUMMY)
                                 {
-                                    topright.SegDissolve();
+                                    topright.SegDissolve(dummysub);
                                 }
                                 else
                                 {
                                     topright.SegBond(ref toplsubseg);
                                 }
-                                if (botlsubseg.seg == Segment.Empty)
+                                if (botlsubseg.seg.hash == DUMMY)
                                 {
-                                    topleft.SegDissolve();
+                                    topleft.SegDissolve(dummysub);
                                 }
                                 else
                                 {
                                     topleft.SegBond(ref botlsubseg);
                                 }
-                                if (botrsubseg.seg == Segment.Empty)
+                                if (botrsubseg.seg.hash == DUMMY)
                                 {
-                                    botleft.SegDissolve();
+                                    botleft.SegDissolve(dummysub);
                                 }
                                 else
                                 {
                                     botleft.SegBond(ref botrsubseg);
                                 }
-                                if (toprsubseg.seg == Segment.Empty)
+                                if (toprsubseg.seg.hash == DUMMY)
                                 {
-                                    botright.SegDissolve();
+                                    botright.SegDissolve(dummysub);
                                 }
                                 else
                                 {
@@ -1175,7 +1255,7 @@ namespace TriangleNet
                     // Check for finishing a complete revolution about the new vertex, or
                     // falling outside of the triangulation. The latter will happen when
                     // a vertex is inserted at a boundary.
-                    if ((leftvertex == first) || (testtri.tri.id == Triangle.EmptyID))
+                    if ((leftvertex == first) || (testtri.tri.id == DUMMY))
                     {
                         // We're done. Return a triangle whose origin is the new vertex.
                         horiz.Lnext(ref searchtri);
@@ -1221,7 +1301,7 @@ namespace TriangleNet
             }
             // Check if there's already a subsegment here.
             tri.Pivot(ref newsubseg);
-            if (newsubseg.seg == Segment.Empty)
+            if (newsubseg.seg.hash == DUMMY)
             {
                 // Make new subsegment and initialize its vertices.
                 MakeSegment(ref newsubseg);
@@ -1306,7 +1386,7 @@ namespace TriangleNet
 
             // SELF CHECK
 
-            //if (top.triangle.id == Triangle.EmptyID)
+            //if (top.triangle.id == DUMMY)
             //{
             //    logger.Error("Attempt to flip on boundary.", "Mesh.Flip()");
             //    flipedge.LnextSelf();
@@ -1349,36 +1429,36 @@ namespace TriangleNet
                 botright.Pivot(ref botrsubseg);
                 topright.Pivot(ref toprsubseg);
 
-                if (toplsubseg.seg == Segment.Empty)
+                if (toplsubseg.seg.hash == DUMMY)
                 {
-                    topright.SegDissolve();
+                    topright.SegDissolve(dummysub);
                 }
                 else
                 {
                     topright.SegBond(ref toplsubseg);
                 }
 
-                if (botlsubseg.seg == Segment.Empty)
+                if (botlsubseg.seg.hash == DUMMY)
                 {
-                    topleft.SegDissolve();
+                    topleft.SegDissolve(dummysub);
                 }
                 else
                 {
                     topleft.SegBond(ref botlsubseg);
                 }
 
-                if (botrsubseg.seg == Segment.Empty)
+                if (botrsubseg.seg.hash == DUMMY)
                 {
-                    botleft.SegDissolve();
+                    botleft.SegDissolve(dummysub);
                 }
                 else
                 {
                     botleft.SegBond(ref botrsubseg);
                 }
 
-                if (toprsubseg.seg == Segment.Empty)
+                if (toprsubseg.seg.hash == DUMMY)
                 {
-                    botright.SegDissolve();
+                    botright.SegDissolve(dummysub);
                 }
                 else
                 {
@@ -1451,33 +1531,33 @@ namespace TriangleNet
                 botleft.Pivot(ref botlsubseg);
                 botright.Pivot(ref botrsubseg);
                 topright.Pivot(ref toprsubseg);
-                if (toplsubseg.seg == Segment.Empty)
+                if (toplsubseg.seg.hash == DUMMY)
                 {
-                    botleft.SegDissolve();
+                    botleft.SegDissolve(dummysub);
                 }
                 else
                 {
                     botleft.SegBond(ref toplsubseg);
                 }
-                if (botlsubseg.seg == Segment.Empty)
+                if (botlsubseg.seg.hash == DUMMY)
                 {
-                    botright.SegDissolve();
+                    botright.SegDissolve(dummysub);
                 }
                 else
                 {
                     botright.SegBond(ref botlsubseg);
                 }
-                if (botrsubseg.seg == Segment.Empty)
+                if (botrsubseg.seg.hash == DUMMY)
                 {
-                    topright.SegDissolve();
+                    topright.SegDissolve(dummysub);
                 }
                 else
                 {
                     topright.SegBond(ref botrsubseg);
                 }
-                if (toprsubseg.seg == Segment.Empty)
+                if (toprsubseg.seg.hash == DUMMY)
                 {
-                    topleft.SegDissolve();
+                    topleft.SegDissolve(dummysub);
                 }
                 else
                 {
@@ -1677,12 +1757,12 @@ namespace TriangleNet
             deltri.Bond(ref leftcasing);
             deltriright.Bond(ref rightcasing);
             lefttri.Pivot(ref leftsubseg);
-            if (leftsubseg.seg != Segment.Empty)
+            if (leftsubseg.seg.hash != DUMMY)
             {
                 deltri.SegBond(ref leftsubseg);
             }
             righttri.Pivot(ref rightsubseg);
-            if (rightsubseg.seg != Segment.Empty)
+            if (rightsubseg.seg.hash != DUMMY)
             {
                 deltriright.SegBond(ref rightsubseg);
             }
@@ -1775,7 +1855,7 @@ namespace TriangleNet
                     TriangleDealloc(botright.tri);
 
                     fliptri.Sym(ref gluetri);
-                    if (gluetri.tri.id != Triangle.EmptyID)
+                    if (gluetri.tri.id != DUMMY)
                     {
                         gluetri.Lnext();
                         gluetri.Dnext(ref topright);

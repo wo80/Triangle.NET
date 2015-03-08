@@ -16,19 +16,24 @@ namespace TriangleNet
     /// </summary>
     class Sampler
     {
-        static Random rand = new Random(DateTime.Now.Millisecond);
+        // Empirically chosen factor.
+        private const int samplefactor = 11;
+
+        private Random rand;
 
         // Number of random samples for point location (at least 1).
-        int samples = 1;
+        private int samples = 1;
 
         // Number of triangles in mesh.
-        int triangleCount = 0;
-
-        // Empirically chosen factor.
-        static int samplefactor = 11;
+        private int triangleCount = 0;
 
         // Keys of the triangle dictionary.
-        int[] keys;
+        private int[] keys;
+
+        public Sampler()
+        {
+            this.rand = new Random(110503);
+        }
 
         /// <summary>
         /// Reset the sampler.

@@ -213,9 +213,9 @@ namespace TriangleNet.Topology
         /// </summary>
         /// <remarks>Note that the other subsegment will still think it's 
         /// connected to this subsegment.</remarks>
-        internal void Dissolve()
+        internal void Dissolve(Segment dummy)
         {
-            seg.subsegs[orient].seg = Segment.Empty;
+            seg.subsegs[orient].seg = dummy;
         }
 
         /// <summary>
@@ -229,9 +229,9 @@ namespace TriangleNet.Topology
         /// <summary>
         /// Dissolve a bond (from the subsegment side).
         /// </summary>
-        internal void TriDissolve()
+        internal void TriDissolve(Triangle dummy)
         {
-            seg.triangles[orient].tri = Triangle.Empty;
+            seg.triangles[orient].tri = dummy;
         }
 
         /// <summary>

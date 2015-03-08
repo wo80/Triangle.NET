@@ -106,7 +106,7 @@ namespace TriangleNet.Meshing
             for (i = 0; i < mesh.vertices.Count; i++)
             {
                 Otri tmp = default(Otri);
-                tmp.tri = Triangle.Empty;
+                tmp.tri = mesh.dummytri;
                 vertexarray[i] = new List<Otri>(3);
                 vertexarray[i].Add(tmp);
             }
@@ -164,7 +164,7 @@ namespace TriangleNet.Meshing
 
                     checktri = nexttri;
 
-                    if (checktri.tri.id != Triangle.EmptyID)
+                    if (checktri.tri.id != Mesh.DUMMY)
                     {
                         tdest = tri.Dest();
                         tapex = tri.Apex();
@@ -192,7 +192,7 @@ namespace TriangleNet.Meshing
                             nexttri = vertexarray[aroundvertex][index];
 
                             checktri = nexttri;
-                        } while (checktri.tri.id != Triangle.EmptyID);
+                        } while (checktri.tri.id != Mesh.DUMMY);
                     }
                 }
 
@@ -276,7 +276,7 @@ namespace TriangleNet.Meshing
                         // occurrence of a triangle on a list can (and does) represent
                         // an edge.  In this way, most edges are represented twice, and
                         // every triangle-subsegment bond is represented once.
-                        while (notfound && (checktri.tri.id != Triangle.EmptyID))
+                        while (notfound && (checktri.tri.id != Mesh.DUMMY))
                         {
                             checkdest = checktri.Dest();
 
@@ -289,7 +289,7 @@ namespace TriangleNet.Meshing
                                 checktri.SegBond(ref subseg);
                                 // Check if this is a boundary edge.
                                 checktri.Sym(ref checkneighbor);
-                                if (checkneighbor.tri.id == Triangle.EmptyID)
+                                if (checkneighbor.tri.id == Mesh.DUMMY)
                                 {
                                     // The next line doesn't insert a subsegment (because there's
                                     // already one there), but it sets the boundary markers of
@@ -321,16 +321,16 @@ namespace TriangleNet.Meshing
                 nexttri = vertexarray[i][index];
                 checktri = nexttri;
 
-                while (checktri.tri.id != Triangle.EmptyID)
+                while (checktri.tri.id != Mesh.DUMMY)
                 {
                     // Find the next triangle in the stack before this
                     // information gets overwritten.
                     index--;
                     nexttri = vertexarray[i][index];
                     // No adjacent subsegment.  (This overwrites the stack info.)
-                    checktri.SegDissolve();
+                    checktri.SegDissolve(mesh.dummysub);
                     checktri.Sym(ref checkneighbor);
-                    if (checkneighbor.tri.id == Triangle.EmptyID)
+                    if (checkneighbor.tri.id == Mesh.DUMMY)
                     {
                         mesh.InsertSubseg(ref checktri, 1);
                         hullsize++;

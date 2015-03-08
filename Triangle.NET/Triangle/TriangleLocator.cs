@@ -196,7 +196,7 @@ namespace TriangleNet
                 {
                     // Check for walking through a subsegment.
                     backtracktri.Pivot(ref checkedge);
-                    if (checkedge.seg != Segment.Empty)
+                    if (checkedge.seg.hash != Mesh.DUMMY)
                     {
                         // Go back to the last triangle.
                         backtracktri.Copy(ref searchtri);
@@ -204,7 +204,7 @@ namespace TriangleNet
                     }
                 }
                 // Check for walking right out of the triangulation.
-                if (searchtri.tri.id == Triangle.EmptyID)
+                if (searchtri.tri.id == Mesh.DUMMY)
                 {
                     // Go back to the last triangle.
                     backtracktri.Copy(ref searchtri);

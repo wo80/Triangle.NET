@@ -79,11 +79,16 @@ namespace TriangleNet.Topology.DCEL
             this.generator = generator;
             this.edge = edge;
             this.bounded = true;
+
+            if (generator != null)
+            {
+                this.id = generator.ID;
+            }
         }
 
         public override string ToString()
         {
-            return string.Format("F-ID {0}", generator == null ? id : generator.id);
+            return string.Format("F-ID {0}", id);
         }
     }
 }

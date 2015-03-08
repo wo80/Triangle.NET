@@ -698,10 +698,12 @@ namespace TriangleNet.Meshing.Algorithm
 
             bool noPoly = !mesh.behavior.Poly;
 
+            var dummytri = mesh.dummytri;
+
             // Find an edge on the convex hull to start point location from.
             startghost.Lprev(ref searchedge);
             searchedge.Sym();
-            Triangle.Empty.neighbors[0] = searchedge;
+            dummytri.neighbors[0] = searchedge;
             // Remove the bounding box and count the convex hull edges.
             startghost.Copy(ref dissolveedge);
             hullsize = 0;
@@ -717,7 +719,7 @@ namespace TriangleNet.Meshing.Algorithm
                 if (noPoly)
                 {
                     // Watch out for the case where all the input vertices are collinear.
-                    if (dissolveedge.tri.id != Triangle.EmptyID)
+                    if (dissolveedge.tri.id != Mesh.DUMMY)
                     {
                         markorg = dissolveedge.Org();
                         if (markorg.mark == 0)
@@ -727,7 +729,7 @@ namespace TriangleNet.Meshing.Algorithm
                     }
                 }
                 // Remove a bounding triangle from a convex hull triangle.
-                dissolveedge.Dissolve();
+                dissolveedge.Dissolve(dummytri);
                 // Find the next bounding triangle.
                 deadtriangle.Sym(ref dissolveedge);
 

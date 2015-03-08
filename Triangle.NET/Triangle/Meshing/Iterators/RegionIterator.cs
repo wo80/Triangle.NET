@@ -66,8 +66,8 @@ namespace TriangleNet.Meshing.Iterators
                     testtri.Pivot(ref neighborsubseg);
                     // Make sure the neighbor exists, is not already infected, and
                     // isn't protected by a subsegment.
-                    if ((neighbor.tri.id != Triangle.EmptyID) && !neighbor.IsInfected()
-                        && (neighborsubseg.seg == Segment.Empty))
+                    if ((neighbor.tri.id != Mesh.DUMMY) && !neighbor.IsInfected()
+                        && (neighborsubseg.seg.hash == Mesh.DUMMY))
                     {
                         // Infect the neighbor.
                         neighbor.Infect();
@@ -104,7 +104,7 @@ namespace TriangleNet.Meshing.Iterators
         /// </summary>
         public void Process(Triangle triangle, Action<Triangle> func)
         {
-            if (triangle.id != Triangle.EmptyID)
+            if (triangle.id != Mesh.DUMMY)
             {
                 // Make sure the triangle under consideration still exists.
                 // It may have been eaten by the virus.

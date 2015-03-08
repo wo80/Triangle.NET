@@ -2364,7 +2364,7 @@ namespace TriangleNet
                 badotri.Sym(ref neighbor);
                 // check if it is the one we are looking for by checking the corners			
                 // first check if the neighbor is nonexistent, since it can be on the border
-                if (neighbor.tri.id != Triangle.EmptyID)
+                if (neighbor.tri.id != Mesh.DUMMY)
                 {
                     // then check if two wanted corners are also in this triangle
                     // take the vertices of the candidate neighbor		

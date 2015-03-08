@@ -396,9 +396,9 @@ namespace TriangleNet.Topology
         /// this triangle. Usually, however, the other triangle is being deleted 
         /// entirely, or bonded to another triangle, so it doesn't matter.
         /// </remarks>
-        internal void Dissolve()
+        internal void Dissolve(Triangle dummy)
         {
-            tri.neighbors[orient].tri = Triangle.Empty;
+            tri.neighbors[orient].tri = dummy;
             tri.neighbors[orient].orient = 0;
         }
 
@@ -454,9 +454,9 @@ namespace TriangleNet.Topology
         /// <summary>
         /// Dissolve a bond (from the triangle side).
         /// </summary>
-        internal void SegDissolve()
+        internal void SegDissolve(Segment dummy)
         {
-            tri.subsegs[orient].seg = Segment.Empty;
+            tri.subsegs[orient].seg = dummy;
         }
 
         /// <summary>

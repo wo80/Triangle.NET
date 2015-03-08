@@ -73,6 +73,7 @@ namespace TriangleNet.IO
                 if (format != null && format.IsSupported(filename))
                 {
                     format.Write(polygon, filename);
+                    return;
                 }
             }
 
@@ -113,6 +114,7 @@ namespace TriangleNet.IO
                 if (format != null && format.IsSupported(filename))
                 {
                     format.Write(mesh, filename);
+                    return;
                 }
             }
 

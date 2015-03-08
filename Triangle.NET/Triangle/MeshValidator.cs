@@ -50,7 +50,8 @@ namespace TriangleNet
                         {
                             if (Log.Verbose)
                             {
-                                logger.Warning("Triangle is flat or inverted.", "MeshValidator.IsConsistent()");
+                                logger.Warning(String.Format("Triangle is flat or inverted (ID {0}).", t.id),
+                                    "MeshValidator.IsConsistent()");
                             }
 
                             horrors++;
@@ -59,7 +60,7 @@ namespace TriangleNet
 
                     // Find the neighboring triangle on this edge.
                     tri.Sym(ref oppotri);
-                    if (oppotri.tri.id != Triangle.EmptyID)
+                    if (oppotri.tri.id != Mesh.DUMMY)
                     {
                         // Check that the triangle's neighbor knows it's a neighbor.
                         oppotri.Sym(ref oppooppotri);
@@ -168,7 +169,7 @@ namespace TriangleNet
                     // adjoining triangle whose pointer is larger (to ensure that
                     // each pair isn't tested twice).
                     shouldbedelaunay = (loop.tri.id < oppotri.tri.id) &&
-                           !Otri.IsDead(oppotri.tri) && (oppotri.tri.id != Triangle.EmptyID) &&
+                           !Otri.IsDead(oppotri.tri) && (oppotri.tri.id != Mesh.DUMMY) &&
                           (org != inf1) && (org != inf2) && (org != inf3) &&
                           (dest != inf1) && (dest != inf2) && (dest != inf3) &&
                           (apex != inf1) && (apex != inf2) && (apex != inf3) &&
@@ -180,7 +181,7 @@ namespace TriangleNet
                         // constrained, so no local Delaunay test should be done.
                         loop.Pivot(ref opposubseg);
 
-                        if (opposubseg.seg != Segment.Empty)
+                        if (opposubseg.seg.hash != Mesh.DUMMY)
                         {
                             shouldbedelaunay = false;
                         }
