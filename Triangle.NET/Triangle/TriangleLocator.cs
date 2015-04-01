@@ -40,6 +40,7 @@ namespace TriangleNet
 
         public void Reset()
         {
+            sampler.Reset();
             recenttri.tri = null; // No triangle has been visited yet.
         }
 
