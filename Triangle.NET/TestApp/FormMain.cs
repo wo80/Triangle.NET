@@ -370,7 +370,16 @@ namespace MeshExplorer
                         "Do you want to import the mesh?", MessageBoxButtons.YesNo) == DialogResult.OK)
                     {
                         input = null;
-                        mesh = FileProcessor.Import(filename);
+
+                        try
+                        {
+                            mesh = FileProcessor.Import(filename);
+                        }
+                        catch (Exception e)
+                        {
+                            DarkMessageBox.Show("Import mesh error", e.Message, MessageBoxButtons.OK);
+                            return false;
+                        }
 
                         if (mesh != null)
                         {

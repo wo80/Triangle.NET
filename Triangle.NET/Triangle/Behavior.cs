@@ -69,7 +69,7 @@ namespace TriangleNet
                 Log.Instance.Warning("Invalid quality option (minimum angle).", "Mesh.Behavior");
             }
 
-            if ((this.maxAngle != 0.0) && this.maxAngle < 90 || this.maxAngle > 180)
+            if ((this.maxAngle != 0.0) && (this.maxAngle < 60 || this.maxAngle > 180))
             {
                 this.maxAngle = 0;
                 this.quality = false;

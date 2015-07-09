@@ -124,7 +124,7 @@ namespace TriangleNet.Meshing.Algorithm
                     fliptri.Onext(ref farrighttri);
                     Check4DeadEvent(ref farrighttri, eventheap, ref heapsize);
 
-                    if (farlefttri.Equal(bottommost))
+                    if (farlefttri.Equals(bottommost))
                     {
                         fliptri.Lprev(ref bottommost);
                     }
@@ -191,7 +191,7 @@ namespace TriangleNet.Meshing.Algorithm
                         righttri.Lprev();
                         lefttri.Bond(ref farlefttri);
                         righttri.Bond(ref farrighttri);
-                        if (!farrightflag && farrighttri.Equal(bottommost))
+                        if (!farrightflag && farrighttri.Equals(bottommost))
                         {
                             lefttri.Copy(ref bottommost);
                         }
@@ -585,7 +585,7 @@ namespace TriangleNet.Meshing.Algorithm
             while (!farrightflag && RightOfHyperbola(ref searchtri, searchvertex))
             {
                 searchtri.Onext();
-                farrightflag = searchtri.Equal(bottommost);
+                farrightflag = searchtri.Equals(bottommost);
             }
             farright = farrightflag;
             return splayroot;
@@ -735,7 +735,7 @@ namespace TriangleNet.Meshing.Algorithm
 
                 // Delete the bounding triangle.
                 mesh.TriangleDealloc(deadtriangle.tri);
-            } while (!dissolveedge.Equal(startghost));
+            } while (!dissolveedge.Equals(startghost));
 
             return hullsize;
         }

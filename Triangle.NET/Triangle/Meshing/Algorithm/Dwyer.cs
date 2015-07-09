@@ -893,7 +893,7 @@ namespace TriangleNet.Meshing.Algorithm
 
                 // Delete the bounding triangle.
                 mesh.TriangleDealloc(deadtriangle.tri);
-            } while (!dissolveedge.Equal(startghost));
+            } while (!dissolveedge.Equals(startghost));
 
             return hullsize;
         }

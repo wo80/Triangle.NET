@@ -23,7 +23,7 @@ namespace MeshExplorer.Generators
             descriptions[1] = "Width:";
             descriptions[2] = "Height:";
 
-            ranges[0] = new int[] { 5, 5000 };
+            ranges[0] = new int[] { 10, 5000 };
             ranges[1] = new int[] { 10, 200 };
             ranges[2] = new int[] { 10, 200 };
         }
@@ -33,9 +33,9 @@ namespace MeshExplorer.Generators
             int numPoints = GetParamValueInt(0, param0);
             numPoints = (numPoints / 10) * 10;
 
-            if (numPoints < 5)
+            if (numPoints < ranges[0][0])
             {
-                numPoints = 5;
+                numPoints = ranges[0][0];
             }
 
             var input = new Polygon(numPoints);

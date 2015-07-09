@@ -349,6 +349,14 @@ namespace TriangleNet.Topology
             ot.orient = orient;
         }
 
+        /// <summary>
+        /// Test for equality of oriented triangles.
+        /// </summary>
+        public bool Equals(Otri ot)
+        {
+            return ((tri == ot.tri) && (orient == ot.orient));
+        }
+
         #endregion
 
         #region Otri primitives (internal)
@@ -400,14 +408,6 @@ namespace TriangleNet.Topology
         {
             tri.neighbors[orient].tri = dummy;
             tri.neighbors[orient].orient = 0;
-        }
-
-        /// <summary>
-        /// Test for equality of oriented triangles.
-        /// </summary>
-        internal bool Equal(Otri ot)
-        {
-            return ((tri == ot.tri) && (orient == ot.orient));
         }
 
         /// <summary>

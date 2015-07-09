@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="QuadTree.cs" company="">
-// Original code by Frank Dockhorn, http://sourceforge.net/projects/quadtreesim/
+// <copyright file="TriangleQuadTree.cs" company="">
+// Original code by Frank Dockhorn, [not available anymore: http://sourceforge.net/projects/quadtreesim/]
 // Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
@@ -14,7 +14,7 @@ namespace TriangleNet.Tools
     /// <summary>
     /// A Quadtree implementation optimized for triangles.
     /// </summary>
-    public class QuadTree
+    public class TriangleQuadTree
     {
         QuadNode root;
 
@@ -24,7 +24,7 @@ namespace TriangleNet.Tools
         internal int maxDepth;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="QuadTree" /> class.
+        /// Initializes a new instance of the <see cref="TriangleQuadTree" /> class.
         /// </summary>
         /// <param name="mesh">Mesh containing triangles.</param>
         /// <param name="maxDepth">The maximum depth of the tree.</param>
@@ -37,7 +37,7 @@ namespace TriangleNet.Tools
         /// A node of the tree will be split, if its level if less than the max depth parameter
         /// AND the number of triangles in the node is greater than the size bound.
         /// </remarks>
-        public QuadTree(Mesh mesh, int maxDepth = 10, int sizeBound = 10)
+        public TriangleQuadTree(Mesh mesh, int maxDepth = 10, int sizeBound = 10)
         {
             this.maxDepth = maxDepth;
             this.sizeBound = sizeBound;
@@ -130,18 +130,18 @@ namespace TriangleNet.Tools
 
             Rectangle bounds;
             Point pivot;
-            QuadTree tree;
+            TriangleQuadTree tree;
             QuadNode[] regions;
             List<int> triangles;
 
             byte bitRegions;
 
-            public QuadNode(Rectangle box, QuadTree tree)
+            public QuadNode(Rectangle box, TriangleQuadTree tree)
                 : this(box, tree, false)
             {
             }
 
-            public QuadNode(Rectangle box, QuadTree tree, bool init)
+            public QuadNode(Rectangle box, TriangleQuadTree tree, bool init)
             {
                 this.tree = tree;
 
@@ -232,7 +232,7 @@ namespace TriangleNet.Tools
             void AddTriangleToRegion(Point[] triangle, int index)
             {
                 bitRegions = 0;
-                if (QuadTree.IsPointInTriangle(pivot, triangle[0], triangle[1], triangle[2]))
+                if (TriangleQuadTree.IsPointInTriangle(pivot, triangle[0], triangle[1], triangle[2]))
                 {
                     AddToRegion(index, SW);
                     AddToRegion(index, SE);

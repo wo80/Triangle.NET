@@ -102,7 +102,7 @@
     <Compile Include="Voronoi\Legacy\BoundedVoronoiLegacy.cs" />
     <Compile Include="Tools\CuthillMcKee.cs" />
     <Compile Include="Voronoi\Legacy\IVoronoi.cs" />
-    <Compile Include="Tools\QuadTree.cs" />
+    <Compile Include="Tools\TriangleQuadTree.cs" />
     <Compile Include="Tools\QualityMeasure.cs" />
     <Compile Include="Meshing\Iterators\RegionIterator.cs" />
     <Compile Include="Tools\Statistic.cs" />

@@ -177,7 +177,7 @@ namespace TriangleNet.Voronoi.Legacy
 
                 region.AddNeighbor(f.tri.id, regions[f.Apex().id]);
 
-                if (f_next.Equal(f_init))
+                if (f_next.Equals(f_init))
                 {
                     // Voronoi cell is complete (bounded case).
                     region.Add(vpoints);

@@ -3429,8 +3429,8 @@ namespace TriangleNet
             {
                 for (i = 0; i < numpolys; i++)
                 {
-                    min = 99999999999999999;
-                    max = -99999999999999999;
+                    min = double.MaxValue;
+                    max = double.MinValue;
                     // compute the minimum and maximum of the
                     // third coordinate of the cross product		
                     for (j = 1; j <= 2 * polys[i][0] - 1; j = j + 2)

@@ -372,7 +372,7 @@ namespace TriangleNet.Voronoi.Legacy
                 // Call f_next the next triangle counterclockwise around x
                 f_next.Onext();
             }
-            while (!f.Equal(f_init));
+            while (!f.Equals(f_init));
 
             // Output: Bounded Voronoi cell of x in counterclockwise order.
             region.Add(vpoints);
@@ -416,7 +416,7 @@ namespace TriangleNet.Voronoi.Legacy
             if (f_prev.tri.id != Mesh.DUMMY)
             {
                 // Go clockwise until we reach the border (or the initial triangle)
-                while (f_prev.tri.id != Mesh.DUMMY && !f_prev.Equal(f_init))
+                while (f_prev.tri.id != Mesh.DUMMY && !f_prev.Equals(f_init))
                 {
                     f_prev.Copy(ref f);
                     f_prev.Oprev();
@@ -579,7 +579,7 @@ namespace TriangleNet.Voronoi.Legacy
                 // Call f_next the next triangle counterclockwise around x
                 f_next.Onext();
             }
-            while (!f.Equal(f_init));
+            while (!f.Equals(f_init));
 
             // Output: Bounded Voronoi cell of x in counterclockwise order.
             region.Add(vpoints);

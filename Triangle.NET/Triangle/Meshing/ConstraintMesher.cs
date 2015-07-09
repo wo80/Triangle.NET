@@ -317,7 +317,7 @@ namespace TriangleNet.Meshing
                     hulltri.Oprev(ref nexttri);
                 }
 
-            } while (!hulltri.Equal(starttri));
+            } while (!hulltri.Equals(starttri));
         }
 
         /// <summary>
@@ -446,7 +446,7 @@ namespace TriangleNet.Meshing
                         testtri.Onext(ref neighbor);
                         // Stop upon reaching a boundary or the starting triangle.
                         while ((neighbor.tri.id != Mesh.DUMMY) &&
-                               (!neighbor.Equal(testtri)))
+                               (!neighbor.Equals(testtri)))
                         {
                             if (neighbor.IsInfected())
                             {
@@ -1179,7 +1179,7 @@ namespace TriangleNet.Meshing
                     nexttri.Copy(ref hulltri);
                     hulltri.Oprev(ref nexttri);
                 }
-            } while (!hulltri.Equal(starttri));
+            } while (!hulltri.Equals(starttri));
         }
 
         #endregion

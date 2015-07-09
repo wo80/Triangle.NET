@@ -1733,7 +1733,7 @@ namespace TriangleNet
             // Count the degree of the vertex being deleted.
             deltri.Onext(ref countingtri);
             edgecount = 1;
-            while (!deltri.Equal(countingtri))
+            while (!deltri.Equals(countingtri))
             {
                 edgecount++;
                 countingtri.Onext();

@@ -12,7 +12,7 @@ namespace MeshExplorer
     public partial class FormTopology : Form
     {
         Mesh mesh;
-        QuadTree tree;
+        TriangleQuadTree tree;
         Otri current;
 
         public FormTopology()
@@ -63,7 +63,7 @@ namespace MeshExplorer
 
             if (tree == null)
             {
-                tree = new QuadTree(mesh, 5, 2);
+                tree = new TriangleQuadTree(mesh, 5, 2);
             }
 
             return tree.Query(p.X, p.Y);

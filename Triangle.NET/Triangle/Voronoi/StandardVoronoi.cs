@@ -6,18 +6,68 @@
 
 namespace TriangleNet.Voronoi
 {
+    using System.Collections.Generic;
     using TriangleNet.Geometry;
+    using TriangleNet.Tools;
+    using TriangleNet.Topology.DCEL;
 
     public class StandardVoronoi : VoronoiBase
     {
         public StandardVoronoi(Mesh mesh)
-            : base(mesh, true)
+            : this(mesh, mesh.bounds)
         {
         }
 
-        private void Intersect(Rectangle box)
+        public StandardVoronoi(Mesh mesh, Rectangle box)
+            : base(mesh, true)
         {
-            // TODO: compute edge intersections with bounding box.
+            // We assume the box to be at least as large as the mesh.
+            box.Expand(mesh.bounds);
+
+            // We explicitly told the base constructor to call the Generate method, so
+            // at this point the basic Voronoi diagram is already created.
+            PostProcess(box);
+        }
+
+        /// <summary>
+        /// Compute edge intersections with bounding box.
+        /// </summary>
+        private void PostProcess(Rectangle box)
+        {
+            var infEdges = new List<HalfEdge>();
+
+            // TODO: save the half-infinite boundary edge in base class
+            // so we don't have to process the complete list here.
+            foreach (var edge in base.edges)
+            {
+                if (edge.next == null)
+                {
+                    infEdges.Add(edge);
+                }
+            }
+
+            foreach (var edge in infEdges)
+            {
+                // The vertices of the infinite edge.
+                var v1 = (Point)edge.origin;
+                var v2 = (Point)edge.twin.origin;
+
+                if (box.Contains(v1) || box.Contains(v2))
+                {
+                    // Move infinite vertex v2 onto the box boundary.
+                    IntersectionHelper.BoxRayIntersection(box, v1, v2, ref v2);
+                }
+                else
+                {
+                    // There is actually no easy way to handle the second case. The two edges
+                    // leaving v1, pointing towards the mesh, don't have to intersect the box
+                    // (the could join with edges of other cells outside the box).
+
+                    // A general intersection algorithm (DCEL <-> Rectangle) is needed, which
+                    // computes intersections with all edges and discards objects outside the
+                    // box.
+                }
+            }
         }
     }
 }

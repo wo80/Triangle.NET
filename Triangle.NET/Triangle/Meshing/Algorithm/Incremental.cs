@@ -147,7 +147,7 @@ namespace TriangleNet.Meshing.Algorithm
             mesh.dummytri.neighbors[0] = searchedge;
 
             hullsize = -2;
-            while (!nextedge.Equal(finaledge))
+            while (!nextedge.Equals(finaledge))
             {
                 hullsize++;
                 nextedge.Lprev(ref dissolveedge);
