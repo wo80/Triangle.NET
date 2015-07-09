@@ -34,19 +34,7 @@ namespace TriangleNet.Voronoi
         /// </summary>
         private void PostProcess(Rectangle box)
         {
-            var infEdges = new List<HalfEdge>();
-
-            // TODO: save the half-infinite boundary edge in base class
-            // so we don't have to process the complete list here.
-            foreach (var edge in base.edges)
-            {
-                if (edge.next == null)
-                {
-                    infEdges.Add(edge);
-                }
-            }
-
-            foreach (var edge in infEdges)
+            foreach (var edge in rays)
             {
                 // The vertices of the infinite edge.
                 var v1 = (Point)edge.origin;
