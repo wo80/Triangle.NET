@@ -615,7 +615,7 @@ namespace TriangleNet
                     p.hash = p.id;
 
                     // Make sure the hash counter gets updated.
-                    hash_vtx = Math.Max(p.hash, hash_vtx);
+                    hash_vtx = Math.Max(p.hash + 1, hash_vtx);
                 }
                 else
                 {
