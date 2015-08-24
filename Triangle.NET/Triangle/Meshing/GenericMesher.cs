@@ -25,7 +25,7 @@ namespace TriangleNet.Meshing
         }
 
         /// <inherit />
-        public IMesh Triangulate(ICollection<Vertex> points)
+        public IMesh Triangulate(IList<Vertex> points)
         {
             return triangulator.Triangulate(points);
         }

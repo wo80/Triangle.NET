@@ -23,7 +23,7 @@ namespace TriangleNet.Meshing.Algorithm
         /// </summary>
         /// <returns>Returns the number of edges on the convex hull of the 
         /// triangulation.</returns>
-        public IMesh Triangulate(ICollection<Vertex> points)
+        public IMesh Triangulate(IList<Vertex> points)
         {
             this.mesh = new Mesh();
             this.mesh.TransferNodes(points);

@@ -19,6 +19,6 @@ namespace TriangleNet.Meshing
         /// </summary>
         /// <param name="points">Collection of points.</param>
         /// <returns>Mesh</returns>
-        IMesh Triangulate(ICollection<Vertex> points);
+        IMesh Triangulate(IList<Vertex> points);
     }
 }

@@ -586,7 +586,7 @@ namespace TriangleNet
         /// Read the vertices from memory.
         /// </summary>
         /// <param name="data">The input data.</param>
-        internal void TransferNodes(ICollection<Vertex> points)
+        internal void TransferNodes(IList<Vertex> points)
         {
             this.invertices = points.Count;
             this.mesh_dim = 2;
@@ -598,17 +598,29 @@ namespace TriangleNet
                 throw new Exception("Input must have at least three input vertices.");
             }
 
-            bool first = true;
+            var v = points[0];
 
-            foreach (Vertex p in points)
+            // Check attributes.
+            this.nextras = v.attributes == null ? 0 : v.attributes.Length;
+
+            // Simple heuristic to check if ids are already set.  We assume that if the
+            // first two vertex ids are distinct, then all input vertices have pairwise
+            // distinct ids.
+            bool userId = (v.ID != points[1].ID);
+
+            foreach (var p in points)
             {
-                if (first)
+                if (userId)
                 {
-                    this.nextras = p.attributes == null ? 0 : p.attributes.Length;
-                    first = false;
-                }
+                    p.hash = p.id;
 
-                p.hash = p.id = this.hash_vtx++;
+                    // Make sure the hash counter gets updated.
+                    hash_vtx = Math.Max(p.hash, hash_vtx);
+                }
+                else
+                {
+                    p.hash = p.id = hash_vtx++;
+                }
 
                 this.vertices.Add(p.hash, p);
                 this.bounds.Expand(p);

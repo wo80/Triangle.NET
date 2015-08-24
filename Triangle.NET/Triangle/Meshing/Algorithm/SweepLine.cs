@@ -31,7 +31,7 @@ namespace TriangleNet.Meshing.Algorithm
         double xminextreme; // Nonexistent x value used as a flag in sweepline.
         List<SplayNode> splaynodes;
 
-        public IMesh Triangulate(ICollection<Vertex> points)
+        public IMesh Triangulate(IList<Vertex> points)
         {
             this.mesh = new Mesh();
             this.mesh.TransferNodes(points);

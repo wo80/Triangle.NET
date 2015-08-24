@@ -60,7 +60,7 @@ namespace TriangleNet.Meshing.Algorithm
         /// Sorts the vertices, calls a recursive procedure to triangulate them, and
         /// removes the bounding box, setting boundary markers as appropriate.
         /// </remarks>
-        public IMesh Triangulate(ICollection<Vertex> points)
+        public IMesh Triangulate(IList<Vertex> points)
         {
             this.mesh = new Mesh();
             this.mesh.TransferNodes(points);
