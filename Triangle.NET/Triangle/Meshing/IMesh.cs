@@ -23,7 +23,7 @@ namespace TriangleNet.Meshing
         /// <summary>
         /// Gets the segments (constraint edges) of the mesh.
         /// </summary>
-        ICollection<Segment> Segments { get; }
+        ICollection<SubSegment> Segments { get; }
 
         /// <summary>
         /// Gets the triangles of the mesh.

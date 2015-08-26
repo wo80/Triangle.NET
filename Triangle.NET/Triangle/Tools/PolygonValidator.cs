@@ -7,6 +7,7 @@
 namespace TriangleNet.Tools
 {
     using System;
+    using System.Collections.Generic;
     using TriangleNet.Geometry;
 
     public static class PolygonValidator
@@ -18,23 +19,37 @@ namespace TriangleNet.Tools
         {
             var logger = Log.Instance;
 
+            var points = poly.Points;
+
             int horrors = 0;
 
             int i = 0;
-            int count = poly.Points.Count;
+            int count = points.Count;
 
-            foreach (var p in poly.Points)
+            if (count < 3)
+            {
+                logger.Warning("Polygon must have at least 3 vertices.", "PolygonValidator.IsConsistent()");
+                return false;
+            }
+
+            foreach (var p in points)
             {
                 if (p == null)
                 {
                     horrors++;
                     logger.Warning(String.Format("Point {0} is null.", i), "PolygonValidator.IsConsistent()");
                 }
-                else if (double.IsNaN(p.x + p.y) || double.IsInfinity(p.x + p.y))
+                else if (double.IsNaN(p.x) || double.IsNaN(p.y))
                 {
                     horrors++;
                     logger.Warning(String.Format("Point {0} has invalid coordinates.", i), "PolygonValidator.IsConsistent()");
                 }
+                else if (double.IsInfinity(p.x) || double.IsInfinity(p.y))
+                {
+                    horrors++;
+                    logger.Warning(String.Format("Point {0} has invalid coordinates.", i), "PolygonValidator.IsConsistent()");
+                }
+
                 i++;
             }
 
@@ -46,25 +61,31 @@ namespace TriangleNet.Tools
                 {
                     horrors++;
                     logger.Warning(String.Format("Segment {0} is null.", i), "PolygonValidator.IsConsistent()");
-                }
-                else
-                {
-                    if (seg.P0 < 0 || seg.P0 >= count)
-                    {
-                        horrors++;
-                        logger.Warning(String.Format("Segment {0} has invalid startpoint.", i),
-                            "PolygonValidator.IsConsistent()");
-                    }
 
-                    if (seg.P1 < 0 || seg.P1 >= count)
-                    {
-                        horrors++;
-                        logger.Warning(String.Format("Segment {0} has invalid endpoint.", i),
-                            "PolygonValidator.IsConsistent()");
-                    }
+                    // Always abort if a NULL-segment is found.
+                    return false;
+                }
+
+                var p = seg.GetVertex(0);
+                var q = seg.GetVertex(1);
+
+                if ((p.x == q.x) && (p.y == q.y))
+                {
+                    horrors++;
+                    logger.Warning(String.Format("Endpoints of segment {0} are coincident (IDs {1} / {2}).", i, p.id, q.id),
+                        "PolygonValidator.IsConsistent()");
                 }
 
                 i++;
+            }
+
+            if (points[0].ID == points[1].ID)
+            {
+                horrors += CheckVertexIDs(poly, count);
+            }
+            else
+            {
+                horrors += CheckDuplicateIDs(poly);
             }
 
             return horrors == 0;
@@ -116,8 +137,8 @@ namespace TriangleNet.Tools
                 q0 = p0;
                 q1 = p1;
 
-                p0 = (seg.P0 >= 0 && seg.P0 < count) ? poly.Points[seg.P0] : null;
-                p1 = (seg.P1 >= 0 && seg.P1 < count) ? poly.Points[seg.P1] : null;
+                p0 = seg.GetVertex(0);
+                p1 = seg.GetVertex(1);
 
                 if (q0 != null && q1 != null)
                 {
@@ -159,6 +180,58 @@ namespace TriangleNet.Tools
         {
             //  Calculate the Z coordinate of the cross product.
             return (a.X - b.X) * (c.Y - b.Y) - (a.Y - b.Y) * (c.X - b.X);
+        }
+
+        private static int CheckVertexIDs(IPolygon poly, int count)
+        {
+            var logger = Log.Instance;
+
+            int horrors = 0;
+
+            int i = 0;
+
+            Vertex p, q;
+
+            foreach (var seg in poly.Segments)
+            {
+                p = seg.GetVertex(0);
+                q = seg.GetVertex(1);
+
+                if (p.ID < 0 || p.ID >= count)
+                {
+                    horrors++;
+                    logger.Warning(String.Format("Segment {0} has invalid startpoint.", i),
+                        "PolygonValidator.IsConsistent()");
+                }
+
+                if (q.ID < 0 || q.ID >= count)
+                {
+                    horrors++;
+                    logger.Warning(String.Format("Segment {0} has invalid endpoint.", i),
+                        "PolygonValidator.IsConsistent()");
+                }
+
+                i++;
+            }
+
+            return horrors;
+        }
+
+        private static int CheckDuplicateIDs(IPolygon poly)
+        {
+            var ids = new HashSet<int>();
+
+            // Check for duplicate ids.
+            foreach (var p in poly.Points)
+            {
+                if (!ids.Add(p.ID))
+                {
+                    Log.Instance.Warning("Found duplicate vertex ids.", "PolygonValidator.IsConsistent()");
+                    return 1;
+                }
+            }
+
+            return 0;
         }
     }
 }

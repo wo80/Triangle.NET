@@ -55,7 +55,7 @@ namespace TriangleNet.IO
             TriangleWriter.WriteElements((Mesh)mesh, Path.ChangeExtension(filename, ".ele"));
         }
 
-        public void Write(IMesh mesh, StreamWriter stream)
+        public void Write(IMesh mesh, Stream stream)
         {
             throw new NotImplementedException();
         }
@@ -83,7 +83,7 @@ namespace TriangleNet.IO
             TriangleWriter.WritePoly(polygon, filename);
         }
 
-        public void Write(IPolygon polygon, StreamWriter stream)
+        public void Write(IPolygon polygon, Stream stream)
         {
             throw new NotImplementedException();
         }

@@ -59,29 +59,36 @@ namespace TriangleNet.IO
         /// <param name="line">The current line.</param>
         /// <param name="attributes">Number of point attributes</param>
         /// <param name="marks">Number of point markers (0 or 1)</param>
-        static void ReadVertex(Polygon data, int index, string[] line, int attributes, int marks)
+        static void ReadVertex(List<Vertex> data, int index, string[] line, int attributes, int marks)
         {
             double x = double.Parse(line[1], nfi);
             double y = double.Parse(line[2], nfi);
-            int mark = 0;
-            double[] attribs = attributes == 0 ? null : new double[attributes];
 
-            // Read the vertex attributes.
-            for (int j = 0; j < attributes; j++)
-            {
-                if (line.Length > 3 + j)
-                {
-                    attribs[j] = double.Parse(line[3 + j], nfi);
-                }
-            }
+            var v = new Vertex(x, y);
 
             // Read a vertex marker.
             if (marks > 0 && line.Length > 3 + attributes)
             {
-                mark = int.Parse(line[3 + attributes]);
+                v.Boundary = int.Parse(line[3 + attributes]);
             }
 
-            data.Add(new Vertex(x, y, mark), attribs);
+            if (attributes > 0)
+            {
+                var attribs = new double[attributes];
+
+                // Read the vertex attributes.
+                for (int j = 0; j < attributes; j++)
+                {
+                    if (line.Length > 3 + j)
+                    {
+                        attribs[j] = double.Parse(line[3 + j], nfi);
+                    }
+                }
+
+                v.attributes = attribs;
+            }
+
+            data.Add(v);
         }
 
         #endregion
@@ -219,7 +226,7 @@ namespace TriangleNet.IO
                             startIndex = int.Parse(line[0], nfi);
                         }
 
-                        ReadVertex(data, i, line, attributes, nodemarkers);
+                        ReadVertex(data.Points, i, line, attributes, nodemarkers);
                     }
                 }
             }
@@ -326,19 +333,21 @@ namespace TriangleNet.IO
                             startIndex = int.Parse(line[0], nfi);
                         }
 
-                        ReadVertex(data, i, line, attributes, nodemarkers);
+                        ReadVertex(data.Points, i, line, attributes, nodemarkers);
                     }
                 }
                 else
                 {
                     // If the .poly file claims there are zero vertices, that means that
                     // the vertices should be read from a separate .node file.
-                    string nodefile = Path.ChangeExtension(polyfilename, ".node");
-                    data = ReadNodeFile(nodefile);
+                    data = ReadNodeFile(Path.ChangeExtension(polyfilename, ".node"));
+
                     invertices = data.Points.Count;
                 }
 
-                if (data.Points == null)
+                var points = data.Points;
+
+                if (points.Count == 0)
                 {
                     throw new Exception("No nodes available.");
                 }
@@ -401,7 +410,7 @@ namespace TriangleNet.IO
                     }
                     else
                     {
-                        data.Add(new Edge(end1, end2, mark));
+                        data.Add(new Segment(points[end1], points[end2], mark));
                     }
                 }
 

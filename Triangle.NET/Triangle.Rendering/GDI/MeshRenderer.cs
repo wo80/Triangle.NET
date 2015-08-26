@@ -115,7 +115,12 @@ namespace TriangleNet.Rendering.GDI
 
                     if (filled)
                     {
-                        g.FillPolygon(brushes[partition[i]], tri);
+                        var b = brushes[partition[i]];
+
+                        if (b.Color.A > 0)
+                        {
+                            g.FillPolygon(b, tri);
+                        }
                     }
                     else
                     {

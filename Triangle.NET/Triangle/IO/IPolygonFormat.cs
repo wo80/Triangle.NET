@@ -29,10 +29,10 @@ namespace TriangleNet.IO
         void Write(IPolygon polygon, string filename);
 
         /// <summary>
-        /// Save a polygon geometry to a <see cref="StreamWriter" />.
+        /// Save a polygon geometry to a <see cref="Stream" />.
         /// </summary>
         /// <param name="polygon">An instance of the <see cref="IPolygon" /> class.</param>
         /// <param name="stream">The stream to save to.</param>
-        void Write(IPolygon polygon, StreamWriter stream);
+        void Write(IPolygon polygon, Stream stream);
     }
 }

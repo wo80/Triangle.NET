@@ -213,10 +213,12 @@ namespace TriangleNet.Meshing
             Otri checkneighbor = default(Otri);
             Osub subseg = default(Osub);
             Otri prevlink; // Triangle
-            TVertex shorg;
-            TVertex segmentorg, segmentdest;
-            int[] end = new int[2];
+
+            TVertex tmp;
+            TVertex sorg, sdest;
+
             bool notfound;
+
             //bool segmentmarkers = false;
             int boundmarker;
             int aroundvertex;
@@ -234,40 +236,38 @@ namespace TriangleNet.Meshing
                 {
                     subseg.seg = item;
 
-                    end[0] = polygon.Segments[i].P0;
-                    end[1] = polygon.Segments[i].P1;
+                    sorg = polygon.Segments[i].GetVertex(0);
+                    sdest = polygon.Segments[i].GetVertex(1);
+
                     boundmarker = polygon.Segments[i].Boundary;
 
-                    for (int j = 0; j < 2; j++)
+                    if ((sorg.id < 0 || sorg.id >= mesh.invertices) || (sdest.id < 0 || sdest.id >= mesh.invertices))
                     {
-                        if ((end[j] < 0) || (end[j] >= mesh.invertices))
-                        {
-                            Log.Instance.Error("Segment has an invalid vertex index.", "MeshReader.Reconstruct()");
-                            throw new Exception("Segment has an invalid vertex index.");
-                        }
+                        Log.Instance.Error("Segment has an invalid vertex index.", "MeshReader.Reconstruct()");
+                        throw new Exception("Segment has an invalid vertex index.");
                     }
 
                     // set the subsegment's vertices.
                     subseg.orient = 0;
-                    segmentorg = mesh.vertices[end[0]];
-                    segmentdest = mesh.vertices[end[1]];
-                    subseg.SetOrg(segmentorg);
-                    subseg.SetDest(segmentdest);
-                    subseg.SetSegOrg(segmentorg);
-                    subseg.SetSegDest(segmentdest);
+                    subseg.SetOrg(sorg);
+                    subseg.SetDest(sdest);
+                    subseg.SetSegOrg(sorg);
+                    subseg.SetSegDest(sdest);
                     subseg.seg.boundary = boundmarker;
                     // Try linking the subsegment to triangles that share these vertices.
                     for (subseg.orient = 0; subseg.orient < 2; subseg.orient++)
                     {
                         // Take the number for the destination of subsegloop.
-                        aroundvertex = end[1 - subseg.orient];
+                        aroundvertex = subseg.orient == 1 ? sorg.id : sdest.id;
+
                         int index = vertexarray[aroundvertex].Count - 1;
+
                         // Look for triangles having this vertex.
                         prevlink = vertexarray[aroundvertex][index];
                         nexttri = vertexarray[aroundvertex][index];
 
                         checktri = nexttri;
-                        shorg = subseg.Org();
+                        tmp = subseg.Org();
                         notfound = true;
                         // Look for triangles having this edge.  Note that I'm only
                         // comparing each triangle's destination with the subsegment;
@@ -280,7 +280,7 @@ namespace TriangleNet.Meshing
                         {
                             checkdest = checktri.Dest();
 
-                            if (shorg == checkdest)
+                            if (tmp == checkdest)
                             {
                                 // We have a match. Remove this triangle from the list.
                                 //prevlink = vertexarray[aroundvertex][index];

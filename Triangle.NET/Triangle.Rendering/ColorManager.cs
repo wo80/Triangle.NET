@@ -145,7 +145,7 @@ namespace TriangleNet.Rendering
             }
         }
 
-        internal void Dispose(Dictionary<int, Brush> brushes)
+        internal void Dispose(Dictionary<int, SolidBrush> brushes)
         {
             foreach (var brush in brushes.Values)
             {
@@ -153,9 +153,9 @@ namespace TriangleNet.Rendering
             }
         }
 
-        internal Dictionary<int, Brush> GetBrushDictionary()
+        internal Dictionary<int, SolidBrush> GetBrushDictionary()
         {
-            var brushes = new Dictionary<int, Brush>();
+            var brushes = new Dictionary<int, SolidBrush>();
 
             foreach (var item in ColorDictionary)
             {

@@ -202,17 +202,22 @@ namespace TriangleNet.IO
                 // Number of segments, number of boundary markers (zero or one).
                 writer.WriteLine("{0} {1}", polygon.Segments.Count, hasMarkers ? "1" : "0");
 
+                Vertex p, q;
+
                 int j = 0;
                 foreach (var seg in polygon.Segments)
                 {
+                    p = seg.GetVertex(0);
+                    q = seg.GetVertex(1);
+
                     // Segment number, indices of its two endpoints, and possibly a marker.
                     if (hasMarkers)
                     {
-                        writer.WriteLine("{0} {1} {2} {3}", j, seg.P0, seg.P1, seg.Boundary);
+                        writer.WriteLine("{0} {1} {2} {3}", j, p.ID, q.ID, seg.Boundary);
                     }
                     else
                     {
-                        writer.WriteLine("{0} {1} {2}", j, seg.P0, seg.P1);
+                        writer.WriteLine("{0} {1} {2}", j, p.ID, q.ID);
                     }
 
                     j++;

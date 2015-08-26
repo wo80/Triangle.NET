@@ -13,7 +13,7 @@ namespace TriangleNet.Topology
     /// <summary>
     /// The subsegment data structure.
     /// </summary>
-    public class Segment : ISegment
+    public class SubSegment : ISegment
     {
         // Hash for dictionary. Will be set by mesh instance.
         internal int hash;
@@ -23,7 +23,7 @@ namespace TriangleNet.Topology
         internal Otri[] triangles;
         internal int boundary;
 
-        public Segment()
+        public SubSegment()
         {
             // Four NULL vertices.
             vertices = new Vertex[4];

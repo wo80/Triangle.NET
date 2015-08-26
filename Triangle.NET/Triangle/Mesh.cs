@@ -35,7 +35,7 @@ namespace TriangleNet
 
         // Using hashsets for memory management should quite fast.
         internal Dictionary<int, Triangle> triangles;
-        internal Dictionary<int, Segment> subsegs;
+        internal Dictionary<int, SubSegment> subsegs;
         internal Dictionary<int, Vertex> vertices;
 
         // Hash seeds (should belong to mesh instance)
@@ -111,7 +111,7 @@ namespace TriangleNet
         /// <summary>
         /// Gets the mesh segments.
         /// </summary>
-        public ICollection<Segment> Segments
+        public ICollection<SubSegment> Segments
         {
             get { return this.subsegs.Values; }
         }
@@ -183,11 +183,11 @@ namespace TriangleNet
         // triangle side or subsegment end that isn't attached to a real
         // subsegment.
 
-        internal Segment dummysub;
+        internal SubSegment dummysub;
 
         private void Initialize()
         {
-            dummysub = new Segment();
+            dummysub = new SubSegment();
             dummysub.hash = DUMMY;
 
             // Initialize the two adjoining subsegments to be the omnipresent
@@ -231,7 +231,7 @@ namespace TriangleNet
 
             vertices = new Dictionary<int, Vertex>();
             triangles = new Dictionary<int, Triangle>();
-            subsegs = new Dictionary<int, Segment>();
+            subsegs = new Dictionary<int, SubSegment>();
 
             flipstack = new Stack<Otri>();
 
@@ -287,13 +287,13 @@ namespace TriangleNet
             }
             else if (num == NodeNumbering.CuthillMcKee)
             {
-                CuthillMcKee rcm = new CuthillMcKee();
-                int[] perm_inv = rcm.Renumber(this);
+                var rcm = new CuthillMcKee();
+                var iperm = rcm.Renumber(this);
 
                 // Permute the node indices.
                 foreach (var node in this.vertices.Values)
                 {
-                    node.id = perm_inv[node.id];
+                    node.id = iperm[node.id];
                 }
             }
 
@@ -689,7 +689,7 @@ namespace TriangleNet
         /// <param name="newsubseg">Reference to the new subseg.</param>
         internal void MakeSegment(ref Osub newsubseg)
         {
-            Segment seg = new Segment();
+            var seg = new SubSegment();
 
             seg.hash = this.hash_seg++;
 
@@ -1924,7 +1924,7 @@ namespace TriangleNet
         /// Deallocate space for a subsegment, marking it dead.
         /// </summary>
         /// <param name="dyingsubseg"></param>
-        internal void SubsegDealloc(Segment dyingsubseg)
+        internal void SubsegDealloc(SubSegment dyingsubseg)
         {
             // Mark the subsegment as dead. This makes it possible to detect dead 
             // subsegments when traversing the list of all subsegments.

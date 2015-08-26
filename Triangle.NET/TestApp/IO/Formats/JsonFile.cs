@@ -154,7 +154,7 @@ namespace MeshExplorer.IO.Formats
             }
         }
 
-        public void Write(IMesh mesh, StreamWriter stream)
+        public void Write(IMesh mesh, Stream stream)
         {
             throw new NotImplementedException();
         }
@@ -226,7 +226,7 @@ namespace MeshExplorer.IO.Formats
             throw new NotImplementedException();
         }
 
-        public void Write(IPolygon polygon, StreamWriter stream)
+        public void Write(IPolygon polygon, Stream stream)
         {
             throw new NotImplementedException();
         }
@@ -315,6 +315,9 @@ namespace MeshExplorer.IO.Formats
 
                 int p0, p1;
 
+                throw new NotImplementedException();
+                // TODO: Fix JSON format
+
                 for (int i = 0; i < n; i += 2)
                 {
                     mark = 0;
@@ -332,7 +335,7 @@ namespace MeshExplorer.IO.Formats
                         throw new Exception("JSON format error (segment index).");
                     }
 
-                    geometry.Add(new Edge(p0, p1, mark));
+                    //geometry.Add(new Edge(p0, p1, mark));
                 }
             }
         }
@@ -497,7 +500,7 @@ namespace MeshExplorer.IO.Formats
             writer.Write("]");
         }
 
-        private void WriteSegments(IEnumerable<Segment> data, StreamWriter writer, int ns)
+        private void WriteSegments(IEnumerable<SubSegment> data, StreamWriter writer, int ns)
         {
             int i = 0;
 

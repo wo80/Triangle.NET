@@ -1,4 +1,9 @@
-﻿
+﻿// -----------------------------------------------------------------------
+// <copyright file="IPolygon.cs" company="">
+// Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
+// </copyright>
+// -----------------------------------------------------------------------
+
 namespace TriangleNet.Geometry
 {
     using System.Collections.Generic;
@@ -17,7 +22,7 @@ namespace TriangleNet.Geometry
         /// <summary>
         /// Gets the segments of the polygon.
         /// </summary>
-        List<IEdge> Segments { get; }
+        List<ISegment> Segments { get; }
 
         /// <summary>
         /// Gets a list of points defining the holes of the polygon.
@@ -30,12 +35,12 @@ namespace TriangleNet.Geometry
         List<RegionPointer> Regions { get; }
 
         /// <summary>
-        /// Gets or sets value indicating wether the vertices have marks or not.
+        /// Gets or sets a value indicating whether the vertices have marks or not.
         /// </summary>
         bool HasPointMarkers { get; set; }
 
         /// <summary>
-        /// Gets or sets value indicating wether the segments have marks or not.
+        /// Gets or sets a value indicating whether the segments have marks or not.
         /// </summary>
         bool HasSegmentMarkers { get; set; }
 

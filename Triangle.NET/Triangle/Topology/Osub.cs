@@ -20,10 +20,10 @@ namespace TriangleNet.Topology
     /// </remarks>
     public struct Osub
     {
-        internal Segment seg;
+        internal SubSegment seg;
         internal int orient; // Ranges from 0 to 1.
 
-        public Segment Segment
+        public SubSegment Segment
         {
             get { return seg; }
         }
@@ -213,7 +213,7 @@ namespace TriangleNet.Topology
         /// </summary>
         /// <remarks>Note that the other subsegment will still think it's 
         /// connected to this subsegment.</remarks>
-        internal void Dissolve(Segment dummy)
+        internal void Dissolve(SubSegment dummy)
         {
             seg.subsegs[orient].seg = dummy;
         }
@@ -237,7 +237,7 @@ namespace TriangleNet.Topology
         /// <summary>
         /// Check a subsegment's deallocation.
         /// </summary>
-        internal static bool IsDead(Segment sub)
+        internal static bool IsDead(SubSegment sub)
         {
             return sub.subsegs[0].seg == null;
         }
@@ -245,7 +245,7 @@ namespace TriangleNet.Topology
         /// <summary>
         /// Set a subsegment's deallocation.
         /// </summary>
-        internal static void Kill(Segment sub)
+        internal static void Kill(SubSegment sub)
         {
             sub.subsegs[0].seg = null;
             sub.subsegs[1].seg = null;

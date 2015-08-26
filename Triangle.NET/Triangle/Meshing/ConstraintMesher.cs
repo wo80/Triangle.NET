@@ -169,9 +169,10 @@ namespace TriangleNet.Meshing
         /// </summary>
         public void FormSkeleton(IPolygon input)
         {
-            Vertex endpoint1, endpoint2;
-            int end1, end2;
-            int boundmarker;
+            // The segment endpoints.
+            Vertex p, q;
+
+            int label;
 
             mesh.insegments = 0;
 
@@ -191,51 +192,31 @@ namespace TriangleNet.Meshing
                     mesh.MakeVertexMap();
                 }
 
-                boundmarker = 0;
+                label = 0;
 
                 // Read and insert the segments.
                 foreach (var seg in input.Segments)
                 {
                     mesh.insegments++;
 
-                    end1 = seg.P0;
-                    end2 = seg.P1;
-                    boundmarker = seg.Boundary;
+                    label = seg.Boundary;
 
-                    if ((end1 < 0) || (end1 >= mesh.invertices))
+                    // TODO: wrap segment dictionary access in try / catch?
+
+                    p = seg.GetVertex(0);
+                    q = seg.GetVertex(1);
+
+                    if ((p.x == q.x) && (p.y == q.y))
                     {
                         if (Log.Verbose)
                         {
-                            logger.Warning("Invalid first endpoint of segment.", "Mesh.FormSkeleton().1");
-                        }
-                    }
-                    else if ((end2 < 0) || (end2 >= mesh.invertices))
-                    {
-                        if (Log.Verbose)
-                        {
-                            logger.Warning("Invalid second endpoint of segment.", "Mesh.FormSkeleton().2");
+                            logger.Warning("Endpoints of segment (IDs " + p.id + "/" + q.id + ") are coincident.",
+                                "Mesh.FormSkeleton()");
                         }
                     }
                     else
                     {
-                        // TODO: Is using the vertex ID reliable???
-                        // It should be. The ID gets appropriately set in TransferNodes().
-
-                        // Find the vertices numbered 'end1' and 'end2'.
-                        endpoint1 = mesh.vertices[end1];
-                        endpoint2 = mesh.vertices[end2];
-                        if ((endpoint1.x == endpoint2.x) && (endpoint1.y == endpoint2.y))
-                        {
-                            if (Log.Verbose)
-                            {
-                                logger.Warning("Endpoints of segment (IDs " + end1 + "/" + end2 + ") are coincident.",
-                                    "Mesh.FormSkeleton()");
-                            }
-                        }
-                        else
-                        {
-                            InsertSegment(endpoint1, endpoint2, boundmarker);
-                        }
+                        InsertSegment(p, q, label);
                     }
                 }
             }

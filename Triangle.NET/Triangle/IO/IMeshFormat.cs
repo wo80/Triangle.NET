@@ -29,10 +29,10 @@ namespace TriangleNet.IO
         void Write(IMesh mesh, string filename);
 
         /// <summary>
-        /// Save a mesh to a <see cref="StreamWriter" />.
+        /// Save a mesh to a <see cref="Stream" />.
         /// </summary>
         /// <param name="mesh">An instance of the <see cref="IMesh" /> interface.</param>
         /// <param name="stream">The stream to save to.</param>
-        void Write(IMesh mesh, StreamWriter stream);
+        void Write(IMesh mesh, Stream stream);
     }
 }

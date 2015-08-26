@@ -30,7 +30,7 @@ namespace TriangleNet.Voronoi.Legacy
         List<Point> segPoints;
         int segIndex;
 
-        Dictionary<int, Segment> subsegMap;
+        Dictionary<int, SubSegment> subsegMap;
 
         bool includeBoundary = true;
 
@@ -151,7 +151,7 @@ namespace TriangleNet.Voronoi.Legacy
             int blinded = 0;
 
             Stack<Triangle> triangles;
-            subsegMap = new Dictionary<int, Segment>();
+            subsegMap = new Dictionary<int, SubSegment>();
 
             Otri f = default(Otri);
             Otri f0 = default(Otri);

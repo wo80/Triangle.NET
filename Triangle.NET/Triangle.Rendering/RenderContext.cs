@@ -80,6 +80,14 @@ namespace TriangleNet.Rendering
             // Always clear voronoi layer.
             RenderLayers[4].Reset(true);
 
+            int i = 0;
+
+            // Ensure linear numbering of polygon vertices.
+            foreach (var p in data.Points)
+            {
+                p.ID = i++;
+            }
+
             this.bounds = RenderLayers[2].SetPoints(data);
             this.zoom.Initialize(bounds);
 

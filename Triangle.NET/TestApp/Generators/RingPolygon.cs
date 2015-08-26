@@ -7,6 +7,7 @@
 namespace MeshExplorer.Generators
 {
     using System;
+    using System.Collections.Generic;
     using TriangleNet.Geometry;
 
     /// <summary>
@@ -54,15 +55,19 @@ namespace MeshExplorer.Generators
             double ro, r = 10;
             double step = 2 * Math.PI / m;
 
+            var inner = new List<Vertex>(m);
+
             // Inner ring
             for (int i = 0; i < m; i++)
             {
-                input.Add(new Vertex(r * Math.Cos(i * step), r * Math.Sin(i * step)));
-                input.Add(new Edge(i, (i + 1) % m, 1));
+                inner.Add(new Vertex(r * Math.Cos(i * step), r * Math.Sin(i * step)));
             }
+
+            input.AddContour(inner, 1);
 
             r = 1.5 * r;
 
+            var outer = new List<Vertex>(n);
 
             step = 2 * Math.PI / n;
             double offset = step / 2;
@@ -77,9 +82,10 @@ namespace MeshExplorer.Generators
                     ro = r + r * Util.Random.NextDouble() * (param1 / 100);
                 }
 
-                input.Add(new Vertex(ro * Math.Cos(i * step + offset), ro * Math.Sin(i * step + offset)));
-                input.Add(new Edge(m + i, m + ((i + 1) % n), 2));
+                outer.Add(new Vertex(ro * Math.Cos(i * step + offset), ro * Math.Sin(i * step + offset)));
             }
+
+            input.AddContour(outer, 2);
 
             input.Holes.Add(new Point(0, 0));
 

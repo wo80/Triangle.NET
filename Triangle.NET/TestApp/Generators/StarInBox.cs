@@ -29,9 +29,9 @@ namespace MeshExplorer.Generators
         {
             int numRays = GetParamValueInt(0, param0);
 
-            var input = new Polygon(numRays + 4);
+            var g = new Polygon(numRays + 4);
 
-            input.Add(new Vertex(0, 0)); // Center
+            g.Add(new Vertex(0, 0)); // Center
 
             double x, y, r, e, step = 2 * Math.PI / numRays;
 
@@ -42,22 +42,22 @@ namespace MeshExplorer.Generators
                 x = r * Math.Cos(i * step + e);
                 y = r * Math.Sin(i * step + e);
 
-                input.Add(new Vertex(x, y, 2));
-                input.Add(new Edge(0, i + 1, 2));
+                g.Add(new Vertex(x, y, 2));
+                g.Add(new Segment(g.Points[0], g.Points[i + 1], 2));
             }
 
-            input.Add(new Vertex(-1, -1, 1)); // Box
-            input.Add(new Vertex(1, -1, 1));
-            input.Add(new Vertex(1, 1, 1));
-            input.Add(new Vertex(-1, 1, 1));
+            g.Add(new Vertex(-1, -1, 1)); // Box
+            g.Add(new Vertex(1, -1, 1));
+            g.Add(new Vertex(1, 1, 1));
+            g.Add(new Vertex(-1, 1, 1));
 
-            numRays = input.Count;
-            input.Add(new Edge(numRays - 1, numRays - 2, 1));
-            input.Add(new Edge(numRays - 2, numRays - 3, 1));
-            input.Add(new Edge(numRays - 3, numRays - 4, 1));
-            input.Add(new Edge(numRays - 4, numRays - 1, 1));
+            numRays = g.Count;
+            g.Add(new Segment(g.Points[numRays - 1], g.Points[numRays - 2], 1));
+            g.Add(new Segment(g.Points[numRays - 2], g.Points[numRays - 3], 1));
+            g.Add(new Segment(g.Points[numRays - 3], g.Points[numRays - 4], 1));
+            g.Add(new Segment(g.Points[numRays - 4], g.Points[numRays - 1], 1));
 
-            return input;
+            return g;
         }
     }
 }

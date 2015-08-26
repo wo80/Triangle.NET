@@ -100,10 +100,10 @@ namespace TriangleNet.Meshing
             left = bounds.Left;
             bottom = bounds.Bottom;
 
-            int i, j, k, l, n;
+            int i, j, k, l, n = 0;
 
             // Add vertices.
-            var points = polygon.Points;
+            var points = new Vertex[(nx + 1) * (ny + 1)];
 
             for (i = 0; i <= nx; i++)
             {
@@ -113,9 +113,11 @@ namespace TriangleNet.Meshing
                 {
                     y = bottom + j * dy;
 
-                    points.Add(new Vertex(x, y));
+                    points[n++] = new Vertex(x, y);
                 }
             }
+
+            polygon.Points.AddRange(points);
 
             n = 0;
 
@@ -130,22 +132,44 @@ namespace TriangleNet.Meshing
 
             segments.Capacity = 2 * (nx + ny);
 
+            Vertex a, b;
+
             for (j = 0; j < ny; j++)
             {
                 // Left
-                segments.Add(new Edge(j, j + 1));
+                a = points[j];
+                b = points[j + 1];
+
+                segments.Add(new Segment(a, b, 1));
+
+                a.Boundary = b.Boundary = 1;
 
                 // Right
-                segments.Add(new Edge(nx * (ny + 1) + j, nx * (ny + 1) + (j + 1)));
+                a = points[nx * (ny + 1) + j];
+                b = points[nx * (ny + 1) + (j + 1)];
+
+                segments.Add(new Segment(a, b, 1));
+
+                a.Boundary = b.Boundary = 1;
             }
 
             for (i = 0; i < nx; i++)
             {
                 // Bottom
-                segments.Add(new Edge(i * (ny + 1), (i + 1) * (ny + 1)));
+                a = points[i * (ny + 1)];
+                b = points[(i + 1) * (ny + 1)];
+
+                segments.Add(new Segment(a, b, 1));
+
+                a.Boundary = b.Boundary = 1;
 
                 // Top
-                segments.Add(new Edge(i * (ny + 1) + nx, (i + 1) * (ny + 1) + nx));
+                a = points[i * (ny + 1) + nx];
+                b = points[(i + 1) * (ny + 1) + nx];
+
+                segments.Add(new Segment(a, b, 1));
+
+                a.Boundary = b.Boundary = 1;
             }
 
             // Add triangles.

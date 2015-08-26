@@ -454,7 +454,7 @@ namespace TriangleNet.Topology
         /// <summary>
         /// Dissolve a bond (from the triangle side).
         /// </summary>
-        internal void SegDissolve(Segment dummy)
+        internal void SegDissolve(SubSegment dummy)
         {
             tri.subsegs[orient].seg = dummy;
         }

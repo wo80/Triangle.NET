@@ -57,7 +57,7 @@ namespace MeshExplorer.IO.Formats
             format.Write(polygon, filename);
         }
 
-        public void Write(IPolygon polygon, StreamWriter stream)
+        public void Write(IPolygon polygon, Stream stream)
         {
             format.Write(polygon, stream);
         }
@@ -75,7 +75,7 @@ namespace MeshExplorer.IO.Formats
             }
         }
 
-        public void Write(IMesh mesh, StreamWriter stream)
+        public void Write(IMesh mesh, Stream stream)
         {
             format.Write(mesh, stream);
         }
