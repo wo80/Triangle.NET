@@ -14,12 +14,17 @@ namespace TriangleNet.Voronoi
     public class StandardVoronoi : VoronoiBase
     {
         public StandardVoronoi(Mesh mesh)
-            : this(mesh, mesh.bounds)
+            : this(mesh, mesh.bounds, new DefaultVoronoiFactory(), RobustPredicates.Default)
         {
         }
 
         public StandardVoronoi(Mesh mesh, Rectangle box)
-            : base(mesh, true)
+            : this(mesh, box, new DefaultVoronoiFactory(), RobustPredicates.Default)
+        {
+        }
+
+        public StandardVoronoi(Mesh mesh, Rectangle box, IVoronoiFactory factory, IPredicates predicates)
+            : base(mesh, factory, predicates, true)
         {
             // We assume the box to be at least as large as the mesh.
             box.Expand(mesh.bounds);

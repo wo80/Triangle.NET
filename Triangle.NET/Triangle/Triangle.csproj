@@ -62,6 +62,7 @@
     <Compile Include="IO\TriangleFormat.cs" />
     <Compile Include="IO\TriangleReader.cs" />
     <Compile Include="IO\TriangleWriter.cs" />
+    <Compile Include="IPredicates.cs" />
     <Compile Include="Meshing\ConstraintMesher.cs" />
     <Compile Include="Meshing\ConstraintOptions.cs" />
     <Compile Include="Meshing\Converter.cs" />
@@ -80,6 +81,7 @@
     <Compile Include="Meshing\Data\BadTriQueue.cs" />
     <Compile Include="Meshing\Iterators\EdgeIterator.cs" />
     <Compile Include="Meshing\Iterators\RegionIterator.cs" />
+    <Compile Include="Smoothing\VoronoiFactory.cs" />
     <Compile Include="Tools\AdjacencyMatrix.cs" />
     <Compile Include="Tools\CuthillMcKee.cs" />
     <Compile Include="Tools\IntersectionHelper.cs" />
@@ -99,6 +101,8 @@
     <Compile Include="Smoothing\ISmoother.cs" />
     <Compile Include="Smoothing\SimpleSmoother.cs" />
     <Compile Include="Voronoi\BoundedVoronoi.cs" />
+    <Compile Include="Voronoi\DefaultVoronoiFactory.cs" />
+    <Compile Include="Voronoi\IVoronoiFactory.cs" />
     <Compile Include="Voronoi\StandardVoronoi.cs" />
     <Compile Include="Voronoi\VoronoiBase.cs" />
     <Compile Include="Voronoi\Legacy\BoundedVoronoiLegacy.cs" />

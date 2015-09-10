@@ -20,13 +20,30 @@ namespace TriangleNet.Smoothing
     /// </remarks>
     public class SimpleSmoother : ISmoother
     {
+        IPredicates predicates;
+
+        IVoronoiFactory factory;
+
         ConstraintOptions options;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SimpleSmoother" /> class.
         /// </summary>
         public SimpleSmoother()
+            : this(new VoronoiFactory(), RobustPredicates.Default)
         {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SimpleSmoother" /> class.
+        /// </summary>
+        /// <param name="factory">Voronoi object factory.</param>
+        /// <param name="predicates">Geometric predicates implementation.</param>
+        public SimpleSmoother(IVoronoiFactory factory, IPredicates predicates)
+        {
+            this.factory = factory;
+            this.predicates = predicates;
+
             this.options = new ConstraintOptions() { ConformingDelaunay = true };
         }
 
@@ -45,20 +62,22 @@ namespace TriangleNet.Smoothing
             // Take a few smoothing rounds (Lloyd's algorithm).
             for (int i = 0; i < limit; i++)
             {
-                Step(smoothedMesh);
+                Step(smoothedMesh, factory);
 
                 // Actually, we only want to rebuild, if mesh is no longer
                 // Delaunay. Flipping edges could be the right choice instead 
                 // of re-triangulating...
                 smoothedMesh = (Mesh)Rebuild(smoothedMesh).Triangulate(options);
+
+                factory.Reset();
             }
 
             smoothedMesh.CopyTo((Mesh)mesh);
         }
 
-        private void Step(Mesh mesh)
+        private void Step(Mesh mesh, IVoronoiFactory factory)
         {
-            var voronoi = new BoundedVoronoi(mesh);
+            var voronoi = new BoundedVoronoi(mesh, factory, predicates);
 
             double x, y;
 

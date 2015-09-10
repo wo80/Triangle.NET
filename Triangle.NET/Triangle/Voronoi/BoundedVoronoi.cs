@@ -19,7 +19,12 @@ namespace TriangleNet.Voronoi
         int offset;
 
         public BoundedVoronoi(Mesh mesh)
-            : base(mesh, true)
+            : this(mesh, new DefaultVoronoiFactory(), RobustPredicates.Default)
+        {
+        }
+
+        public BoundedVoronoi(Mesh mesh, IVoronoiFactory factory, IPredicates predicates)
+            : base(mesh, factory, predicates, true)
         {
             // We explicitly told the base constructor to call the Generate method, so
             // at this point the basic Voronoi diagram is already created.
@@ -46,7 +51,7 @@ namespace TriangleNet.Voronoi
                 var v1 = (TVertex)edge.face.generator;
                 var v2 = (TVertex)twin.face.generator;
 
-                double dir = RobustPredicates.CounterClockwise(v1, v2, edge.origin);
+                double dir = predicates.CounterClockwise(v1, v2, edge.origin);
 
                 if (dir <= 0)
                 {
@@ -75,10 +80,10 @@ namespace TriangleNet.Voronoi
             v.y = (v1.y + v2.y) / 2.0;
 
             // Close the cell connected to edge.
-            var gen = new HVertex(v1.x, v1.y);
+            var gen = factory.CreateVertex(v1.x, v1.y);
 
-            var h1 = new HalfEdge(edge.twin.origin, edge.face);
-            var h2 = new HalfEdge(gen, edge.face);
+            var h1 = factory.CreateHalfEdge(edge.twin.origin, edge.face);
+            var h2 = factory.CreateHalfEdge(gen, edge.face);
 
             edge.next = h1;
             h1.next = h2;
@@ -129,8 +134,8 @@ namespace TriangleNet.Voronoi
             edge.twin = null;
 
             // Close the cell.
-            var gen = new HVertex(v1.x, v1.y);
-            var he = new HalfEdge(gen, edge.face);
+            var gen = factory.CreateVertex(v1.x, v1.y);
+            var he = factory.CreateHalfEdge(gen, edge.face);
 
             edge.next = he;
             he.next = edge.face.edge;

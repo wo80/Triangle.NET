@@ -16,6 +16,8 @@ namespace TriangleNet.Meshing
 
     internal class ConstraintMesher
     {
+        IPredicates predicates;
+
         Mesh mesh;
         Behavior behavior;
         TriangleLocator locator;
@@ -24,9 +26,11 @@ namespace TriangleNet.Meshing
 
         ILog<LogItem> logger;
 
-        public ConstraintMesher(Mesh mesh)
+        public ConstraintMesher(Mesh mesh, IPredicates predicates)
         {
             this.mesh = mesh;
+            this.predicates = predicates;
+
             this.behavior = mesh.behavior;
             this.locator = mesh.locator;
 
@@ -74,7 +78,7 @@ namespace TriangleNet.Meshing
                         // falls within the starting triangle.
                         searchorg = searchtri.Org();
                         searchdest = searchtri.Dest();
-                        if (RobustPredicates.CounterClockwise(searchorg, searchdest, hole) > 0.0)
+                        if (predicates.CounterClockwise(searchorg, searchdest, hole) > 0.0)
                         {
                             // Find a triangle that contains the hole.
                             intersect = mesh.locator.Locate(hole, ref searchtri);
@@ -116,7 +120,7 @@ namespace TriangleNet.Meshing
                         // region point falls within the starting triangle.
                         searchorg = searchtri.Org();
                         searchdest = searchtri.Dest();
-                        if (RobustPredicates.CounterClockwise(searchorg, searchdest, region.point) > 0.0)
+                        if (predicates.CounterClockwise(searchorg, searchdest, region.point) > 0.0)
                         {
                             // Find a triangle that contains the region point.
                             intersect = mesh.locator.Locate(region.point, ref searchtri);
@@ -534,10 +538,10 @@ namespace TriangleNet.Meshing
             rightvertex = searchtri.Dest();
             leftvertex = searchtri.Apex();
             // Is 'searchpoint' to the left?
-            leftccw = RobustPredicates.CounterClockwise(searchpoint, startvertex, leftvertex);
+            leftccw = predicates.CounterClockwise(searchpoint, startvertex, leftvertex);
             leftflag = leftccw > 0.0;
             // Is 'searchpoint' to the right?
-            rightccw = RobustPredicates.CounterClockwise(startvertex, searchpoint, rightvertex);
+            rightccw = predicates.CounterClockwise(startvertex, searchpoint, rightvertex);
             rightflag = rightccw > 0.0;
             if (leftflag && rightflag)
             {
@@ -564,7 +568,7 @@ namespace TriangleNet.Meshing
                 }
                 leftvertex = searchtri.Apex();
                 rightccw = leftccw;
-                leftccw = RobustPredicates.CounterClockwise(searchpoint, startvertex, leftvertex);
+                leftccw = predicates.CounterClockwise(searchpoint, startvertex, leftvertex);
                 leftflag = leftccw > 0.0;
             }
             while (rightflag)
@@ -578,7 +582,7 @@ namespace TriangleNet.Meshing
                 }
                 rightvertex = searchtri.Dest();
                 leftccw = rightccw;
-                rightccw = RobustPredicates.CounterClockwise(startvertex, searchpoint, rightvertex);
+                rightccw = predicates.CounterClockwise(startvertex, searchpoint, rightvertex);
                 rightflag = rightccw > 0.0;
             }
             if (leftccw == 0.0)
@@ -859,7 +863,7 @@ namespace TriangleNet.Meshing
             // Check whether the previous polygon vertex is a reflex vertex.
             if (leftside)
             {
-                if (RobustPredicates.CounterClockwise(nearvertex, leftvertex, farvertex) <= 0.0)
+                if (predicates.CounterClockwise(nearvertex, leftvertex, farvertex) <= 0.0)
                 {
                     // leftvertex is a reflex vertex too. Nothing can
                     // be done until a convex section is found.
@@ -868,20 +872,20 @@ namespace TriangleNet.Meshing
             }
             else
             {
-                if (RobustPredicates.CounterClockwise(farvertex, rightvertex, nearvertex) <= 0.0)
+                if (predicates.CounterClockwise(farvertex, rightvertex, nearvertex) <= 0.0)
                 {
                     // rightvertex is a reflex vertex too.  Nothing can
                     // be done until a convex section is found.
                     return;
                 }
             }
-            if (RobustPredicates.CounterClockwise(rightvertex, leftvertex, farvertex) > 0.0)
+            if (predicates.CounterClockwise(rightvertex, leftvertex, farvertex) > 0.0)
             {
                 // fartri is not an inverted triangle, and farvertex is not a reflex
                 // vertex.  As there are no reflex vertices, fixuptri isn't an
                 // inverted triangle, either.  Hence, test the edge between the
                 // triangles to ensure it is locally Delaunay.
-                if (RobustPredicates.InCircle(leftvertex, farvertex, rightvertex, nearvertex) <= 0.0)
+                if (predicates.InCircle(leftvertex, farvertex, rightvertex, nearvertex) <= 0.0)
                 {
                     return;
                 }
@@ -983,7 +987,7 @@ namespace TriangleNet.Meshing
                 {
                     // Check whether farvertex is to the left or right of the segment being
                     // inserted, to decide which edge of fixuptri to dig through next.
-                    area = RobustPredicates.CounterClockwise(endpoint1, endpoint2, farvertex);
+                    area = predicates.CounterClockwise(endpoint1, endpoint2, farvertex);
                     if (area == 0.0)
                     {
                         // We've collided with a vertex between endpoint1 and endpoint2.

@@ -19,6 +19,8 @@ namespace TriangleNet.Meshing
     /// </summary>
     class QualityMesher
     {
+        IPredicates predicates;
+
         Queue<BadSubseg> badsubsegs;
         BadTriQueue queue;
         Mesh mesh;
@@ -28,7 +30,7 @@ namespace TriangleNet.Meshing
 
         ILog<LogItem> logger;
 
-        public QualityMesher(Mesh mesh)
+        public QualityMesher(Mesh mesh, IPredicates predicates)
         {
             logger = Log.Instance;
 
@@ -36,9 +38,11 @@ namespace TriangleNet.Meshing
             queue = new BadTriQueue();
 
             this.mesh = mesh;
+            this.predicates = predicates;
+
             this.behavior = mesh.behavior;
 
-            newLocation = new NewLocation(mesh);
+            newLocation = new NewLocation(mesh, predicates);
         }
 
         /// <summary>
@@ -570,7 +574,7 @@ namespace TriangleNet.Meshing
                         // Roundoff in the above calculation may yield a 'newvertex'
                         // that is not precisely collinear with 'eorg' and 'edest'.
                         // Improve collinearity by one step of iterative refinement.
-                        multiplier = RobustPredicates.CounterClockwise(eorg, edest, newvertex);
+                        multiplier = predicates.CounterClockwise(eorg, edest, newvertex);
                         divisor = ((eorg.x - edest.x) * (eorg.x - edest.x) +
                                    (eorg.y - edest.y) * (eorg.y - edest.y));
                         if ((multiplier != 0.0) && (divisor != 0.0))
@@ -671,7 +675,7 @@ namespace TriangleNet.Meshing
                 // reset VertexType?
                 if (behavior.fixedArea || behavior.VarArea)
                 {
-                    newloc = RobustPredicates.FindCircumcenter(borg, bdest, bapex, ref xi, ref eta, behavior.offconstant);
+                    newloc = predicates.FindCircumcenter(borg, bdest, bapex, ref xi, ref eta, behavior.offconstant);
                 }
                 else
                 {

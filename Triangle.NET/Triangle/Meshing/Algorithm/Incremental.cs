@@ -16,7 +16,19 @@ namespace TriangleNet.Meshing.Algorithm
     /// </summary>
     public class Incremental : ITriangulator
     {
+        IPredicates predicates;
+
         Mesh mesh;
+
+        public Incremental()
+            : this(RobustPredicates.Default)
+        {
+        }
+
+        public Incremental(IPredicates predicates)
+        {
+            this.predicates = predicates;
+        }
 
         /// <summary>
         /// Form a Delaunay triangulation by incrementally inserting vertices.
@@ -25,7 +37,7 @@ namespace TriangleNet.Meshing.Algorithm
         /// triangulation.</returns>
         public IMesh Triangulate(IList<Vertex> points)
         {
-            this.mesh = new Mesh();
+            this.mesh = new Mesh(predicates);
             this.mesh.TransferNodes(points);
 
             Otri starttri = new Otri();

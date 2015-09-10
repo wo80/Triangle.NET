@@ -24,6 +24,8 @@ namespace TriangleNet
     {
         #region Variables
 
+        IPredicates predicates;
+
         ILog<LogItem> logger;
 
         QualityMesher qualityMesher;
@@ -221,7 +223,7 @@ namespace TriangleNet
         /// <summary>
         /// Initializes a new instance of the <see cref="Mesh" /> class.
         /// </summary>
-        public Mesh()
+        public Mesh(IPredicates predicates)
         {
             Initialize();
 
@@ -238,11 +240,11 @@ namespace TriangleNet
             holes = new List<Point>();
             regions = new List<RegionPointer>();
 
-            qualityMesher = new QualityMesher(this);
+            this.predicates = predicates;
 
-            locator = new TriangleLocator(this);
+            this.qualityMesher = new QualityMesher(this, predicates);
 
-            RobustPredicates.ExactInit();
+            this.locator = new TriangleLocator(this, predicates);
         }
 
         public void Refine(QualityOptions quality)
@@ -439,7 +441,7 @@ namespace TriangleNet
             infvertex3 = null;
 
             // Insert segments, carving holes.
-            var mesher = new ConstraintMesher(this);
+            var mesher = new ConstraintMesher(this, predicates);
 
             if (behavior.useSegments)
             {
@@ -1125,7 +1127,7 @@ namespace TriangleNet
                             // the boundary of the triangulation. 'farvertex' might be
                             // infinite as well, but trust me, this same condition should
                             // be applied.
-                            doflip = RobustPredicates.CounterClockwise(newvertex, rightvertex, farvertex) > 0.0;
+                            doflip = predicates.CounterClockwise(newvertex, rightvertex, farvertex) > 0.0;
                         }
                         else if ((rightvertex == infvertex1) ||
                                  (rightvertex == infvertex2) ||
@@ -1135,7 +1137,7 @@ namespace TriangleNet
                             // the boundary of the triangulation. 'farvertex' might be
                             // infinite as well, but trust me, this same condition should
                             // be applied.
-                            doflip = RobustPredicates.CounterClockwise(farvertex, leftvertex, newvertex) > 0.0;
+                            doflip = predicates.CounterClockwise(farvertex, leftvertex, newvertex) > 0.0;
                         }
                         else if ((farvertex == infvertex1) ||
                                  (farvertex == infvertex2) ||
@@ -1148,7 +1150,7 @@ namespace TriangleNet
                         else
                         {
                             // Test whether the edge is locally Delaunay.
-                            doflip = RobustPredicates.InCircle(leftvertex, newvertex, rightvertex, farvertex) > 0.0;
+                            doflip = predicates.InCircle(leftvertex, newvertex, rightvertex, farvertex) > 0.0;
                         }
                         if (doflip)
                         {
@@ -1675,7 +1677,7 @@ namespace TriangleNet
                 testtri.Onext();
                 testvertex = testtri.Dest();
                 // Is this a better vertex?
-                if (RobustPredicates.InCircle(leftbasevertex, rightbasevertex, bestvertex, testvertex) > 0.0)
+                if (predicates.InCircle(leftbasevertex, rightbasevertex, bestvertex, testvertex) > 0.0)
                 {
                     testtri.Copy(ref besttri);
                     bestvertex = testvertex;

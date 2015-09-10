@@ -22,13 +22,16 @@ namespace TriangleNet
         Sampler sampler;
         Mesh mesh;
 
+        IPredicates predicates;
+
         // Pointer to a recently visited triangle. Improves point location if
         // proximate vertices are inserted sequentially.
         internal Otri recenttri;
 
-        public TriangleLocator(Mesh mesh)
+        public TriangleLocator(Mesh mesh, IPredicates predicates)
         {
             this.mesh = mesh;
+            this.predicates = predicates;
 
             sampler = new Sampler();
         }
@@ -133,10 +136,10 @@ namespace TriangleNet
                 }
                 // Does the point lie on the other side of the line defined by the
                 // triangle edge opposite the triangle's destination?
-                destorient = RobustPredicates.CounterClockwise(forg, fapex, searchpoint);
+                destorient = predicates.CounterClockwise(forg, fapex, searchpoint);
                 // Does the point lie on the other side of the line defined by the
                 // triangle edge opposite the triangle's origin?
-                orgorient = RobustPredicates.CounterClockwise(fapex, fdest, searchpoint);
+                orgorient = predicates.CounterClockwise(fapex, fdest, searchpoint);
                 if (destorient > 0.0)
                 {
                     if (orgorient > 0.0)
@@ -322,7 +325,7 @@ namespace TriangleNet
                 return LocateResult.OnVertex;
             }
             // Orient 'searchtri' to fit the preconditions of calling preciselocate().
-            ahead = RobustPredicates.CounterClockwise(torg, tdest, searchpoint);
+            ahead = predicates.CounterClockwise(torg, tdest, searchpoint);
             if (ahead < 0.0)
             {
                 // Turn around so that 'searchpoint' is to the left of the

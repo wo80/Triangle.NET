@@ -20,6 +20,10 @@ namespace TriangleNet.Voronoi
     /// </summary>
     public abstract class VoronoiBase : DcelMesh
     {
+        protected IPredicates predicates;
+
+        protected IVoronoiFactory factory;
+
         // List of infinite half-edges, i.e. half-edges that start at circumcenters of triangles
         // which lie on the domain boundary.
         protected List<HalfEdge> rays;
@@ -28,11 +32,16 @@ namespace TriangleNet.Voronoi
         /// Initializes a new instance of the <see cref="VoronoiBase" /> class.
         /// </summary>
         /// <param name="mesh">Triangle mesh.</param>
+        /// <param name="factory">Voronoi object factory.</param>
+        /// <param name="predicates">Geometric predicates implementation.</param>
         /// <param name="generate">If set to true, the constuctor will call the Generate
         /// method, which builds the Voronoi diagram.</param>
-        protected VoronoiBase(Mesh mesh, bool generate)
-            : base(false)
+        protected VoronoiBase(Mesh mesh, IVoronoiFactory factory, IPredicates predicates,
+            bool generate) : base(false)
         {
+            this.factory = factory;
+            this.predicates = predicates;
+
             if (generate)
             {
                 Generate(mesh);
@@ -55,13 +64,20 @@ namespace TriangleNet.Voronoi
             var vertices = new Vertex[mesh.triangles.Count + mesh.hullsize];
             var faces = new Face[mesh.vertices.Count];
 
+            if (factory == null)
+            {
+                factory = new DefaultVoronoiFactory();
+            }
+
+            factory.Initialize(vertices.Length, 2 * mesh.edges, faces.Length);
+
             // Compute triangles circumcenters.
             var map = ComputeVertices(mesh, vertices);
 
             // Create all Voronoi faces.
             foreach (var vertex in mesh.vertices.Values)
             {
-                faces[vertex.id] = new Face(vertex);
+                faces[vertex.id] = factory.CreateFace(vertex);
             }
 
             ComputeEdges(mesh, vertices, faces, map);
@@ -94,9 +110,9 @@ namespace TriangleNet.Voronoi
                 id = t.id;
                 tri.tri = t;
 
-                pt = RobustPredicates.FindCircumcenter(tri.Org(), tri.Dest(), tri.Apex(), ref xi, ref eta);
+                pt = predicates.FindCircumcenter(tri.Org(), tri.Dest(), tri.Apex(), ref xi, ref eta);
 
-                vertex = new Vertex(pt.x, pt.y);
+                vertex = factory.CreateVertex(pt.x, pt.y);
                 vertex.id = id;
 
                 vertices[id] = vertex;
@@ -169,13 +185,13 @@ namespace TriangleNet.Voronoi
                             px = dest.y - org.y;
                             py = org.x - dest.x;
 
-                            end = new Vertex(vertex.x + px, vertex.y + py);
+                            end = factory.CreateVertex(vertex.x + px, vertex.y + py);
                             end.id = count + j++;
 
                             vertices[end.id] = end;
 
-                            edge = new HalfEdge(end, face);
-                            twin = new HalfEdge(vertex, neighborFace);
+                            edge = factory.CreateHalfEdge(end, face);
+                            twin = factory.CreateHalfEdge(vertex, neighborFace);
 
                             // Make (face.edge) always point to an edge that starts at an infinite
                             // vertex. This will allow traversing of unbounded faces.
@@ -191,8 +207,8 @@ namespace TriangleNet.Voronoi
                             end = vertices[nid];
 
                             // Create half-edges.
-                            edge = new HalfEdge(end, face);
-                            twin = new HalfEdge(vertex, neighborFace);
+                            edge = factory.CreateHalfEdge(end, face);
+                            twin = factory.CreateHalfEdge(vertex, neighborFace);
 
                             // Add to vertex map.
                             map[nid].Add(edge);

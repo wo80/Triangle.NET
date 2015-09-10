@@ -1,4 +1,9 @@
-﻿
+﻿// -----------------------------------------------------------------------
+// <copyright file="GenericMesher.cs">
+// Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
+// </copyright>
+// -----------------------------------------------------------------------
+
 namespace TriangleNet.Meshing
 {
     using System;
@@ -12,15 +17,24 @@ namespace TriangleNet.Meshing
     /// </summary>
     public class GenericMesher : ITriangulator, IConstraintMesher, IQualityMesher
     {
+        IPredicates predicates;
+
         ITriangulator triangulator;
 
         public GenericMesher()
-            : this(new Dwyer())
         {
+            this.predicates = RobustPredicates.Default;
+            this.triangulator = new Dwyer(this.predicates);
         }
 
         public GenericMesher(ITriangulator triangulator)
+            : this(triangulator, RobustPredicates.Default)
         {
+        }
+
+        public GenericMesher(ITriangulator triangulator, IPredicates predicates)
+        {
+            this.predicates = predicates;
             this.triangulator = triangulator;
         }
 

@@ -13,6 +13,8 @@ namespace TriangleNet
 
     public static class MeshValidator
     {
+        private static RobustPredicates predicates = RobustPredicates.Default;
+
         /// <summary>
         /// Test the mesh for topological consistency.
         /// </summary>
@@ -46,7 +48,7 @@ namespace TriangleNet
                         // Only test for inversion once.
                         // Test if the triangle is flat or inverted.
                         apex = tri.Apex();
-                        if (RobustPredicates.CounterClockwise(org, dest, apex) <= 0.0)
+                        if (predicates.CounterClockwise(org, dest, apex) <= 0.0)
                         {
                             if (Log.Verbose)
                             {
@@ -189,7 +191,7 @@ namespace TriangleNet
 
                     if (shouldbedelaunay)
                     {
-                        if (RobustPredicates.NonRegular(org, dest, apex, oppoapex) > 0.0)
+                        if (predicates.NonRegular(org, dest, apex, oppoapex) > 0.0)
                         {
                             if (Log.Verbose)
                             {

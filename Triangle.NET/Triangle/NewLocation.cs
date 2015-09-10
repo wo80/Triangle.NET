@@ -22,6 +22,8 @@ namespace TriangleNet
     {
         const double EPS = 1e-50;
 
+        IPredicates predicates;
+
         Mesh mesh;
         Behavior behavior;
 
@@ -42,9 +44,11 @@ namespace TriangleNet
         double[] poly2 = new double[100];
         double[][] polys = new double[3][];
 
-        public NewLocation(Mesh mesh)
+        public NewLocation(Mesh mesh, IPredicates predicates)
         {
             this.mesh = mesh;
+            this.predicates = predicates;
+
             this.behavior = mesh.behavior;
         }
 
@@ -178,7 +182,7 @@ namespace TriangleNet
                 // Use the counterclockwise() routine to ensure a positive (and
                 //   reasonably accurate) result, avoiding any possibility of
                 //   division by zero.
-                denominator = 0.5 / RobustPredicates.CounterClockwise(tdest, tapex, torg);
+                denominator = 0.5 / predicates.CounterClockwise(tdest, tapex, torg);
                 // Don't count the above as an orientation test.
                 Statistic.CounterClockwiseCount--;
             }
@@ -473,7 +477,7 @@ namespace TriangleNet
                         neighborvertex_2 = neighborotri.Dest();
                         neighborvertex_3 = neighborotri.Apex();
                         // now calculate neighbor's circumcenter which is the voronoi site
-                        neighborCircumcenter = RobustPredicates.FindCircumcenter(neighborvertex_1, neighborvertex_2, neighborvertex_3,
+                        neighborCircumcenter = predicates.FindCircumcenter(neighborvertex_1, neighborvertex_2, neighborvertex_3,
                             ref xi_tmp, ref eta_tmp);
 
                         /// compute petal and Voronoi edge intersection ///
@@ -604,7 +608,7 @@ namespace TriangleNet
                         neighborvertex_2 = neighborotri.Dest();
                         neighborvertex_3 = neighborotri.Apex();
                         // now calculate neighbor's circumcenter which is the voronoi site
-                        neighborCircumcenter = RobustPredicates.FindCircumcenter(neighborvertex_1, neighborvertex_2, neighborvertex_3,
+                        neighborCircumcenter = predicates.FindCircumcenter(neighborvertex_1, neighborvertex_2, neighborvertex_3,
                             ref xi_tmp, ref eta_tmp);
 
                         /// compute petal and Voronoi edge intersection ///
@@ -891,7 +895,7 @@ namespace TriangleNet
                 // Use the counterclockwise() routine to ensure a positive (and
                 //   reasonably accurate) result, avoiding any possibility of
                 //   division by zero.
-                denominator = 0.5 / RobustPredicates.CounterClockwise(tdest, tapex, torg);
+                denominator = 0.5 / predicates.CounterClockwise(tdest, tapex, torg);
                 // Don't count the above as an orientation test.
                 Statistic.CounterClockwiseCount--;
             }
@@ -1234,7 +1238,7 @@ namespace TriangleNet
                         neighborvertex_2 = neighborotri.Dest();
                         neighborvertex_3 = neighborotri.Apex();
                         // now calculate neighbor's circumcenter which is the voronoi site
-                        neighborCircumcenter = RobustPredicates.FindCircumcenter(neighborvertex_1, neighborvertex_2, neighborvertex_3,
+                        neighborCircumcenter = predicates.FindCircumcenter(neighborvertex_1, neighborvertex_2, neighborvertex_3,
                             ref xi_tmp, ref eta_tmp);
 
                         /// compute petal and Voronoi edge intersection ///						
@@ -1516,7 +1520,7 @@ namespace TriangleNet
                         neighborvertex_2 = neighborotri.Dest();
                         neighborvertex_3 = neighborotri.Apex();
                         // now calculate neighbor's circumcenter which is the voronoi site
-                        neighborCircumcenter = RobustPredicates.FindCircumcenter(neighborvertex_1, neighborvertex_2, neighborvertex_3,
+                        neighborCircumcenter = predicates.FindCircumcenter(neighborvertex_1, neighborvertex_2, neighborvertex_3,
                             ref xi_tmp, ref eta_tmp);
 
                         /// compute petal and Voronoi edge intersection ///
@@ -3419,7 +3423,7 @@ namespace TriangleNet
             int intFound = 0;
             dx = x2 - x1;
             dy = y2 - y1;
-            numpolys = SplitConvexPolygon(numvertices, convexPoly, x1, y1, x2, y2, ref polys);
+            numpolys = SplitConvexPolygon(numvertices, convexPoly, x1, y1, x2, y2, polys);
 
             if (numpolys == 3)
             {
@@ -3480,7 +3484,7 @@ namespace TriangleNet
         /// <remarks>
         /// http://www.mathematik.uni-ulm.de/stochastik/lehre/ws03_04/rt/Geometry2D.ps
         /// </remarks>
-        private int SplitConvexPolygon(int numvertices, double[] convexPoly, double x1, double y1, double x2, double y2, ref double[][] polys)
+        private int SplitConvexPolygon(int numvertices, double[] convexPoly, double x1, double y1, double x2, double y2, double[][] polys)
         {
             // state = 0: before the first intersection (with the line)
             // state = 1: after the first intersection (with the line)
@@ -4099,7 +4103,7 @@ namespace TriangleNet
             else
             {
                 // Orient 'searchtri' to fit the preconditions of calling preciselocate().
-                ahead = RobustPredicates.CounterClockwise(torg, tdest, newvertex);
+                ahead = predicates.CounterClockwise(torg, tdest, newvertex);
                 if (ahead < 0.0)
                 {
                     // Turn around so that 'searchpoint' is to the left of the

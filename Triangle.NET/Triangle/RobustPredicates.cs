@@ -25,8 +25,39 @@ namespace TriangleNet
     /// command prompt with the command "CL /P /C EXACT.C", see
     /// http://msdn.microsoft.com/en-us/library/8z9z0bx6.aspx
     /// </remarks>
-    public static class RobustPredicates
+    public class RobustPredicates : IPredicates
     {
+        #region Default predicates instance (Singleton)
+
+        private static readonly object creationLock = new object();
+        private static RobustPredicates _default;
+
+        /// <summary>
+        /// Gets the default configuration instance.
+        /// </summary>
+        public static RobustPredicates Default
+        {
+            get
+            {
+                if (_default == null)
+                {
+                    lock (creationLock)
+                    {
+                        if (_default == null)
+                        {
+                            _default = new RobustPredicates();
+                        }
+                    }
+                }
+
+                return _default;
+            }
+        }
+
+        #endregion
+
+        #region Static initialization
+
         private static double epsilon, splitter, resulterrbound;
         private static double ccwerrboundA, ccwerrboundB, ccwerrboundC;
         private static double iccerrboundA, iccerrboundB, iccerrboundC;
@@ -49,7 +80,7 @@ namespace TriangleNet
         ///
         /// Don't change this routine unless you fully understand it.
         /// </remarks>
-        public static void ExactInit()
+        static RobustPredicates()
         {
             double half;
             double check, lastcheck;
@@ -89,6 +120,13 @@ namespace TriangleNet
             //o3derrboundC = (26.0 + 288.0 * epsilon) * epsilon * epsilon;
         }
 
+        #endregion
+
+        public RobustPredicates()
+        {
+            AllocateWorkspace();
+        }
+
         /// <summary>
         /// Check, if the three points appear in counterclockwise order. The result is 
         /// also a rough approximation of twice the signed area of the triangle defined 
@@ -100,7 +138,7 @@ namespace TriangleNet
         /// <returns>Return a positive value if the points pa, pb, and pc occur in 
         /// counterclockwise order; a negative value if they occur in clockwise order; 
         /// and zero if they are collinear.</returns>
-        public static double CounterClockwise(Point pa, Point pb, Point pc)
+        public double CounterClockwise(Point pa, Point pb, Point pc)
         {
             double detleft, detright, det;
             double detsum, errbound;
@@ -165,7 +203,7 @@ namespace TriangleNet
         /// <returns>Return a positive value if the point pd lies inside the circle passing through 
         /// pa, pb, and pc; a negative value if it lies outside; and zero if the four points 
         /// are cocircular.</returns>
-        public static double InCircle(Point pa, Point pb, Point pc, Point pd)
+        public double InCircle(Point pa, Point pb, Point pc, Point pd)
         {
             double adx, bdx, cdx, ady, bdy, cdy;
             double bdxcdy, cdxbdy, cdxady, adxcdy, adxbdy, bdxady;
@@ -231,7 +269,7 @@ namespace TriangleNet
         /// <returns>Return a positive value if the point pd lies inside the circle passing through 
         /// pa, pb, and pc; a negative value if it lies outside; and zero if the four points 
         /// are cocircular.</returns>
-        public static double NonRegular(Point pa, Point pb, Point pc, Point pd)
+        public double NonRegular(Point pa, Point pb, Point pc, Point pd)
         {
             return InCircle(pa, pb, pc, pd);
         }
@@ -246,7 +284,7 @@ namespace TriangleNet
         /// <param name="eta">Relative coordinate of new location.</param>
         /// <param name="offconstant">Off-center constant.</param>
         /// <returns>Coordinates of the circumcenter (or off-center)</returns>
-        public static Point FindCircumcenter(Point org, Point dest, Point apex,
+        public Point FindCircumcenter(Point org, Point dest, Point apex,
             ref double xi, ref double eta, double offconstant)
         {
             double xdo, ydo, xao, yao;
@@ -365,7 +403,7 @@ namespace TriangleNet
         /// This procedure also returns the square of the length of the triangle's
         /// shortest edge.
         /// </remarks>
-        public static Point FindCircumcenter(Point org, Point dest, Point apex,
+        public Point FindCircumcenter(Point org, Point dest, Point apex,
             ref double xi, ref double eta)
         {
             double xdo, ydo, xao, yao;
@@ -429,7 +467,7 @@ namespace TriangleNet
         /// property.  (That is, if e is strongly nonoverlapping, h will be also.) Does NOT
         /// maintain the nonoverlapping or nonadjacent properties. 
         /// </remarks>
-        static int FastExpansionSumZeroElim(int elen, double[] e, int flen, double[] f, double[] h)
+        private int FastExpansionSumZeroElim(int elen, double[] e, int flen, double[] f, double[] h)
         {
             double Q;
             double Qnew;
@@ -555,7 +593,7 @@ namespace TriangleNet
         /// maintains the strongly nonoverlapping and nonadjacent properties as well. (That is,
         /// if e has one of these properties, so will h.)
         /// </remarks>
-        static int ScaleExpansionZeroElim(int elen, double[] e, double b, double[] h)
+        private int ScaleExpansionZeroElim(int elen, double[] e, double b, double[] h)
         {
             double Q, sum;
             double hh;
@@ -605,7 +643,7 @@ namespace TriangleNet
         /// <param name="elen"></param>
         /// <param name="e"></param>
         /// <returns></returns>
-        static double Estimate(int elen, double[] e)
+        private double Estimate(int elen, double[] e)
         {
             double Q;
             int eindex;
@@ -636,7 +674,7 @@ namespace TriangleNet
         /// the returned value has the correct sign.  Hence, this function is usually quite fast,
         /// but will run more slowly when the input points are collinear or nearly so.
         /// </remarks>
-        static double CounterClockwiseAdapt(Point pa, Point pb, Point pc, double detsum)
+        private double CounterClockwiseAdapt(Point pa, Point pb, Point pc, double detsum)
         {
             double acx, acy, bcx, bcy;
             double acxtail, acytail, bcxtail, bcytail;
@@ -649,7 +687,7 @@ namespace TriangleNet
             double[] C1 = new double[8], C2 = new double[12], D = new double[16];
             double B3;
             int C1length, C2length, Dlength;
-            
+
             double u3;
             double s1, t1;
             double s0, t0;
@@ -741,7 +779,7 @@ namespace TriangleNet
         /// the returned value has the correct sign. Hence, this function is usually quite fast,
         /// but will run more slowly when the input points are cocircular or nearly so.
         /// </remarks>
-        static double InCircleAdapt(Point pa, Point pb, Point pc, Point pd, double permanent)
+        private double InCircleAdapt(Point pa, Point pb, Point pc, Point pd, double permanent)
         {
             double adx, bdx, cdx, ady, bdy, cdy;
             double det, errbound;
@@ -750,15 +788,10 @@ namespace TriangleNet
             double bdxcdy0, cdxbdy0, cdxady0, adxcdy0, adxbdy0, bdxady0;
             double[] bc = new double[4], ca = new double[4], ab = new double[4];
             double bc3, ca3, ab3;
-            double[] axbc = new double[8], axxbc = new double[16], aybc = new double[8], ayybc = new double[16], adet = new double[32];
             int axbclen, axxbclen, aybclen, ayybclen, alen;
-            double[] bxca = new double[8], bxxca = new double[16], byca = new double[8], byyca = new double[16], bdet = new double[32];
             int bxcalen, bxxcalen, bycalen, byycalen, blen;
-            double[] cxab = new double[8], cxxab = new double[16], cyab = new double[8], cyyab = new double[16], cdet = new double[32];
             int cxablen, cxxablen, cyablen, cyyablen, clen;
-            double[] abdet = new double[64];
             int ablen;
-            double[] fin1 = new double[1152], fin2 = new double[1152];
             double[] finnow, finother, finswap;
             int finlength;
 
@@ -773,8 +806,6 @@ namespace TriangleNet
             // See unsafe indexing in FastExpansionSumZeroElim.
             double[] u = new double[5], v = new double[5];
             double u3, v3;
-            double[] temp8 = new double[8], temp16a = new double[16], temp16b = new double[16], temp16c = new double[16];
-            double[] temp32a = new double[32], temp32b = new double[32], temp48 = new double[48], temp64 = new double[64];
             int temp8len, temp16alen, temp16blen, temp16clen;
             int temp32alen, temp32blen, temp48len, temp64len;
             double[] axtbb = new double[8], axtcc = new double[8], aytbb = new double[8], aytcc = new double[8];
@@ -887,24 +918,21 @@ namespace TriangleNet
             finnow = fin1;
             finother = fin2;
 
-            if ((bdxtail != 0.0) || (bdytail != 0.0)
-                || (cdxtail != 0.0) || (cdytail != 0.0))
+            if ((bdxtail != 0.0) || (bdytail != 0.0) || (cdxtail != 0.0) || (cdytail != 0.0))
             {
                 adxadx1 = (double)(adx * adx); c = (double)(splitter * adx); abig = (double)(c - adx); ahi = c - abig; alo = adx - ahi; err1 = adxadx1 - (ahi * ahi); err3 = err1 - ((ahi + ahi) * alo); adxadx0 = (alo * alo) - err3;
                 adyady1 = (double)(ady * ady); c = (double)(splitter * ady); abig = (double)(c - ady); ahi = c - abig; alo = ady - ahi; err1 = adyady1 - (ahi * ahi); err3 = err1 - ((ahi + ahi) * alo); adyady0 = (alo * alo) - err3;
                 _i = (double)(adxadx0 + adyady0); bvirt = (double)(_i - adxadx0); avirt = _i - bvirt; bround = adyady0 - bvirt; around = adxadx0 - avirt; aa[0] = around + bround; _j = (double)(adxadx1 + _i); bvirt = (double)(_j - adxadx1); avirt = _j - bvirt; bround = _i - bvirt; around = adxadx1 - avirt; _0 = around + bround; _i = (double)(_0 + adyady1); bvirt = (double)(_i - _0); avirt = _i - bvirt; bround = adyady1 - bvirt; around = _0 - avirt; aa[1] = around + bround; aa3 = (double)(_j + _i); bvirt = (double)(aa3 - _j); avirt = aa3 - bvirt; bround = _i - bvirt; around = _j - avirt; aa[2] = around + bround;
                 aa[3] = aa3;
             }
-            if ((cdxtail != 0.0) || (cdytail != 0.0)
-                || (adxtail != 0.0) || (adytail != 0.0))
+            if ((cdxtail != 0.0) || (cdytail != 0.0) || (adxtail != 0.0) || (adytail != 0.0))
             {
                 bdxbdx1 = (double)(bdx * bdx); c = (double)(splitter * bdx); abig = (double)(c - bdx); ahi = c - abig; alo = bdx - ahi; err1 = bdxbdx1 - (ahi * ahi); err3 = err1 - ((ahi + ahi) * alo); bdxbdx0 = (alo * alo) - err3;
                 bdybdy1 = (double)(bdy * bdy); c = (double)(splitter * bdy); abig = (double)(c - bdy); ahi = c - abig; alo = bdy - ahi; err1 = bdybdy1 - (ahi * ahi); err3 = err1 - ((ahi + ahi) * alo); bdybdy0 = (alo * alo) - err3;
                 _i = (double)(bdxbdx0 + bdybdy0); bvirt = (double)(_i - bdxbdx0); avirt = _i - bvirt; bround = bdybdy0 - bvirt; around = bdxbdx0 - avirt; bb[0] = around + bround; _j = (double)(bdxbdx1 + _i); bvirt = (double)(_j - bdxbdx1); avirt = _j - bvirt; bround = _i - bvirt; around = bdxbdx1 - avirt; _0 = around + bround; _i = (double)(_0 + bdybdy1); bvirt = (double)(_i - _0); avirt = _i - bvirt; bround = bdybdy1 - bvirt; around = _0 - avirt; bb[1] = around + bround; bb3 = (double)(_j + _i); bvirt = (double)(bb3 - _j); avirt = bb3 - bvirt; bround = _i - bvirt; around = _j - avirt; bb[2] = around + bround;
                 bb[3] = bb3;
             }
-            if ((adxtail != 0.0) || (adytail != 0.0)
-                || (bdxtail != 0.0) || (bdytail != 0.0))
+            if ((adxtail != 0.0) || (adytail != 0.0) || (bdxtail != 0.0) || (bdytail != 0.0))
             {
                 cdxcdx1 = (double)(cdx * cdx); c = (double)(splitter * cdx); abig = (double)(c - cdx); ahi = c - abig; alo = cdx - ahi; err1 = cdxcdx1 - (ahi * ahi); err3 = err1 - ((ahi + ahi) * alo); cdxcdx0 = (alo * alo) - err3;
                 cdycdy1 = (double)(cdy * cdy); c = (double)(splitter * cdy); abig = (double)(c - cdy); ahi = c - abig; alo = cdy - ahi; err1 = cdycdy1 - (ahi * ahi); err3 = err1 - ((ahi + ahi) * alo); cdycdy0 = (alo * alo) - err3;
@@ -1260,6 +1288,59 @@ namespace TriangleNet
 
             return finnow[finlength - 1];
         }
+
+        #region Workspace
+
+        // InCircleAdapt workspace:
+        double[] fin1, fin2, abdet;
+
+        double[] axbc, axxbc, aybc, ayybc, adet;
+        double[] bxca, bxxca, byca, byyca, bdet;
+        double[] cxab, cxxab, cyab, cyyab, cdet;
+
+        double[] temp8, temp16a, temp16b, temp16c;
+        double[] temp32a, temp32b, temp48, temp64;
+
+        private void AllocateWorkspace()
+        {
+            fin1 = new double[1152];
+            fin2 = new double[1152];
+            abdet = new double[64];
+
+            axbc = new double[8];
+            axxbc = new double[16];
+            aybc = new double[8];
+            ayybc = new double[16];
+            adet = new double[32];
+
+            bxca = new double[8];
+            bxxca = new double[16];
+            byca = new double[8];
+            byyca = new double[16];
+            bdet = new double[32];
+
+            cxab = new double[8];
+            cxxab = new double[16];
+            cyab = new double[8];
+            cyyab = new double[16];
+            cdet = new double[32];
+
+            temp8 = new double[8];
+            temp16a = new double[16];
+            temp16b = new double[16];
+            temp16c = new double[16];
+
+            temp32a = new double[32];
+            temp32b = new double[32];
+            temp48 = new double[48];
+            temp64 = new double[64];
+        }
+
+        private void ClearWorkspace()
+        {
+        }
+
+        #endregion
 
         #endregion
     }

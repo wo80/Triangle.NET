@@ -21,6 +21,8 @@ namespace TriangleNet.Voronoi.Legacy
     [Obsolete("Use TriangleNet.Voronoi.BoundedVoronoi class instead.")]
     public class BoundedVoronoiLegacy : IVoronoi
     {
+        IPredicates predicates = RobustPredicates.Default;
+
         Mesh mesh;
 
         Point[] points;
@@ -132,7 +134,7 @@ namespace TriangleNet.Voronoi.Legacy
             {
                 tri.tri = item;
 
-                pt = RobustPredicates.FindCircumcenter(tri.Org(), tri.Dest(), tri.Apex(), ref xi, ref eta);
+                pt = predicates.FindCircumcenter(tri.Org(), tri.Dest(), tri.Apex(), ref xi, ref eta);
                 pt.id = item.id;
 
                 points[item.id] = pt;
