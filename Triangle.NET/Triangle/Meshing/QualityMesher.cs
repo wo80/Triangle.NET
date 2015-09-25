@@ -46,6 +46,51 @@ namespace TriangleNet.Meshing
         }
 
         /// <summary>
+        /// Triangulate given input data.
+        /// </summary>
+        /// <param name="input"></param>
+        public void Apply(QualityOptions quality)
+        {
+            // Copy quality options
+            if (quality != null)
+            {
+                behavior.Quality = true;
+
+                behavior.MinAngle = quality.MinimumAngle;
+                behavior.MaxAngle = quality.MaximumAngle;
+                behavior.MaxArea = quality.MaximumArea;
+                behavior.UserTest = quality.UserTest;
+
+                mesh.steinerleft = quality.SteinerPoints == 0 ? -1 : quality.SteinerPoints;
+            }
+
+            // TODO: remove
+            if (!behavior.Poly)
+            {
+                // Be careful not to allocate space for element area constraints that
+                // will never be assigned any value (other than the default -1.0).
+                behavior.VarArea = false;
+            }
+
+            // Ensure that no vertex can be mistaken for a triangular bounding
+            // box vertex in insertvertex().
+            mesh.infvertex1 = null;
+            mesh.infvertex2 = null;
+            mesh.infvertex3 = null;
+
+            if (behavior.useSegments)
+            {
+                mesh.checksegments = true;
+            }
+
+            if (behavior.Quality && mesh.triangles.Count > 0)
+            {
+                // Enforce angle and area constraints.
+                EnforceQuality();
+            }
+        }
+
+        /// <summary>
         /// Add a bad subsegment to the queue.
         /// </summary>
         /// <param name="badseg">Bad subsegment.</param>
@@ -272,13 +317,10 @@ namespace TriangleNet.Meshing
                 }
 
                 // Check whether the user thinks this triangle is too large.
-                if (behavior.UserTest != null)
+                if ((behavior.UserTest != null) && behavior.UserTest(testtri.tri, area))
                 {
-                    if (behavior.UserTest(testtri.tri, area))
-                    {
-                        queue.Enqueue(ref testtri, minedge, tapex, torg, tdest);
-                        return;
-                    }
+                    queue.Enqueue(ref testtri, minedge, tapex, torg, tdest);
+                    return;
                 }
             }
 
@@ -773,7 +815,7 @@ namespace TriangleNet.Meshing
         /// <summary>
         /// Remove all the encroached subsegments and bad triangles from the triangulation.
         /// </summary>
-        public void EnforceQuality()
+        private void EnforceQuality()
         {
             BadTriangle badtri;
 

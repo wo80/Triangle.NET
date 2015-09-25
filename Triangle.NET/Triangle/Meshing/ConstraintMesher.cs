@@ -9,10 +9,10 @@ namespace TriangleNet.Meshing
 {
     using System;
     using System.Collections.Generic;
-    using TriangleNet.Topology;
     using TriangleNet.Geometry;
     using TriangleNet.Logging;
     using TriangleNet.Meshing.Iterators;
+    using TriangleNet.Topology;
 
     internal class ConstraintMesher
     {
@@ -39,12 +39,67 @@ namespace TriangleNet.Meshing
             logger = Log.Instance;
         }
 
+
+        /// <summary>
+        /// Triangulate given input data.
+        /// </summary>
+        /// <param name="input"></param>
+        public void Apply(IPolygon input, ConstraintOptions options)
+        {
+            behavior.Poly = input.Segments.Count > 0;
+
+            // Copy constraint options
+            if (options != null)
+            {
+                behavior.ConformingDelaunay = options.ConformingDelaunay;
+                behavior.Convex = options.Convex;
+                behavior.NoBisect = options.SegmentSplitting;
+
+                if (behavior.ConformingDelaunay)
+                {
+                    behavior.Quality = true;
+                }
+            }
+
+            //if (input.EdgeMarkers != null)
+            //{
+            //    behavior.UseBoundaryMarkers = true;
+            //}
+
+            behavior.useRegions = input.Regions.Count > 0;
+
+            // Ensure that no vertex can be mistaken for a triangular bounding
+            // box vertex in insertvertex().
+            mesh.infvertex1 = null;
+            mesh.infvertex2 = null;
+            mesh.infvertex3 = null;
+
+            if (behavior.useSegments)
+            {
+                // Segments will be introduced next.
+                mesh.checksegments = true;
+
+                // Insert PSLG segments and/or convex hull segments.
+                FormSkeleton(input);
+            }
+
+            if (behavior.Poly && (mesh.triangles.Count > 0))
+            {
+                // Copy holes and regions
+                mesh.holes.AddRange(input.Holes);
+                mesh.regions.AddRange(input.Regions);
+
+                // Carve out holes and concavities.
+                CarveHoles();
+            }
+        }
+
         /// <summary>
         /// Find the holes and infect them. Find the area constraints and infect 
         /// them. Infect the convex hull. Spread the infection and kill triangles. 
         /// Spread the area constraints.
         /// </summary>
-        public void CarveHoles()
+        private void CarveHoles()
         {
             Otri searchtri = default(Otri);
             Vertex searchorg, searchdest;
@@ -171,7 +226,7 @@ namespace TriangleNet.Meshing
         /// Create the segments of a triangulation, including PSLG segments and edges 
         /// on the convex hull.
         /// </summary>
-        public void FormSkeleton(IPolygon input)
+        private void FormSkeleton(IPolygon input)
         {
             // The segment endpoints.
             Vertex p, q;

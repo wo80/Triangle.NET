@@ -22,8 +22,7 @@ namespace MeshExplorer
 
         private void FormTopology_Load(object sender, EventArgs e)
         {
-            var mesher = new GenericMesher();
-            mesh = (Mesh)mesher.StructuredMesh(new Rectangle(0.0, 0.0, 4.0, 4.0), 4, 4);
+            mesh = (Mesh)GenericMesher.StructuredMesh(new Rectangle(0.0, 0.0, 4.0, 4.0), 4, 4);
 
             renderControl.Initialize(mesh);
 

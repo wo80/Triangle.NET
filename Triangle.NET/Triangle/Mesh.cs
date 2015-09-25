@@ -252,20 +252,23 @@ namespace TriangleNet
 
             this.predicates = predicates;
 
-            this.qualityMesher = new QualityMesher(this, predicates);
-
             this.locator = new TriangleLocator(this, predicates);
         }
 
         public void Refine(QualityOptions quality)
         {
-            behavior.MinAngle = quality.MinimumAngle;
-            behavior.MaxAngle = quality.MaximumAngle;
+            inelements = triangles.Count;
+            invertices = vertices.Count;
 
-            behavior.MaxArea = quality.MaximumArea;
-            behavior.VarArea = quality.VariableArea;
+            if (behavior.Poly)
+            {
+                insegments = behavior.useSegments ? subsegs.Count : hullsize;
+            }
 
-            this.Refine();
+            Reset();
+
+            // Enforce angle and area constraints.
+            qualityMesher.Apply(quality);
         }
 
         /// <summary>
@@ -321,130 +324,14 @@ namespace TriangleNet
         }
 
         #region Misc
-        
-        /// <summary>
-        /// Triangulate given input data.
-        /// </summary>
-        /// <param name="input"></param>
-        internal void ApplyConstraints(IPolygon input, ConstraintOptions options, QualityOptions quality)
-        {
-            behavior.Poly = input.Segments.Count > 0;
-
-            // Copy constraint options
-            if (options != null)
-            {
-                behavior.ConformingDelaunay = options.ConformingDelaunay;
-                behavior.Convex = options.Convex;
-                behavior.NoBisect = options.SegmentSplitting;
-
-                if (behavior.ConformingDelaunay)
-                {
-                    behavior.Quality = true;
-                }
-            }
-
-            // Copy quality options
-            if (quality != null)
-            {
-                behavior.Quality = true;
-
-                behavior.MinAngle = quality.MinimumAngle;
-                behavior.MaxAngle = quality.MaximumAngle;
-                behavior.MaxArea = quality.MaximumArea;
-                behavior.UserTest = quality.UserTest;
-
-                steinerleft = quality.SteinerPoints == 0 ? -1 : quality.SteinerPoints;
-            }
-
-            //if (input.EdgeMarkers != null)
-            //{
-            //    behavior.UseBoundaryMarkers = true;
-            //}
-
-            // TODO: remove
-            if (!behavior.Poly)
-            {
-                // Be careful not to allocate space for element area constraints that
-                // will never be assigned any value (other than the default -1.0).
-                behavior.VarArea = false;
-            }
-
-            behavior.useRegions = input.Regions.Count > 0;
-            
-            // Ensure that no vertex can be mistaken for a triangular bounding
-            // box vertex in insertvertex().
-            infvertex1 = null;
-            infvertex2 = null;
-            infvertex3 = null;
-
-            // Insert segments, carving holes.
-            var mesher = new ConstraintMesher(this, predicates);
-
-            if (behavior.useSegments)
-            {
-                // Segments will be introduced next.
-                checksegments = true;
-
-                // Insert PSLG segments and/or convex hull segments.
-                mesher.FormSkeleton(input);
-            }
-
-            if (behavior.Poly && (triangles.Count > 0))
-            {
-                // Copy holes
-                foreach (var item in input.Holes)
-                {
-                    holes.Add(item);
-                }
-
-                // Copy regions
-                foreach (var item in input.Regions)
-                {
-                    regions.Add(item);
-                }
-
-                // Carve out holes and concavities.
-                mesher.CarveHoles();
-            }
-
-            if (behavior.Quality && triangles.Count > 0)
-            {
-                // Enforce angle and area constraints.
-                qualityMesher.EnforceQuality();
-            }
-        }
 
         /// <summary>
-        /// Refines the current mesh.
+        /// Set QualityMesher for mesh refinement.
         /// </summary>
-        internal void Refine()
+        /// <param name="qmesher"></param>
+        internal void SetQualityMesher(QualityMesher qmesher)
         {
-            inelements = triangles.Count;
-            invertices = vertices.Count;
-
-            // TODO: Set all vertex types to input (i.e. NOT free)?
-
-            if (behavior.Poly)
-            {
-                insegments = behavior.useSegments ? subsegs.Count : hullsize;
-            }
-
-            Reset();
-
-            // Ensure that no vertex can be mistaken for a triangular bounding
-            // box vertex in insertvertex().
-            infvertex1 = infvertex2 = infvertex3 = null;
-
-            if (behavior.useSegments)
-            {
-                checksegments = true;
-            }
-
-            if (triangles.Count > 0)
-            {
-                // Enforce angle and area constraints.
-                qualityMesher.EnforceQuality();
-            }
+            qualityMesher = qmesher;
         }
 
         internal void CopyTo(Mesh target)
@@ -535,7 +422,7 @@ namespace TriangleNet
             // Simple heuristic to check if ids are already set.  We assume that if the
             // first two vertex ids are distinct, then all input vertices have pairwise
             // distinct ids.
-            bool userId = (v.ID != points[1].ID);
+            bool userId = (v.id != points[1].id);
 
             foreach (var p in points)
             {

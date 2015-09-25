@@ -23,7 +23,7 @@ namespace TriangleNet.Meshing
 
         public GenericMesher()
         {
-            this.predicates = RobustPredicates.Default;
+            this.predicates = new RobustPredicates();
             this.triangulator = new Dwyer(this.predicates);
         }
 
@@ -67,7 +67,16 @@ namespace TriangleNet.Meshing
         {
             var mesh = (Mesh)triangulator.Triangulate(polygon.Points);
 
-            mesh.ApplyConstraints(polygon, options, quality);
+            var cmesher = new ConstraintMesher(mesh, predicates);
+            var qmesher = new QualityMesher(mesh, predicates);
+
+            mesh.SetQualityMesher(qmesher);
+
+            // Insert segments.
+            cmesher.Apply(polygon, options);
+
+            // Refine mesh.
+            qmesher.Apply(quality);
 
             return mesh;
         }
@@ -80,7 +89,7 @@ namespace TriangleNet.Meshing
         /// <param name="nx">Number of segments in x direction.</param>
         /// <param name="ny">Number of segments in y direction.</param>
         /// <returns>Mesh</returns>
-        public IMesh StructuredMesh(double width, double height, int nx, int ny)
+        public static IMesh StructuredMesh(double width, double height, int nx, int ny)
         {
             if (width <= 0.0)
             {
@@ -102,7 +111,7 @@ namespace TriangleNet.Meshing
         /// <param name="nx">Number of segments in x direction.</param>
         /// <param name="ny">Number of segments in y direction.</param>
         /// <returns>Mesh</returns>
-        public IMesh StructuredMesh(Rectangle bounds, int nx, int ny)
+        public static IMesh StructuredMesh(Rectangle bounds, int nx, int ny)
         {
             var polygon = new Polygon((nx + 1) * (ny + 1));
 
