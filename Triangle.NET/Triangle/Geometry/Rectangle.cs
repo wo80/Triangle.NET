@@ -150,7 +150,7 @@ namespace TriangleNet.Geometry
         /// <returns>Return true, if bounding box contains given point.</returns>
         public bool Contains(Point pt)
         {
-            return ((pt.X >= xmin) && (pt.X <= xmax) && (pt.Y >= ymin) && (pt.Y <= ymax));
+            return ((pt.x >= xmin) && (pt.x <= xmax) && (pt.y >= ymin) && (pt.y <= ymax));
         }
 
         /// <summary>

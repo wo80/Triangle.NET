@@ -54,7 +54,6 @@ namespace TriangleNet
         internal int inelements;     // Number of input triangles.
         internal int insegments;     // Number of input segments.
         internal int undeads;        // Number of input vertices that don't appear in the mesh.
-        internal int edges;          // Number of output edges.
         internal int mesh_dim;       // Dimension (ought to be 2).
         internal int nextras;        // Number of attributes per vertex.
         //internal int eextras;        // Number of attributes per triangle.
@@ -136,17 +135,26 @@ namespace TriangleNet
         /// <summary>
         /// Gets the number of input vertices.
         /// </summary>
-        public int NumberOfInputPoints { get { return invertices; } }
+        public int NumberOfInputPoints
+        {
+            get { return invertices; }
+        }
 
         /// <summary>
         /// Gets the number of mesh edges.
         /// </summary>
-        public int NumberOfEdges { get { return this.edges; } }
+        public int NumberOfEdges
+        {
+            get { return (3 * triangles.Count + hullsize) / 2; }
+        }
 
         /// <summary>
         /// Indicates whether the input is a PSLG or a point set.
         /// </summary>
-        public bool IsPolygon { get { return this.insegments > 0; } }
+        public bool IsPolygon
+        {
+            get { return this.insegments > 0; }
+        }
 
         /// <summary>
         /// Gets the current node numbering.
@@ -240,6 +248,8 @@ namespace TriangleNet
             holes = new List<Point>();
             regions = new List<RegionPointer>();
 
+            steinerleft = -1;
+
             this.predicates = predicates;
 
             this.qualityMesher = new QualityMesher(this, predicates);
@@ -311,78 +321,7 @@ namespace TriangleNet
         }
 
         #region Misc
-
-        /*
-        /// <summary>
-        /// Load a mesh from file (.node/poly and .ele).
-        /// </summary>
-        public void Load(string filename)
-        {
-            List<ITriangle> triangles;
-            InputGeometry geometry;
-
-            FileReader.Read(filename, out geometry, out triangles);
-
-            if (geometry != null && triangles != null)
-            {
-                Load(geometry, triangles);
-            }
-        }
-
-        /// <summary>
-        /// Reconstructs a mesh from raw input data.
-        /// </summary>
-        public void Load(InputGeometry input, List<ITriangle> triangles)
-        {
-            if (input == null || triangles == null)
-            {
-                throw new ArgumentException("Invalid input (argument is null).");
-            }
-
-            // Clear all data structures / reset hash seeds
-            this.ResetData();
-
-            if (input.HasSegments)
-            {
-                behavior.Poly = true;
-
-                this.holes.AddRange(input.Holes);
-            }
-
-            //if (input.EdgeMarkers != null)
-            //{
-            //    behavior.UseBoundaryMarkers = true;
-            //}
-
-            //if (input.TriangleAreas != null)
-            //{
-            //    behavior.VarArea = true;
-            //}
-
-            // TODO: remove
-            if (!behavior.Poly)
-            {
-                // Be careful not to allocate space for element area constraints that
-                // will never be assigned any value (other than the default -1.0).
-                behavior.VarArea = false;
-
-                // Be careful not to add an extra attribute to each element unless the
-                // input supports it (PSLG in, but not refining a preexisting mesh).
-                behavior.useRegions = false;
-            }
-
-            behavior.useRegions = input.Regions.Count > 0;
-
-            TransferNodes(input.points);
-
-            // Read and reconstruct a mesh.
-            hullsize = DataReader.Reconstruct(this, input, triangles.ToArray());
-
-            // Calculate the number of edges.
-            edges = (3 * triangles.Count + hullsize) / 2;
-        }
-        */
-
+        
         /// <summary>
         /// Triangulate given input data.
         /// </summary>
@@ -407,14 +346,14 @@ namespace TriangleNet
             // Copy quality options
             if (quality != null)
             {
+                behavior.Quality = true;
+
                 behavior.MinAngle = quality.MinimumAngle;
                 behavior.MaxAngle = quality.MaximumAngle;
                 behavior.MaxArea = quality.MaximumArea;
                 behavior.UserTest = quality.UserTest;
 
-                behavior.SteinerPoints = quality.SteinerPoints == 0 ? -1 : quality.SteinerPoints;
-
-                behavior.Quality = true;
+                steinerleft = quality.SteinerPoints == 0 ? -1 : quality.SteinerPoints;
             }
 
             //if (input.EdgeMarkers != null)
@@ -431,9 +370,7 @@ namespace TriangleNet
             }
 
             behavior.useRegions = input.Regions.Count > 0;
-
-            steinerleft = behavior.SteinerPoints;
-
+            
             // Ensure that no vertex can be mistaken for a triangular bounding
             // box vertex in insertvertex().
             infvertex1 = null;
@@ -475,9 +412,6 @@ namespace TriangleNet
                 // Enforce angle and area constraints.
                 qualityMesher.EnforceQuality();
             }
-
-            // Calculate the number of edges.
-            edges = (3 * triangles.Count + hullsize) / 2;
         }
 
         /// <summary>
@@ -497,8 +431,6 @@ namespace TriangleNet
 
             Reset();
 
-            steinerleft = behavior.SteinerPoints;
-
             // Ensure that no vertex can be mistaken for a triangular bounding
             // box vertex in insertvertex().
             infvertex1 = infvertex2 = infvertex3 = null;
@@ -513,9 +445,6 @@ namespace TriangleNet
                 // Enforce angle and area constraints.
                 qualityMesher.EnforceQuality();
             }
-
-            // Calculate the number of edges.
-            edges = (3 * triangles.Count + hullsize) / 2;
         }
 
         internal void CopyTo(Mesh target)
@@ -533,7 +462,6 @@ namespace TriangleNet
 
             target.numbering = this.numbering;
             target.hullsize = this.hullsize;
-            target.edges = this.edges;
         }
 
         /// <summary>
@@ -556,7 +484,6 @@ namespace TriangleNet
             flipstack.Clear();
 
             hullsize = 0;
-            edges = 0;
 
             Reset();
 

@@ -38,31 +38,31 @@ namespace TriangleNet.Meshing
             this.triangulator = triangulator;
         }
 
-        /// <inherit />
+        /// <inheritdoc />
         public IMesh Triangulate(IList<Vertex> points)
         {
             return triangulator.Triangulate(points);
         }
 
-        /// <inherit />
+        /// <inheritdoc />
         public IMesh Triangulate(IPolygon polygon)
         {
             return Triangulate(polygon, null, null);
         }
 
-        /// <inherit />
+        /// <inheritdoc />
         public IMesh Triangulate(IPolygon polygon, ConstraintOptions options)
         {
             return Triangulate(polygon, options, null);
         }
 
-        /// <inherit />
+        /// <inheritdoc />
         public IMesh Triangulate(IPolygon polygon, QualityOptions quality)
         {
             return Triangulate(polygon, null, quality);
         }
 
-        /// <inherit />
+        /// <inheritdoc />
         public IMesh Triangulate(IPolygon polygon, ConstraintOptions options, QualityOptions quality)
         {
             var mesh = (Mesh)triangulator.Triangulate(polygon.Points);

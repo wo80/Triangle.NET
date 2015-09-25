@@ -53,7 +53,7 @@ namespace TriangleNet.Tools
                 {
                     var a = array[i];
                     int j = i - 1;
-                    while (j >= left && (array[j].X > a.X || (array[j].X == a.X && array[j].Y > a.Y)))
+                    while (j >= left && (array[j].x > a.x || (array[j].x == a.x && array[j].y > a.y)))
                     {
                         array[j + 1] = array[j];
                         j--;
@@ -66,8 +66,8 @@ namespace TriangleNet.Tools
 
             // Choose a random pivot to split the array.
             pivot = rand.Next(left, right);
-            pivotx = array[pivot].X;
-            pivoty = array[pivot].Y;
+            pivotx = array[pivot].x;
+            pivoty = array[pivot].y;
             // Split the array.
             left--;
             right++;
@@ -78,15 +78,15 @@ namespace TriangleNet.Tools
                 {
                     left++;
                 }
-                while ((left <= right) && ((array[left].X < pivotx) ||
-                    ((array[left].X == pivotx) && (array[left].Y < pivoty))));
+                while ((left <= right) && ((array[left].x < pivotx) ||
+                    ((array[left].x == pivotx) && (array[left].y < pivoty))));
                 // Search for a vertex whose x-coordinate is too small for the right.
                 do
                 {
                     right--;
                 }
-                while ((left <= right) && ((array[right].X > pivotx) ||
-                    ((array[right].X == pivotx) && (array[right].Y > pivoty))));
+                while ((left <= right) && ((array[right].x > pivotx) ||
+                    ((array[right].x == pivotx) && (array[right].y > pivoty))));
 
                 if (left < right)
                 {

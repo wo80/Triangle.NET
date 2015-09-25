@@ -341,7 +341,6 @@ namespace TriangleNet.Meshing
             }
 
             mesh.hullsize = hullsize;
-            mesh.edges = (3 * mesh.triangles.Count + hullsize) / 2;
         }
 
         #endregion
@@ -355,7 +354,7 @@ namespace TriangleNet.Meshing
             var vertices = new HVertex[mesh.vertices.Count];
             var faces = new Face[mesh.triangles.Count];
 
-            dcel.HalfEdges.Capacity = 2 * mesh.edges;
+            dcel.HalfEdges.Capacity = 2 * mesh.NumberOfEdges;
 
             mesh.Renumber();
 

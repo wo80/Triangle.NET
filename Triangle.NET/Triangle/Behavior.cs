@@ -27,7 +27,6 @@ namespace TriangleNet
         Func<ITriangle, double, bool> usertest;
 
         int noBisect = 0;
-        int steiner = -1;
 
         double minAngle = 0.0;
         double maxAngle = 0.0;
@@ -215,15 +214,6 @@ namespace TriangleNet
                     noBisect = 0;
                 }
             }
-        }
-
-        /// <summary>
-        /// Use maximum number of Steiner points.
-        /// </summary>
-        public int SteinerPoints
-        {
-            get { return steiner; }
-            set { steiner = value; }
         }
 
         /// <summary>

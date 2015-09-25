@@ -69,7 +69,7 @@ namespace TriangleNet.Voronoi
                 factory = new DefaultVoronoiFactory();
             }
 
-            factory.Initialize(vertices.Length, 2 * mesh.edges, faces.Length);
+            factory.Initialize(vertices.Length, 2 * mesh.NumberOfEdges, faces.Length);
 
             // Compute triangles circumcenters.
             var map = ComputeVertices(mesh, vertices);

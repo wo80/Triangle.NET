@@ -8,7 +8,6 @@
 namespace TriangleNet
 {
     using System;
-    using TriangleNet.Topology;
     using TriangleNet.Geometry;
     using TriangleNet.Tools;
 
@@ -701,10 +700,10 @@ namespace TriangleNet
             double _i, _j;
             double _0;
 
-            acx = (double)(pa.X - pc.X);
-            bcx = (double)(pb.X - pc.X);
-            acy = (double)(pa.Y - pc.Y);
-            bcy = (double)(pb.Y - pc.Y);
+            acx = (double)(pa.x - pc.x);
+            bcx = (double)(pb.x - pc.x);
+            acy = (double)(pa.y - pc.y);
+            bcy = (double)(pb.y - pc.y);
 
             detleft = (double)(acx * bcy); c = (double)(splitter * acx); abig = (double)(c - acx); ahi = c - abig; alo = acx - ahi; c = (double)(splitter * bcy); abig = (double)(c - bcy); bhi = c - abig; blo = bcy - bhi; err1 = detleft - (ahi * bhi); err2 = err1 - (alo * bhi); err3 = err2 - (ahi * blo); detlefttail = (alo * blo) - err3;
             detright = (double)(acy * bcx); c = (double)(splitter * acy); abig = (double)(c - acy); ahi = c - abig; alo = acy - ahi; c = (double)(splitter * bcx); abig = (double)(c - bcx); bhi = c - abig; blo = bcx - bhi; err1 = detright - (ahi * bhi); err2 = err1 - (alo * bhi); err3 = err2 - (ahi * blo); detrighttail = (alo * blo) - err3;
@@ -720,10 +719,10 @@ namespace TriangleNet
                 return det;
             }
 
-            bvirt = (double)(pa.X - acx); avirt = acx + bvirt; bround = bvirt - pc.X; around = pa.X - avirt; acxtail = around + bround;
-            bvirt = (double)(pb.X - bcx); avirt = bcx + bvirt; bround = bvirt - pc.X; around = pb.X - avirt; bcxtail = around + bround;
-            bvirt = (double)(pa.Y - acy); avirt = acy + bvirt; bround = bvirt - pc.Y; around = pa.Y - avirt; acytail = around + bround;
-            bvirt = (double)(pb.Y - bcy); avirt = bcy + bvirt; bround = bvirt - pc.Y; around = pb.Y - avirt; bcytail = around + bround;
+            bvirt = (double)(pa.x - acx); avirt = acx + bvirt; bround = bvirt - pc.x; around = pa.x - avirt; acxtail = around + bround;
+            bvirt = (double)(pb.x - bcx); avirt = bcx + bvirt; bround = bvirt - pc.x; around = pb.x - avirt; bcxtail = around + bround;
+            bvirt = (double)(pa.y - acy); avirt = acy + bvirt; bround = bvirt - pc.y; around = pa.y - avirt; acytail = around + bround;
+            bvirt = (double)(pb.y - bcy); avirt = bcy + bvirt; bround = bvirt - pc.y; around = pb.y - avirt; bcytail = around + bround;
 
             if ((acxtail == 0.0) && (acytail == 0.0)
                 && (bcxtail == 0.0) && (bcytail == 0.0))
@@ -837,19 +836,19 @@ namespace TriangleNet
             double _i, _j;
             double _0;
 
-            adx = (double)(pa.X - pd.X);
-            bdx = (double)(pb.X - pd.X);
-            cdx = (double)(pc.X - pd.X);
-            ady = (double)(pa.Y - pd.Y);
-            bdy = (double)(pb.Y - pd.Y);
-            cdy = (double)(pc.Y - pd.Y);
+            adx = (double)(pa.x - pd.x);
+            bdx = (double)(pb.x - pd.x);
+            cdx = (double)(pc.x - pd.x);
+            ady = (double)(pa.y - pd.y);
+            bdy = (double)(pb.y - pd.y);
+            cdy = (double)(pc.y - pd.y);
 
-            adx = (double)(pa.X - pd.X);
-            bdx = (double)(pb.X - pd.X);
-            cdx = (double)(pc.X - pd.X);
-            ady = (double)(pa.Y - pd.Y);
-            bdy = (double)(pb.Y - pd.Y);
-            cdy = (double)(pc.Y - pd.Y);
+            adx = (double)(pa.x - pd.x);
+            bdx = (double)(pb.x - pd.x);
+            cdx = (double)(pc.x - pd.x);
+            ady = (double)(pa.y - pd.y);
+            bdy = (double)(pb.y - pd.y);
+            cdy = (double)(pc.y - pd.y);
 
             bdxcdy1 = (double)(bdx * cdy); c = (double)(splitter * bdx); abig = (double)(c - bdx); ahi = c - abig; alo = bdx - ahi; c = (double)(splitter * cdy); abig = (double)(c - cdy); bhi = c - abig; blo = cdy - bhi; err1 = bdxcdy1 - (ahi * bhi); err2 = err1 - (alo * bhi); err3 = err2 - (ahi * blo); bdxcdy0 = (alo * blo) - err3;
             cdxbdy1 = (double)(cdx * bdy); c = (double)(splitter * cdx); abig = (double)(c - cdx); ahi = c - abig; alo = cdx - ahi; c = (double)(splitter * bdy); abig = (double)(c - bdy); bhi = c - abig; blo = bdy - bhi; err1 = cdxbdy1 - (ahi * bhi); err2 = err1 - (alo * bhi); err3 = err2 - (ahi * blo); cdxbdy0 = (alo * blo) - err3;
@@ -891,12 +890,12 @@ namespace TriangleNet
                 return det;
             }
 
-            bvirt = (double)(pa.X - adx); avirt = adx + bvirt; bround = bvirt - pd.X; around = pa.X - avirt; adxtail = around + bround;
-            bvirt = (double)(pa.Y - ady); avirt = ady + bvirt; bround = bvirt - pd.Y; around = pa.Y - avirt; adytail = around + bround;
-            bvirt = (double)(pb.X - bdx); avirt = bdx + bvirt; bround = bvirt - pd.X; around = pb.X - avirt; bdxtail = around + bround;
-            bvirt = (double)(pb.Y - bdy); avirt = bdy + bvirt; bround = bvirt - pd.Y; around = pb.Y - avirt; bdytail = around + bround;
-            bvirt = (double)(pc.X - cdx); avirt = cdx + bvirt; bround = bvirt - pd.X; around = pc.X - avirt; cdxtail = around + bround;
-            bvirt = (double)(pc.Y - cdy); avirt = cdy + bvirt; bround = bvirt - pd.Y; around = pc.Y - avirt; cdytail = around + bround;
+            bvirt = (double)(pa.x - adx); avirt = adx + bvirt; bround = bvirt - pd.x; around = pa.x - avirt; adxtail = around + bround;
+            bvirt = (double)(pa.y - ady); avirt = ady + bvirt; bround = bvirt - pd.y; around = pa.y - avirt; adytail = around + bround;
+            bvirt = (double)(pb.x - bdx); avirt = bdx + bvirt; bround = bvirt - pd.x; around = pb.x - avirt; bdxtail = around + bround;
+            bvirt = (double)(pb.y - bdy); avirt = bdy + bvirt; bround = bvirt - pd.y; around = pb.y - avirt; bdytail = around + bround;
+            bvirt = (double)(pc.x - cdx); avirt = cdx + bvirt; bround = bvirt - pd.x; around = pc.x - avirt; cdxtail = around + bround;
+            bvirt = (double)(pc.y - cdy); avirt = cdy + bvirt; bround = bvirt - pd.y; around = pc.y - avirt; cdytail = around + bround;
             if ((adxtail == 0.0) && (bdxtail == 0.0) && (cdxtail == 0.0)
                 && (adytail == 0.0) && (bdytail == 0.0) && (cdytail == 0.0))
             {

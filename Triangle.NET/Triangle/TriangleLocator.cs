@@ -129,7 +129,7 @@ namespace TriangleNet
             while (true)
             {
                 // Check whether the apex is the point we seek.
-                if ((fapex.x == searchpoint.X) && (fapex.y == searchpoint.Y))
+                if ((fapex.x == searchpoint.x) && (fapex.y == searchpoint.y))
                 {
                     searchtri.Lprev();
                     return LocateResult.OnVertex;
@@ -149,8 +149,8 @@ namespace TriangleNet
                         // a line perpendicular to the line (forg, fdest) and passing
                         // through 'fapex', and determining which side of this line
                         // 'searchpoint' falls on.
-                        moveleft = (fapex.x - searchpoint.X) * (fdest.x - forg.x) +
-                                   (fapex.y - searchpoint.Y) * (fdest.y - forg.y) > 0.0;
+                        moveleft = (fapex.x - searchpoint.x) * (fdest.x - forg.x) +
+                                   (fapex.y - searchpoint.y) * (fdest.y - forg.y) > 0.0;
                     }
                     else
                     {
@@ -266,8 +266,8 @@ namespace TriangleNet
             // Record the distance from the suggested starting triangle to the
             // point we seek.
             torg = searchtri.Org();
-            searchdist = (searchpoint.X - torg.x) * (searchpoint.X - torg.x) +
-                         (searchpoint.Y - torg.y) * (searchpoint.Y - torg.y);
+            searchdist = (searchpoint.x - torg.x) * (searchpoint.x - torg.x) +
+                         (searchpoint.y - torg.y) * (searchpoint.y - torg.y);
 
             // If a recently encountered triangle has been recorded and has not been
             // deallocated, test it as a good starting point.
@@ -276,13 +276,13 @@ namespace TriangleNet
                 if (!Otri.IsDead(recenttri.tri))
                 {
                     torg = recenttri.Org();
-                    if ((torg.x == searchpoint.X) && (torg.y == searchpoint.Y))
+                    if ((torg.x == searchpoint.x) && (torg.y == searchpoint.y))
                     {
                         recenttri.Copy(ref searchtri);
                         return LocateResult.OnVertex;
                     }
-                    dist = (searchpoint.X - torg.x) * (searchpoint.X - torg.x) +
-                           (searchpoint.Y - torg.y) * (searchpoint.Y - torg.y);
+                    dist = (searchpoint.x - torg.x) * (searchpoint.x - torg.x) +
+                           (searchpoint.y - torg.y) * (searchpoint.y - torg.y);
                     if (dist < searchdist)
                     {
                         recenttri.Copy(ref searchtri);
@@ -301,8 +301,8 @@ namespace TriangleNet
                 if (!Otri.IsDead(sampletri.tri))
                 {
                     torg = sampletri.Org();
-                    dist = (searchpoint.X - torg.x) * (searchpoint.X - torg.x) +
-                           (searchpoint.Y - torg.y) * (searchpoint.Y - torg.y);
+                    dist = (searchpoint.x - torg.x) * (searchpoint.x - torg.x) +
+                           (searchpoint.y - torg.y) * (searchpoint.y - torg.y);
                     if (dist < searchdist)
                     {
                         sampletri.Copy(ref searchtri);
@@ -315,11 +315,11 @@ namespace TriangleNet
             torg = searchtri.Org();
             tdest = searchtri.Dest();
             // Check the starting triangle's vertices.
-            if ((torg.x == searchpoint.X) && (torg.y == searchpoint.Y))
+            if ((torg.x == searchpoint.x) && (torg.y == searchpoint.y))
             {
                 return LocateResult.OnVertex;
             }
-            if ((tdest.x == searchpoint.X) && (tdest.y == searchpoint.Y))
+            if ((tdest.x == searchpoint.x) && (tdest.y == searchpoint.y))
             {
                 searchtri.Lnext();
                 return LocateResult.OnVertex;
@@ -335,8 +335,8 @@ namespace TriangleNet
             else if (ahead == 0.0)
             {
                 // Check if 'searchpoint' is between 'torg' and 'tdest'.
-                if (((torg.x < searchpoint.X) == (searchpoint.X < tdest.x)) &&
-                    ((torg.y < searchpoint.Y) == (searchpoint.Y < tdest.y)))
+                if (((torg.x < searchpoint.x) == (searchpoint.x < tdest.x)) &&
+                    ((torg.y < searchpoint.y) == (searchpoint.y < tdest.y)))
                 {
                     return LocateResult.OnEdge;
                 }

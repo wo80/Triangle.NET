@@ -356,7 +356,7 @@ namespace TriangleNet.IO
             using (StreamWriter writer = new StreamWriter(filename))
             {
                 // Number of edges, number of boundary markers (zero or one).
-                writer.WriteLine("{0} {1}", mesh.edges, behavior.UseBoundaryMarkers ? "1" : "0");
+                writer.WriteLine("{0} {1}", mesh.NumberOfEdges, behavior.UseBoundaryMarkers ? "1" : "0");
 
                 long index = 0;
                 // To loop over the set of edges, loop over all triangles, and look at

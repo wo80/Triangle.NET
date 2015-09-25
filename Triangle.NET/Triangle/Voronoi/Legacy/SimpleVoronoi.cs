@@ -270,8 +270,8 @@ namespace TriangleNet.Voronoi.Legacy
 
         private bool BoxRayIntersection(Point pt, double dx, double dy, out Point intersect)
         {
-            double x = pt.X;
-            double y = pt.Y;
+            double x = pt.x;
+            double y = pt.y;
 
             double t1, x1, y1, t2, x2, y2;
 
@@ -365,7 +365,7 @@ namespace TriangleNet.Voronoi.Legacy
                     }
                     else
                     {
-                        edges.Add(new Edge(last.ID, pt.ID));
+                        edges.Add(new Edge(last.id, pt.id));
 
                         last = pt;
                     }
@@ -373,7 +373,7 @@ namespace TriangleNet.Voronoi.Legacy
 
                 if (region.Bounded && first != null)
                 {
-                    edges.Add(new Edge(last.ID, first.ID));
+                    edges.Add(new Edge(last.id, first.id));
                 }
             }
 

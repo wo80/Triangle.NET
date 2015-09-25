@@ -79,7 +79,7 @@ namespace TriangleNet.Tools
                 i++;
             }
 
-            if (points[0].ID == points[1].ID)
+            if (points[0].id == points[1].id)
             {
                 horrors += CheckVertexIDs(poly, count);
             }
@@ -114,13 +114,15 @@ namespace TriangleNet.Tools
                 }
             }
 
-            return horrors == 0;
+            return horrors > 0;
         }
 
         /// <summary>
         /// Test the polygon for 360 degree angles.
         /// </summary>
-        public static bool HasBadAngles(IPolygon poly)
+        /// <param name="poly">The polygon.</param>
+        /// <param name="threshold">The angle threshold.</param>
+        public static bool HasBadAngles(IPolygon poly, double threshold = 2e-12)
         {
             var logger = Log.Instance;
 
@@ -134,18 +136,24 @@ namespace TriangleNet.Tools
 
             foreach (var seg in poly.Segments)
             {
-                q0 = p0;
-                q1 = p1;
+                q0 = p0; // Previous segment start point.
+                q1 = p1; // Previous segment end point.
 
-                p0 = seg.GetVertex(0);
-                p1 = seg.GetVertex(1);
+                p0 = seg.GetVertex(0); // Current segment start point.
+                p1 = seg.GetVertex(1); // Current segment end point.
+
+                if (p0 == p1 || q0 == q1)
+                {
+                    // Ignore zero-length segments.
+                    continue;
+                }
 
                 if (q0 != null && q1 != null)
                 {
                     // The two segments are connected.
                     if (p0 == q1 && p1 != null)
                     {
-                        if (IsBadAngle(q0, p0, p1))
+                        if (IsBadAngle(q0, p0, p1,threshold))
                         {
                             horrors++;
                             logger.Warning(String.Format("Bad segment angle found at index {0}.", i),
@@ -157,29 +165,29 @@ namespace TriangleNet.Tools
                 i++;
             }
 
-            return horrors == 0;
+            return horrors > 0;
         }
 
-        private static bool IsBadAngle(Point a, Point b, Point c, double eps = 0.0)
+        private static bool IsBadAngle(Point a, Point b, Point c, double threshold = 0.0)
         {
             double x = DotProduct(a, b, c);
             double y = CrossProductLength(a, b, c);
 
-            return Math.Abs(Math.Atan2(y, x)) <= eps;
+            return Math.Abs(Math.Atan2(y, x)) <= threshold;
         }
 
         //  Returns the dot product <AB, BC>.
         private static double DotProduct(Point a, Point b, Point c)
         {
             //  Calculate the dot product.
-            return (a.X - b.X) * (c.X - b.X) + (a.Y - b.Y) * (c.Y - b.Y);
+            return (a.x - b.x) * (c.x - b.x) + (a.y - b.y) * (c.y - b.y);
         }
 
         //  Returns the length of cross product AB x BC.
         private static double CrossProductLength(Point a, Point b, Point c)
         {
             //  Calculate the Z coordinate of the cross product.
-            return (a.X - b.X) * (c.Y - b.Y) - (a.Y - b.Y) * (c.X - b.X);
+            return (a.x - b.x) * (c.y - b.y) - (a.y - b.y) * (c.x - b.x);
         }
 
         private static int CheckVertexIDs(IPolygon poly, int count)
@@ -197,14 +205,14 @@ namespace TriangleNet.Tools
                 p = seg.GetVertex(0);
                 q = seg.GetVertex(1);
 
-                if (p.ID < 0 || p.ID >= count)
+                if (p.id < 0 || p.id >= count)
                 {
                     horrors++;
                     logger.Warning(String.Format("Segment {0} has invalid startpoint.", i),
                         "PolygonValidator.IsConsistent()");
                 }
 
-                if (q.ID < 0 || q.ID >= count)
+                if (q.id < 0 || q.id >= count)
                 {
                     horrors++;
                     logger.Warning(String.Format("Segment {0} has invalid endpoint.", i),
@@ -224,7 +232,7 @@ namespace TriangleNet.Tools
             // Check for duplicate ids.
             foreach (var p in poly.Points)
             {
-                if (!ids.Add(p.ID))
+                if (!ids.Add(p.id))
                 {
                     Log.Instance.Warning("Found duplicate vertex ids.", "PolygonValidator.IsConsistent()");
                     return 1;

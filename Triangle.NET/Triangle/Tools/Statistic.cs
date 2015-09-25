@@ -272,8 +272,8 @@ namespace TriangleNet.Tools
                     k1 = plus1Mod3[i];
                     k2 = minus1Mod3[i];
 
-                    dx[i] = p[k1].X - p[k2].X;
-                    dy[i] = p[k1].Y - p[k2].Y;
+                    dx[i] = p[k1].x - p[k2].x;
+                    dy[i] = p[k1].y - p[k2].y;
 
                     edgeLength[i] = dx[i] * dx[i] + dy[i] * dy[i];
 
@@ -294,8 +294,8 @@ namespace TriangleNet.Tools
                 }
 
                 //triarea = Primitives.CounterClockwise(p[0], p[1], p[2]);
-                triArea = Math.Abs((p[2].X - p[0].X) * (p[1].Y - p[0].Y) -
-                    (p[1].X - p[0].X) * (p[2].Y - p[0].Y));
+                triArea = Math.Abs((p[2].x - p[0].x) * (p[1].y - p[0].y) -
+                    (p[1].x - p[0].x) * (p[2].y - p[0].y));
 
                 if (triArea < minArea)
                 {
