@@ -6,8 +6,8 @@
 
 namespace TriangleNet.Geometry
 {
+    using System;
     using System.Collections.Generic;
-    using TriangleNet.Topology;
 
     /// <summary>
     /// Polygon interface.
@@ -44,21 +44,10 @@ namespace TriangleNet.Geometry
         /// </summary>
         bool HasSegmentMarkers { get; set; }
 
-        /// <summary>
-        /// Adds a contour to the polygon.
-        /// </summary>
-        /// <param name="points">Points making up the contour.</param>
-        /// <param name="marker">Contour marker.</param>
-        /// <param name="hole">Treat contour as a hole (interior boundary).</param>
-        /// <param name="convex">The hole is convex.</param>
+        [Obsolete("Use polygon.Add(contour) method instead.")]
         void AddContour(IEnumerable<Vertex> points, int marker, bool hole, bool convex);
 
-        /// <summary>
-        /// Adds a contour to the polygon.
-        /// </summary>
-        /// <param name="points">Points making up the contour.</param>
-        /// <param name="marker">Contour marker.</param>
-        /// <param name="hole">Point inside the contour, making it a hole.</param>
+        [Obsolete("Use polygon.Add(contour) method instead.")]
         void AddContour(IEnumerable<Vertex> points, int marker, Point hole);
 
         /// <summary>
@@ -66,5 +55,45 @@ namespace TriangleNet.Geometry
         /// </summary>
         /// <returns>Rectangle defining an axis-aligned bounding box.</returns>
         Rectangle Bounds();
+
+        /// <summary>
+        /// Add a vertex to the polygon.
+        /// </summary>
+        /// <param name="vertex">The vertex to insert.</param>
+        void Add(Vertex vertex);
+
+        /// <summary>
+        /// Add a segment to the polygon.
+        /// </summary>
+        /// <param name="segment">The segment to insert.</param>
+        void Add(ISegment segment);
+
+        /// <summary>
+        /// Add a segment to the polygon.
+        /// </summary>
+        /// <param name="segment">The segment to insert.</param>
+        /// <param name="insert">If true, both endpoints will be added to the points list.</param>
+        void Add(ISegment segment, bool insert);
+
+        /// <summary>
+        /// Add a segment to the polygon.
+        /// </summary>
+        /// <param name="segment">The segment to insert.</param>
+        /// <param name="index">The index of the segment endpoint to add to the points list (must be 0 or 1).</param>
+        void Add(ISegment segment, int index);
+
+        /// <summary>
+        /// Add a contour to the polygon.
+        /// </summary>
+        /// <param name="contour">The contour to insert.</param>
+        /// <param name="hole">Treat contour as a hole.</param>
+        void Add(Contour contour, bool hole = false);
+
+        /// <summary>
+        /// Add a contour to the polygon.
+        /// </summary>
+        /// <param name="contour">The contour to insert.</param>
+        /// <param name="hole">Point inside the contour, making it a hole.</param>
+        void Add(Contour contour, Point hole);
     }
 }

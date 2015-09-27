@@ -30,6 +30,10 @@ namespace TriangleNet.Meshing
 
         ILog<LogItem> logger;
 
+        // Stores the vertices of the triangle that contains newvertex
+        // in SplitTriangle method.
+        Triangle newvertex_tri;
+
         public QualityMesher(Mesh mesh, IPredicates predicates)
         {
             logger = Log.Instance;
@@ -43,6 +47,8 @@ namespace TriangleNet.Meshing
             this.behavior = mesh.behavior;
 
             newLocation = new NewLocation(mesh, predicates);
+
+            newvertex_tri = new Triangle();
         }
 
         /// <summary>
@@ -684,6 +690,54 @@ namespace TriangleNet.Meshing
         }
 
         /// <summary>
+        /// Linear interpolation of vertex attributes.
+        /// </summary>
+        /// <param name="newvertex"></param>
+        private void InterpolateAttribs(Vertex newvertex)
+        {
+            Vertex org = newvertex_tri.vertices[0];
+            Vertex dest = newvertex_tri.vertices[1];
+            Vertex apex = newvertex_tri.vertices[2];
+
+            double xdo, ydo, xao, yao;
+            double denominator;
+            double dx, dy;
+            double xi, eta;
+
+            int nextras = mesh.nextras;
+
+            // Compute the circumcenter of the triangle.
+            xdo = dest.x - org.x;
+            ydo = dest.y - org.y;
+            xao = apex.x - org.x;
+            yao = apex.y - org.y;
+
+            denominator = 0.5 / (xdo * yao - xao * ydo);
+
+            //dx = (yao * dodist - ydo * aodist) * denominator;
+            //dy = (xdo * aodist - xao * dodist) * denominator;
+
+            dx = newvertex.x - org.x;
+            dy = newvertex.y - org.y;
+
+            // To interpolate vertex attributes for the new vertex inserted at
+            // the circumcenter, define a coordinate system with a xi-axis,
+            // directed from the triangle's origin to its destination, and
+            // an eta-axis, directed from its origin to its apex.
+            // Calculate the xi and eta coordinates of the circumcenter.
+            xi = (yao * dx - xao * dy) * (2.0 * denominator);
+            eta = (xdo * dy - ydo * dx) * (2.0 * denominator);
+
+            for (int i = 0; i < nextras; i++)
+            {
+                // Interpolate the vertex attributes.
+                newvertex.attributes[i] = org.attributes[i]
+                    + xi * (dest.attributes[i] - org.attributes[i])
+                    + eta * (apex.attributes[i] - org.attributes[i]);
+            }
+        }
+
+        /// <summary>
         /// Inserts a vertex at the circumcenter of a triangle. Deletes 
         /// the newly inserted vertex if it encroaches upon a segment.
         /// </summary>
@@ -742,14 +796,6 @@ namespace TriangleNet.Meshing
                     Vertex newvertex = new Vertex(newloc.x, newloc.y, 0, mesh.nextras);
                     newvertex.type = VertexType.FreeVertex;
 
-                    for (int i = 0; i < mesh.nextras; i++)
-                    {
-                        // Interpolate the vertex attributes at the circumcenter.
-                        newvertex.attributes[i] = borg.attributes[i]
-                            + xi * (bdest.attributes[i] - borg.attributes[i])
-                            + eta * (bapex.attributes[i] - borg.attributes[i]);
-                    }
-
                     // Ensure that the handle 'badotri' does not represent the longest
                     // edge of the triangle.  This ensures that the circumcenter must
                     // fall to the left of this edge, so point location will work.
@@ -762,6 +808,9 @@ namespace TriangleNet.Meshing
                         badotri.Lprev();
                     }
 
+                    // Assign triangle for attributes interpolation.
+                    newvertex.tri.tri = newvertex_tri;
+
                     // Insert the circumcenter, searching from the edge of the triangle,
                     // and maintain the Delaunay property of the triangulation.
                     Osub tmp = default(Osub);
@@ -771,6 +820,11 @@ namespace TriangleNet.Meshing
                     {
                         newvertex.hash = mesh.hash_vtx++;
                         newvertex.id = newvertex.hash;
+
+                        if (mesh.nextras > 0)
+                        {
+                            InterpolateAttribs(newvertex);
+                        }
 
                         mesh.vertices.Add(newvertex.hash, newvertex);
 

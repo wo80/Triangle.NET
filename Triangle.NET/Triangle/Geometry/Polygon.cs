@@ -8,7 +8,6 @@ namespace TriangleNet.Geometry
 {
     using System;
     using System.Collections.Generic;
-    using TriangleNet.Topology;
 
     /// <summary>
     /// A polygon represented as a planar straight line graph.
@@ -21,37 +20,37 @@ namespace TriangleNet.Geometry
 
         List<ISegment> segments;
 
-        /// <inherit />
+        /// <inheritdoc />
         public List<Vertex> Points
         {
             get { return points; }
         }
 
-        /// <inherit />
+        /// <inheritdoc />
         public List<Point> Holes
         {
             get { return holes; }
         }
 
-        /// <inherit />
+        /// <inheritdoc />
         public List<RegionPointer> Regions
         {
             get { return regions; }
         }
 
-        /// <inherit />
+        /// <inheritdoc />
         public List<ISegment> Segments
         {
             get { return segments; }
         }
 
-        /// <inherit />
+        /// <inheritdoc />
         public bool HasPointMarkers { get; set; }
 
-        /// <inherit />
+        /// <inheritdoc />
         public bool HasSegmentMarkers { get; set; }
 
-        /// <inherit />
+        /// <inheritdoc />
         public int Count
         {
             get { return points.Count; }
@@ -91,35 +90,20 @@ namespace TriangleNet.Geometry
             HasSegmentMarkers = markers;
         }
 
-        /// <inherit />
+        [Obsolete("Use polygon.Add(contour) method instead.")]
         public void AddContour(IEnumerable<Vertex> points, int marker = 0,
             bool hole = false, bool convex = false)
         {
-            var c = new Contour(points, marker);
-
-            this.points.AddRange(c.Points);
-
-            this.segments.AddRange(c.GetSegments());
-
-            if (hole)
-            {
-                this.holes.Add(c.FindInteriorPoint(convex));
-            }
+            this.Add(new Contour(points, marker, convex), hole);
         }
 
-        /// <inherit />
+        [Obsolete("Use polygon.Add(contour) method instead.")]
         public void AddContour(IEnumerable<Vertex> points, int marker, Point hole)
         {
-            var c = new Contour(points, marker);
-
-            this.points.AddRange(c.Points);
-
-            this.segments.AddRange(c.GetSegments());
-
-            this.holes.Add(hole);
+            this.Add(new Contour(points, marker), hole);
         }
 
-        /// <inherit />
+        /// <inheritdoc />
         public Rectangle Bounds()
         {
             var bounds = new Rectangle();
@@ -131,6 +115,7 @@ namespace TriangleNet.Geometry
         /// <summary>
         /// Add a vertex to the polygon.
         /// </summary>
+        /// <param name="vertex">The vertex to insert.</param>
         public void Add(Vertex vertex)
         {
             this.points.Add(vertex);
@@ -139,9 +124,69 @@ namespace TriangleNet.Geometry
         /// <summary>
         /// Add a segment to the polygon.
         /// </summary>
+        /// <param name="segment">The segment to insert.</param>
         public void Add(ISegment segment)
         {
             this.segments.Add(segment);
+        }
+
+        /// <summary>
+        /// Add a segment to the polygon.
+        /// </summary>
+        /// <param name="segment">The segment to insert.</param>
+        /// <param name="insert">If true, both endpoints will be added to the points list.</param>
+        public void Add(ISegment segment, bool insert)
+        {
+            this.segments.Add(segment);
+
+            if (insert)
+            {
+                this.points.Add(segment.GetVertex(0));
+                this.points.Add(segment.GetVertex(1));
+            }
+        }
+
+        /// <summary>
+        /// Add a segment to the polygon.
+        /// </summary>
+        /// <param name="segment">The segment to insert.</param>
+        /// <param name="index">The index of the segment endpoint to add to the points list (must be 0 or 1).</param>
+        public void Add(ISegment segment, int index)
+        {
+            this.segments.Add(segment);
+
+            this.points.Add(segment.GetVertex(index));
+        }
+
+        /// <summary>
+        /// Add a contour to the polygon.
+        /// </summary>
+        /// <param name="contour">The contour to insert.</param>
+        /// <param name="hole">Treat contour as a hole.</param>
+        public void Add(Contour contour, bool hole = false)
+        {
+            if (hole)
+            {
+                this.Add(contour, contour.FindInteriorPoint());
+            }
+            else
+            {
+                this.points.AddRange(contour.Points);
+                this.segments.AddRange(contour.GetSegments());
+            }
+        }
+
+        /// <summary>
+        /// Add a contour to the polygon.
+        /// </summary>
+        /// <param name="contour">The contour to insert.</param>
+        /// <param name="hole">Point inside the contour, making it a hole.</param>
+        public void Add(Contour contour, Point hole)
+        {
+            this.points.AddRange(contour.Points);
+            this.segments.AddRange(contour.GetSegments());
+
+            this.holes.Add(hole);
         }
     }
 }

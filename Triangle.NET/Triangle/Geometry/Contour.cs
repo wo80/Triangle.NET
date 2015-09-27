@@ -8,33 +8,72 @@ namespace TriangleNet.Geometry
 {
     using System;
     using System.Collections.Generic;
-
+    
     public class Contour
     {
         int marker;
 
+        bool convex;
+
+        /// <summary>
+        /// Gets or sets the list of points making up the contour.
+        /// </summary>
         public List<Vertex> Points { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Contour" /> class.
         /// </summary>
-        public Contour(IEnumerable<Vertex> points, int marker)
+        /// <param name="points">The points that make up the contour.</param>
+        public Contour(IEnumerable<Vertex> points)
+            : this(points, 0, false)
         {
-            this.Points = new List<Vertex>(points);
-
-            int count = Points.Count;
-
-            // Check if first vertex equals last vertex.
-            if (Points[0] == Points[count - 1])
-            {
-                count--;
-                Points.RemoveAt(count);
-            }
-
-            this.marker = marker;
         }
 
-        public Point FindInteriorPoint(bool convex)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Contour" /> class.
+        /// </summary>
+        /// <param name="points">The points that make up the contour.</param>
+        /// <param name="marker">Contour marker.</param>
+        public Contour(IEnumerable<Vertex> points, int marker)
+            : this(points, marker, false)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Contour" /> class.
+        /// </summary>
+        /// <param name="points">The points that make up the contour.</param>
+        /// <param name="marker">Contour marker.</param>
+        /// <param name="convex">The hole is convex.</param>
+        public Contour(IEnumerable<Vertex> points, int marker, bool convex)
+        {
+            AddPoints(points);
+
+            this.marker = marker;
+            this.convex = convex;
+        }
+
+        public List<ISegment> GetSegments()
+        {
+            var segments = new List<ISegment>();
+
+            var p = this.Points;
+
+            int count = p.Count - 1;
+
+            for (int i = 0; i < count; i++)
+            {
+                // Add segments to polygon.
+                segments.Add(new Segment(p[i], p[i + 1], marker));
+            }
+
+            // Close the contour.
+            segments.Add(new Segment(p[count], p[0], marker));
+
+            return segments;
+        }
+
+        public Point FindInteriorPoint()
         {
             if (convex)
             {
@@ -58,24 +97,17 @@ namespace TriangleNet.Geometry
             return FindPointInPolygon(this.Points);
         }
 
-        public List<ISegment> GetSegments()
+        private void AddPoints(IEnumerable<Vertex> points)
         {
-            var segments = new List<ISegment>();
+            this.Points = new List<Vertex>(points);
 
-            var p = this.Points;
+            int count = Points.Count - 1;
 
-            int count = p.Count - 1;
-
-            for (int i = 0; i < count; i++)
+            // Check if first vertex equals last vertex.
+            if (Points[0] == Points[count])
             {
-                // Add segments to polygon.
-                segments.Add(new Segment(p[i], p[i + 1], marker));
+                Points.RemoveAt(count);
             }
-
-            // Close the contour.
-            segments.Add(new Segment(p[count], p[0], marker));
-
-            return segments;
         }
 
         private static Point FindPointInPolygon(List<Vertex> contour)

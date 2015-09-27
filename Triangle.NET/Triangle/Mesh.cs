@@ -884,6 +884,15 @@ namespace TriangleNet
             // The insertion is successful by default, unless an encroached
             // subsegment is found.
             success = InsertVertexResult.Successful;
+
+            if (newvertex.tri.tri != null)
+            {
+                // Store the coordinates of the triangle that contains newvertex.
+                newvertex.tri.SetOrg(rightvertex);
+                newvertex.tri.SetDest(leftvertex);
+                newvertex.tri.SetApex(botvertex);
+            }
+
             // Circle around the newly inserted vertex, checking each edge opposite it 
             // for the Delaunay property. Non-Delaunay edges are flipped. 'horiz' is 
             // always the edge being checked. 'first' marks where to stop circling.

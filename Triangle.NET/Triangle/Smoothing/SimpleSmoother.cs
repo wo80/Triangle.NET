@@ -110,10 +110,10 @@ namespace TriangleNet.Smoothing
                 p = edge.Origin;
                 q = edge.Twin.Origin;
 
-                ai = p.X * q.Y - q.X * p.Y;
+                ai = p.x * q.y - q.x * p.y;
                 atmp += ai;
-                xtmp += (q.X + p.X) * ai;
-                ytmp += (q.Y + p.Y) * ai;
+                xtmp += (q.x + p.x) * ai;
+                ytmp += (q.y + p.y) * ai;
 
                 edge = edge.Next;
 
