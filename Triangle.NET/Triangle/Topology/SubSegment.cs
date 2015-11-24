@@ -60,7 +60,7 @@ namespace TriangleNet.Topology
         /// <summary>
         /// Gets the segment boundary mark.
         /// </summary>
-        public int Boundary
+        public int Label
         {
             get { return this.boundary; }
         }

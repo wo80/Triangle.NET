@@ -184,7 +184,7 @@ namespace TriangleNet.Meshing
                                 // Record the triangle for processing after the
                                 // holes have been carved.
                                 regionTris[i] = searchtri.tri;
-                                regionTris[i].region = region.id;
+                                regionTris[i].label = region.id;
                             }
                         }
                     }
@@ -258,7 +258,7 @@ namespace TriangleNet.Meshing
                 {
                     mesh.insegments++;
 
-                    label = seg.Boundary;
+                    label = seg.Label;
 
                     // TODO: wrap segment dictionary access in try / catch?
 
@@ -337,13 +337,13 @@ namespace TriangleNet.Meshing
                             hullsubseg.seg.boundary = 1;
                             horg = hulltri.Org();
                             hdest = hulltri.Dest();
-                            if (horg.mark == 0)
+                            if (horg.label == 0)
                             {
-                                horg.mark = 1;
+                                horg.label = 1;
                             }
-                            if (hdest.mark == 0)
+                            if (hdest.label == 0)
                             {
-                                hdest.mark = 1;
+                                hdest.label = 1;
                             }
                         }
                     }
@@ -450,13 +450,13 @@ namespace TriangleNet.Meshing
                             }
                             norg = neighbor.Org();
                             ndest = neighbor.Dest();
-                            if (norg.mark == 0)
+                            if (norg.label == 0)
                             {
-                                norg.mark = 1;
+                                norg.label = 1;
                             }
-                            if (ndest.mark == 0)
+                            if (ndest.label == 0)
                             {
-                                ndest.mark = 1;
+                                ndest.label = 1;
                             }
                         }
                     }

@@ -38,7 +38,7 @@ namespace TriangleNet.Geometry
         /// <summary>
         /// Gets the segments boundary mark.
         /// </summary>
-        public int Boundary
+        public int Label
         {
             get;
             private set;
@@ -58,7 +58,7 @@ namespace TriangleNet.Geometry
         {
             this.P0 = p0;
             this.P1 = p1;
-            this.Boundary = boundary;
+            this.Label = boundary;
         }
     }
 }

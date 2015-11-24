@@ -17,8 +17,9 @@ namespace TriangleNet.Rendering
         IBuffer<float> Points { get; }
         IBuffer<int> Indices { get; }
 
-        bool IsActive { get; set; }
-        bool IsEmpty { get; }
+        bool IsEnabled { get; set; }
+
+        bool IsEmpty();
 
         void Reset(bool clear);
 

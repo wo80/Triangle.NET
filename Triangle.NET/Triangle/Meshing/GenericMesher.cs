@@ -165,7 +165,7 @@ namespace TriangleNet.Meshing
 
                 segments.Add(new Segment(a, b, 1));
 
-                a.Boundary = b.Boundary = 1;
+                a.Label = b.Label = 1;
 
                 // Right
                 a = points[nx * (ny + 1) + j];
@@ -173,7 +173,7 @@ namespace TriangleNet.Meshing
 
                 segments.Add(new Segment(a, b, 1));
 
-                a.Boundary = b.Boundary = 1;
+                a.Label = b.Label = 1;
             }
 
             for (i = 0; i < nx; i++)
@@ -184,7 +184,7 @@ namespace TriangleNet.Meshing
 
                 segments.Add(new Segment(a, b, 1));
 
-                a.Boundary = b.Boundary = 1;
+                a.Label = b.Label = 1;
 
                 // Top
                 a = points[i * (ny + 1) + nx];
@@ -192,7 +192,7 @@ namespace TriangleNet.Meshing
 
                 segments.Add(new Segment(a, b, 1));
 
-                a.Boundary = b.Boundary = 1;
+                a.Label = b.Label = 1;
             }
 
             // Add triangles.

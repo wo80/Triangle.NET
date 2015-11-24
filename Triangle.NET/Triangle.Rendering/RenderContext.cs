@@ -33,6 +33,10 @@ namespace TriangleNet.Rendering
             renderLayers.Add(new RenderLayer()); // 5 = vector field
             renderLayers.Add(new RenderLayer()); // 6 = contour lines
 
+            RenderLayers[1].IsEnabled = true;
+            RenderLayers[2].IsEnabled = true;
+            RenderLayers[3].IsEnabled = true;
+
             this.zoom = zoom;
             this.colorManager = colorManager;
         }
@@ -66,7 +70,7 @@ namespace TriangleNet.Rendering
         {
             get
             {
-                return renderLayers.Any(layer => !layer.IsEmpty);
+                return renderLayers.Any(layer => !layer.IsEmpty());
             }
         }
 
@@ -92,10 +96,7 @@ namespace TriangleNet.Rendering
             this.zoom.Initialize(bounds);
 
             RenderLayers[2].SetPolygon(data);
-            RenderLayers[2].IsActive = true;
-
             RenderLayers[3].SetPoints(RenderLayers[2].Points);
-            RenderLayers[3].IsActive = true;
         }
 
         public void Add(IMesh data, bool reset)
@@ -115,21 +116,18 @@ namespace TriangleNet.Rendering
             this.zoom.Initialize(bounds);
 
             RenderLayers[1].SetMesh(data, false);
-            RenderLayers[1].IsActive = true;
 
             RenderLayers[2].SetPoints(RenderLayers[1].Points);
             RenderLayers[2].SetPolygon(data);
-            RenderLayers[2].IsActive = true;
 
             RenderLayers[3].SetPoints(RenderLayers[1].Points);
-            RenderLayers[3].IsActive = true;
         }
 
         public void Add(ICollection<Point> points, IEnumerable<IEdge> edges, bool reset)
         {
             RenderLayers[4].SetPoints(points);
             RenderLayers[4].SetMesh(edges);
-            RenderLayers[4].IsActive = true;
+            RenderLayers[4].IsEnabled = true;
         }
 
         public void Add(float[] data)
@@ -139,7 +137,7 @@ namespace TriangleNet.Rendering
             RenderLayers[0].SetMesh(this.mesh, true);
             RenderLayers[0].AttachLayerData(data, colorManager.ColorMap);
 
-            RenderLayers[0].IsActive = true;
+            RenderLayers[0].IsEnabled = true;
         }
 
         public void Add(int[] data)
@@ -149,12 +147,16 @@ namespace TriangleNet.Rendering
             RenderLayers[0].SetMesh(this.mesh, true);
             RenderLayers[0].AttachLayerData(data);
 
-            RenderLayers[0].IsActive = true;
+            RenderLayers[0].IsEnabled = true;
         }
 
         public void Enable(int layer, bool enabled)
         {
-            renderLayers[layer].IsActive = enabled;
+            renderLayers[layer].IsEnabled = enabled;
+        }
+
+        public void Clear()
+        {
         }
     }
 }

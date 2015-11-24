@@ -66,14 +66,8 @@ namespace TriangleNet.Geometry
         /// Add a segment to the polygon.
         /// </summary>
         /// <param name="segment">The segment to insert.</param>
-        void Add(ISegment segment);
-
-        /// <summary>
-        /// Add a segment to the polygon.
-        /// </summary>
-        /// <param name="segment">The segment to insert.</param>
         /// <param name="insert">If true, both endpoints will be added to the points list.</param>
-        void Add(ISegment segment, bool insert);
+        void Add(ISegment segment, bool insert = false);
 
         /// <summary>
         /// Add a segment to the polygon.

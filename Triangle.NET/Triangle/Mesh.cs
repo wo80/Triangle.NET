@@ -711,7 +711,7 @@ namespace TriangleNet
                 horiz.SetOrg(newvertex);
 
                 // Set the region of a new triangle.
-                newbotright.tri.region = botright.tri.region;
+                newbotright.tri.label = botright.tri.label;
 
                 if (behavior.VarArea)
                 {
@@ -728,7 +728,7 @@ namespace TriangleNet
                     topright.SetOrg(newvertex);
 
                     // Set the region of another new triangle.
-                    newtopright.tri.region = topright.tri.region;
+                    newtopright.tri.label = topright.tri.label;
 
                     if (behavior.VarArea)
                     {
@@ -793,9 +793,9 @@ namespace TriangleNet
                     splitseg.Sym();
 
                     // Transfer the subsegment's boundary marker to the vertex if required.
-                    if (newvertex.mark == 0)
+                    if (newvertex.label == 0)
                     {
-                        newvertex.mark = splitseg.seg.boundary;
+                        newvertex.label = splitseg.seg.boundary;
                     }
                 }
 
@@ -834,8 +834,8 @@ namespace TriangleNet
                 horiz.SetApex(newvertex);
 
                 // Set the region of the new triangles.
-                newbotleft.tri.region = horiz.tri.region;
-                newbotright.tri.region = horiz.tri.region;
+                newbotleft.tri.label = horiz.tri.label;
+                newbotright.tri.label = horiz.tri.label;
 
                 if (behavior.VarArea)
                 {
@@ -1043,9 +1043,9 @@ namespace TriangleNet
 
                             // Assign region.
                             // TODO: check region ok (no Math.Min necessary)
-                            region = Math.Min(top.tri.region, horiz.tri.region);
-                            top.tri.region = region;
-                            horiz.tri.region = region;
+                            region = Math.Min(top.tri.label, horiz.tri.label);
+                            top.tri.label = region;
+                            horiz.tri.label = region;
 
                             if (behavior.VarArea)
                             {
@@ -1128,13 +1128,13 @@ namespace TriangleNet
             triorg = tri.Org();
             tridest = tri.Dest();
             // Mark vertices if possible.
-            if (triorg.mark == 0)
+            if (triorg.label == 0)
             {
-                triorg.mark = subsegmark;
+                triorg.label = subsegmark;
             }
-            if (tridest.mark == 0)
+            if (tridest.label == 0)
             {
-                tridest.mark = subsegmark;
+                tridest.label = subsegmark;
             }
             // Check if there's already a subsegment here.
             tri.Pivot(ref newsubseg);

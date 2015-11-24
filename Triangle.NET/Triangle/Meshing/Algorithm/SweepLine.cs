@@ -734,9 +734,9 @@ namespace TriangleNet.Meshing.Algorithm
                     if (dissolveedge.tri.id != Mesh.DUMMY)
                     {
                         markorg = dissolveedge.Org();
-                        if (markorg.mark == 0)
+                        if (markorg.label == 0)
                         {
-                            markorg.mark = 1;
+                            markorg.label = 1;
                         }
                     }
                 }

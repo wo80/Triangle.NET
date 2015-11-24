@@ -28,13 +28,13 @@ namespace MeshExplorer.Topology
             {
                 lbTriangle.Text = tri.ID.ToString();
 
-                lbV0.Text = tri.P0.ToString();
-                lbV1.Text = tri.P1.ToString();
-                lbV2.Text = tri.P2.ToString();
+                lbV0.Text = tri.GetVertexID(0).ToString();
+                lbV1.Text = tri.GetVertexID(1).ToString();
+                lbV2.Text = tri.GetVertexID(2).ToString();
 
-                lbN0.Text = tri.N0.ToString();
-                lbN1.Text = tri.N1.ToString();
-                lbN2.Text = tri.N2.ToString();
+                lbN0.Text = tri.GetNeighborID(0).ToString();
+                lbN1.Text = tri.GetNeighborID(1).ToString();
+                lbN2.Text = tri.GetNeighborID(2).ToString();
 
                 lbS0.Text = GetSegmentString(tri.GetSegment(0));
                 lbS1.Text = GetSegmentString(tri.GetSegment(1));

@@ -123,7 +123,7 @@ namespace TriangleNet.IO
                     if (markers)
                     {
                         // Write the boundary marker.
-                        writer.Write(" {0}", vertex.mark);
+                        writer.Write(" {0}", vertex.label);
                     }
 
                     writer.WriteLine();
@@ -166,7 +166,7 @@ namespace TriangleNet.IO
 
                     if (regions)
                     {
-                        writer.Write(" {0}", tri.tri.region);
+                        writer.Write(" {0}", tri.tri.label);
                     }
 
                     writer.WriteLine();
@@ -213,7 +213,7 @@ namespace TriangleNet.IO
                     // Segment number, indices of its two endpoints, and possibly a marker.
                     if (hasMarkers)
                     {
-                        writer.WriteLine("{0} {1} {2} {3}", j, p.ID, q.ID, seg.Boundary);
+                        writer.WriteLine("{0} {1} {2} {3}", j, p.ID, q.ID, seg.Label);
                     }
                     else
                     {

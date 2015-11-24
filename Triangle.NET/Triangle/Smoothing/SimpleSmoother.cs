@@ -83,7 +83,7 @@ namespace TriangleNet.Smoothing
 
             foreach (var face in voronoi.Faces)
             {
-                if (face.generator.mark == 0)
+                if (face.generator.label == 0)
                 {
                     Centroid(face, out x, out y);
 

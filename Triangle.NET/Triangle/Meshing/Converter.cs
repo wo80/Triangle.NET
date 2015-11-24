@@ -119,13 +119,11 @@ namespace TriangleNet.Meshing
             {
                 tri.tri = item;
 
-                corner[0] = triangles[i].P0;
-                corner[1] = triangles[i].P1;
-                corner[2] = triangles[i].P2;
-
                 // Copy the triangle's three corners.
                 for (int j = 0; j < 3; j++)
                 {
+                    corner[j] = triangles[i].GetVertexID(j);
+
                     if ((corner[j] < 0) || (corner[j] >= mesh.invertices))
                     {
                         Log.Instance.Error("Triangle has an invalid vertex index.", "MeshReader.Reconstruct()");
@@ -134,7 +132,7 @@ namespace TriangleNet.Meshing
                 }
 
                 // Read the triangle's attributes.
-                tri.tri.region = triangles[i].Region;
+                tri.tri.label = triangles[i].Label;
 
                 // TODO: VarArea
                 if (mesh.behavior.VarArea)
@@ -239,7 +237,7 @@ namespace TriangleNet.Meshing
                     sorg = polygon.Segments[i].GetVertex(0);
                     sdest = polygon.Segments[i].GetVertex(1);
 
-                    boundmarker = polygon.Segments[i].Boundary;
+                    boundmarker = polygon.Segments[i].Label;
 
                     if ((sorg.id < 0 || sorg.id >= mesh.invertices) || (sdest.id < 0 || sdest.id >= mesh.invertices))
                     {
@@ -364,7 +362,7 @@ namespace TriangleNet.Meshing
             {
                 vertex = new HVertex(v.x, v.y);
                 vertex.id = v.id;
-                vertex.mark = v.mark;
+                vertex.label = v.label;
 
                 vertices[v.id] = vertex;
             }

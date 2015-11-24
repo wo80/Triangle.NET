@@ -6,8 +6,9 @@
 
 namespace TriangleNet.Topology.DCEL
 {
+    using System.Collections.Generic;
     using TriangleNet.Geometry;
-
+    
     /// <summary>
     /// A face of DCEL mesh.
     /// </summary>
@@ -84,6 +85,23 @@ namespace TriangleNet.Topology.DCEL
             {
                 this.id = generator.ID;
             }
+        }
+
+        /// <summary>
+        /// Enumerates all half-edges of the face boundary.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<HalfEdge> EnumerateEdges()
+        {
+            var edge = this.Edge;
+            int first = edge.ID;
+
+            do
+            {
+                yield return edge;
+
+                edge = edge.Next;
+            } while (edge.ID != first);
         }
 
         public override string ToString()

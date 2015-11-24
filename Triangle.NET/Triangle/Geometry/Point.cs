@@ -16,7 +16,7 @@ namespace TriangleNet.Geometry
         internal int id;
         internal double x;
         internal double y;
-        internal int mark;
+        internal int label;
 
         public Point()
             : this(0, 0, 0)
@@ -28,11 +28,11 @@ namespace TriangleNet.Geometry
         {
         }
 
-        public Point(double x, double y, int mark)
+        public Point(double x, double y, int label)
         {
             this.x = x;
             this.y = y;
-            this.mark = mark;
+            this.label = label;
         }
 
         #region Public properties
@@ -65,12 +65,15 @@ namespace TriangleNet.Geometry
         }
 
         /// <summary>
-        /// Gets or sets the vertex boundary mark.
+        /// Gets or sets a general-purpose label.
         /// </summary>
-        public int Boundary
+        /// <remarks>
+        /// This is used for the vertex boundary mark.
+        /// </remarks>
+        public int Label
         {
-            get { return this.mark; }
-            set { this.mark = value; }
+            get { return this.label; }
+            set { this.label = value; }
         }
 
         #endregion

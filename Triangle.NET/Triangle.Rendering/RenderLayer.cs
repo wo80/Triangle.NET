@@ -21,7 +21,7 @@ namespace TriangleNet.Rendering
 
         public RenderLayer()
         {
-            this.IsActive = false;
+            this.IsEnabled = false;
         }
 
         public int Count
@@ -50,11 +50,11 @@ namespace TriangleNet.Rendering
             get { return colors; }
         }
 
-        public bool IsActive { get; set; }
+        public bool IsEnabled { get; set; }
 
-        public bool IsEmpty
+        public bool IsEmpty()
         {
-            get { return (points == null || points.Count == 0); }
+            return (points == null || points.Count == 0);
         }
 
         public void Reset(bool clear)

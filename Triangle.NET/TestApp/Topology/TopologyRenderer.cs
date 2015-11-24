@@ -6,8 +6,7 @@ namespace MeshExplorer.Topology
     using TriangleNet;
     using TriangleNet.Geometry;
     using TriangleNet.Rendering;
-    using TriangleNet.Topology;
-
+    
     public class TopologyRenderer
     {
         Projection zoom;
@@ -165,9 +164,9 @@ namespace MeshExplorer.Topology
             // Draw triangles
             foreach (var tri in triangles)
             {
-                p0 = points[tri.P0];
-                p1 = points[tri.P1];
-                p2 = points[tri.P2];
+                p0 = points[tri.GetVertexID(0)];
+                p1 = points[tri.GetVertexID(1)];
+                p2 = points[tri.GetVertexID(2)];
 
                 zoom.WorldToScreen(ref p0);
                 zoom.WorldToScreen(ref p1);
@@ -194,9 +193,9 @@ namespace MeshExplorer.Topology
             // Draw triangles
             foreach (var tri in triangles)
             {
-                p0 = points[tri.P0];
-                p1 = points[tri.P1];
-                p2 = points[tri.P2];
+                p0 = points[tri.GetVertexID(0)];
+                p1 = points[tri.GetVertexID(1)];
+                p2 = points[tri.GetVertexID(2)];
 
                 zoom.WorldToScreen(ref p0);
                 zoom.WorldToScreen(ref p1);
@@ -269,9 +268,9 @@ namespace MeshExplorer.Topology
             {
                 var p = new PointF[3];
 
-                p[0] = points[currentTri.P0];
-                p[1] = points[currentTri.P1];
-                p[2] = points[currentTri.P2];
+                p[0] = points[currentTri.GetVertexID(0)];
+                p[1] = points[currentTri.GetVertexID(1)];
+                p[2] = points[currentTri.GetVertexID(2)];
 
                 zoom.WorldToScreen(ref p[0]);
                 zoom.WorldToScreen(ref p[1]);

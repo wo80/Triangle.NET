@@ -16,7 +16,7 @@ namespace TriangleNet.Geometry
         Vertex v0;
         Vertex v1;
 
-        int boundary;
+        int label;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Segment" /> class.
@@ -29,12 +29,12 @@ namespace TriangleNet.Geometry
         /// <summary>
         /// Initializes a new instance of the <see cref="Segment" /> class.
         /// </summary>
-        public Segment(Vertex v0, Vertex v1, int boundary)
+        public Segment(Vertex v0, Vertex v1, int label)
         {
             this.v0 = v0;
             this.v1 = v1;
 
-            this.boundary = boundary;
+            this.label = label;
         }
 
         /// <summary>
@@ -84,10 +84,10 @@ namespace TriangleNet.Geometry
         /// <summary>
         /// Gets or sets the segments boundary mark.
         /// </summary>
-        public int Boundary
+        public int Label
         {
-            get { return boundary; }
-            set { boundary = value; }
+            get { return label; }
+            set { label = value; }
         }
     }
 }

@@ -129,9 +129,9 @@ namespace TriangleNet.Rendering.Util
 
             foreach (var e in elements)
             {
-                data[size * i + 0] = e.P0;
-                data[size * i + 1] = e.P1;
-                data[size * i + 2] = e.P2;
+                data[size * i + 0] = e.GetVertexID(0);
+                data[size * i + 1] = e.GetVertexID(1);
+                data[size * i + 2] = e.GetVertexID(2);
 
                 i++;
             }

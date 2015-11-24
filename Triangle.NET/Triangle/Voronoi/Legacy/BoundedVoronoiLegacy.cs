@@ -99,7 +99,7 @@ namespace TriangleNet.Voronoi.Legacy
             foreach (var v in mesh.vertices.Values)
             {
                 // TODO: Need a reliable way to check if a vertex is on a segment
-                if (v.type == VertexType.FreeVertex || v.Boundary == 0)
+                if (v.type == VertexType.FreeVertex || v.label == 0)
                 {
                     ConstructCell(v);
                 }

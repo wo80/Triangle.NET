@@ -470,12 +470,12 @@ namespace MeshExplorer.IO.Formats
                     item.X.ToString(Util.Nfi),
                     item.Y.ToString(Util.Nfi), seperator);
 
-                if (item.Boundary > 0)
+                if (item.Label > 0)
                 {
                     useMarkers = true;
                 }
 
-                markers.AppendFormat("{0}{1}", item.Boundary, seperator);
+                markers.AppendFormat("{0}{1}", item.Label, seperator);
 
                 i++;
             }
@@ -517,12 +517,12 @@ namespace MeshExplorer.IO.Formats
                 writer.Write("{0},{1}{2}",
                     item.P0, item.P1, seperator);
 
-                if (item.Boundary > 0)
+                if (item.Label > 0)
                 {
                     useMarkers = true;
                 }
 
-                markers.AppendFormat("{0}{1}", item.Boundary, seperator);
+                markers.AppendFormat("{0}{1}", item.Label, seperator);
 
                 i++;
             }
@@ -551,10 +551,16 @@ namespace MeshExplorer.IO.Formats
                 seperator = (i == ne - 1) ? String.Empty : ", ";
 
                 writer.Write("{0},{1},{2}{3}",
-                    item.P0, item.P1, item.P2, seperator);
+                    item.GetVertexID(0),
+                    item.GetVertexID(1),
+                    item.GetVertexID(2),
+                    seperator);
 
                 neighbors.AppendFormat("{0},{1},{2}{3}",
-                    item.N0, item.N1, item.N2, seperator);
+                    item.GetNeighborID(0),
+                    item.GetNeighborID(1),
+                    item.GetNeighborID(2),
+                    seperator);
 
                 i++;
             }

@@ -19,8 +19,8 @@ namespace TriangleNet.Geometry
         int P1 { get; }
 
         /// <summary>
-        /// Gets the segments boundary mark.
+        /// Gets or sets a general-purpose label.
         /// </summary>
-        int Boundary { get; }
+        int Label { get; }
     }
 }

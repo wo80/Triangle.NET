@@ -157,7 +157,7 @@ namespace TriangleNet.IO
                 foreach (var v in mesh.vertices.Values)
                 {
                     // Vertex number, x and y coordinates and marker.
-                    stream.WriteLine("{0} {1} {2} {3}", v.hash, v.x.ToString(nfi), v.y.ToString(nfi), v.mark);
+                    stream.WriteLine("{0} {1} {2} {3}", v.hash, v.x.ToString(nfi), v.y.ToString(nfi), v.label);
                 }
             }
             else

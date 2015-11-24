@@ -96,7 +96,7 @@ namespace TriangleNet.Meshing.Iterators
         public void Process(Triangle triangle)
         {
             // Default action is to just set the region id for all trianlges.
-            this.Process(triangle, (tri) => { tri.region = triangle.region; });
+            this.Process(triangle, (tri) => { tri.label = triangle.label; });
         }
 
         /// <summary>

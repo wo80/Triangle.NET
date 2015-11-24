@@ -38,7 +38,7 @@ namespace TriangleNet.Rendering.GDI
 
             foreach (var layer in this.Context.RenderLayers)
             {
-                if (!layer.IsEmpty && layer.IsActive)
+                if (!layer.IsEmpty() && layer.IsEnabled)
                 {
                     switch (i)
                     {

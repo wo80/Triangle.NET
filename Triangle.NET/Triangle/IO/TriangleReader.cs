@@ -69,7 +69,7 @@ namespace TriangleNet.IO
             // Read a vertex marker.
             if (marks > 0 && line.Length > 3 + attributes)
             {
-                v.Boundary = int.Parse(line[3 + attributes]);
+                v.Label = int.Parse(line[3 + attributes]);
             }
 
             if (attributes > 0)
@@ -559,7 +559,7 @@ namespace TriangleNet.IO
                     {
                         int region = 0;
                         validRegion = int.TryParse(line[4], out region);
-                        tri.region = region;
+                        tri.label = region;
                     }
 
                     triangles.Add(tri);
