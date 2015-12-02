@@ -7,12 +7,11 @@
 
 namespace TriangleNet.IO
 {
-    using System;
-    using System.IO;
-    using System.Globalization;
-    using TriangleNet.Topology;
-    using TriangleNet.Geometry;
     using System.Collections.Generic;
+    using System.Globalization;
+    using System.IO;
+    using TriangleNet.Geometry;
+    using TriangleNet.Topology;
 
     /// <summary>
     /// Helper methods for writing Triangle file formats.
@@ -51,6 +50,7 @@ namespace TriangleNet.IO
         private static void WriteNodes(StreamWriter writer, Mesh mesh)
         {
             int outvertices = mesh.vertices.Count;
+            int nextras = mesh.nextras;
 
             Behavior behavior = mesh.behavior;
 
@@ -63,7 +63,7 @@ namespace TriangleNet.IO
             {
                 // Number of vertices, number of dimensions, number of vertex attributes,
                 // and number of boundary markers (zero or one).
-                writer.WriteLine("{0} {1} {2} {3}", outvertices, mesh.mesh_dim, mesh.nextras,
+                writer.WriteLine("{0} {1} {2} {3}", outvertices, mesh.mesh_dim, nextras,
                     behavior.UseBoundaryMarkers ? "1" : "0");
 
                 if (mesh.numbering == NodeNumbering.None)
@@ -76,7 +76,7 @@ namespace TriangleNet.IO
                 {
                     // If numbering is linear, just use the dictionary values.
                     WriteNodes(writer, mesh.vertices.Values, behavior.UseBoundaryMarkers,
-                        mesh.nextras, behavior.Jettison);
+                        nextras, behavior.Jettison);
                 }
                 else
                 {
@@ -92,7 +92,7 @@ namespace TriangleNet.IO
                     }
 
                     WriteNodes(writer, nodes, behavior.UseBoundaryMarkers,
-                        mesh.nextras, behavior.Jettison);
+                        nextras, behavior.Jettison);
                 }
             }
         }
@@ -114,11 +114,13 @@ namespace TriangleNet.IO
                     // Vertex number, x and y coordinates.
                     writer.Write("{0} {1} {2}", index, vertex.x.ToString(nfi), vertex.y.ToString(nfi));
 
+#if USE_ATTRIBS
                     // Write attributes.
                     for (int j = 0; j < attribs; j++)
                     {
                         writer.Write(" {0}", vertex.attributes[j].ToString(nfi));
                     }
+#endif
 
                     if (markers)
                     {

@@ -18,8 +18,9 @@ namespace TriangleNet.Geometry
         // Hash for dictionary. Will be set by mesh instance.
         internal int hash;
 
+#if USE_ATTRIBS
         internal double[] attributes;
-
+#endif
         internal VertexType type;
         internal Otri tri;
 
@@ -27,7 +28,7 @@ namespace TriangleNet.Geometry
         /// Initializes a new instance of the <see cref="Vertex" /> class.
         /// </summary>
         public Vertex()
-            : this(0, 0, 0, 0)
+            : this(0, 0, 0)
         {
         }
 
@@ -37,7 +38,7 @@ namespace TriangleNet.Geometry
         /// <param name="x">The x coordinate of the vertex.</param>
         /// <param name="y">The y coordinate of the vertex.</param>
         public Vertex(double x, double y)
-            : this(x, y, 0, 0)
+            : this(x, y, 0)
         {
         }
 
@@ -48,10 +49,12 @@ namespace TriangleNet.Geometry
         /// <param name="y">The y coordinate of the vertex.</param>
         /// <param name="mark">The boundary mark.</param>
         public Vertex(double x, double y, int mark)
-            : this(x, y, mark, 0)
+            : base(x, y, mark)
         {
+            this.type = VertexType.InputVertex;
         }
 
+#if USE_ATTRIBS
         /// <summary>
         /// Initializes a new instance of the <see cref="Vertex" /> class.
         /// </summary>
@@ -60,18 +63,18 @@ namespace TriangleNet.Geometry
         /// <param name="mark">The boundary mark.</param>
         /// <param name="attribs">The number of point attributes.</param>
         public Vertex(double x, double y, int mark, int attribs)
-            : base(x, y, mark)
+            : this(x, y, mark)
         {
-            this.type = VertexType.InputVertex;
-
             if (attribs > 0)
             {
                 this.attributes = new double[attribs];
             }
         }
+#endif
 
         #region Public properties
 
+#if USE_ATTRIBS
         /// <summary>
         /// Gets the vertex attributes (may be null).
         /// </summary>
@@ -79,6 +82,7 @@ namespace TriangleNet.Geometry
         {
             get { return this.attributes; }
         }
+#endif
 
         /// <summary>
         /// Gets the vertex type.

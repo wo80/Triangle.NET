@@ -76,8 +76,8 @@ namespace TriangleNet.Meshing.Algorithm
             splaynodes = new List<SplayNode>();
             splayroot = null;
 
-            CreateHeap(out eventheap);//, out events, out freeevents);
-            heapsize = mesh.invertices;
+            heapsize = points.Count;
+            CreateHeap(out eventheap, heapsize);//, out events, out freeevents);
 
             mesh.MakeTriangle(ref lefttri);
             mesh.MakeTriangle(ref righttri);
@@ -387,14 +387,14 @@ namespace TriangleNet.Meshing.Algorithm
             Heapify(heap, heapsize - 1, eventnum);
         }
 
-        void CreateHeap(out SweepEvent[] eventheap)
+        void CreateHeap(out SweepEvent[] eventheap, int size)
         {
             Vertex thisvertex;
             int maxevents;
             int i;
             SweepEvent evt;
 
-            maxevents = (3 * mesh.invertices) / 2;
+            maxevents = (3 * size) / 2;
             eventheap = new SweepEvent[maxevents];
 
             i = 0;

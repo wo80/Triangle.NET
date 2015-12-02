@@ -48,7 +48,6 @@ namespace TriangleNet.Meshing
 
             mesh.TransferNodes(polygon.Points);
 
-            mesh.inelements = elements;
             mesh.regions.AddRange(polygon.Regions);
             mesh.behavior.useRegions = polygon.Regions.Count > 0;
 

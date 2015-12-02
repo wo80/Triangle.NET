@@ -21,6 +21,9 @@ namespace TriangleNet.Geometry
         /// <summary>
         /// Gets or sets a general-purpose label.
         /// </summary>
+        /// <remarks>
+        /// This is used for the segments boundary mark.
+        /// </remarks>
         int Label { get; }
     }
 }

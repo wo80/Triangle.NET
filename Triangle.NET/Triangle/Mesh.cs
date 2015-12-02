@@ -48,10 +48,11 @@ namespace TriangleNet
         internal List<Point> holes;
         internal List<RegionPointer> regions;
 
+        // TODO: remove mesh_dim, invertices and insegments
+
         // Other variables.
         internal Rectangle bounds; // x and y bounds.
         internal int invertices;     // Number of input vertices.
-        internal int inelements;     // Number of input triangles.
         internal int insegments;     // Number of input segments.
         internal int undeads;        // Number of input vertices that don't appear in the mesh.
         internal int mesh_dim;       // Dimension (ought to be 2).
@@ -257,7 +258,6 @@ namespace TriangleNet
 
         public void Refine(QualityOptions quality)
         {
-            inelements = triangles.Count;
             invertices = vertices.Count;
 
             if (behavior.Poly)
@@ -416,8 +416,10 @@ namespace TriangleNet
 
             var v = points[0];
 
+#if USE_ATTRIBS
             // Check attributes.
             this.nextras = v.attributes == null ? 0 : v.attributes.Length;
+#endif
 
             // Simple heuristic to check if ids are already set.  We assume that if the
             // first two vertex ids are distinct, then all input vertices have pairwise

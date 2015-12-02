@@ -12,9 +12,9 @@ namespace TriangleNet.Geometry
     public interface ISegment : IEdge
     {
         /// <summary>
-        /// Gets the segments endpoint.
+        /// Gets the vertex at given index.
         /// </summary>
-        /// <param name="index">The vertex index (0 or 1).</param>
+        /// <param name="index">The local index (0 or 1).</param>
         Vertex GetVertex(int index);
 
         /// <summary>

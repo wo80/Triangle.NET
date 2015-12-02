@@ -6,12 +6,6 @@
 
 namespace TriangleNet.Geometry
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using TriangleNet.Topology;
-
     /// <summary>
     /// Represents a straight line segment in 2D space.
     /// </summary>
@@ -54,11 +48,11 @@ namespace TriangleNet.Geometry
         /// <summary>
         /// Initializes a new instance of the <see cref="Edge" /> class.
         /// </summary>
-        public Edge(int p0, int p1, int boundary)
+        public Edge(int p0, int p1, int label)
         {
             this.P0 = p0;
             this.P1 = p1;
-            this.Label = boundary;
+            this.Label = label;
         }
     }
 }

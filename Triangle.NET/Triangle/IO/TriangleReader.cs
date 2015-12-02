@@ -8,12 +8,10 @@
 namespace TriangleNet.IO
 {
     using System;
-    using System.IO;
-    using System.Globalization;
-    using TriangleNet.Topology;
-    using TriangleNet.Logging;
-    using TriangleNet.Geometry;
     using System.Collections.Generic;
+    using System.Globalization;
+    using System.IO;
+    using TriangleNet.Geometry;
 
     /// <summary>
     /// Helper methods for reading Triangle file formats.
@@ -74,6 +72,7 @@ namespace TriangleNet.IO
 
             if (attributes > 0)
             {
+#if USE_ATTRIBS
                 var attribs = new double[attributes];
 
                 // Read the vertex attributes.
@@ -86,6 +85,7 @@ namespace TriangleNet.IO
                 }
 
                 v.attributes = attribs;
+#endif
             }
 
             data.Add(v);

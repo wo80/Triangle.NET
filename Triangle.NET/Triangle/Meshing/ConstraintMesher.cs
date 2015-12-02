@@ -710,17 +710,22 @@ namespace TriangleNet.Meshing
             newvertex = new Vertex(
                 torg.x + split * (tdest.x - torg.x),
                 torg.y + split * (tdest.y - torg.y),
-                splitsubseg.seg.boundary,
-                mesh.nextras);
+                splitsubseg.seg.boundary
+#if USE_ATTRIBS
+                , mesh.nextras
+#endif
+                );
 
             newvertex.hash = mesh.hash_vtx++;
             newvertex.id = newvertex.hash;
 
+#if USE_ATTRIBS
             // Interpolate its attributes.
             for (int i = 0; i < mesh.nextras; i++)
             {
                 newvertex.attributes[i] = torg.attributes[i] + split * (tdest.attributes[i] - torg.attributes[i]);
             }
+#endif
 
             mesh.vertices.Add(newvertex.hash, newvertex);
 

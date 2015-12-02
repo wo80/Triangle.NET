@@ -14,9 +14,13 @@ namespace TriangleNet.Geometry
     public class Point : IComparable<Point>, IEquatable<Point>
     {
         internal int id;
+        internal int label;
+
         internal double x;
         internal double y;
-        internal int label;
+#if USE_Z
+        internal double z;
+#endif
 
         public Point()
             : this(0, 0, 0)
@@ -63,6 +67,17 @@ namespace TriangleNet.Geometry
             get { return this.y; }
             set { this.y = value; }
         }
+
+#if USE_Z
+        /// <summary>
+        /// Gets or sets the vertex z coordinate.
+        /// </summary>
+        public double Z
+        {
+            get { return this.z; }
+            set { this.z = value; }
+        }
+#endif
 
         /// <summary>
         /// Gets or sets a general-purpose label.

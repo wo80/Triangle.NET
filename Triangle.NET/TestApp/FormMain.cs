@@ -366,7 +366,7 @@ namespace MeshExplorer
             {
                 if (FileProcessor.ContainsMeshData(filename))
                 {
-                    if (DarkMessageBox.Show("Import mesh", Settings.ImportString,
+                    if (filename.EndsWith(".ele") || DarkMessageBox.Show("Import mesh", Settings.ImportString,
                         "Do you want to import the mesh?", MessageBoxButtons.YesNo) == DialogResult.OK)
                     {
                         input = null;
@@ -619,16 +619,35 @@ namespace MeshExplorer
 
             if (mesh.IsPolygon)
             {
-                this.voronoi = new BoundedVoronoi(mesh);
+                try
+                {
+                    this.voronoi = new BoundedVoronoi(mesh);
+                }
+                catch (Exception ex)
+                {
+                    if (!meshControlView.ParamConformDelChecked)
+                    {
+                        DarkMessageBox.Show("Exception - Bounded Voronoi", Settings.VoronoiString, MessageBoxButtons.OK);
+                    }
+                    else
+                    {
+                        DarkMessageBox.Show("Exception - Bounded Voronoi", ex.Message, MessageBoxButtons.OK);
+                    }
+
+                    this.voronoi = null;
+                }
             }
             else
             {
                 this.voronoi = new StandardVoronoi(mesh);
             }
 
-            // HACK: List<Vertex> -> ICollection<Point> ? Nope, no way.
-            //           Vertex[] -> ICollection<Point> ? Well, ok.
-            renderManager.Set(voronoi.Vertices.ToArray(), voronoi.Edges, false);
+            if (this.voronoi != null)
+            {
+                // HACK: List<Vertex> -> ICollection<Point> ? Nope, no way.
+                //           Vertex[] -> ICollection<Point> ? Well, ok.
+                renderManager.Set(voronoi.Vertices.ToArray(), voronoi.Edges, false);
+            }
         }
 
         private void ShowLog()

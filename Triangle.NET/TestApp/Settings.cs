@@ -22,6 +22,9 @@ namespace MeshExplorer
         public static string ImportString = "The selected file has associated mesh information. " +
             "You can choose to import the mesh or just read the geometry.";
 
+        public static string VoronoiString = "Make sure you use the \"Confoming Delaunay\" option " +
+            "when building the Voronoi diagram from a constrained mesh.";
+
         // Open file dialog
         public string OfdDirectory { get; set; }
         public string OfdFilter { get; set; }
