@@ -37,7 +37,8 @@ namespace TriangleNet.Voronoi
         /// <param name="generate">If set to true, the constuctor will call the Generate
         /// method, which builds the Voronoi diagram.</param>
         protected VoronoiBase(Mesh mesh, IVoronoiFactory factory, IPredicates predicates,
-            bool generate) : base(false)
+            bool generate)
+            : base(false)
         {
             this.factory = factory;
             this.predicates = predicates;
@@ -105,7 +106,7 @@ namespace TriangleNet.Voronoi
             var map = new List<HalfEdge>[mesh.triangles.Count];
 
             // Compue triangle circumcenters
-            foreach (var t in mesh.triangles.Values)
+            foreach (var t in mesh.triangles)
             {
                 id = t.id;
                 tri.tri = t;
@@ -152,7 +153,7 @@ namespace TriangleNet.Voronoi
             // to the edge, operate on the edge. If there is another adjacent triangle,
             // operate on the edge only if the current triangle has a smaller id than
             // its neighbor. This way, each edge is considered only once.
-            foreach (var t in mesh.triangles.Values)
+            foreach (var t in mesh.triangles)
             {
                 id = t.id;
 

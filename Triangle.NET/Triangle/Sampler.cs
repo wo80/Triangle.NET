@@ -9,17 +9,18 @@ namespace TriangleNet
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
+    using TriangleNet.Topology;
 
     /// <summary>
     /// Used for triangle sampling in the <see cref="TriangleLocator"/> class.
     /// </summary>
-    class Sampler
+    class Sampler : IEnumerable<Triangle>
     {
         // Empirically chosen factor.
         private const int samplefactor = 11;
 
         private Random rand;
+        private Mesh mesh;
 
         // Number of random samples for point location (at least 1).
         private int samples = 1;
@@ -27,11 +28,9 @@ namespace TriangleNet
         // Number of triangles in mesh.
         private int triangleCount = 0;
 
-        // Keys of the triangle dictionary.
-        private int[] keys;
-
-        public Sampler()
+        public Sampler(Mesh mesh)
         {
+            this.mesh = mesh;
             this.rand = new Random(110503);
         }
 
@@ -48,16 +47,7 @@ namespace TriangleNet
         /// Update sampling parameters if mesh changed.
         /// </summary>
         /// <param name="mesh">Current mesh.</param>
-        public void Update(Mesh mesh)
-        {
-            this.Update(mesh, false);
-        }
-
-        /// <summary>
-        /// Update sampling parameters if mesh changed.
-        /// </summary>
-        /// <param name="mesh">Current mesh.</param>
-        public void Update(Mesh mesh, bool forceUpdate)
+        public void Update(bool forceUpdate = false)
         {
             int count = mesh.triangles.Count;
 
@@ -74,43 +64,17 @@ namespace TriangleNet
                 {
                     samples++;
                 }
-
-                // TODO: Is there a way not calling ToArray()?
-                keys = mesh.triangles.Keys.ToArray();
             }
         }
 
-        /// <summary>
-        /// Get a random sample set of triangle keys.
-        /// </summary>
-        /// <returns>Array of triangle keys.</returns>
-        public int[] GetSamples(Mesh mesh)
+        public IEnumerator<Triangle> GetEnumerator()
         {
-            // TODO: Using currKeys to check key availability?
-            List<int> randSamples = new List<int>(samples);
+            return mesh.triangles.Sample(samples, rand).GetEnumerator();
+        }
 
-            int range = triangleCount / samples;
-            int key;
-
-            for (int i = 0; i < samples; i++)
-            {
-                // Yeah, rand should be equally distributed, but just to make
-                // sure, use a range variable...
-                key = rand.Next(i * range, (i + 1) * range - 1);
-
-                if (!mesh.triangles.ContainsKey(keys[key]))
-                {
-                    // Keys collection isn't up to date anymore!
-                    this.Update(mesh, true);
-                    i--;
-                }
-                else
-                {
-                    randSamples.Add(keys[key]);
-                }
-            }
-
-            return randSamples.ToArray();
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

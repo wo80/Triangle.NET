@@ -36,7 +36,7 @@ namespace TriangleNet
         // TODO: Check if custom hashmap implementation could be faster.
 
         // Using hashsets for memory management should quite fast.
-        internal Dictionary<int, Triangle> triangles;
+        internal TrianglePool triangles;
         internal Dictionary<int, SubSegment> subsegs;
         internal Dictionary<int, Vertex> vertices;
 
@@ -107,7 +107,7 @@ namespace TriangleNet
         /// </summary>
         public ICollection<Triangle> Triangles
         {
-            get { return this.triangles.Values; }
+            get { return this.triangles; }
         }
 
         /// <summary>
@@ -232,7 +232,7 @@ namespace TriangleNet
         /// <summary>
         /// Initializes a new instance of the <see cref="Mesh" /> class.
         /// </summary>
-        public Mesh(IPredicates predicates)
+        public Mesh(Configuration config)
         {
             Initialize();
 
@@ -241,8 +241,9 @@ namespace TriangleNet
             behavior = new Behavior();
 
             vertices = new Dictionary<int, Vertex>();
-            triangles = new Dictionary<int, Triangle>();
             subsegs = new Dictionary<int, SubSegment>();
+
+            triangles = config.TrianglePool();
 
             flipstack = new Stack<Otri>();
 
@@ -251,7 +252,7 @@ namespace TriangleNet
 
             steinerleft = -1;
 
-            this.predicates = predicates;
+            this.predicates = config.Predicates();
 
             this.locator = new TriangleLocator(this, predicates);
         }
@@ -317,7 +318,7 @@ namespace TriangleNet
 
             // Triangles will always be numbered from 0 to n-1
             id = 0;
-            foreach (var item in this.triangles.Values)
+            foreach (var item in this.triangles)
             {
                 item.id = id++;
             }
@@ -358,7 +359,7 @@ namespace TriangleNet
         private void ResetData()
         {
             vertices.Clear();
-            triangles.Clear();
+            triangles.Restart();
             subsegs.Clear();
 
             holes.Clear();
@@ -410,7 +411,7 @@ namespace TriangleNet
 
             if (this.invertices < 3)
             {
-                logger.Error("Input must have at least three input vertices.", "MeshReader.TransferNodes()");
+                logger.Error("Input must have at least three input vertices.", "Mesh.TransferNodes()");
                 throw new Exception("Input must have at least three input vertices.");
             }
 
@@ -461,7 +462,7 @@ namespace TriangleNet
             Otri tri = default(Otri);
             Vertex triorg;
 
-            foreach (var t in this.triangles.Values)
+            foreach (var t in this.triangles)
             {
                 tri.tri = t;
                 // Check all three vertices of the triangle.
@@ -483,9 +484,9 @@ namespace TriangleNet
         /// <param name="newotri">Reference to the new triangle.</param>
         internal void MakeTriangle(ref Otri newotri)
         {
-            Triangle tri = new Triangle();
+            Triangle tri = triangles.Get();
 
-            tri.hash = tri.id = this.hash_tri++;
+            //tri.id = tri.hash;
 
             tri.subsegs[0].seg = dummysub;
             tri.subsegs[1].seg = dummysub;
@@ -497,8 +498,6 @@ namespace TriangleNet
 
             newotri.tri = tri;
             newotri.orient = 0;
-
-            triangles.Add(tri.hash, tri);
         }
 
         /// <summary>
@@ -1732,7 +1731,7 @@ namespace TriangleNet
             // Mark the triangle as dead. This makes it possible to detect dead 
             // triangles when traversing the list of all triangles.
             Otri.Kill(dyingtriangle);
-            triangles.Remove(dyingtriangle.hash);
+            triangles.Release(dyingtriangle);
         }
 
         /// <summary>

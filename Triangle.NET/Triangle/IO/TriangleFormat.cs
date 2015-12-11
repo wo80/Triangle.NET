@@ -38,7 +38,7 @@ namespace TriangleNet.IO
                 List<ITriangle> triangles;
                 Polygon geometry;
 
-                TriangleReader.Read(filename, out geometry, out triangles);
+                (new TriangleReader()).Read(filename, out geometry, out triangles);
 
                 if (geometry != null && triangles != null)
                 {
@@ -51,8 +51,10 @@ namespace TriangleNet.IO
 
         public void Write(IMesh mesh, string filename)
         {
-            TriangleWriter.WritePoly((Mesh)mesh, Path.ChangeExtension(filename, ".poly"));
-            TriangleWriter.WriteElements((Mesh)mesh, Path.ChangeExtension(filename, ".ele"));
+            var writer = new TriangleWriter();
+
+            writer.WritePoly((Mesh)mesh, Path.ChangeExtension(filename, ".poly"));
+            writer.WriteElements((Mesh)mesh, Path.ChangeExtension(filename, ".ele"));
         }
 
         public void Write(IMesh mesh, Stream stream)
@@ -66,12 +68,11 @@ namespace TriangleNet.IO
 
             if (ext == ".node")
             {
-                return TriangleReader.ReadNodeFile(filename);
+                return (new TriangleReader()).ReadNodeFile(filename);
             }
-
-            if (ext == ".poly")
+            else if (ext == ".poly")
             {
-                return TriangleReader.ReadPolyFile(filename);
+                return (new TriangleReader()).ReadPolyFile(filename);
             }
 
             throw new NotSupportedException("File format '" + ext + "' not supported.");
@@ -80,7 +81,7 @@ namespace TriangleNet.IO
 
         public void Write(IPolygon polygon, string filename)
         {
-            TriangleWriter.WritePoly(polygon, filename);
+            (new TriangleWriter()).WritePoly(polygon, filename);
         }
 
         public void Write(IPolygon polygon, Stream stream)

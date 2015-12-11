@@ -27,7 +27,7 @@ namespace TriangleNet.Meshing.Iterators
         /// </summary>
         public EdgeIterator(Mesh mesh)
         {
-            triangles = mesh.triangles.Values.GetEnumerator();
+            triangles = mesh.triangles.GetEnumerator();
             triangles.MoveNext();
 
             tri.tri = triangles.Current;

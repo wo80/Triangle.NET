@@ -12,7 +12,7 @@ namespace TriangleNet.Meshing
     using TriangleNet.Geometry;
     using TriangleNet.Logging;
     using TriangleNet.Meshing.Data;
-    using Tools;
+    using TriangleNet.Tools;
     using TriangleNet.Topology;
 
     /// <summary>
@@ -35,7 +35,7 @@ namespace TriangleNet.Meshing
         // in SplitTriangle method.
         Triangle newvertex_tri;
 
-        public QualityMesher(Mesh mesh, IPredicates predicates)
+        public QualityMesher(Mesh mesh, Configuration config)
         {
             logger = Log.Instance;
 
@@ -43,7 +43,7 @@ namespace TriangleNet.Meshing
             queue = new BadTriQueue();
 
             this.mesh = mesh;
-            this.predicates = predicates;
+            this.predicates = config.Predicates();
 
             this.behavior = mesh.behavior;
 
@@ -53,9 +53,9 @@ namespace TriangleNet.Meshing
         }
 
         /// <summary>
-        /// Triangulate given input data.
+        /// Apply quality constraints to a mesh.
         /// </summary>
-        /// <param name="input"></param>
+        /// <param name="quality">The quality constraints.</param>
         public void Apply(QualityOptions quality)
         {
             // Copy quality options
@@ -684,7 +684,7 @@ namespace TriangleNet.Meshing
             Otri triangleloop = default(Otri);
             triangleloop.orient = 0;
 
-            foreach (var tri in mesh.triangles.Values)
+            foreach (var tri in mesh.triangles)
             {
                 triangleloop.tri = tri;
 

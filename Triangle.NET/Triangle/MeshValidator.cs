@@ -34,7 +34,7 @@ namespace TriangleNet
             int horrors = 0;
 
             // Run through the list of triangles, checking each one.
-            foreach (var t in mesh.triangles.Values)
+            foreach (var t in mesh.triangles)
             {
                 tri.tri = t;
 
@@ -153,7 +153,7 @@ namespace TriangleNet
             var inf3 = mesh.infvertex3;
 
             // Run through the list of triangles, checking each one.
-            foreach (var tri in mesh.triangles.Values)
+            foreach (var tri in mesh.triangles)
             {
                 loop.tri = tri;
 

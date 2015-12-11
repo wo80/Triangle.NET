@@ -47,7 +47,7 @@ namespace TriangleNet.Rendering
         // so inverY must be set to true.
         bool invertY = false;
 
-        int maxZoomLevel = 50;
+        int maxZoomLevel = 100;
 
         public Projection(Rectangle screen, bool invertY = true)
         {
@@ -62,15 +62,12 @@ namespace TriangleNet.Rendering
             this.invertY = invertY;
         }
 
+        /// <summary>
+        /// Inititialize the projection.
+        /// </summary>
+        /// <param name="world">The world that should be transformed to screen coordinates.</param>
         public void Initialize(BoundingBox world)
         {
-            Initialize(this.screen, world);
-        }
-
-        public void Initialize(Rectangle screen, BoundingBox world)
-        {
-            this.screen = screen;
-
             this.Level = 1;
 
             // Add a margin so there's some space around the border
@@ -99,6 +96,66 @@ namespace TriangleNet.Rendering
             this.ClipMargin = this.Viewport.Width * 0.05f;
 
             this.world = this.Viewport;
+        }
+
+        /// <summary>
+        /// Handle resize of the screen.
+        /// </summary>
+        /// <param name="newScreen">The new screen dimensions.</param>
+        public void Resize(Rectangle newScreen)
+        {
+            // The viewport has to be updated, but we want to keep
+            // the scaling and the center.
+
+            // Get the screen scaling.
+            float scaleX = newScreen.Width / (float)screen.Width;
+            float scaleY = newScreen.Height / (float)screen.Height;
+
+            this.screen = newScreen;
+
+            var view = this.Viewport;
+
+            // Center of the viewport
+            float centerX = (view.Left + view.Right) / 2;
+            float centerY = (view.Bottom + view.Top) / 2;
+
+            // The new viewport dimensions.
+            float width = view.Width * scaleX;
+            float height = view.Height * scaleY;
+
+            this.Viewport = new RectangleF(
+                centerX - width / 2,
+                centerY - height / 2,
+                width, height);
+
+            // Do the same for the world:
+            centerX = (world.Left + world.Right) / 2;
+            centerY = (world.Bottom + world.Top) / 2;
+
+            width = world.Width * scaleX;
+            height = world.Height * scaleY;
+
+            this.world = new RectangleF(
+                centerX - width / 2,
+                centerY - height / 2,
+                width, height);
+        }
+
+        public bool Translate(int dx, int dy)
+        {
+            if (Level == 1)
+            {
+                return false;
+            }
+
+            var view = this.Viewport;
+
+            float x = view.X + dx * view.Width / 4;
+            float y = view.Y + dy * view.Height / 4;
+
+            this.Viewport = new RectangleF(x, y, view.Width, view.Height);
+
+            return true;
         }
 
         /// <summary>

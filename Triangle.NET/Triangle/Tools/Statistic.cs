@@ -154,7 +154,7 @@ namespace TriangleNet.Tools
             int i, j, k;
 
             tri.orient = 0;
-            foreach (var t in mesh.triangles.Values)
+            foreach (var t in mesh.triangles)
             {
                 tri.tri = t;
                 p[0] = tri.Org();
@@ -256,7 +256,7 @@ namespace TriangleNet.Tools
 
             double triMinAngle, triMaxAngle = 1;
 
-            foreach (var tri in mesh.triangles.Values)
+            foreach (var tri in mesh.triangles)
             {
                 triMinAngle = 0; // Min angle:  0 < a <  60 degress
                 triMaxAngle = 1; // Max angle: 60 < a < 180 degress

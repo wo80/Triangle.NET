@@ -55,16 +55,6 @@ namespace TriangleNet.Meshing.Algorithm
         Vertex[] sortarray;
         Mesh mesh;
 
-        public Dwyer()
-            : this(RobustPredicates.Default)
-        {
-        }
-
-        public Dwyer(IPredicates predicates)
-        {
-            this.predicates = predicates;
-        }
-
         /// <summary>
         /// Form a Delaunay triangulation by the divide-and-conquer method.
         /// </summary>
@@ -73,9 +63,11 @@ namespace TriangleNet.Meshing.Algorithm
         /// Sorts the vertices, calls a recursive procedure to triangulate them, and
         /// removes the bounding box, setting boundary markers as appropriate.
         /// </remarks>
-        public IMesh Triangulate(IList<Vertex> points)
+        public IMesh Triangulate(IList<Vertex> points, Configuration config)
         {
-            this.mesh = new Mesh(predicates);
+            this.predicates = config.Predicates();
+
+            this.mesh = new Mesh(config);
             this.mesh.TransferNodes(points);
 
             Otri hullleft = default(Otri), hullright = default(Otri);
@@ -104,7 +96,7 @@ namespace TriangleNet.Meshing.Algorithm
                     if (Log.Verbose)
                     {
                         Log.Instance.Warning(
-                            String.Format("A duplicate vertex appeared and was ignored (ID {0}).", sortarray[j].hash),
+                            String.Format("A duplicate vertex appeared and was ignored (ID {0}).", sortarray[j].id),
                             "Dwyer.Triangulate()");
                     }
                     sortarray[j].type = VertexType.UndeadVertex;

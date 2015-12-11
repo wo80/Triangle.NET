@@ -18,7 +18,8 @@ namespace TriangleNet.Meshing
         /// Triangulates a point set.
         /// </summary>
         /// <param name="points">Collection of points.</param>
+        /// <param name="config"></param>
         /// <returns>Mesh</returns>
-        IMesh Triangulate(IList<Vertex> points);
+        IMesh Triangulate(IList<Vertex> points, Configuration config);
     }
 }

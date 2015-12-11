@@ -118,7 +118,7 @@ namespace TriangleNet.Voronoi.Legacy
             Point pt;
 
             // Compue triangle circumcenters
-            foreach (var item in mesh.triangles.Values)
+            foreach (var item in mesh.triangles)
             {
                 tri.tri = item;
 

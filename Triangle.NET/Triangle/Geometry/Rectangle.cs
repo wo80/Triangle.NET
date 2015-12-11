@@ -10,7 +10,7 @@ namespace TriangleNet.Geometry
     using System.Collections.Generic;
 
     /// <summary>
-    /// A simple bounding box class.
+    /// A simple rectangle class.
     /// </summary>
     public class Rectangle
     {
@@ -79,7 +79,7 @@ namespace TriangleNet.Geometry
         }
 
         /// <summary>
-        /// Gets the width of the bounding box.
+        /// Gets the width of the rectangle.
         /// </summary>
         public double Width
         {
@@ -87,7 +87,7 @@ namespace TriangleNet.Geometry
         }
 
         /// <summary>
-        /// Gets the height of the bounding box.
+        /// Gets the height of the rectangle.
         /// </summary>
         public double Height
         {
@@ -144,20 +144,31 @@ namespace TriangleNet.Geometry
         }
 
         /// <summary>
-        /// Check if given point is inside bounding box.
+        /// Check if given point is inside rectangle.
         /// </summary>
-        /// <param name="pt">Point to check.</param>
-        /// <returns>Return true, if bounding box contains given point.</returns>
-        public bool Contains(Point pt)
+        /// <param name="x">Point to check.</param>
+        /// <param name="y">Point to check.</param>
+        /// <returns>Return true, if rectangle contains given point.</returns>
+        public bool Contains(double x, double y)
         {
-            return ((pt.x >= xmin) && (pt.x <= xmax) && (pt.y >= ymin) && (pt.y <= ymax));
+            return ((x >= xmin) && (x <= xmax) && (y >= ymin) && (y <= ymax));
         }
 
         /// <summary>
-        /// Check if given rectangle is inside bounding box.
+        /// Check if given point is inside rectangle.
+        /// </summary>
+        /// <param name="pt">Point to check.</param>
+        /// <returns>Return true, if rectangle contains given point.</returns>
+        public bool Contains(Point pt)
+        {
+            return Contains(pt.x, pt.y);
+        }
+
+        /// <summary>
+        /// Check if this rectangle contains other rectangle.
         /// </summary>
         /// <param name="other">Rectangle to check.</param>
-        /// <returns>Return true, if bounding box contains given rectangle.</returns>
+        /// <returns>Return true, if this rectangle contains given rectangle.</returns>
         public bool Contains(Rectangle other)
         {
             return (xmin <= other.Left && other.Right <= xmax
@@ -165,10 +176,10 @@ namespace TriangleNet.Geometry
         }
 
         /// <summary>
-        /// Check if given rectangle intersects bounding box.
+        /// Check if this rectangle intersects other rectangle.
         /// </summary>
         /// <param name="other">Rectangle to check.</param>
-        /// <returns>Return true, if given rectangle intersects bounding box.</returns>
+        /// <returns>Return true, if given rectangle intersects this rectangle.</returns>
         public bool Intersects(Rectangle other)
         {
             return (other.Left < xmax && xmin < other.Right

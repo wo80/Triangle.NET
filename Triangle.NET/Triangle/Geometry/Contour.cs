@@ -8,7 +8,7 @@ namespace TriangleNet.Geometry
 {
     using System;
     using System.Collections.Generic;
-    
+
     public class Contour
     {
         int marker;

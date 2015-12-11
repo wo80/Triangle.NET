@@ -21,8 +21,6 @@ namespace TriangleNet.Rendering
         void Initialize();
         void Refresh();
 
-        void HandleMouseClick(float x, float y, MouseButtons button);
-        void HandleMouseWheel(float x, float y, int delta);
         void HandleResize();
     }
 }

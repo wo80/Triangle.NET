@@ -44,7 +44,8 @@ namespace TriangleNet.Meshing
             int elements = triangles == null ? 0 : triangles.Length;
             int segments = polygon.Segments.Count;
 
-            var mesh = new Mesh(RobustPredicates.Default);
+            // TODO: Configuration should be a function argument.
+            var mesh = new Mesh(new Configuration());
 
             mesh.TransferNodes(polygon.Points);
 
@@ -114,7 +115,7 @@ namespace TriangleNet.Meshing
 
             // Read the triangles from the .ele file, and link
             // together those that share an edge.
-            foreach (var item in mesh.triangles.Values)
+            foreach (var item in mesh.triangles)
             {
                 tri.tri = item;
 
@@ -371,7 +372,7 @@ namespace TriangleNet.Meshing
 
             Face face;
 
-            foreach (var t in mesh.triangles.Values)
+            foreach (var t in mesh.triangles)
             {
                 face = new Face(null);
                 face.id = t.id;
@@ -396,7 +397,7 @@ namespace TriangleNet.Meshing
             // Maps a vertex to its leaving boundary edge.
             var boundary = new Dictionary<int, HalfEdge>();
 
-            foreach (var t in mesh.triangles.Values)
+            foreach (var t in mesh.triangles)
             {
                 id = t.id;
 

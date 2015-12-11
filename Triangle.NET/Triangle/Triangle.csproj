@@ -40,6 +40,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration.cs" />
     <Compile Include="Geometry\Contour.cs" />
     <Compile Include="Geometry\Edge.cs" />
     <Compile Include="Geometry\ExtensionMethods.cs" />
@@ -101,6 +102,7 @@
     <Compile Include="Topology\DCEL\Vertex.cs" />
     <Compile Include="Smoothing\ISmoother.cs" />
     <Compile Include="Smoothing\SimpleSmoother.cs" />
+    <Compile Include="TrianglePool.cs" />
     <Compile Include="Voronoi\BoundedVoronoi.cs" />
     <Compile Include="Voronoi\DefaultVoronoiFactory.cs" />
     <Compile Include="Voronoi\IVoronoiFactory.cs" />

@@ -2524,11 +2524,6 @@ namespace TriangleNet
                 petaly = new double[2 * numpoints];
                 petalr = new double[2 * numpoints];
                 wedges = new double[2 * numpoints * 16 + 36];
-
-                if (Log.Verbose)
-                {
-                    Log.Instance.Info("NewLocation: resized work arrays (" + 2 * numpoints + ")");
-                }
             }
 
             double xmid, ymid, dist, x3, y3;
@@ -2791,11 +2786,6 @@ namespace TriangleNet
                 petaly = new double[2 * numpoints];
                 petalr = new double[2 * numpoints];
                 wedges = new double[2 * numpoints * 20 + 40];
-
-                if (Log.Verbose)
-                {
-                    Log.Instance.Info("NewLocation: resized work arrays (" + 2 * numpoints + ")");
-                }
             }
 
             double xmid, ymid, dist, x3, y3;

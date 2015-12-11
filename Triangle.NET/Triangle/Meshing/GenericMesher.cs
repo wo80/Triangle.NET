@@ -15,33 +15,36 @@ namespace TriangleNet.Meshing
     /// <summary>
     /// Create meshes of point sets or polygons.
     /// </summary>
-    public class GenericMesher : ITriangulator, IConstraintMesher, IQualityMesher
+    public class GenericMesher
     {
-        IPredicates predicates;
-
+        Configuration config;
         ITriangulator triangulator;
 
         public GenericMesher()
+            : this(new Dwyer(), new Configuration())
         {
-            this.predicates = new RobustPredicates();
-            this.triangulator = new Dwyer(this.predicates);
         }
 
         public GenericMesher(ITriangulator triangulator)
-            : this(triangulator, RobustPredicates.Default)
+            : this(triangulator, new Configuration())
         {
         }
 
-        public GenericMesher(ITriangulator triangulator, IPredicates predicates)
+        public GenericMesher(Configuration config)
+            : this(new Dwyer(), config)
         {
-            this.predicates = predicates;
+        }
+
+        public GenericMesher(ITriangulator triangulator, Configuration config)
+        {
+            this.config = config;
             this.triangulator = triangulator;
         }
 
         /// <inheritdoc />
         public IMesh Triangulate(IList<Vertex> points)
         {
-            return triangulator.Triangulate(points);
+            return triangulator.Triangulate(points, config);
         }
 
         /// <inheritdoc />
@@ -65,10 +68,10 @@ namespace TriangleNet.Meshing
         /// <inheritdoc />
         public IMesh Triangulate(IPolygon polygon, ConstraintOptions options, QualityOptions quality)
         {
-            var mesh = (Mesh)triangulator.Triangulate(polygon.Points);
+            var mesh = (Mesh)triangulator.Triangulate(polygon.Points, config);
 
-            var cmesher = new ConstraintMesher(mesh, predicates);
-            var qmesher = new QualityMesher(mesh, predicates);
+            var cmesher = new ConstraintMesher(mesh, config);
+            var qmesher = new QualityMesher(mesh, config);
 
             mesh.SetQualityMesher(qmesher);
 

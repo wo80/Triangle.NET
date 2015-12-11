@@ -33,7 +33,7 @@ namespace TriangleNet
             this.mesh = mesh;
             this.predicates = predicates;
 
-            sampler = new Sampler();
+            sampler = new Sampler(mesh);
         }
 
         public void Update(ref Otri otri)
@@ -292,12 +292,11 @@ namespace TriangleNet
             }
 
             // TODO: Improve sampling.
-            sampler.Update(mesh);
-            int[] samples = sampler.GetSamples(mesh);
+            sampler.Update();
 
-            foreach (var key in samples)
+            foreach (var t in sampler)
             {
-                sampletri.tri = mesh.triangles[key];
+                sampletri.tri = t;
                 if (!Otri.IsDead(sampletri.tri))
                 {
                     torg = sampletri.Org();

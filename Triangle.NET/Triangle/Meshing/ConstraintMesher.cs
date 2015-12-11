@@ -26,10 +26,10 @@ namespace TriangleNet.Meshing
 
         ILog<LogItem> logger;
 
-        public ConstraintMesher(Mesh mesh, IPredicates predicates)
+        public ConstraintMesher(Mesh mesh, Configuration config)
         {
             this.mesh = mesh;
-            this.predicates = predicates;
+            this.predicates = config.Predicates();
 
             this.behavior = mesh.behavior;
             this.locator = mesh.locator;
@@ -41,9 +41,10 @@ namespace TriangleNet.Meshing
 
 
         /// <summary>
-        /// Triangulate given input data.
+        /// Insert segments into the mesh.
         /// </summary>
-        /// <param name="input"></param>
+        /// <param name="input">The polygon.</param>
+        /// <param name="options">Constraint options.</param>
         public void Apply(IPolygon input, ConstraintOptions options)
         {
             behavior.Poly = input.Segments.Count > 0;
@@ -231,8 +232,6 @@ namespace TriangleNet.Meshing
             // The segment endpoints.
             Vertex p, q;
 
-            int label;
-
             mesh.insegments = 0;
 
             if (behavior.Poly)
@@ -251,16 +250,10 @@ namespace TriangleNet.Meshing
                     mesh.MakeVertexMap();
                 }
 
-                label = 0;
-
                 // Read and insert the segments.
                 foreach (var seg in input.Segments)
                 {
                     mesh.insegments++;
-
-                    label = seg.Label;
-
-                    // TODO: wrap segment dictionary access in try / catch?
 
                     p = seg.GetVertex(0);
                     q = seg.GetVertex(1);
@@ -275,7 +268,7 @@ namespace TriangleNet.Meshing
                     }
                     else
                     {
-                        InsertSegment(p, q, label);
+                        InsertSegment(p, q, seg.Label);
                     }
                 }
             }

@@ -16,19 +16,19 @@ namespace TriangleNet.IO
     /// <summary>
     /// Helper methods for writing Triangle file formats.
     /// </summary>
-    public static class TriangleWriter
+    public class TriangleWriter
     {
-        static NumberFormatInfo nfi = CultureInfo.InvariantCulture.NumberFormat;
+        static NumberFormatInfo nfi = NumberFormatInfo.InvariantInfo;
 
         /// <summary>
         /// Number the vertices and write them to a .node file.
         /// </summary>
         /// <param name="mesh"></param>
         /// <param name="filename"></param>
-        public static void Write(Mesh mesh, string filename)
+        public void Write(Mesh mesh, string filename)
         {
-            TriangleWriter.WritePoly(mesh, Path.ChangeExtension(filename, ".poly"));
-            TriangleWriter.WriteElements(mesh, Path.ChangeExtension(filename, ".ele"));
+            WritePoly(mesh, Path.ChangeExtension(filename, ".poly"));
+            WriteElements(mesh, Path.ChangeExtension(filename, ".ele"));
         }
 
         /// <summary>
@@ -36,18 +36,18 @@ namespace TriangleNet.IO
         /// </summary>
         /// <param name="mesh"></param>
         /// <param name="filename"></param>
-        public static void WriteNodes(Mesh mesh, string filename)
+        public void WriteNodes(Mesh mesh, string filename)
         {
-            using (StreamWriter writer = new StreamWriter(filename))
+            using (var writer = new StreamWriter(filename))
             {
-                TriangleWriter.WriteNodes(writer, mesh);
+                WriteNodes(writer, mesh);
             }
         }
 
         /// <summary>
         /// Number the vertices and write them to a .node file.
         /// </summary>
-        private static void WriteNodes(StreamWriter writer, Mesh mesh)
+        private void WriteNodes(StreamWriter writer, Mesh mesh)
         {
             int outvertices = mesh.vertices.Count;
             int nextras = mesh.nextras;
@@ -102,7 +102,7 @@ namespace TriangleNet.IO
         /// </summary>
         /// <param name="nodes"></param>
         /// <param name="writer"></param>
-        private static void WriteNodes(StreamWriter writer, IEnumerable<Vertex> nodes, bool markers,
+        private void WriteNodes(StreamWriter writer, IEnumerable<Vertex> nodes, bool markers,
             int attribs, bool jettison)
         {
             int index = 0;
@@ -140,7 +140,7 @@ namespace TriangleNet.IO
         /// </summary>
         /// <param name="mesh"></param>
         /// <param name="filename"></param>
-        public static void WriteElements(Mesh mesh, string filename)
+        public void WriteElements(Mesh mesh, string filename)
         {
             Otri tri = default(Otri);
             Vertex p1, p2, p3;
@@ -150,12 +150,12 @@ namespace TriangleNet.IO
 
             tri.orient = 0;
 
-            using (StreamWriter writer = new StreamWriter(filename))
+            using (var writer = new StreamWriter(filename))
             {
                 // Number of triangles, vertices per triangle, attributes per triangle.
                 writer.WriteLine("{0} 3 {1}", mesh.triangles.Count, regions ? 1 : 0);
 
-                foreach (var item in mesh.triangles.Values)
+                foreach (var item in mesh.triangles)
                 {
                     tri.tri = item;
 
@@ -188,18 +188,18 @@ namespace TriangleNet.IO
         /// <remarks>If the nodes should not be written into this file, 
         /// make sure a .node file was written before, so that the nodes 
         /// are numbered right.</remarks>
-        public static void WritePoly(IPolygon polygon, string filename)
+        public void WritePoly(IPolygon polygon, string filename)
         {
             bool hasMarkers = polygon.HasSegmentMarkers;
 
-            using (StreamWriter writer = new StreamWriter(filename))
+            using (var writer = new StreamWriter(filename))
             {
                 // TODO: write vertex attributes
 
                 writer.WriteLine("{0} 2 0 {1}", polygon.Points.Count, polygon.HasPointMarkers ? "1" : "0");
 
                 // Write nodes to this file.
-                TriangleWriter.WriteNodes(writer, polygon.Points, polygon.HasPointMarkers, 0, false);
+                WriteNodes(writer, polygon.Points, polygon.HasPointMarkers, 0, false);
 
                 // Number of segments, number of boundary markers (zero or one).
                 writer.WriteLine("{0} {1}", polygon.Segments.Count, hasMarkers ? "1" : "0");
@@ -254,9 +254,9 @@ namespace TriangleNet.IO
         /// </summary>
         /// <param name="mesh"></param>
         /// <param name="filename"></param>
-        public static void WritePoly(Mesh mesh, string filename)
+        public void WritePoly(Mesh mesh, string filename)
         {
-            TriangleWriter.WritePoly(mesh, filename, true);
+            WritePoly(mesh, filename, true);
         }
 
         /// <summary>
@@ -268,19 +268,19 @@ namespace TriangleNet.IO
         /// <remarks>If the nodes should not be written into this file, 
         /// make sure a .node file was written before, so that the nodes 
         /// are numbered right.</remarks>
-        public static void WritePoly(Mesh mesh, string filename, bool writeNodes)
+        public void WritePoly(Mesh mesh, string filename, bool writeNodes)
         {
             Osub subseg = default(Osub);
             Vertex pt1, pt2;
 
             bool useBoundaryMarkers = mesh.behavior.UseBoundaryMarkers;
 
-            using (StreamWriter writer = new StreamWriter(filename))
+            using (var writer = new StreamWriter(filename))
             {
                 if (writeNodes)
                 {
                     // Write nodes to this file.
-                    TriangleWriter.WriteNodes(writer, mesh);
+                    WriteNodes(writer, mesh);
                 }
                 else
                 {
@@ -347,7 +347,7 @@ namespace TriangleNet.IO
         /// </summary>
         /// <param name="mesh"></param>
         /// <param name="filename"></param>
-        public static void WriteEdges(Mesh mesh, string filename)
+        public void WriteEdges(Mesh mesh, string filename)
         {
             Otri tri = default(Otri), trisym = default(Otri);
             Osub checkmark = default(Osub);
@@ -355,7 +355,7 @@ namespace TriangleNet.IO
 
             Behavior behavior = mesh.behavior;
 
-            using (StreamWriter writer = new StreamWriter(filename))
+            using (var writer = new StreamWriter(filename))
             {
                 // Number of edges, number of boundary markers (zero or one).
                 writer.WriteLine("{0} {1}", mesh.NumberOfEdges, behavior.UseBoundaryMarkers ? "1" : "0");
@@ -367,7 +367,7 @@ namespace TriangleNet.IO
                 // adjacent triangle, operate on the edge only if the current triangle
                 // has a smaller pointer than its neighbor.  This way, each edge is
                 // considered only once.
-                foreach (var item in mesh.triangles.Values)
+                foreach (var item in mesh.triangles)
                 {
                     tri.tri = item;
 
@@ -423,7 +423,7 @@ namespace TriangleNet.IO
         /// <param name="filename"></param>
         /// <remarks>WARNING: Be sure WriteElements has been called before, 
         /// so the elements are numbered right!</remarks>
-        public static void WriteNeighbors(Mesh mesh, string filename)
+        public void WriteNeighbors(Mesh mesh, string filename)
         {
             Otri tri = default(Otri), trisym = default(Otri);
             int n1, n2, n3;
@@ -434,7 +434,7 @@ namespace TriangleNet.IO
                 // Number of triangles, three neighbors per triangle.
                 writer.WriteLine("{0} 3", mesh.triangles.Count);
 
-                foreach (var item in mesh.triangles.Values)
+                foreach (var item in mesh.triangles)
                 {
                     tri.tri = item;
 

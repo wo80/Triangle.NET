@@ -77,16 +77,6 @@ namespace TriangleNet.Rendering
             control.HandleResize();
         }
 
-        public void Click(float x, float y, MouseButtons button)
-        {
-            control.HandleMouseClick(x, y, button);
-        }
-
-        public void Zoom(float x, float y, int delta)
-        {
-            control.HandleMouseWheel(x, y, delta);
-        }
-
         public void Enable(int layer, bool enabled)
         {
             context.Enable(layer, enabled);

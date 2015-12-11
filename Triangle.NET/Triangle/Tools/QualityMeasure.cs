@@ -182,7 +182,7 @@ namespace TriangleNet.Tools
 
             int n = 0;
 
-            foreach (var tri in mesh.triangles.Values)
+            foreach (var tri in mesh.triangles)
             {
                 n++;
 
@@ -247,7 +247,7 @@ namespace TriangleNet.Tools
 
             int gi, gj;
 
-            foreach (var tri in mesh.triangles.Values)
+            foreach (var tri in mesh.triangles)
             {
                 for (int j = 0; j < 3; j++)
                 {

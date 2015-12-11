@@ -135,7 +135,7 @@ namespace TriangleNet.Tools
             }
 
             // Examine each triangle.
-            foreach (var tri in mesh.triangles.Values)
+            foreach (var tri in mesh.triangles)
             {
                 tid = tri.id;
 
@@ -222,7 +222,7 @@ namespace TriangleNet.Tools
             int tid, nid; // Triangle and neighbor id.
 
             // Examine each triangle.
-            foreach (var tri in mesh.triangles.Values)
+            foreach (var tri in mesh.triangles)
             {
                 tid = tri.id;
 

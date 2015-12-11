@@ -86,16 +86,8 @@ namespace MeshExplorer
             control.Size = new Size(size.Width, size.Height);
             control.TabIndex = 0;
             control.Text = "renderControl1";
-            control.MouseClick += new MouseEventHandler(RenderControl_MouseClick);
 
             this.splitContainer1.ResumeLayout();
-        }
-
-        private void RenderControl_MouseClick(object sender, MouseEventArgs e)
-        {
-            var pt = e.Location;
-
-            renderManager.Click(((float)pt.X), ((float)pt.Y), e.Button);
         }
 
         private void Form1_KeyUp(object sender, KeyEventArgs e)
@@ -186,17 +178,7 @@ namespace MeshExplorer
 
         protected override void OnMouseWheel(MouseEventArgs e)
         {
-            var container = this.splitContainer1.Panel2.ClientRectangle;
-
-            System.Drawing.Point pt = e.Location;
-            pt.Offset(-splitContainer1.SplitterDistance, 0);
-
-            if (container.Contains(pt))
-            {
-                renderManager.Zoom(((float)pt.X) / container.Width,
-                    ((float)pt.Y) / container.Height, e.Delta);
-            }
-            base.OnMouseWheel(e);
+            // TODO: focus render control
         }
 
         #region Resize event handler

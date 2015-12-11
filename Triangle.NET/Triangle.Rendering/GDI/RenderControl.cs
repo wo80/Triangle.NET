@@ -10,6 +10,7 @@ namespace TriangleNet.Rendering.GDI
     using System.Drawing;
     using System.Drawing.Drawing2D;
     using System.Drawing.Text;
+    using System.Globalization;
     using System.Windows.Forms;
 
     /// <summary>
@@ -36,6 +37,7 @@ namespace TriangleNet.Rendering.GDI
         {
             //this.SetStyle(ControlStyles.UserPaint, true);
             //this.SetStyle(ControlStyles.OptimizedDoubleBuffer, false);
+            //this.SetStyle(ControlStyles.Selectable, true);
             this.SetStyle(ControlStyles.ResizeRedraw, true);
 
             //renderColors = ColorManager.Default();
@@ -74,60 +76,14 @@ namespace TriangleNet.Rendering.GDI
             this.Render();
         }
 
-        public void HandleMouseClick(float x, float y, MouseButtons button)
-        {
-            if (!initialized) return;
-
-            var zoom = this.Renderer.Context.Zoom;
-
-            if (button == MouseButtons.Middle)
-            {
-                zoom.Reset();
-                this.Render();
-            }
-            else if (button == MouseButtons.Left)
-            {
-                timer.Stop();
-
-                var nfi = System.Globalization.CultureInfo.InvariantCulture.NumberFormat;
-
-                PointF c = new PointF(x / this.Width, y / this.Height);
-                zoom.ScreenToWorld(ref c);
-                coordinate = String.Format(nfi, "X:{0} Y:{1}", c.X, c.Y);
-
-                this.Invalidate();
-
-                timer.Start();
-            }
-        }
-
-        /// <summary>
-        /// Zoom to the given location.
-        /// </summary>
-        /// <param name="location">The zoom focus.</param>
-        /// <param name="delta">Indicates whether to zoom in or out.</param>
-        public void HandleMouseWheel(float x, float y, int delta)
-        {
-            if (!initialized) return;
-
-            var zoom = this.Renderer.Context.Zoom;
-
-            if (zoom.Zoom(delta, x, y))
-            {
-                // Redraw
-                this.Render();
-            }
-        }
-
         /// <summary>
         /// Update graphics buffer and zoom after a resize.
         /// </summary>
         public void HandleResize()
         {
             var zoom = this.Renderer.Context.Zoom;
-            var bounds = this.Renderer.Context.Bounds;
 
-            zoom.Initialize(this.ClientRectangle, bounds);
+            zoom.Resize(this.ClientRectangle);
             InitializeBuffer();
         }
 
@@ -213,6 +169,82 @@ namespace TriangleNet.Rendering.GDI
             {
                 base.OnPaintBackground(pevent);
             }
+        }
+
+        protected override void OnMouseWheel(MouseEventArgs e)
+        {
+            if (!initialized) return;
+
+            var zoom = this.Renderer.Context.Zoom;
+
+            if (zoom.Zoom(e.Delta, (float)e.X / Width, (float)e.Y / Height))
+            {
+                // Redraw
+                this.Render();
+            }
+        }
+
+        protected override void OnMouseClick(MouseEventArgs e)
+        {
+            // We need to manually set the focus to get proper handling of
+            // the KeyUp and MouseWheel events.
+            this.Focus();
+
+            if (!initialized) return;
+
+            var zoom = this.Renderer.Context.Zoom;
+
+            if (e.Button == MouseButtons.Middle)
+            {
+                zoom.Reset();
+                this.Render();
+            }
+            else if (e.Button == MouseButtons.Left)
+            {
+                timer.Stop();
+
+                PointF c = new PointF((float)e.X / Width, (float)e.Y / Height);
+                zoom.ScreenToWorld(ref c);
+                coordinate = String.Format(NumberFormatInfo.InvariantInfo,
+                    "X:{0} Y:{1}", c.X, c.Y);
+
+                this.Invalidate();
+
+                timer.Start();
+            }
+        }
+
+        protected override void OnKeyUp(KeyEventArgs e)
+        {
+            if (!initialized) return;
+
+            var zoom = this.Renderer.Context.Zoom;
+
+            bool redraw = false;
+
+            if (e.KeyCode == Keys.Up)
+            {
+                redraw = zoom.Translate(0, 1);
+            }
+            else if (e.KeyCode == Keys.Down)
+            {
+                redraw = zoom.Translate(0, -1);
+            }
+            else if (e.KeyCode == Keys.Left)
+            {
+                redraw = zoom.Translate(-1, 0);
+            }
+            else if (e.KeyCode == Keys.Right)
+            {
+                redraw = zoom.Translate(1, 0);
+            }
+
+            if (redraw)
+            {
+                this.Render();
+            }
+
+            e.Handled = true;
         }
 
         #endregion

@@ -130,7 +130,7 @@ namespace TriangleNet.Voronoi.Legacy
             Point pt;
 
             // Compue triangle circumcenters
-            foreach (var item in mesh.triangles.Values)
+            foreach (var item in mesh.triangles)
             {
                 tri.tri = item;
 
@@ -161,7 +161,7 @@ namespace TriangleNet.Voronoi.Legacy
             Osub sub1 = default(Osub);
 
             // Tag all triangles non-blind
-            foreach (var t in mesh.triangles.Values)
+            foreach (var t in mesh.triangles)
             {
                 // Use the infected flag for 'blinded' attribute.
                 t.infected = false;
@@ -442,7 +442,7 @@ namespace TriangleNet.Voronoi.Legacy
             // Add midpoint of start triangles' edge.
             torg = f.Org();
             tdest = f.Dest();
-            p = new Point((torg.X + tdest.X) / 2, (torg.Y + tdest.Y) / 2);
+            p = new Point((torg.x + tdest.x) / 2, (torg.y + tdest.y) / 2);
 
             p.id = n + segIndex++;
             segPoints.Add(p);
@@ -466,7 +466,7 @@ namespace TriangleNet.Voronoi.Legacy
                     // been added, so post process cell to remove duplicates???)
                     torg = f.Org();
                     tapex = f.Apex();
-                    p = new Point((torg.X + tapex.X) / 2, (torg.Y + tapex.Y) / 2);
+                    p = new Point((torg.x + tapex.x) / 2, (torg.y + tapex.y) / 2);
 
                     p.id = n + segIndex++;
                     segPoints.Add(p);
@@ -515,7 +515,7 @@ namespace TriangleNet.Voronoi.Legacy
                         // have to add the intersection with the segment.
 
                         // Center of f edge dest->apex
-                        Point bisec = new Point((tdest.X + tapex.X) / 2, (tdest.Y + tapex.Y) / 2);
+                        Point bisec = new Point((tdest.x + tapex.x) / 2, (tdest.y + tapex.y) / 2);
 
                         // Find intersection of seg with line through f's bisector and circumcenter
                         if (SegmentsIntersect(sorg, sdest, bisec, cc_f, out p, false))
@@ -562,7 +562,7 @@ namespace TriangleNet.Voronoi.Legacy
                             // have to add the intersection with the segment.
 
                             // Center of f_next edge org->dest
-                            Point bisec = new Point((torg.X + tdest.X) / 2, (torg.Y + tdest.Y) / 2);
+                            Point bisec = new Point((torg.x + tdest.x) / 2, (torg.y + tdest.y) / 2);
 
                             // Find intersection of seg with line through f_next's bisector and circumcenter
                             if (SegmentsIntersect(sorg, sdest, bisec, cc_f_next, out p, false))
@@ -602,12 +602,12 @@ namespace TriangleNet.Voronoi.Legacy
         /// </returns>
         private bool SegmentsIntersect(Point p1, Point p2, Point p3, Point p4, out Point p, bool strictIntersect)
         {
-            p = null;
+            p = null; // TODO: Voronoi SegmentsIntersect
 
-            double Ax = p1.X, Ay = p1.Y;
-            double Bx = p2.X, By = p2.Y;
-            double Cx = p3.X, Cy = p3.Y;
-            double Dx = p4.X, Dy = p4.Y;
+            double Ax = p1.x, Ay = p1.y;
+            double Bx = p2.x, By = p2.y;
+            double Cx = p3.x, Cy = p3.y;
+            double Dx = p4.x, Dy = p4.y;
 
             double distAB, theCos, theSin, newX, ABpos;
 
@@ -674,7 +674,7 @@ namespace TriangleNet.Voronoi.Legacy
                     }
                     else
                     {
-                        edges.Add(new Edge(last.ID, pt.ID));
+                        edges.Add(new Edge(last.id, pt.id));
 
                         last = pt;
                     }
@@ -682,7 +682,7 @@ namespace TriangleNet.Voronoi.Legacy
 
                 if (region.Bounded && first != null)
                 {
-                    edges.Add(new Edge(last.ID, first.ID));
+                    edges.Add(new Edge(last.id, first.id));
                 }
             }
 

@@ -8,8 +8,6 @@ namespace TriangleNet.Tools
 {
     using TriangleNet.Geometry;
 
-    using Vertex = TriangleNet.Topology.DCEL.Vertex;
-
     public static class IntersectionHelper
     {
         /// <summary>
@@ -47,8 +45,8 @@ namespace TriangleNet.Tools
         /// <param name="rect">The clip rectangle.</param>
         /// <param name="p0">Segment endpoint.</param>
         /// <param name="p1">Segment endpoint.</param>
-        /// <param name="c0">The new location of p0 (DCEL vertex).</param>
-        /// <param name="c1">The new location of p1 (DCEL vertex).</param>
+        /// <param name="c0">The new location of p0.</param>
+        /// <param name="c1">The new location of p1.</param>
         /// <returns>Returns true, if segment is clipped.</returns>
         /// <remarks>
         /// Based on Liang-Barsky function by Daniel White:
@@ -111,7 +109,7 @@ namespace TriangleNet.Tools
         /// <param name="rect">The clip rectangle.</param>
         /// <param name="p0">The ray startpoint (inside the box).</param>
         /// <param name="p1">Any point in ray direction (NOT the direction vector).</param>
-        /// <param name="c1">The intersection point (DCEL vertex).</param>
+        /// <param name="c1">The intersection point.</param>
         /// <returns>Returns false, if startpoint is outside the box.</returns>
         public static bool BoxRayIntersection(Rectangle rect, Point p0, Point p1, ref Point c1)
         {
