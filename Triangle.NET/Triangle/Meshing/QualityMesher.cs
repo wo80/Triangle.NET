@@ -67,6 +67,7 @@ namespace TriangleNet.Meshing
                 behavior.MaxAngle = quality.MaximumAngle;
                 behavior.MaxArea = quality.MaximumArea;
                 behavior.UserTest = quality.UserTest;
+                behavior.VarArea = quality.VariableArea;
 
                 mesh.steinerleft = quality.SteinerPoints == 0 ? -1 : quality.SteinerPoints;
             }
