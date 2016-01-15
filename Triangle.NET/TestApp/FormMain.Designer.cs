@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.btnSmooth = new MeshExplorer.Controls.DarkButton();
             this.flatTabControl1 = new MeshExplorer.Controls.DarkTabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
@@ -52,14 +52,14 @@
             this.menuTools = new System.Windows.Forms.ToolStripMenuItem();
             this.menuToolsGen = new System.Windows.Forms.ToolStripMenuItem();
             this.menuToolsCheck = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuToolsTopology = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.menuToolsRcm = new System.Windows.Forms.ToolStripMenuItem();
             this.btnMesh = new MeshExplorer.Controls.DarkButton();
-            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
-            this.menuToolsTopology = new System.Windows.Forms.ToolStripMenuItem();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
-            this.splitContainer1.Panel1.SuspendLayout();
-            this.splitContainer1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
+            this.splitContainer.Panel1.SuspendLayout();
+            this.splitContainer.SuspendLayout();
             this.flatTabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -67,30 +67,30 @@
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // splitContainer1
+            // splitContainer
             // 
-            this.splitContainer1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(68)))), ((int)(((byte)(68)))), ((int)(((byte)(68)))));
-            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
-            this.splitContainer1.IsSplitterFixed = true;
-            this.splitContainer1.Location = new System.Drawing.Point(0, 0);
-            this.splitContainer1.Name = "splitContainer1";
+            this.splitContainer.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(68)))), ((int)(((byte)(68)))), ((int)(((byte)(68)))));
+            this.splitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
+            this.splitContainer.IsSplitterFixed = true;
+            this.splitContainer.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer.Name = "splitContainer";
             // 
-            // splitContainer1.Panel1
+            // splitContainer.Panel1
             // 
-            this.splitContainer1.Panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(76)))), ((int)(((byte)(76)))));
-            this.splitContainer1.Panel1.Controls.Add(this.btnSmooth);
-            this.splitContainer1.Panel1.Controls.Add(this.flatTabControl1);
-            this.splitContainer1.Panel1.Controls.Add(this.menuStrip1);
-            this.splitContainer1.Panel1.Controls.Add(this.btnMesh);
+            this.splitContainer.Panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(76)))), ((int)(((byte)(76)))));
+            this.splitContainer.Panel1.Controls.Add(this.btnSmooth);
+            this.splitContainer.Panel1.Controls.Add(this.flatTabControl1);
+            this.splitContainer.Panel1.Controls.Add(this.menuStrip1);
+            this.splitContainer.Panel1.Controls.Add(this.btnMesh);
             // 
-            // splitContainer1.Panel2
+            // splitContainer.Panel2
             // 
-            this.splitContainer1.Panel2.BackColor = System.Drawing.Color.Black;
-            this.splitContainer1.Size = new System.Drawing.Size(984, 612);
-            this.splitContainer1.SplitterDistance = 280;
-            this.splitContainer1.SplitterWidth = 1;
-            this.splitContainer1.TabIndex = 0;
+            this.splitContainer.Panel2.BackColor = System.Drawing.Color.Black;
+            this.splitContainer.Size = new System.Drawing.Size(992, 623);
+            this.splitContainer.SplitterDistance = 280;
+            this.splitContainer.SplitterWidth = 1;
+            this.splitContainer.TabIndex = 0;
             // 
             // btnSmooth
             // 
@@ -310,6 +310,18 @@
             this.menuToolsCheck.Text = "Check Mesh";
             this.menuToolsCheck.Click += new System.EventHandler(this.menuToolsCheck_Click);
             // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(192, 6);
+            // 
+            // menuToolsTopology
+            // 
+            this.menuToolsTopology.Name = "menuToolsTopology";
+            this.menuToolsTopology.Size = new System.Drawing.Size(195, 22);
+            this.menuToolsTopology.Text = "Topology Explorer";
+            this.menuToolsTopology.Click += new System.EventHandler(this.menuToolsTopology_Click);
+            // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
@@ -334,26 +346,14 @@
             this.btnMesh.UseVisualStyleBackColor = true;
             this.btnMesh.Click += new System.EventHandler(this.btnMesh_Click);
             // 
-            // toolStripSeparator5
-            // 
-            this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(192, 6);
-            // 
-            // menuToolsTopology
-            // 
-            this.menuToolsTopology.Name = "menuToolsTopology";
-            this.menuToolsTopology.Size = new System.Drawing.Size(195, 22);
-            this.menuToolsTopology.Text = "Topology Explorer";
-            this.menuToolsTopology.Click += new System.EventHandler(this.menuToolsTopology_Click);
-            // 
             // FormMain
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(76)))), ((int)(((byte)(76)))));
-            this.ClientSize = new System.Drawing.Size(984, 612);
-            this.Controls.Add(this.splitContainer1);
+            this.ClientSize = new System.Drawing.Size(992, 623);
+            this.Controls.Add(this.splitContainer);
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip1;
@@ -367,10 +367,10 @@
             this.DragOver += new System.Windows.Forms.DragEventHandler(this.frmDragOver);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyUp);
             this.Resize += new System.EventHandler(this.ResizeHandler);
-            this.splitContainer1.Panel1.ResumeLayout(false);
-            this.splitContainer1.Panel1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
-            this.splitContainer1.ResumeLayout(false);
+            this.splitContainer.Panel1.ResumeLayout(false);
+            this.splitContainer.Panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).EndInit();
+            this.splitContainer.ResumeLayout(false);
             this.flatTabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
@@ -383,7 +383,7 @@
 
         #endregion
 
-        private System.Windows.Forms.SplitContainer splitContainer1;
+        private System.Windows.Forms.SplitContainer splitContainer;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem menuFile;
         private System.Windows.Forms.ToolStripMenuItem menuFileOpen;

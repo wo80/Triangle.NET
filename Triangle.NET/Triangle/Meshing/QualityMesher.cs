@@ -56,7 +56,8 @@ namespace TriangleNet.Meshing
         /// Apply quality constraints to a mesh.
         /// </summary>
         /// <param name="quality">The quality constraints.</param>
-        public void Apply(QualityOptions quality)
+        /// <param name="delaunay">A value indicating, if the refined mesh should be Conforming Delaunay.</param>
+        public void Apply(QualityOptions quality, bool delaunay = false)
         {
             // Copy quality options
             if (quality != null)
@@ -68,6 +69,8 @@ namespace TriangleNet.Meshing
                 behavior.MaxArea = quality.MaximumArea;
                 behavior.UserTest = quality.UserTest;
                 behavior.VarArea = quality.VariableArea;
+
+                behavior.ConformingDelaunay = behavior.ConformingDelaunay || delaunay;
 
                 mesh.steinerleft = quality.SteinerPoints == 0 ? -1 : quality.SteinerPoints;
             }

@@ -56,6 +56,8 @@ namespace TriangleNet.Tools
 
             // Set up the adj adjacency array.
             this.irow = AdjacencySet(mesh, this.pcol);
+
+            SortIndices();
         }
 
         public AdjacencyMatrix(int[] pcol, int[] irow)
@@ -260,17 +262,22 @@ namespace TriangleNet.Tools
                 }
             }
 
-            int k1, k2;
+            return list;
+        }
+
+        public void SortIndices()
+        {
+            int k1, k2, n = N;
+
+            int[] list = this.irow;
 
             // Ascending sort the entries for each column.
-            for (i = 0; i < n; i++)
+            for (int i = 0; i < n; i++)
             {
                 k1 = pcol[i];
                 k2 = pcol[i + 1];
                 Array.Sort(list, k1, k2 - k1);
             }
-
-            return list;
         }
 
         #endregion

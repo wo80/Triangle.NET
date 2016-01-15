@@ -48,6 +48,10 @@ namespace TriangleNet.Meshing
         /// <summary>
         /// Refine the mesh.
         /// </summary>
-        void Refine(QualityOptions quality);
+        /// <param name="quality">The quality constraints.</param>
+        /// <param name="conforming">
+        /// A value indicating, if the refined mesh should be Conforming Delaunay.
+        /// </param>
+        void Refine(QualityOptions quality, bool delaunay);
     }
 }

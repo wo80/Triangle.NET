@@ -72,10 +72,10 @@ namespace MeshExplorer
 
         private void InitializeRenderControl(Control control)
         {
-            this.splitContainer1.SuspendLayout();
-            this.splitContainer1.Panel2.Controls.Add(control);
+            this.splitContainer.SuspendLayout();
+            this.splitContainer.Panel2.Controls.Add(control);
 
-            var size = this.splitContainer1.Panel2.ClientRectangle;
+            var size = this.splitContainer.Panel2.ClientRectangle;
 
             // Initialize control
             control.BackColor = Color.Black;
@@ -87,7 +87,21 @@ namespace MeshExplorer
             control.TabIndex = 0;
             control.Text = "renderControl1";
 
-            this.splitContainer1.ResumeLayout();
+            this.splitContainer.ResumeLayout();
+        }
+
+        protected override void OnMouseWheel(MouseEventArgs e)
+        {
+            if (splitContainer.Panel2.Bounds.Contains(e.Location))
+            {
+                var control = renderManager.Control as Control;
+
+                // Set focus on the render control.
+                if (control != null && !control.Focused)
+                {
+                    control.Focus();
+                }
+            }
         }
 
         private void Form1_KeyUp(object sender, KeyEventArgs e)
@@ -175,11 +189,6 @@ namespace MeshExplorer
         }
 
         #endregion
-
-        protected override void OnMouseWheel(MouseEventArgs e)
-        {
-            // TODO: focus render control
-        }
 
         #region Resize event handler
 
@@ -536,7 +545,7 @@ namespace MeshExplorer
 
             try
             {
-                mesh.Refine(quality);
+                mesh.Refine(quality, meshControlView.ParamConformDelChecked);
 
                 statisticView.UpdateStatistic(mesh);
 
