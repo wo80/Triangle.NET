@@ -19,6 +19,30 @@ namespace TriangleNet.Geometry
         int label;
 
         /// <summary>
+        /// Gets or sets the segments boundary mark.
+        /// </summary>
+        public int Label
+        {
+            get { return label; }
+            set { label = value; }
+        }
+        /// <summary>
+        /// Gets the first endpoints index.
+        /// </summary>
+        public int P0
+        {
+            get { return v0.id; }
+        }
+
+        /// <summary>
+        /// Gets the second endpoints index.
+        /// </summary>
+        public int P1
+        {
+            get { return v1.id; }
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Segment" /> class.
         /// </summary>
         public Segment(Vertex v0, Vertex v1)
@@ -63,31 +87,6 @@ namespace TriangleNet.Geometry
         public ITriangle GetTriangle(int index)
         {
             throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Gets the first endpoints index.
-        /// </summary>
-        public int P0
-        {
-            get { return v0.id; }
-        }
-
-        /// <summary>
-        /// Gets the second endpoints index.
-        /// </summary>
-        public int P1
-        {
-            get { return v1.id; }
-        }
-
-        /// <summary>
-        /// Gets or sets the segments boundary mark.
-        /// </summary>
-        public int Label
-        {
-            get { return label; }
-            set { label = value; }
         }
     }
 }

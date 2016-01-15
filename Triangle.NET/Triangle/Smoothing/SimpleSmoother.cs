@@ -20,7 +20,8 @@ namespace TriangleNet.Smoothing
     /// </remarks>
     public class SimpleSmoother : ISmoother
     {
-        IPredicates predicates;
+        TrianglePool pool;
+        Configuration config;
 
         IVoronoiFactory factory;
 
@@ -30,19 +31,34 @@ namespace TriangleNet.Smoothing
         /// Initializes a new instance of the <see cref="SimpleSmoother" /> class.
         /// </summary>
         public SimpleSmoother()
-            : this(new VoronoiFactory(), RobustPredicates.Default)
+            : this(new VoronoiFactory())
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SimpleSmoother" /> class.
         /// </summary>
-        /// <param name="factory">Voronoi object factory.</param>
-        /// <param name="predicates">Geometric predicates implementation.</param>
-        public SimpleSmoother(IVoronoiFactory factory, IPredicates predicates)
+        public SimpleSmoother(IVoronoiFactory factory)
         {
             this.factory = factory;
-            this.predicates = predicates;
+            this.pool = new TrianglePool();
+
+            this.config = new Configuration(
+                () => RobustPredicates.Default,
+                () => pool.Restart());
+
+            this.options = new ConstraintOptions() { ConformingDelaunay = true };
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SimpleSmoother" /> class.
+        /// </summary>
+        /// <param name="factory">Voronoi object factory.</param>
+        /// <param name="config">Configuration.</param>
+        public SimpleSmoother(IVoronoiFactory factory, Configuration config)
+        {
+            this.factory = factory;
+            this.config = config;
 
             this.options = new ConstraintOptions() { ConformingDelaunay = true };
         }
@@ -56,18 +72,21 @@ namespace TriangleNet.Smoothing
         {
             var smoothedMesh = (Mesh)mesh;
 
+            var mesher = new GenericMesher(config);
+            var predicates = config.Predicates();
+
             // The smoother should respect the mesh segment splitting behavior.
             this.options.SegmentSplitting = smoothedMesh.behavior.NoBisect;
 
             // Take a few smoothing rounds (Lloyd's algorithm).
             for (int i = 0; i < limit; i++)
             {
-                Step(smoothedMesh, factory);
+                Step(smoothedMesh, factory, predicates);
 
-                // Actually, we only want to rebuild, if mesh is no longer
+                // Actually, we only want to rebuild, if the mesh is no longer
                 // Delaunay. Flipping edges could be the right choice instead 
                 // of re-triangulating...
-                smoothedMesh = (Mesh)Rebuild(smoothedMesh).Triangulate(options);
+                smoothedMesh = (Mesh)mesher.Triangulate(Rebuild(smoothedMesh), options);
 
                 factory.Reset();
             }
@@ -75,7 +94,7 @@ namespace TriangleNet.Smoothing
             smoothedMesh.CopyTo((Mesh)mesh);
         }
 
-        private void Step(Mesh mesh, IVoronoiFactory factory)
+        private void Step(Mesh mesh, IVoronoiFactory factory, IPredicates predicates)
         {
             var voronoi = new BoundedVoronoi(mesh, factory, predicates);
 

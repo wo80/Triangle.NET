@@ -40,11 +40,10 @@ namespace TriangleNet.Tools
             dx = vertex.x - org.x;
             dy = vertex.y - org.y;
 
-            // To interpolate vertex attributes for the new vertex inserted at
-            // the circumcenter, define a coordinate system with a xi-axis,
-            // directed from the triangle's origin to its destination, and
-            // an eta-axis, directed from its origin to its apex.
-            // Calculate the xi and eta coordinates of the circumcenter.
+            // To interpolate vertex attributes for the new vertex, define a
+            // coordinate system with a xi-axis directed from the triangle's
+            // origin to its destination, and an eta-axis, directed from its
+            // origin to its apex.
             xi = (yao * dx - xao * dy) * (2.0 * denominator);
             eta = (xdo * dy - ydo * dx) * (2.0 * denominator);
         

@@ -71,6 +71,7 @@
     <Compile Include="Meshing\IConstraintMesher.cs" />
     <Compile Include="Meshing\IMesh.cs" />
     <Compile Include="Meshing\IQualityMesher.cs" />
+    <Compile Include="Meshing\Iterators\VertexCirculator.cs" />
     <Compile Include="Meshing\ITriangulator.cs" />
     <Compile Include="Meshing\QualityOptions.cs" />
     <Compile Include="Meshing\QualityMesher.cs" />

@@ -592,11 +592,11 @@ namespace MeshExplorer
             UpdateLog();
         }
 
-        private void CreateVoronoi()
+        private bool CreateVoronoi()
         {
             if (mesh == null)
             {
-                return;
+                return false;
             }
 
             if (mesh.IsPolygon)
@@ -616,7 +616,7 @@ namespace MeshExplorer
                         DarkMessageBox.Show("Exception - Bounded Voronoi", ex.Message, MessageBoxButtons.OK);
                     }
 
-                    this.voronoi = null;
+                    return false;
                 }
             }
             else
@@ -624,12 +624,11 @@ namespace MeshExplorer
                 this.voronoi = new StandardVoronoi(mesh);
             }
 
-            if (this.voronoi != null)
-            {
-                // HACK: List<Vertex> -> ICollection<Point> ? Nope, no way.
-                //           Vertex[] -> ICollection<Point> ? Well, ok.
-                renderManager.Set(voronoi.Vertices.ToArray(), voronoi.Edges, false);
-            }
+            // HACK: List<Vertex> -> ICollection<Point> ? Nope, no way.
+            //           Vertex[] -> ICollection<Point> ? Well, ok.
+            renderManager.Set(voronoi.Vertices.ToArray(), voronoi.Edges, false);
+
+            return true;
         }
 
         private void ShowLog()
@@ -722,8 +721,7 @@ namespace MeshExplorer
         {
             if (this.voronoi == null)
             {
-                CreateVoronoi();
-                menuViewVoronoi.Checked = true;
+                menuViewVoronoi.Checked = CreateVoronoi();
             }
             else
             {

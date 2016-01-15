@@ -76,8 +76,8 @@ namespace TriangleNet.Geometry
         /// <summary>
         /// Try to find a point inside the contour.
         /// </summary>
-        /// <param name="limit">The number of iterations on each segment (default = 8).</param>
-        /// <param name="eps">Threshold for co-linear points (default = 2e-6).</param>
+        /// <param name="limit">The number of iterations on each segment (default = 5).</param>
+        /// <param name="eps">Threshold for co-linear points (default = 2e-5).</param>
         /// <returns>Point inside the contour</returns>
         /// <exception cref="Exception">Throws if no point could be found.</exception>
         /// <remarks>
@@ -86,15 +86,15 @@ namespace TriangleNet.Geometry
         /// on the bisecting line, or, if <see cref="IPredicates.CounterClockwise"/> is less than
         /// eps, on the perpendicular line.
         /// A given number of points will be tested (limit), while the distance to the contour
-        /// boundary will be reduced in each iteration (with a factor of 1/2^i, i = 1 ... limit).
+        /// boundary will be reduced in each iteration (with a factor 1 / 2^i, i = 1 ... limit).
         /// </remarks>
-        public Point FindInteriorPoint(int limit = 8, double eps = 2e-6)
+        public Point FindInteriorPoint(int limit = 5, double eps = 2e-5)
         {
-            var point = new Point(0.0, 0.0);
-
             if (convex)
             {
                 int count = this.Points.Count;
+
+                var point = new Point(0.0, 0.0);
 
                 for (int i = 0; i < count; i++)
                 {
@@ -152,8 +152,8 @@ namespace TriangleNet.Geometry
                 c = contour[(i + 2) % length];
 
                 // Corner point.
-                bx = b.X;
-                by = b.Y;
+                bx = b.x;
+                by = b.y;
 
                 // NOTE: if we knew the contour points were in counterclockwise order, we
                 // could skip concave corners and search only in one direction.
@@ -163,14 +163,14 @@ namespace TriangleNet.Geometry
                 if (Math.Abs(h) < eps)
                 {
                     // Points are nearly co-linear. Use perpendicular direction.
-                    dx = (c.Y - a.Y) / 2;
-                    dy = (a.X - c.X) / 2;
+                    dx = (c.y - a.y) / 2;
+                    dy = (a.x - c.x) / 2;
                 }
                 else
                 {
                     // Direction [midpoint(a-c) -> corner point]
-                    dx = (a.X + c.X) / 2 - bx;
-                    dy = (a.Y + c.Y) / 2 - by;
+                    dx = (a.x + c.x) / 2 - bx;
+                    dy = (a.y + c.y) / 2 - by;
                 }
 
                 // Move around the contour.
@@ -182,8 +182,8 @@ namespace TriangleNet.Geometry
                 for (int j = 0; j < limit; j++)
                 {
                     // Search in direction.
-                    test.X = bx + dx / h;
-                    test.Y = by + dy / h;
+                    test.x = bx + dx * h;
+                    test.y = by + dy * h;
 
                     if (bounds.Contains(test) && IsPointInPolygon(test, contour))
                     {
@@ -191,15 +191,15 @@ namespace TriangleNet.Geometry
                     }
 
                     // Search in opposite direction (see NOTE above).
-                    test.X = bx - dx / h;
-                    test.Y = by - dy / h;
+                    test.x = bx - dx * h;
+                    test.y = by - dy * h;
 
                     if (bounds.Contains(test) && IsPointInPolygon(test, contour))
                     {
                         return test;
                     }
 
-                    h = 2.0 * h;
+                    h = h / 2;
                 }
             }
 

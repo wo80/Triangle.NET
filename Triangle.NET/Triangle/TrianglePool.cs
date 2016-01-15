@@ -298,7 +298,7 @@ namespace TriangleNet
 
             public void Reset()
             {
-                index = 0;
+                index = offset = 0;
             }
         }
     }

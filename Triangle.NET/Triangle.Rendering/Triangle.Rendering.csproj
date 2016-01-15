@@ -50,6 +50,7 @@
     <Compile Include="ColorManager.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="GDI\FunctionRenderer.cs" />
+    <Compile Include="GDI\ImageRenderer.cs" />
     <Compile Include="GDI\LayerRenderer.cs" />
     <Compile Include="GDI\MeshRenderer.cs" />
     <Compile Include="GDI\Native\GradientFillMode.cs" />

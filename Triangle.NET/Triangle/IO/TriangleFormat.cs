@@ -19,7 +19,7 @@ namespace TriangleNet.IO
     {
         public bool IsSupported(string file)
         {
-            string ext = Path.GetExtension(file);
+            string ext = Path.GetExtension(file).ToLower();
 
             if (ext == ".node" || ext == ".poly" || ext == ".ele")
             {
