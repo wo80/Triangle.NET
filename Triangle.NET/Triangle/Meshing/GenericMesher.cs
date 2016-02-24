@@ -182,16 +182,16 @@ namespace TriangleNet.Meshing
             for (i = 0; i < nx; i++)
             {
                 // Bottom
-                a = points[i * (ny + 1)];
-                b = points[(i + 1) * (ny + 1)];
+                a = points[(ny + 1) * i];
+                b = points[(ny + 1) * (i + 1)];
 
                 segments.Add(new Segment(a, b, 1));
 
                 a.Label = b.Label = 1;
 
                 // Top
-                a = points[i * (ny + 1) + nx];
-                b = points[(i + 1) * (ny + 1) + nx];
+                a = points[ny + (ny + 1) * i];
+                b = points[ny + (ny + 1) * (i + 1)];
 
                 segments.Add(new Segment(a, b, 1));
 

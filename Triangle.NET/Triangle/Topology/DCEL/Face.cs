@@ -8,7 +8,7 @@ namespace TriangleNet.Topology.DCEL
 {
     using System.Collections.Generic;
     using TriangleNet.Geometry;
-    
+
     /// <summary>
     /// A face of DCEL mesh.
     /// </summary>

@@ -19,6 +19,7 @@ namespace TriangleNet.IO
     public class TriangleReader
     {
         static NumberFormatInfo nfi = NumberFormatInfo.InvariantInfo;
+
         int startIndex = 0;
 
         #region Helper methods
@@ -98,20 +99,20 @@ namespace TriangleNet.IO
         /// <summary>
         /// Reads geometry information from .node or .poly files.
         /// </summary>
-        public void Read(string filename, out Polygon geometry)
+        public void Read(string filename, out Polygon polygon)
         {
-            geometry = null;
+            polygon = null;
 
             string path = Path.ChangeExtension(filename, ".poly");
 
             if (File.Exists(path))
             {
-                geometry = ReadPolyFile(path);
+                polygon = ReadPolyFile(path);
             }
             else
             {
                 path = Path.ChangeExtension(filename, ".node");
-                geometry = ReadNodeFile(path);
+                polygon = ReadNodeFile(path);
             }
         }
 

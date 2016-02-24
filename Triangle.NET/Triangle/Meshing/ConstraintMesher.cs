@@ -296,7 +296,6 @@ namespace TriangleNet.Meshing
             Vertex horg, hdest;
 
             var dummytri = mesh.dummytri;
-            var dummysub = mesh.dummysub;
 
             // Find a triangle handle on the hull.
             hulltri.tri = dummytri;

@@ -69,6 +69,7 @@ namespace TriangleNet
             // Based on using -U switch, call the corresponding function
             if (behavior.MaxAngle == 0.0)
             {
+                // Disable the "no max angle" code. It may return weired vertex locations.
                 return FindNewLocationWithoutMaxAngle(org, dest, apex, ref xi, ref eta, true, badotri);
             }
 
@@ -101,7 +102,7 @@ namespace TriangleNet
 
             ////////////////////////////// HALE'S VARIABLES //////////////////////////////
             // keeps the difference of coordinates edge 
-            double xShortestEdge = 0, yShortestEdge = 0, xMiddleEdge, yMiddleEdge, xLongestEdge, yLongestEdge;
+            double xShortestEdge = 0, yShortestEdge = 0;
 
             // keeps the square of edge lengths
             double shortestEdgeDist = 0, middleEdgeDist = 0, longestEdgeDist = 0;
@@ -218,8 +219,6 @@ namespace TriangleNet
                     /// smallest angle corner: dest
                     /// largest angle corner: apex
                     xShortestEdge = xao; yShortestEdge = yao;
-                    xMiddleEdge = xda; yMiddleEdge = yda;
-                    xLongestEdge = xdo; yLongestEdge = ydo;
 
                     shortestEdgeDist = aodist;
                     middleEdgeDist = dadist;
@@ -234,8 +233,6 @@ namespace TriangleNet
                     /// smallest angle corner: dest
                     /// largest angle corner: org
                     xShortestEdge = xao; yShortestEdge = yao;
-                    xMiddleEdge = xdo; yMiddleEdge = ydo;
-                    xLongestEdge = xda; yLongestEdge = yda;
 
                     shortestEdgeDist = aodist;
                     middleEdgeDist = dodist;
@@ -250,8 +247,6 @@ namespace TriangleNet
                     /// smallest angle corner: org
                     /// largest angle corner: apex
                     xShortestEdge = xda; yShortestEdge = yda;
-                    xMiddleEdge = xao; yMiddleEdge = yao;
-                    xLongestEdge = xdo; yLongestEdge = ydo;
 
                     shortestEdgeDist = dadist;
                     middleEdgeDist = aodist;
@@ -265,8 +260,6 @@ namespace TriangleNet
                     /// smallest angle corner: org
                     /// largest angle corner: dest
                     xShortestEdge = xda; yShortestEdge = yda;
-                    xMiddleEdge = xdo; yMiddleEdge = ydo;
-                    xLongestEdge = xao; yLongestEdge = yao;
 
                     shortestEdgeDist = dadist;
                     middleEdgeDist = dodist;
@@ -280,8 +273,6 @@ namespace TriangleNet
                     /// smallest angle corner: apex
                     /// largest angle corner: org
                     xShortestEdge = xdo; yShortestEdge = ydo;
-                    xMiddleEdge = xao; yMiddleEdge = yao;
-                    xLongestEdge = xda; yLongestEdge = yda;
 
                     shortestEdgeDist = dodist;
                     middleEdgeDist = aodist;
@@ -296,8 +287,6 @@ namespace TriangleNet
                     /// smallest angle corner: apex
                     /// largest angle corner: dest
                     xShortestEdge = xdo; yShortestEdge = ydo;
-                    xMiddleEdge = xda; yMiddleEdge = yda;
-                    xLongestEdge = xao; yLongestEdge = yao;
 
                     shortestEdgeDist = dodist;
                     middleEdgeDist = dadist;
@@ -801,7 +790,7 @@ namespace TriangleNet
 
             ////////////////////////////// HALE'S VARIABLES //////////////////////////////
             // keeps the difference of coordinates edge 
-            double xShortestEdge = 0, yShortestEdge = 0, xMiddleEdge, yMiddleEdge, xLongestEdge, yLongestEdge;
+            double xShortestEdge = 0, yShortestEdge = 0;
 
             // keeps the square of edge lengths
             double shortestEdgeDist = 0, middleEdgeDist = 0, longestEdgeDist = 0;
@@ -931,8 +920,6 @@ namespace TriangleNet
                     /// smallest angle corner: dest
                     /// largest angle corner: apex
                     xShortestEdge = xao; yShortestEdge = yao;
-                    xMiddleEdge = xda; yMiddleEdge = yda;
-                    xLongestEdge = xdo; yLongestEdge = ydo;
 
                     shortestEdgeDist = aodist;
                     middleEdgeDist = dadist;
@@ -947,8 +934,6 @@ namespace TriangleNet
                     /// smallest angle corner: dest
                     /// largest angle corner: org
                     xShortestEdge = xao; yShortestEdge = yao;
-                    xMiddleEdge = xdo; yMiddleEdge = ydo;
-                    xLongestEdge = xda; yLongestEdge = yda;
 
                     shortestEdgeDist = aodist;
                     middleEdgeDist = dodist;
@@ -963,8 +948,6 @@ namespace TriangleNet
                     /// smallest angle corner: org
                     /// largest angle corner: apex
                     xShortestEdge = xda; yShortestEdge = yda;
-                    xMiddleEdge = xao; yMiddleEdge = yao;
-                    xLongestEdge = xdo; yLongestEdge = ydo;
 
                     shortestEdgeDist = dadist;
                     middleEdgeDist = aodist;
@@ -978,8 +961,6 @@ namespace TriangleNet
                     /// smallest angle corner: org
                     /// largest angle corner: dest
                     xShortestEdge = xda; yShortestEdge = yda;
-                    xMiddleEdge = xdo; yMiddleEdge = ydo;
-                    xLongestEdge = xao; yLongestEdge = yao;
 
                     shortestEdgeDist = dadist;
                     middleEdgeDist = dodist;
@@ -993,8 +974,6 @@ namespace TriangleNet
                     /// smallest angle corner: apex
                     /// largest angle corner: org
                     xShortestEdge = xdo; yShortestEdge = ydo;
-                    xMiddleEdge = xao; yMiddleEdge = yao;
-                    xLongestEdge = xda; yLongestEdge = yda;
 
                     shortestEdgeDist = dodist;
                     middleEdgeDist = aodist;
@@ -1009,8 +988,6 @@ namespace TriangleNet
                     /// smallest angle corner: apex
                     /// largest angle corner: dest
                     xShortestEdge = xdo; yShortestEdge = ydo;
-                    xMiddleEdge = xda; yMiddleEdge = yda;
-                    xLongestEdge = xao; yLongestEdge = yao;
 
                     shortestEdgeDist = dodist;
                     middleEdgeDist = dadist;
@@ -3959,10 +3936,10 @@ namespace TriangleNet
             double dxod, dyod, dxda, dyda, dxao, dyao;
             double dxod2, dyod2, dxda2, dyda2, dxao2, dyao2;
 
-            double apexlen, orglen, destlen, minedge;
+            double apexlen, orglen, destlen;
             double angle;    // in order to check minimum angle condition 
 
-            double maxangle, maxedge;    // in order to check minimum angle condition
+            double maxangle;    // in order to check minimum angle condition
             // calculate the side lengths
 
             dxod = x1 - x2;
@@ -3987,64 +3964,48 @@ namespace TriangleNet
             // try to find the minimum edge and accordingly the pqr orientation
             if ((apexlen < orglen) && (apexlen < destlen))
             {
-                // The edge opposite the apex is shortest.
-                minedge = apexlen;
                 // Find the square of the cosine of the angle at the apex.
                 angle = dxda * dxao + dyda * dyao;
                 angle = angle * angle / (orglen * destlen);
-
-
             }
             else if (orglen < destlen)
             {
-                // The edge opposite the origin is shortest.
-                minedge = orglen;
                 // Find the square of the cosine of the angle at the origin.
                 angle = dxod * dxao + dyod * dyao;
                 angle = angle * angle / (apexlen * destlen);
-
-
             }
             else
             {
-                // The edge opposite the destination is shortest.
-                minedge = destlen;
                 // Find the square of the cosine of the angle at the destination.
                 angle = dxod * dxda + dyod * dyda;
                 angle = angle * angle / (apexlen * orglen);
 
             }
+
             // try to find the maximum edge and accordingly the pqr orientation
             if ((apexlen > orglen) && (apexlen > destlen))
             {
-                // The edge opposite the apex is longest.
-                maxedge = apexlen;
                 // Find the cosine of the angle at the apex.
                 maxangle = (orglen + destlen - apexlen) / (2 * Math.Sqrt(orglen * destlen));
             }
             else if (orglen > destlen)
             {
-                // The edge opposite the origin is longest.
-                maxedge = orglen;
                 // Find the cosine of the angle at the origin.
                 maxangle = (apexlen + destlen - orglen) / (2 * Math.Sqrt(apexlen * destlen));
             }
             else
             {
-                // The edge opposite the destination is longest.
-                maxedge = destlen;
                 // Find the cosine of the angle at the destination.
                 maxangle = (apexlen + orglen - destlen) / (2 * Math.Sqrt(apexlen * orglen));
             }
-
 
             // Check whether the angle is smaller than permitted.
             if ((angle > behavior.goodAngle) || (behavior.MaxAngle != 0.00 && maxangle < behavior.maxGoodAngle))
             {
                 return true;// it is a bad triangle
             }
-            return false;// it is a good triangle
 
+            return false;// it is a good triangle
         }
 
         /// <summary>

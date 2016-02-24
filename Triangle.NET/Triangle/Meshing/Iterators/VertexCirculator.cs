@@ -9,12 +9,8 @@ namespace TriangleNet.Meshing.Iterators
     {
         List<Otri> cache = new List<Otri>();
 
-        Mesh mesh;
-
         public VertexCirculator(Mesh mesh)
         {
-            this.mesh = mesh;
-
             mesh.MakeVertexMap();
         }
 
