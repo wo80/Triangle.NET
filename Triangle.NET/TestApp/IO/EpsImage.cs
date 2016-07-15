@@ -8,11 +8,13 @@
 namespace MeshExplorer.IO
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Text;
     using TriangleNet;
-    using TriangleNet.Topology;
     using TriangleNet.Geometry;
+
+    using IntPoint = System.Drawing.Point;
 
     /// <summary>
     /// Writes a mesh to an EPS file.
@@ -55,17 +57,17 @@ namespace MeshExplorer.IO
 
             UpdateMetrics(mesh.Bounds);
 
-            using (StreamWriter eps = new StreamWriter(filename))
+            using (var eps = new FormattingStreamWriter(filename))
             {
                 WriteHeader(filename, eps);
 
                 DrawClip(eps);
 
-                DrawTriangles(eps, mesh, false);
+                DrawEdges(eps, mesh);
 
                 DrawSegments(eps, mesh);
 
-                DrawPoints(eps, mesh, false);
+                DrawPoints(eps, mesh);
 
                 WriteTrailer(eps);
             }
@@ -79,7 +81,7 @@ namespace MeshExplorer.IO
             eps.WriteLine("%%Pages: 1");
             eps.WriteLine("%%BoundingBox:  {0}  {1}  {2}  {3}", x_ps_min, y_ps_min, x_ps_max, y_ps_max);
             eps.WriteLine("%%Document-Fonts: Times-Roman");
-            eps.WriteLine("%%LanguageLevel: 1");
+            eps.WriteLine("%%LanguageLevel: 2");
             eps.WriteLine("%%EndComments");
             eps.WriteLine("%%BeginProlog");
             eps.WriteLine("/inch {72 mul} def");
@@ -142,6 +144,123 @@ namespace MeshExplorer.IO
             eps.WriteLine("clip newpath");
         }
 
+        private void DrawEdges(StreamWriter eps, Mesh mesh)
+        {
+            IntPoint a, b;
+
+            eps.WriteLine("%");
+            eps.WriteLine("%  Draw the triangles (mesh edges).");
+            eps.WriteLine("%");
+
+            SetStroke(eps, 0.6f, 0.6f, 0.6f, 0.4f);
+
+            eps.WriteLine(@"/L {
+2 dict begin
+/y2 exch def
+/x2 exch def
+/y1 exch def
+/x1 exch def
+gsave
+newpath x1 y1 moveto x2 y2 lineto stroke
+grestore
+end
+} def");
+
+            foreach (var e in EnumerateEdges(mesh))
+            {
+                a = Transform(e.GetVertex(0));
+                b = Transform(e.GetVertex(1));
+
+                eps.WriteLine("{0} {1} {2} {3} L", a.X, a.Y, b.X, b.Y);
+            }
+        }
+
+        private void DrawSegments(StreamWriter eps, Mesh mesh)
+        {
+            IntPoint a, b;
+
+            eps.WriteLine("%");
+            eps.WriteLine("%  Draw the segments.");
+            eps.WriteLine("%");
+
+            SetStroke(eps, 0.27f, 0.5f, 0.7f, 0.8f);
+
+            foreach (var s in mesh.Segments)
+            {
+                a = Transform(s.GetVertex(0));
+                b = Transform(s.GetVertex(1));
+
+                eps.WriteLine("{0} {1} {2} {3} L", a.X, a.Y, b.X, b.Y);
+            }
+        }
+
+        private void DrawPoints(StreamWriter eps, Mesh mesh)
+        {
+            IntPoint p;
+
+            int n = mesh.Vertices.Count;
+
+            // Size of the points.
+            int size = (n < 100) ? 3 : ((n < 500) ? 2 : 1);
+
+            eps.WriteLine("%");
+            eps.WriteLine("%  Draw the vertices.");
+            eps.WriteLine("%");
+
+            SetColor(eps, 0.0f, 0.4f, 0.0f);
+
+            eps.WriteLine(@"/P {
+2 dict begin
+/y exch def
+/x exch def
+gsave
+newpath x y 1 0 360 arc fill
+grestore
+end
+} def");
+
+            // TODO: EPS point size.
+            //       newpath x y {size} 0 360 arc fill
+
+            foreach (var node in mesh.Vertices)
+            {
+                p = Transform(node);
+
+                eps.WriteLine("{0} {1} P", p.X, p.Y);
+            }
+        }
+
+        /*
+        private void DrawPointLabels(StreamWriter eps, Mesh mesh)
+        {
+            int n = mesh.Vertices.Count;
+
+            IntPoint p;
+
+            StringBuilder labels = new StringBuilder();
+
+            foreach (var node in mesh.Vertices)
+            {
+                p = Transform(node);
+
+                labels.AppendFormat("  {0}  {1}  moveto ({2}) show", p.X, p.Y + 5, node.ID);
+                labels.AppendLine();
+            }
+
+            eps.WriteLine("%");
+            eps.WriteLine("%  Label the nodes.");
+            eps.WriteLine("%");
+            eps.WriteLine("%  Set the RGB color to darker blue.");
+            eps.WriteLine("%");
+            eps.WriteLine("0.000  0.250  0.850 setrgbcolor");
+            eps.WriteLine("/Times-Roman findfont");
+            eps.WriteLine("0.20 inch scalefont");
+            eps.WriteLine("setfont");
+            eps.WriteLine("%");
+
+            eps.WriteLine(labels.ToString());
+        }
+
         private void DrawTriangles(StreamWriter eps, Mesh mesh, bool label)
         {
             eps.WriteLine("%");
@@ -153,170 +272,86 @@ namespace MeshExplorer.IO
             eps.WriteLine("%  Draw the triangles.");
             eps.WriteLine("%");
 
-            StringBuilder labels = new StringBuilder();
+            IntPoint a, b, c;
 
-            Vertex v1, v2, v3;
-            double x1, y1, x2, y2, x3, y3, xa, ya;
-            int x_ps, y_ps;
-
-            foreach (var tri in mesh.Triangles)
+            foreach (var t in mesh.Triangles)
             {
+                a = Transform(t.GetVertex(0));
+                b = Transform(t.GetVertex(1));
+                c = Transform(t.GetVertex(2));
+
                 eps.WriteLine("newpath");
 
-                v1 = tri.GetVertex(0);
-                v2 = tri.GetVertex(1);
-                v3 = tri.GetVertex(2);
-
-                x1 = v1.X; y1 = v1.Y;
-                x2 = v2.X; y2 = v2.Y;
-                x3 = v3.X; y3 = v3.Y;
-
-                x_ps = (int)Math.Floor(((x_max - x1) * x_ps_min + (x1 - x_min) * x_ps_max) / (x_max - x_min));
-                y_ps = (int)Math.Floor(((y_max - y1) * y_ps_min + (y1 - y_min) * y_ps_max) / (y_max - y_min));
-                eps.WriteLine("  {0}  {1}  moveto", x_ps, y_ps);
-
-                x_ps = (int)Math.Floor(((x_max - x2) * x_ps_min + (x2 - x_min) * x_ps_max) / (x_max - x_min));
-                y_ps = (int)Math.Floor(((y_max - y2) * y_ps_min + (y2 - y_min) * y_ps_max) / (y_max - y_min));
-                eps.WriteLine("  {0}  {1}  lineto", x_ps, y_ps);
-
-                x_ps = (int)Math.Floor(((x_max - x3) * x_ps_min + (x3 - x_min) * x_ps_max) / (x_max - x_min));
-                y_ps = (int)Math.Floor(((y_max - y3) * y_ps_min + (y3 - y_min) * y_ps_max) / (y_max - y_min));
-                eps.WriteLine("  {0}  {1}  lineto", x_ps, y_ps);
-
-                x_ps = (int)Math.Floor(((x_max - x1) * x_ps_min + (x1 - x_min) * x_ps_max) / (x_max - x_min));
-                y_ps = (int)Math.Floor(((y_max - y1) * y_ps_min + (y1 - y_min) * y_ps_max) / (y_max - y_min));
-                eps.WriteLine("  {0}  {1}  lineto", x_ps, y_ps);
-
-                if (label)
-                {
-                    xa = (x1 + x2 + x3) / 3.0;
-                    ya = (y1 + y2 + y3) / 3.0;
-
-                    x_ps = (int)Math.Floor(((x_max - xa) * x_ps_min + (xa - x_min) * x_ps_max) / (x_max - x_min));
-                    y_ps = (int)Math.Floor(((y_max - ya) * y_ps_min + (ya - y_min) * y_ps_max) / (y_max - y_min));
-
-                    labels.AppendFormat("  {0}  {1}  moveto ({2}) show", x_ps, y_ps, tri.ID);
-                    labels.AppendLine();
-                }
-
-                eps.WriteLine("stroke");
-            }
-
-            //  Label the triangles.
-            if (label)
-            {
-                eps.WriteLine("%");
-                eps.WriteLine("%  Label the triangles.");
-                eps.WriteLine("%");
-                eps.WriteLine("%  Set the RGB color to darker red.");
-                eps.WriteLine("%");
-                eps.WriteLine("0.950  0.250  0.150 setrgbcolor");
-                eps.WriteLine("/Times-Roman findfont");
-                eps.WriteLine("0.20 inch scalefont");
-                eps.WriteLine("setfont");
-                eps.WriteLine("%");
-
-                eps.Write(labels.ToString());
-            }
-        }
-
-        private void DrawSegments(StreamWriter eps, Mesh mesh)
-        {
-            eps.WriteLine("%");
-            eps.WriteLine("%  Set the triangle line color and width.");
-            eps.WriteLine("%");
-            eps.WriteLine("0.27  0.5  0.7 setrgbcolor");
-            eps.WriteLine("0.75 setlinewidth");
-            eps.WriteLine("%");
-            eps.WriteLine("%  Draw the triangles.");
-            eps.WriteLine("%");
-
-            StringBuilder labels = new StringBuilder();
-
-            double x1, y1, x2, y2;
-            int x_ps, y_ps;
-
-            foreach (var seg in mesh.Segments)
-            {
-                eps.WriteLine("newpath");
-
-                x1 = seg.GetVertex(0).X; y1 = seg.GetVertex(0).Y;
-                x2 = seg.GetVertex(1).X; y2 = seg.GetVertex(1).Y;
-
-                x_ps = (int)Math.Floor(((x_max - x1) * x_ps_min + (x1 - x_min) * x_ps_max) / (x_max - x_min));
-                y_ps = (int)Math.Floor(((y_max - y1) * y_ps_min + (y1 - y_min) * y_ps_max) / (y_max - y_min));
-                eps.WriteLine("  {0}  {1}  moveto", x_ps, y_ps);
-
-                x_ps = (int)Math.Floor(((x_max - x2) * x_ps_min + (x2 - x_min) * x_ps_max) / (x_max - x_min));
-                y_ps = (int)Math.Floor(((y_max - y2) * y_ps_min + (y2 - y_min) * y_ps_max) / (y_max - y_min));
-                eps.WriteLine("  {0}  {1}  lineto", x_ps, y_ps);
-
+                eps.WriteLine("  {0}  {1}  moveto", a.X, a.Y);
+                eps.WriteLine("  {0}  {1}  lineto", b.X, b.Y);
+                eps.WriteLine("  {0}  {1}  lineto", c.X, c.Y);
+                eps.WriteLine("  {0}  {1}  lineto", a.X, a.Y);
 
                 eps.WriteLine("stroke");
             }
         }
 
-        private void DrawPoints(StreamWriter eps, Mesh mesh, bool label)
+        private void DrawTriangleLabels(StreamWriter eps, Mesh mesh)
         {
-            int n = mesh.Vertices.Count;
+            var labels = new StringBuilder();
 
-            int circle_size = 1;
+            IntPoint a, b, c;
 
-            if (n < 100)
+            foreach (var t in mesh.Triangles)
             {
-                circle_size = 3;
-            }
-            else if (n < 500)
-            {
-                circle_size = 2;
+                a = Transform(t.GetVertex(0));
+                b = Transform(t.GetVertex(1));
+                c = Transform(t.GetVertex(2));
+
+                eps.WriteLine("newpath");
+
+                a = Transform((a.X + b.X + c.X) / 3.0, (a.Y + b.Y + c.Y) / 3.0);
+
+                labels.AppendFormat("  {0}  {1}  moveto ({2}) show", a.X, a.Y, t.ID);
+                labels.AppendLine();
+
+                eps.WriteLine("stroke");
             }
 
             eps.WriteLine("%");
-            eps.WriteLine("%  Draw filled dots at the nodes.");
+            eps.WriteLine("%  Label the triangles.");
             eps.WriteLine("%");
-            eps.WriteLine("%  Set the RGB color to blue.");
+            eps.WriteLine("%  Set the RGB color to darker red.");
             eps.WriteLine("%");
-            eps.WriteLine("0.0  0.4  0.0 setrgbcolor");
+            eps.WriteLine("0.950  0.250  0.150 setrgbcolor");
+            eps.WriteLine("/Times-Roman findfont");
+            eps.WriteLine("0.20 inch scalefont");
+            eps.WriteLine("setfont");
             eps.WriteLine("%");
 
-            double x, y;
-            int x_ps, y_ps;
+            eps.WriteLine(labels.ToString());
+        }
+        //*/
 
-            StringBuilder labels = new StringBuilder();
+        private void SetColor(StreamWriter eps, float r, float g, float b)
+        {
+            eps.WriteLine("{0} {1} {2} setrgbcolor", r, g, b);
+            eps.WriteLine("%");
+        }
 
-            foreach (var node in mesh.Vertices)
-            {
-                x = node.X;
-                y = node.Y;
+        private void SetStroke(StreamWriter eps, float r, float g, float b, float width)
+        {
+            eps.WriteLine("{0} {1} {2} setrgbcolor", r, g, b);
+            eps.WriteLine("{0} setlinewidth", width);
+            eps.WriteLine("%");
+        }
 
-                x_ps = (int)Math.Floor(((x_max - x) * x_ps_min + (x - x_min) * x_ps_max) / (x_max - x_min));
-                y_ps = (int)Math.Floor(((y_max - y) * y_ps_min + (y - y_min) * y_ps_max) / (y_max - y_min));
+        private IntPoint Transform(Point p)
+        {
+            return Transform(p.X, p.Y);
+        }
 
-                eps.WriteLine("  newpath  {0}  {1}  {2} 0 360 arc closepath fill", x_ps, y_ps, circle_size);
-
-                if (label)
-                {
-                    labels.AppendFormat("  {0}  {1}  moveto ({2}) show", x_ps, y_ps + 5, node);
-                    labels.AppendLine();
-                }
-            }
-
-            //  Label the nodes.
-            if (label)
-            {
-                eps.WriteLine("%");
-                eps.WriteLine("%  Label the nodes.");
-                eps.WriteLine("%");
-                eps.WriteLine("%  Set the RGB color to darker blue.");
-                eps.WriteLine("%");
-                eps.WriteLine("0.000  0.250  0.850 setrgbcolor");
-                eps.WriteLine("/Times-Roman findfont");
-                eps.WriteLine("0.20 inch scalefont");
-                eps.WriteLine("setfont");
-                eps.WriteLine("%");
-
-                eps.Write(labels.ToString());
-            }
+        private IntPoint Transform(double x, double y)
+        {
+            return new IntPoint(
+                (int)Math.Floor(((x_max - x) * x_ps_min + (x - x_min) * x_ps_max) / (x_max - x_min)),
+                (int)Math.Floor(((y_max - y) * y_ps_min + (y - y_min) * y_ps_max) / (y_max - y_min))
+            );
         }
 
         private void UpdateMetrics(Rectangle bounds)
@@ -361,6 +396,27 @@ namespace MeshExplorer.IO
                 y_ps_min_clip = y_ps_min_clip + delta;
 
                 y_scale = x_scale;
+            }
+        }
+
+        public IEnumerable<ISegment> EnumerateEdges(Mesh mesh, bool segments = false)
+        {
+            foreach (var t in mesh.Triangles)
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    int nid = t.GetNeighborID(i);
+
+                    if ((t.ID < nid) || (nid < 0))
+                    {
+                        if (segments || t.GetSegment(i) == null)
+                        {
+                            yield return new Segment(
+                                t.GetVertex((i + 1) % 3),
+                                t.GetVertex((i + 2) % 3));
+                        }
+                    }
+                }
             }
         }
     }
