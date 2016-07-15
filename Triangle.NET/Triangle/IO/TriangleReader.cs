@@ -446,7 +446,7 @@ namespace TriangleNet.IO
                 // Read area constraints (optional).
                 if (TryReadLine(reader, out line))
                 {
-                    int regions = int.Parse(line[0]);
+                    int id, regions = int.Parse(line[0]);
 
                     if (regions > 0)
                     {
@@ -462,10 +462,32 @@ namespace TriangleNet.IO
                                 throw new Exception("Invalid region attributes.");
                             }
 
+                            if (!int.TryParse(line[3], out id))
+                            {
+                                id = i;
+                            }
+
+                            double area = 0.0;
+
+                            if (line.Length > 4)
+                            {
+                                double.TryParse(line[4], NumberStyles.Number, nfi, out area);
+                            }
+
+                            // Triangle's .poly file format allows region definitions with
+                            // either 4 or 5 parameters, and different interpretations for
+                            // them depending on the number of parameters.
+                            //
+                            // See http://www.cs.cmu.edu/~quake/triangle.poly.html
+                            //
+                            // The .NET version will interpret the fourth parameter always
+                            // as an integer region id and the optional fifth parameter as
+                            // an area constraint.
+
                             data.Regions.Add(new RegionPointer(
                                 double.Parse(line[1], nfi), // Region x
                                 double.Parse(line[2], nfi), // Region y
-                                int.Parse(line[3]))); // Region id
+                                id, area));
                         }
                     }
                 }

@@ -186,6 +186,7 @@ namespace TriangleNet.Meshing
                                 // holes have been carved.
                                 regionTris[i] = searchtri.tri;
                                 regionTris[i].label = region.id;
+                                regionTris[i].area = region.area;
                             }
                         }
                     }
