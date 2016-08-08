@@ -11,6 +11,7 @@ using TriangleNet.Meshing.Algorithm;
 using TriangleNet.Rendering;
 using TriangleNet.Smoothing;
 using TriangleNet.Voronoi;
+using TriangleNet.Rendering.Text;
 
 namespace MeshExplorer
 {
@@ -704,17 +705,17 @@ namespace MeshExplorer
 
                     if (format == 1)
                     {
-                        EpsImage eps = new EpsImage();
+                        var eps = new EpsImage();
                         eps.Export(this.mesh, export.ImageName, size);
                     }
                     else if (format == 2)
                     {
-                        SvgImage svg = new SvgImage();
+                        var svg = new SvgImage();
                         svg.Export(this.mesh, export.ImageName, size);
                     }
                     else
                     {
-                        RasterImage img = new RasterImage();
+                        var img = new RasterImage();
                         img.Export(this.mesh, export.ImageName, size);
                     }
                 }

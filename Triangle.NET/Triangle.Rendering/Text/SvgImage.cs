@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace MeshExplorer.IO
+namespace TriangleNet.Rendering.Text
 {
     using System;
     using System.IO;
@@ -54,7 +54,7 @@ namespace MeshExplorer.IO
 
             int height = (int)((bounds.Height + 2 * margin) * scale);
 
-            using (StreamWriter svg = new StreamWriter(filename))
+            using (var svg = new FormattingStreamWriter(filename))
             {
                 svg.WriteLine("<svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\"");
                 svg.WriteLine("    width=\"{0}px\" height=\"{1}px\"", width, height);
@@ -96,18 +96,16 @@ namespace MeshExplorer.IO
                 x3 = scale * v3.X;
                 y3 = scale * v3.Y;
 
-                svg.Write("M {0},{1} L {2},{3} {4},{5} Z ",
-                    x1.ToString("0.0", Util.Nfi), y1.ToString("0.0", Util.Nfi),
-                    x2.ToString("0.0", Util.Nfi), y2.ToString("0.0", Util.Nfi),
-                    x3.ToString("0.0", Util.Nfi), y3.ToString("0.0", Util.Nfi));
+                svg.Write("M {0:0.#},{1:0.#} L {2:0.#},{3:0.#} {4:0.#},{5:0.#} Z ",
+                    x1, y1, x2, y2, x3, y3);
 
                 if (label)
                 {
                     xa = (x1 + x2 + x3) / 3.0;
                     ya = (y1 + y2 + y3) / 3.0;
 
-                    labels.AppendFormat("<text x=\"{0}\" y=\"{1}\">{2}</text>",
-                        xa.ToString("0.0", Util.Nfi), ya.ToString("0.0", Util.Nfi), tri.ID);
+                    labels.AppendFormat("<text x=\"{0:0.#}\" y=\"{1:0.#}\">{2}</text>",
+                        xa, ya, tri.ID);
                     labels.AppendLine();
                 }
 
@@ -139,9 +137,8 @@ namespace MeshExplorer.IO
                 x2 = scale * seg.GetVertex(1).X;
                 y2 = scale * seg.GetVertex(1).Y;
 
-                svg.Write("M {0},{1} L {2},{3} ",
-                    x1.ToString("0.0", Util.Nfi), y1.ToString("0.0", Util.Nfi),
-                    x2.ToString("0.0", Util.Nfi), y2.ToString("0.0", Util.Nfi));
+                svg.Write("M {0:0.#},{1:0.#} L {2:0.#},{3:0.#} ",
+                    x1, y1, x2, y2);
             }
 
             svg.WriteLine("\" style=\"stroke:#4682B4; fill:none; stroke-linejoin:bevel; stroke-width:2px;\"/>");
@@ -177,13 +174,13 @@ namespace MeshExplorer.IO
                 x = scale * node.X;
                 y = scale * node.Y;
 
-                svg.WriteLine("        <circle cx=\"{0}\" cy=\"{1}\" r=\"{2}\" />",
-                    x.ToString("0.0", Util.Nfi), y.ToString("0.0", Util.Nfi), circle_size);
+                svg.WriteLine("        <circle cx=\"{0:0.#}\" cy=\"{1:0.#}\" r=\"{2:0.#}\" />",
+                    x, y, circle_size);
 
                 if (label)
                 {
-                    labels.AppendFormat("<text x=\"{0}\" y=\"{1}\">{2}</text>",
-                        x.ToString("0.0", Util.Nfi), y.ToString("0.0", Util.Nfi), node.ID);
+                    labels.AppendFormat("<text x=\"{0:0.#}\" y=\"{1:0.#}\">{2}</text>",
+                        x, y, node.ID);
                     labels.AppendLine();
                 }
             }
