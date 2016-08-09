@@ -8,7 +8,6 @@
 namespace TriangleNet.Rendering.Text
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
     using TriangleNet;
     using TriangleNet.Geometry;
@@ -23,14 +22,12 @@ namespace TriangleNet.Rendering.Text
     public class EpsImage
     {
         // EPS page metrics
-
         PageSize ps = new PageSize(36, 126, 576, 666);
         PageSize clip = new PageSize(18, 108, 594, 684);
 
         // Mesh metrics
         double x_max, x_min;
         double y_max, y_min;
-        //double x_scale, y_scale;
 
         // TODO: use color manager
         private static Color ColorPoints = Color.FromArgb(0, 100, 0);
@@ -76,14 +73,16 @@ namespace TriangleNet.Rendering.Text
                 eps.SetClip(GetRectangle(clip));
 
                 // Draw edges.
+                eps.AddComment("Draw edges.");
                 eps.SetStroke(0.4f, ColorLines);
 
-                foreach (var e in EnumerateEdges(mesh))
+                foreach (var e in EdgeIterator.EnumerateEdges(mesh))
                 {
                     eps.DrawLine(Transform(e.GetVertex(0)), Transform(e.GetVertex(1)));
                 }
 
                 // Draw Segments.
+                eps.AddComment("Draw Segments.");
                 eps.SetStroke(0.8f, ColorSegments);
 
                 foreach (var s in mesh.Segments)
@@ -92,6 +91,7 @@ namespace TriangleNet.Rendering.Text
                 }
 
                 // Draw points.
+                eps.AddComment("Draw points.");
                 eps.SetColor(ColorPoints);
 
                 foreach (var node in mesh.Vertices)
@@ -100,125 +100,6 @@ namespace TriangleNet.Rendering.Text
                 }
             }
         }
-
-        /*
-        private void DrawTitle(EpsDocument eps)
-        {
-            var buffer = new StringBuilder();
-
-            buffer.AppendLine("%");
-            buffer.AppendLine("%  Set the RGB color to black.");
-            buffer.AppendLine("%");
-            buffer.AppendLine("0.000  0.000  0.000 setrgbcolor");
-            buffer.AppendLine("%");
-            buffer.AppendLine("%  Set the font and its size.");
-            buffer.AppendLine("%");
-            buffer.AppendLine("/Times-Roman findfont");
-            buffer.AppendLine("0.50 inch scalefont");
-            buffer.AppendLine("setfont");
-            buffer.AppendLine("%");
-            buffer.AppendLine("%  Print a title.");
-            buffer.AppendLine("%");
-            buffer.AppendLine("%210  702  moveto");
-            buffer.AppendLine("%(Triangulation)  show");
-        }
-
-        private void DrawPointLabels(StreamWriter eps, Mesh mesh)
-        {
-            int n = mesh.Vertices.Count;
-
-            IntPoint p;
-
-            StringBuilder labels = new StringBuilder();
-
-            foreach (var node in mesh.Vertices)
-            {
-                p = Transform(node);
-
-                labels.AppendFormat("  {0}  {1}  moveto ({2}) show", p.X, p.Y + 5, node.ID);
-                labels.AppendLine();
-            }
-
-            eps.WriteLine("%");
-            eps.WriteLine("%  Label the nodes.");
-            eps.WriteLine("%");
-            eps.WriteLine("%  Set the RGB color to darker blue.");
-            eps.WriteLine("%");
-            eps.WriteLine("0.000  0.250  0.850 setrgbcolor");
-            eps.WriteLine("/Times-Roman findfont");
-            eps.WriteLine("0.20 inch scalefont");
-            eps.WriteLine("setfont");
-            eps.WriteLine("%");
-
-            eps.WriteLine(labels.ToString());
-        }
-
-        private void DrawTriangles(StreamWriter eps, Mesh mesh, bool label)
-        {
-            eps.WriteLine("%");
-            eps.WriteLine("%  Set the triangle line color and width.");
-            eps.WriteLine("%");
-            eps.WriteLine("0.6  0.6  0.6 setrgbcolor");
-            eps.WriteLine("0.5 setlinewidth");
-            eps.WriteLine("%");
-            eps.WriteLine("%  Draw the triangles.");
-            eps.WriteLine("%");
-
-            IntPoint a, b, c;
-
-            foreach (var t in mesh.Triangles)
-            {
-                a = Transform(t.GetVertex(0));
-                b = Transform(t.GetVertex(1));
-                c = Transform(t.GetVertex(2));
-
-                eps.WriteLine("newpath");
-
-                eps.WriteLine("  {0}  {1}  moveto", a.X, a.Y);
-                eps.WriteLine("  {0}  {1}  lineto", b.X, b.Y);
-                eps.WriteLine("  {0}  {1}  lineto", c.X, c.Y);
-                eps.WriteLine("  {0}  {1}  lineto", a.X, a.Y);
-
-                eps.WriteLine("stroke");
-            }
-        }
-
-        private void DrawTriangleLabels(StreamWriter eps, Mesh mesh)
-        {
-            var labels = new StringBuilder();
-
-            IntPoint a, b, c;
-
-            foreach (var t in mesh.Triangles)
-            {
-                a = Transform(t.GetVertex(0));
-                b = Transform(t.GetVertex(1));
-                c = Transform(t.GetVertex(2));
-
-                eps.WriteLine("newpath");
-
-                a = Transform((a.X + b.X + c.X) / 3.0, (a.Y + b.Y + c.Y) / 3.0);
-
-                labels.AppendFormat("  {0}  {1}  moveto ({2}) show", a.X, a.Y, t.ID);
-                labels.AppendLine();
-
-                eps.WriteLine("stroke");
-            }
-
-            eps.WriteLine("%");
-            eps.WriteLine("%  Label the triangles.");
-            eps.WriteLine("%");
-            eps.WriteLine("%  Set the RGB color to darker red.");
-            eps.WriteLine("%");
-            eps.WriteLine("0.950  0.250  0.150 setrgbcolor");
-            eps.WriteLine("/Times-Roman findfont");
-            eps.WriteLine("0.20 inch scalefont");
-            eps.WriteLine("setfont");
-            eps.WriteLine("%");
-
-            eps.WriteLine(labels.ToString());
-        }
-        //*/
 
         private IntRectangle GetRectangle(PageSize size)
         {
@@ -270,27 +151,6 @@ namespace TriangleNet.Rendering.Text
 
                 ps.Expand(0, -delta);
                 clip.Expand(0, -delta);
-            }
-        }
-
-        public IEnumerable<ISegment> EnumerateEdges(Mesh mesh, bool segments = false)
-        {
-            foreach (var t in mesh.Triangles)
-            {
-                for (int i = 0; i < 3; i++)
-                {
-                    int nid = t.GetNeighborID(i);
-
-                    if ((t.ID < nid) || (nid < 0))
-                    {
-                        if (segments || t.GetSegment(i) == null)
-                        {
-                            yield return new Segment(
-                                t.GetVertex((i + 1) % 3),
-                                t.GetVertex((i + 2) % 3));
-                        }
-                    }
-                }
             }
         }
     }

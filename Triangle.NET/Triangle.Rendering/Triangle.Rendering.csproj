@@ -70,6 +70,7 @@
     <Compile Include="RenderContext.cs" />
     <Compile Include="RenderLayer.cs" />
     <Compile Include="RenderManager.cs" />
+    <Compile Include="Text\EdgeIterator.cs" />
     <Compile Include="Text\EpsDocument.cs" />
     <Compile Include="Text\EpsImage.cs" />
     <Compile Include="Text\FormattingStreamWriter.cs" />

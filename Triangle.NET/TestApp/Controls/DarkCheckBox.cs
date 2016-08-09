@@ -135,17 +135,17 @@ namespace MeshExplorer.Controls
             Rectangle newRect = new Rectangle(1, y, boxSize, boxSize);
             Color text_color = Color.White;
 
+            brushOuter = new LinearGradientBrush(newRect, ColorScheme.ColorGray107, ColorScheme.ColorGray110, mode);
+            e.Graphics.FillRectangle(brushOuter, newRect);
+
+            newRect = new Rectangle(2, y + 1, boxSize - 3, boxSize - 3);
+
             if (Enabled)
             {
                 if (base.Focused)
                     brushBorder = new Pen(Color.FromArgb(60, 60, 60), 1f);
                 else
                     brushBorder = new Pen(Color.FromArgb(38, 38, 38), 1f);
-
-                brushOuter = new LinearGradientBrush(newRect, ColorScheme.ColorGray107, ColorScheme.ColorGray110, mode);
-                e.Graphics.FillRectangle(brushOuter, newRect);
-
-                newRect = new Rectangle(2, y + 1, boxSize - 3, boxSize - 3);
 
                 switch (m_State)
                 {
@@ -170,15 +170,14 @@ namespace MeshExplorer.Controls
             }
             else
             {
-                text_color = Color.FromArgb(110, 110, 110);
-                brushBorder = new Pen(Color.FromArgb(48, 48, 48), 1f);
-                brushOuter = new LinearGradientBrush(newRect, Color.FromArgb(82, 82, 82), Color.FromArgb(67, 67, 67), mode);
                 brushInner = new LinearGradientBrush(newRect, Color.FromArgb(76, 76, 76), Color.FromArgb(65, 65, 65), mode);
-                e.Graphics.FillRectangle(brushOuter, newRect);
-                newRect.Inflate(-1, -1);
                 e.Graphics.FillRectangle(brushInner, newRect);
-                newRect.Inflate(1, 1);
+
+                brushBorder = new Pen(Color.FromArgb(48, 48, 48), 1f);
                 e.Graphics.DrawRectangle(brushBorder, newRect);
+
+                text_color = Color.FromArgb(160, 160, 160);
+                checkMark.Color = Color.FromArgb(180, 180, 180);
             }
 
             e.Graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;

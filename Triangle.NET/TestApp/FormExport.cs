@@ -21,8 +21,8 @@ namespace MeshExplorer
         {
             get
             {
-                int size = (int)darkSlider1.Value;
-                return 18 * size + 200;
+                int size = (int)((2000.0 - 200.0) / 100.0 * darkSlider1.Value + 200.0);
+                return size - (size % 50);
             }
         }
 
@@ -30,6 +30,11 @@ namespace MeshExplorer
         {
             get { return darkTextBox1.Text; }
             set { darkTextBox1.Text = value; }
+        }
+
+        public bool UseCompression
+        {
+            get { return cbUseCompression.Enabled && cbUseCompression.Checked; }
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -49,6 +54,8 @@ namespace MeshExplorer
             if (!String.IsNullOrWhiteSpace(filename))
             {
                 string ext = ".png";
+
+                cbUseCompression.Enabled = darkListBox1.SelectedIndex > 0;
 
                 if (darkListBox1.SelectedIndex == 1)
                 {

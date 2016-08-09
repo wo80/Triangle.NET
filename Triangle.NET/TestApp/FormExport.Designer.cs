@@ -32,6 +32,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.lbSize = new System.Windows.Forms.Label();
+            this.cbUseCompression = new MeshExplorer.Controls.DarkCheckBox();
             this.darkSlider1 = new MeshExplorer.Controls.DarkSlider();
             this.darkTextBox1 = new MeshExplorer.Controls.DarkTextBox();
             this.darkListBox1 = new MeshExplorer.Controls.DarkListBox();
@@ -53,7 +54,7 @@
             // 
             this.label3.AutoSize = true;
             this.label3.BackColor = System.Drawing.Color.Transparent;
-            this.label3.Location = new System.Drawing.Point(12, 198);
+            this.label3.Location = new System.Drawing.Point(12, 190);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(59, 13);
             this.label3.TabIndex = 2;
@@ -63,7 +64,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.BackColor = System.Drawing.Color.Transparent;
-            this.label1.Location = new System.Drawing.Point(12, 156);
+            this.label1.Location = new System.Drawing.Point(12, 148);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(74, 13);
             this.label1.TabIndex = 2;
@@ -74,17 +75,29 @@
             this.lbSize.AutoSize = true;
             this.lbSize.BackColor = System.Drawing.Color.Transparent;
             this.lbSize.ForeColor = System.Drawing.Color.Gray;
-            this.lbSize.Location = new System.Drawing.Point(272, 156);
+            this.lbSize.Location = new System.Drawing.Point(272, 148);
             this.lbSize.Name = "lbSize";
             this.lbSize.Size = new System.Drawing.Size(40, 13);
             this.lbSize.TabIndex = 2;
             this.lbSize.Text = "800 px";
             // 
+            // cbUseCompression
+            // 
+            this.cbUseCompression.BackColor = System.Drawing.Color.DimGray;
+            this.cbUseCompression.Checked = false;
+            this.cbUseCompression.Enabled = false;
+            this.cbUseCompression.Location = new System.Drawing.Point(15, 231);
+            this.cbUseCompression.Name = "cbUseCompression";
+            this.cbUseCompression.Size = new System.Drawing.Size(297, 23);
+            this.cbUseCompression.TabIndex = 6;
+            this.cbUseCompression.Text = "Use GZip compression";
+            this.cbUseCompression.UseVisualStyleBackColor = false;
+            // 
             // darkSlider1
             // 
             this.darkSlider1.BackColor = System.Drawing.Color.Transparent;
             this.darkSlider1.CriticalPercent = ((uint)(0u));
-            this.darkSlider1.Location = new System.Drawing.Point(15, 169);
+            this.darkSlider1.Location = new System.Drawing.Point(15, 161);
             this.darkSlider1.Maximum = 100;
             this.darkSlider1.Minimum = 0;
             this.darkSlider1.Name = "darkSlider1";
@@ -100,7 +113,7 @@
             this.darkTextBox1.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.darkTextBox1.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.darkTextBox1.ForeColor = System.Drawing.Color.Black;
-            this.darkTextBox1.Location = new System.Drawing.Point(12, 214);
+            this.darkTextBox1.Location = new System.Drawing.Point(12, 206);
             this.darkTextBox1.Name = "darkTextBox1";
             this.darkTextBox1.Size = new System.Drawing.Size(300, 21);
             this.darkTextBox1.TabIndex = 4;
@@ -119,7 +132,7 @@
             "Scalable Vector Graphics (*.svg)"});
             this.darkListBox1.Location = new System.Drawing.Point(12, 25);
             this.darkListBox1.Name = "darkListBox1";
-            this.darkListBox1.Size = new System.Drawing.Size(302, 118);
+            this.darkListBox1.Size = new System.Drawing.Size(302, 110);
             this.darkListBox1.TabIndex = 3;
             this.darkListBox1.SelectedIndexChanged += new System.EventHandler(this.darkListBox1_SelectedIndexChanged);
             // 
@@ -149,6 +162,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(76)))), ((int)(((byte)(76)))));
             this.ClientSize = new System.Drawing.Size(324, 299);
+            this.Controls.Add(this.cbUseCompression);
             this.Controls.Add(this.darkSlider1);
             this.Controls.Add(this.darkTextBox1);
             this.Controls.Add(this.darkListBox1);
@@ -183,5 +197,6 @@
         private System.Windows.Forms.Label label1;
         private Controls.DarkSlider darkSlider1;
         private System.Windows.Forms.Label lbSize;
+        private Controls.DarkCheckBox cbUseCompression;
     }
 }

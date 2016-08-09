@@ -39,10 +39,25 @@ namespace TriangleNet.Rendering.Text
             DefaultPointSize = 1;
         }
 
-        //public void Append(string ps)
-        //{
-        //    _w.WriteLine(ps);
-        //}
+        public void AddComment(string comment, int line = 1)
+        {
+            for (int i = 0; i < line; i++)
+            {
+                _w.WriteLine("%");
+            }
+
+            var t = comment.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries );
+
+            for (int i = 0; i < t.Length; i++)
+            {
+                _w.WriteLine("% " + t[i]);
+            }
+
+            for (int i = 0; i < line; i++)
+            {
+                _w.WriteLine("%");
+            }
+        }
 
         public void DrawPoint(Point p)
         {
@@ -114,13 +129,11 @@ namespace TriangleNet.Rendering.Text
             _w.WriteLine("%%Document-Fonts: Times-Roman");
             _w.WriteLine("%%LanguageLevel: 3");
             _w.WriteLine("%%EndComments");
-            _w.WriteLine("%%BeginProlog");
-            _w.WriteLine("/inch {72 mul} def");
-            _w.WriteLine("%%EndProlog");
             _w.WriteLine("%%Page: 1 1");
             _w.WriteLine("save");
             
             // Define points.
+            _w.WriteLine("% Define points.");
             _w.WriteLine("/P {");
             _w.WriteLine("2 dict begin");
             _w.WriteLine("/y exch def");
@@ -132,6 +145,7 @@ namespace TriangleNet.Rendering.Text
             _w.WriteLine("} def");
 
             // Define lines.
+            _w.WriteLine("% Define lines.");
             _w.WriteLine("/L {");
             _w.WriteLine("2 dict begin");
             _w.WriteLine("/y2 exch def");
@@ -149,9 +163,6 @@ namespace TriangleNet.Rendering.Text
         {
             _w.WriteLine("%");
             _w.WriteLine("restore  showpage");
-            _w.WriteLine("%");
-            _w.WriteLine("%  End of page.");
-            _w.WriteLine("%");
             _w.WriteLine("%%Trailer");
             _w.WriteLine("%%EOF");
         }

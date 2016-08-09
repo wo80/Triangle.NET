@@ -11,7 +11,6 @@ using TriangleNet.Meshing.Algorithm;
 using TriangleNet.Rendering;
 using TriangleNet.Smoothing;
 using TriangleNet.Voronoi;
-using TriangleNet.Rendering.Text;
 
 namespace MeshExplorer
 {
@@ -702,22 +701,11 @@ namespace MeshExplorer
                 {
                     int format = export.ImageFormat;
                     int size = export.ImageSize;
+                    bool compress = export.UseCompression;
 
-                    if (format == 1)
-                    {
-                        var eps = new EpsImage();
-                        eps.Export(this.mesh, export.ImageName, size);
-                    }
-                    else if (format == 2)
-                    {
-                        var svg = new SvgImage();
-                        svg.Export(this.mesh, export.ImageName, size);
-                    }
-                    else
-                    {
-                        var img = new RasterImage();
-                        img.Export(this.mesh, export.ImageName, size);
-                    }
+                    var writer = new ImageWriter();
+
+                    writer.Export(this.mesh, export.ImageName, format, size, compress);
                 }
             }
         }
