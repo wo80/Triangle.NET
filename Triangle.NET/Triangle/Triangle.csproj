@@ -123,7 +123,7 @@
     <Compile Include="MeshValidator.cs" />
     <Compile Include="NewLocation.cs" />
     <Compile Include="RobustPredicates.cs" />
-    <Compile Include="Sampler.cs" />
+    <Compile Include="TriangleSampler.cs" />
     <Compile Include="TriangleLocator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

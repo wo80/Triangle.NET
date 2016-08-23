@@ -23,7 +23,7 @@ namespace TriangleNet
     /// <remarks>The result of a search indicates that the point falls in the 
     /// interior of a triangle, on an edge, on a vertex, or outside the mesh.
     /// </remarks>
-    enum LocateResult { InTriangle, OnEdge, OnVertex, Outside };
+    public enum LocateResult { InTriangle, OnEdge, OnVertex, Outside };
 
     /// <summary>
     /// Labels that signify the result of vertex insertion.

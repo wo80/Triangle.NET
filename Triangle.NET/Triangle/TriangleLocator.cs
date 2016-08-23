@@ -7,8 +7,8 @@
 
 namespace TriangleNet
 {
-    using TriangleNet.Topology;
     using TriangleNet.Geometry;
+    using TriangleNet.Topology;
 
     /// <summary>
     /// Locate triangles in a mesh.
@@ -16,10 +16,15 @@ namespace TriangleNet
     /// <remarks>
     /// WARNING: This routine is designed for convex triangulations, and will
     /// not generally work after the holes and concavities have been carved.
+    /// 
+    /// Based on a paper by Ernst P. Mucke, Isaac Saias, and Binhai Zhu, "Fast
+    /// Randomized Point Location Without Preprocessing in Two- and Three-Dimensional
+    /// Delaunay Triangulations," Proceedings of the Twelfth Annual Symposium on
+    /// Computational Geometry, ACM, May 1996.
     /// </remarks>
-    class TriangleLocator
+    public class TriangleLocator
     {
-        Sampler sampler;
+        TriangleSampler sampler;
         Mesh mesh;
 
         IPredicates predicates;
@@ -28,14 +33,23 @@ namespace TriangleNet
         // proximate vertices are inserted sequentially.
         internal Otri recenttri;
 
+        public TriangleLocator(Mesh mesh)
+            : this(mesh, RobustPredicates.Default)
+        {
+        }
+
         public TriangleLocator(Mesh mesh, IPredicates predicates)
         {
             this.mesh = mesh;
             this.predicates = predicates;
 
-            sampler = new Sampler(mesh);
+            sampler = new TriangleSampler(mesh);
         }
 
+        /// <summary>
+        /// Suggest the given triangle as a starting triangle for point location.
+        /// </summary>
+        /// <param name="otri"></param>
         public void Update(ref Otri otri)
         {
             otri.Copy(ref recenttri);
@@ -114,7 +128,7 @@ namespace TriangleNet
         /// However, it can still be used to find the circumcenter of a triangle, as
         /// long as the search is begun from the triangle in question.</remarks>
         public LocateResult PreciseLocate(Point searchpoint, ref Otri searchtri,
-                                        bool stopatsubsegment)
+            bool stopatsubsegment)
         {
             Otri backtracktri = default(Otri);
             Osub checkedge = default(Osub);
@@ -313,6 +327,7 @@ namespace TriangleNet
             // Where are we?
             torg = searchtri.Org();
             tdest = searchtri.Dest();
+
             // Check the starting triangle's vertices.
             if ((torg.x == searchpoint.x) && (torg.y == searchpoint.y))
             {
@@ -323,6 +338,7 @@ namespace TriangleNet
                 searchtri.Lnext();
                 return LocateResult.OnVertex;
             }
+
             // Orient 'searchtri' to fit the preconditions of calling preciselocate().
             ahead = predicates.CounterClockwise(torg, tdest, searchpoint);
             if (ahead < 0.0)
@@ -340,6 +356,7 @@ namespace TriangleNet
                     return LocateResult.OnEdge;
                 }
             }
+
             return PreciseLocate(searchpoint, ref searchtri, false);
         }
     }

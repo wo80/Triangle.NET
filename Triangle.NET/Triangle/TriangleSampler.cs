@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="Sampler.cs">
+// <copyright file="TriangleSampler.cs">
 // Original Triangle code by Jonathan Richard Shewchuk, http://www.cs.cmu.edu/~quake/triangle.html
 // Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
 // </copyright>
@@ -14,12 +14,14 @@ namespace TriangleNet
     /// <summary>
     /// Used for triangle sampling in the <see cref="TriangleLocator"/> class.
     /// </summary>
-    class Sampler : IEnumerable<Triangle>
+    class TriangleSampler : IEnumerable<Triangle>
     {
+        private const int RANDOM_SEED = 110503;
+
         // Empirically chosen factor.
         private const int samplefactor = 11;
 
-        private Random rand;
+        private Random random;
         private Mesh mesh;
 
         // Number of random samples for point location (at least 1).
@@ -28,10 +30,15 @@ namespace TriangleNet
         // Number of triangles in mesh.
         private int triangleCount = 0;
 
-        public Sampler(Mesh mesh)
+        public TriangleSampler(Mesh mesh)
+            : this(mesh, new Random(RANDOM_SEED))
+        {
+        }
+
+        public TriangleSampler(Mesh mesh, Random random)
         {
             this.mesh = mesh;
-            this.rand = new Random(110503);
+            this.random = random;
         }
 
         /// <summary>
@@ -46,18 +53,16 @@ namespace TriangleNet
         /// <summary>
         /// Update sampling parameters if mesh changed.
         /// </summary>
-        /// <param name="mesh">Current mesh.</param>
-        public void Update(bool forceUpdate = false)
+        public void Update()
         {
             int count = mesh.triangles.Count;
 
-            // TODO: Is checking the triangle count a good way to monitor mesh changes?
-            if (triangleCount != count || forceUpdate)
+            if (triangleCount != count)
             {
                 triangleCount = count;
 
-                // The number of random samples taken is proportional to the cube root of
-                // the number of triangles in the mesh.  The next bit of code assumes
+                // The number of random samples taken is proportional to the cube root
+                // of the number of triangles in the mesh.  The next bit of code assumes
                 // that the number of triangles increases monotonically (or at least
                 // doesn't decrease enough to matter).
                 while (samplefactor * samples * samples * samples < count)
@@ -69,7 +74,7 @@ namespace TriangleNet
 
         public IEnumerator<Triangle> GetEnumerator()
         {
-            return mesh.triangles.Sample(samples, rand).GetEnumerator();
+            return mesh.triangles.Sample(samples, random).GetEnumerator();
         }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
