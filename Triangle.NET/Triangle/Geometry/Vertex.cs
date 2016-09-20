@@ -22,7 +22,7 @@ namespace TriangleNet.Geometry
         internal double[] attributes;
 #endif
         internal VertexType type;
-        internal Otri tri; // TODO: change from Otri to Triangle
+        internal Otri tri;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Vertex" /> class.

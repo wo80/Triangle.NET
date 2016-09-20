@@ -9,8 +9,9 @@ namespace TriangleNet.Meshing.Algorithm
 {
     using System;
     using System.Collections.Generic;
-    using TriangleNet.Topology;
     using TriangleNet.Geometry;
+    using TriangleNet.Tools;
+    using TriangleNet.Topology;
 
     /// <summary>
     /// Builds a delaunay triangulation using the divide-and-conquer algorithm.
@@ -71,22 +72,19 @@ namespace TriangleNet.Meshing.Algorithm
             this.mesh.TransferNodes(points);
 
             Otri hullleft = default(Otri), hullright = default(Otri);
-            int divider;
             int i, j, n = points.Count;
 
-            //DebugWriter.Session.Start("test-dbg");
-
             // Allocate an array of pointers to vertices for sorting.
-            // TODO: use ToArray
             this.sortarray = new Vertex[n];
             i = 0;
             foreach (var v in points)
             {
                 sortarray[i++] = v;
             }
+
             // Sort the vertices.
-            //Array.Sort(sortarray);
-            VertexSort(0, n - 1);
+            VertexSorter.Sort(sortarray);
+
             // Discard duplicate vertices, which can really mess up the algorithm.
             i = 0;
             for (j = 1; j < n; j++)
@@ -112,223 +110,15 @@ namespace TriangleNet.Meshing.Algorithm
             if (UseDwyer)
             {
                 // Re-sort the array of vertices to accommodate alternating cuts.
-                divider = i >> 1;
-                if (i - divider >= 2)
-                {
-                    if (divider >= 2)
-                    {
-                        AlternateAxes(0, divider - 1, 1);
-                    }
-                    AlternateAxes(divider, i - 1, 1);
-                }
+                VertexSorter.Alternate(sortarray, i);
             }
 
             // Form the Delaunay triangulation.
             DivconqRecurse(0, i - 1, 0, ref hullleft, ref hullright);
 
-            //DebugWriter.Session.Write(mesh);
-            //DebugWriter.Session.Finish();
-
             this.mesh.hullsize = RemoveGhosts(ref hullleft);
 
             return this.mesh;
-        }
-
-        /// <summary>
-        /// Sort an array of vertices by x-coordinate, using the y-coordinate as a secondary key.
-        /// </summary>
-        /// <param name="left"></param>
-        /// <param name="right"></param>
-        /// <remarks>
-        /// Uses quicksort. Randomized O(n log n) time. No, I did not make any of
-        /// the usual quicksort mistakes.
-        /// </remarks>
-        void VertexSort(int left, int right)
-        {
-            int oleft = left;
-            int oright = right;
-            int arraysize = right - left + 1;
-            int pivot;
-            double pivotx, pivoty;
-            Vertex temp;
-
-            if (arraysize < 32)
-            {
-                // Insertion sort
-                for (int i = left + 1; i <= right; i++)
-                {
-                    var a = sortarray[i];
-                    int j = i - 1;
-                    while (j >= left && (sortarray[j].x > a.x || (sortarray[j].x == a.x && sortarray[j].y > a.y)))
-                    {
-                        sortarray[j + 1] = sortarray[j];
-                        j--;
-                    }
-                    sortarray[j + 1] = a;
-                }
-
-                return;
-            }
-
-            // Choose a random pivot to split the array.
-            pivot = rand.Next(left, right);
-            pivotx = sortarray[pivot].x;
-            pivoty = sortarray[pivot].y;
-            // Split the array.
-            left--;
-            right++;
-            while (left < right)
-            {
-                // Search for a vertex whose x-coordinate is too large for the left.
-                do
-                {
-                    left++;
-                }
-                while ((left <= right) && ((sortarray[left].x < pivotx) ||
-                    ((sortarray[left].x == pivotx) && (sortarray[left].y < pivoty))));
-                // Search for a vertex whose x-coordinate is too small for the right.
-                do
-                {
-                    right--;
-                }
-                while ((left <= right) && ((sortarray[right].x > pivotx) ||
-                    ((sortarray[right].x == pivotx) && (sortarray[right].y > pivoty))));
-
-                if (left < right)
-                {
-                    // Swap the left and right vertices.
-                    temp = sortarray[left];
-                    sortarray[left] = sortarray[right];
-                    sortarray[right] = temp;
-                }
-            }
-            if (left > oleft)
-            {
-                // Recursively sort the left subset.
-                VertexSort(oleft, left);
-            }
-            if (oright > right + 1)
-            {
-                // Recursively sort the right subset.
-                VertexSort(right + 1, oright);
-            }
-        }
-
-        /// <summary>
-        /// An order statistic algorithm, almost.  Shuffles an array of vertices so that 
-        /// the first 'median' vertices occur lexicographically before the remaining vertices.
-        /// </summary>
-        /// <param name="left"></param>
-        /// <param name="right"></param>
-        /// <param name="median"></param>
-        /// <param name="axis"></param>
-        /// <remarks>
-        /// Uses the x-coordinate as the primary key if axis == 0; the y-coordinate
-        /// if axis == 1.  Very similar to the vertexsort() procedure, but runs in
-        /// randomized linear time.
-        /// </remarks>
-        void VertexMedian(int left, int right, int median, int axis)
-        {
-            int arraysize = right - left + 1;
-            int oleft = left, oright = right;
-            int pivot;
-            double pivot1, pivot2;
-            Vertex temp;
-
-            if (arraysize == 2)
-            {
-                // Recursive base case.
-                if ((sortarray[left][axis] > sortarray[right][axis]) ||
-                    ((sortarray[left][axis] == sortarray[right][axis]) &&
-                     (sortarray[left][1 - axis] > sortarray[right][1 - axis])))
-                {
-                    temp = sortarray[right];
-                    sortarray[right] = sortarray[left];
-                    sortarray[left] = temp;
-                }
-                return;
-            }
-            // Choose a random pivot to split the array.
-            pivot = rand.Next(left, right); //left + arraysize / 2;
-            pivot1 = sortarray[pivot][axis];
-            pivot2 = sortarray[pivot][1 - axis];
-
-            left--;
-            right++;
-            while (left < right)
-            {
-                // Search for a vertex whose x-coordinate is too large for the left.
-                do
-                {
-                    left++;
-                }
-                while ((left <= right) && ((sortarray[left][axis] < pivot1) ||
-                    ((sortarray[left][axis] == pivot1) && (sortarray[left][1 - axis] < pivot2))));
-                // Search for a vertex whose x-coordinate is too small for the right.
-                do
-                {
-                    right--;
-                }
-                while ((left <= right) && ((sortarray[right][axis] > pivot1) ||
-                    ((sortarray[right][axis] == pivot1) && (sortarray[right][1 - axis] > pivot2))));
-                if (left < right)
-                {
-                    // Swap the left and right vertices.
-                    temp = sortarray[left];
-                    sortarray[left] = sortarray[right];
-                    sortarray[right] = temp;
-                }
-            }
-
-            // Unlike in vertexsort(), at most one of the following conditionals is true.
-            if (left > median)
-            {
-                // Recursively shuffle the left subset.
-                VertexMedian(oleft, left - 1, median, axis);
-            }
-            if (right < median - 1)
-            {
-                // Recursively shuffle the right subset.
-                VertexMedian(right + 1, oright, median, axis);
-            }
-        }
-
-        /// <summary>
-        /// Sorts the vertices as appropriate for the divide-and-conquer algorithm with 
-        /// alternating cuts.
-        /// </summary>
-        /// <param name="left"></param>
-        /// <param name="right"></param>
-        /// <param name="axis"></param>
-        /// <remarks>
-        /// Partitions by x-coordinate if axis == 0; by y-coordinate if axis == 1.
-        /// For the base case, subsets containing only two or three vertices are
-        /// always sorted by x-coordinate.
-        /// </remarks>
-        void AlternateAxes(int left, int right, int axis)
-        {
-            int arraysize = right - left + 1;
-            int divider;
-
-            divider = arraysize >> 1;
-            //divider += left; // TODO: check
-            if (arraysize <= 3)
-            {
-                // Recursive base case:  subsets of two or three vertices will be
-                // handled specially, and should always be sorted by x-coordinate.
-                axis = 0;
-            }
-            // Partition with a horizontal or vertical cut.
-            VertexMedian(left, right, left + divider, axis);
-            // Recursively partition the subsets with a cross cut.
-            if (arraysize - divider >= 2)
-            {
-                if (divider >= 2)
-                {
-                    AlternateAxes(left, left + divider - 1, 1 - axis);
-                }
-                AlternateAxes(left + divider, right, 1 - axis);
-            }
         }
 
         /// <summary>
@@ -834,15 +624,13 @@ namespace TriangleNet.Meshing.Algorithm
             {
                 // Split the vertices in half.
                 divider = vertices >> 1;
+
                 // Recursively triangulate each half.
                 DivconqRecurse(left, left + divider - 1, 1 - axis, ref farleft, ref innerleft);
-                //DebugWriter.Session.Write(mesh, true);
                 DivconqRecurse(left + divider, right, 1 - axis, ref innerright, ref farright);
-                //DebugWriter.Session.Write(mesh, true);
 
                 // Merge the two triangulations into one.
                 MergeHulls(ref farleft, ref innerleft, ref innerright, ref farright, axis);
-                //DebugWriter.Session.Write(mesh, true);
             }
         }
 

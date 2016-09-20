@@ -88,7 +88,7 @@
     <Compile Include="Tools\CuthillMcKee.cs" />
     <Compile Include="Tools\Interpolation.cs" />
     <Compile Include="Tools\IntersectionHelper.cs" />
-    <Compile Include="Tools\PointSorter.cs" />
+    <Compile Include="Tools\VertexSorter.cs" />
     <Compile Include="Tools\PolygonValidator.cs" />
     <Compile Include="Tools\QualityMeasure.cs" />
     <Compile Include="Tools\TriangleQuadTree.cs" />

@@ -102,7 +102,7 @@ namespace TriangleNet.Tools
 
             var points = poly.Points.ToArray();
 
-            (new PointSorter()).Sort(points);
+            VertexSorter.Sort(points);
 
             for (int i = 1; i < points.Length; i++)
             {
