@@ -40,7 +40,7 @@ namespace TriangleNet.Rendering.GDI
             }
 
             // Ensure .png extension.
-            if (file.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
+            if (!file.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
             {
                 Path.ChangeExtension(file, ".png");
             }
@@ -127,7 +127,7 @@ namespace TriangleNet.Rendering.GDI
 
             if (colors.ColorDictionary == null)
             {
-                colors.CreateColorDictionary(regions.Count);
+                colors.CreateColorDictionary(regions, regions.Count);
             }
 
             return labels;
