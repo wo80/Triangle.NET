@@ -7,10 +7,14 @@ namespace TriangleNet.Rendering.GDI
     using System.Drawing.Drawing2D;
     using System.Drawing.Imaging;
     using System.IO;
+    using TriangleNet.Meshing;
 
+    /// <summary>
+    /// Enables rendering of polygons or meshes to a bitmap.
+    /// </summary>
     public class ImageRenderer
     {
-        ColorManager colors = ImageRenderer.LightScheme();
+        ColorManager colors = LightScheme();
 
         public ColorManager ColorScheme
         {
@@ -30,13 +34,13 @@ namespace TriangleNet.Rendering.GDI
         /// <param name="file">The PNG filename.</param>
         /// <param name="regions">Enable rendering of regions.</param>
         /// <param name="points">Enable rendering of points.</param>
-        public static void Save(Mesh mesh, string file = null, int width = 800,
+        public static void Save(IMesh mesh, string file = null, int width = 800,
             bool regions = false, bool points = true)
         {
             // Check file name
-            if (String.IsNullOrWhiteSpace(file))
+            if (string.IsNullOrWhiteSpace(file))
             {
-                file = String.Format("mesh-{0}.png", DateTime.Now.ToString("yyyy-M-d-hh-mm-ss"));
+                file = string.Format("mesh-{0}.png", DateTime.Now.ToString("yyyy-M-d-hh-mm-ss"));
             }
 
             // Ensure .png extension.
@@ -56,7 +60,7 @@ namespace TriangleNet.Rendering.GDI
         }
 
         /// <summary>
-        /// Export the mesh to PNG format.
+        /// Renders the mesh to a bitmap.
         /// </summary>
         /// <param name="mesh">The current mesh.</param>
         /// <param name="width">The desired width (pixel) of the image.</param>
@@ -65,7 +69,7 @@ namespace TriangleNet.Rendering.GDI
         /// The width has to be at least 2 * sqrt(n), n the number of vertices.
         /// Otherwise, an empty bitmap
         /// </remarks>
-        public Bitmap Render(Mesh mesh, int width = 800)
+        public Bitmap Render(IMesh mesh, int width = 800)
         {
             Bitmap bitmap;
 
@@ -112,12 +116,12 @@ namespace TriangleNet.Rendering.GDI
             return bitmap;
         }
 
-        private int[] GetRegions(Mesh mesh)
+        private int[] GetRegions(IMesh mesh)
         {
             mesh.Renumber();
 
             var labels = new int[mesh.Triangles.Count];
-            var regions = new HashSet<int>();
+            var regions = new SortedSet<int>();
 
             foreach (var t in mesh.Triangles)
             {
