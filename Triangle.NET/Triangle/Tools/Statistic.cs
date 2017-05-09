@@ -136,8 +136,8 @@ namespace TriangleNet.Tools
             double[] ratiotable;
 
             aspecttable = new int[16];
-            ratiotable = new double[] { 
-                1.5, 2.0, 2.5, 3.0, 4.0, 6.0, 10.0, 15.0, 25.0, 50.0, 
+            ratiotable = new double[] {
+                1.5, 2.0, 2.5, 3.0, 4.0, 6.0, 10.0, 15.0, 25.0, 50.0,
                 100.0, 300.0, 1000.0, 10000.0, 100000.0, 0.0 };
 
 
@@ -441,6 +441,88 @@ namespace TriangleNet.Tools
                     maxAngle = 180.0 - degconst * Math.Acos(Math.Sqrt(maxAngle));
                 }
             }
+        }
+
+        /// <summary>
+        /// Compute angle information for given triangle.
+        /// </summary>
+        /// <param name="triangle">The triangle to check.</param>
+        /// <param name="data">Array of doubles (length 6).</param>
+        /// <remarks>
+        /// On return, the squared cosines of the minimum and maximum angle will
+        /// be stored at position data[0] and data[1] respectively.
+        /// If the triangle was obtuse, data[2] will be set to -1 and maximum angle
+        /// is computed as (pi - acos(sqrt(data[1]))).
+        /// </remarks>
+        public static void ComputeAngles(ITriangle triangle, double[] data)
+        {
+            double min = 0.0;
+            double max = 1.0;
+
+            var va = triangle.GetVertex(0);
+            var vb = triangle.GetVertex(1);
+            var vc = triangle.GetVertex(2);
+
+            double dxa = vb.x - vc.x;
+            double dya = vb.y - vc.y;
+            double lena = dxa * dxa + dya * dya;
+
+            double dxb = vc.x - va.x;
+            double dyb = vc.y - va.y;
+            double lenb = dxb * dxb + dyb * dyb;
+
+            double dxc = va.x - vb.x;
+            double dyc = va.y - vb.y;
+            double lenc = dxc * dxc + dyc * dyc;
+
+            // Dot products.
+            double dota = data[0] = dxb * dxc + dyb * dyc;
+            double dotb = data[1] = dxc * dxa + dyc * dya;
+            double dotc = data[2] = dxa * dxb + dya * dyb;
+
+            // Squared cosines.
+            data[3] = (dota * dota) / (lenb * lenc);
+            data[4] = (dotb * dotb) / (lenc * lena);
+            data[5] = (dotc * dotc) / (lena * lenb);
+
+            // The sign of the dot product will tell us, if the angle is
+            // acute (value < 0) or obtuse (value > 0).
+
+            bool acute = true;
+
+            double cos, dot;
+
+            for (int i = 0; i < 3; i++)
+            {
+                dot = data[i];
+                cos = data[3 + i];
+
+                if (dot <= 0.0)
+                {
+                    if (cos > min)
+                    {
+                        min = cos;
+                    }
+
+                    if (acute && (cos < max))
+                    {
+                        max = cos;
+                    }
+                }
+                else
+                {
+                    // Update max angle for (possibly non-acute) triangle
+                    if (acute || (cos > max))
+                    {
+                        max = cos;
+                        acute = false;
+                    }
+                }
+            }
+
+            data[0] = min;
+            data[1] = max;
+            data[2] = acute ? 1.0 : -1.0;
         }
     }
 }

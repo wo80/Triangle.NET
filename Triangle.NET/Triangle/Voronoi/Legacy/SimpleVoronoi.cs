@@ -11,6 +11,7 @@ namespace TriangleNet.Voronoi.Legacy
     using System.Collections.Generic;
     using TriangleNet.Topology;
     using TriangleNet.Geometry;
+    using TriangleNet.Tools;
 
     /// <summary>
     /// The Voronoi Diagram is the dual of a pointset triangulation.
@@ -131,7 +132,7 @@ namespace TriangleNet.Voronoi.Legacy
             }
 
             double ds = Math.Max(bounds.Width, bounds.Height);
-            bounds.Resize(ds, ds);
+            bounds.Resize(ds / 10, ds / 10);
         }
 
         /// <summary>
@@ -211,7 +212,7 @@ namespace TriangleNet.Voronoi.Legacy
             {
                 torg = f.Org();
                 tapex = f.Apex();
-                BoxRayIntersection(points[f.tri.id], torg.y - tapex.y, tapex.x - torg.x, out intersection);
+                intersection = IntersectionHelper.BoxRayIntersection(bounds, points[f.tri.id], torg.y - tapex.y, tapex.x - torg.x);
 
                 // Set the correct id for the vertex
                 intersection.id = n + rayIndex;
@@ -249,7 +250,7 @@ namespace TriangleNet.Voronoi.Legacy
                 torg = f.Org();
                 tdest = f.Dest();
 
-                BoxRayIntersection(points[f.tri.id], tdest.y - torg.y, torg.x - tdest.x, out intersection);
+                intersection = IntersectionHelper.BoxRayIntersection(bounds, points[f.tri.id], tdest.y - torg.y, torg.x - tdest.x);
 
                 // Set the correct id for the vertex
                 intersection.id = n + rayIndex;
@@ -268,82 +269,6 @@ namespace TriangleNet.Voronoi.Legacy
             region.Add(vpoints);
         }
 
-        private bool BoxRayIntersection(Point pt, double dx, double dy, out Point intersect)
-        {
-            double x = pt.x;
-            double y = pt.y;
-
-            double t1, x1, y1, t2, x2, y2;
-
-            // Bounding box
-            double minX = bounds.Left;
-            double maxX = bounds.Right;
-            double minY = bounds.Bottom;
-            double maxY = bounds.Top;
-
-            // Check if point is inside the bounds
-            if (x < minX || x > maxX || y < minY || y > maxY)
-            {
-                intersect = null;
-                return false;
-            }
-
-            // Calculate the cut through the vertical boundaries
-            if (dx < 0)
-            {
-                // Line going to the left: intersect with x = minX
-                t1 = (minX - x) / dx;
-                x1 = minX;
-                y1 = y + t1 * dy;
-            }
-            else if (dx > 0)
-            {
-                // Line going to the right: intersect with x = maxX
-                t1 = (maxX - x) / dx;
-                x1 = maxX;
-                y1 = y + t1 * dy;
-            }
-            else
-            {
-                // Line going straight up or down: no intersection possible
-                t1 = double.MaxValue;
-                x1 = y1 = 0;
-            }
-
-            // Calculate the cut through upper and lower boundaries
-            if (dy < 0)
-            {
-                // Line going downwards: intersect with y = minY
-                t2 = (minY - y) / dy;
-                x2 = x + t2 * dx;
-                y2 = minY;
-            }
-            else if (dy > 0)
-            {
-                // Line going upwards: intersect with y = maxY
-                t2 = (maxY - y) / dy;
-                x2 = x + t2 * dx;
-                y2 = maxY;
-            }
-            else
-            {
-                // Horizontal line: no intersection possible
-                t2 = double.MaxValue;
-                x2 = y2 = 0;
-            }
-
-            if (t1 < t2)
-            {
-                intersect = new Point(x1, y1);
-            }
-            else
-            {
-                intersect = new Point(x2, y2);
-            }
-
-            return true;
-        }
-
         // TODO: Voronoi enumerate edges
 
         private IEnumerable<IEdge> EnumerateEdges()
@@ -353,25 +278,23 @@ namespace TriangleNet.Voronoi.Legacy
             var edges = new List<IEdge>(this.Regions.Count * 2);
             foreach (var region in this.Regions)
             {
-                first = null;
-                last = null;
+                var ve = region.Vertices.GetEnumerator();
 
-                foreach (var pt in region.Vertices)
+                ve.MoveNext();
+
+                first = last = ve.Current;
+
+                while (ve.MoveNext())
                 {
-                    if (first == null)
+                    if (region.ID < region.GetNeighbor(last).ID)
                     {
-                        first = pt;
-                        last = pt;
+                        edges.Add(new Edge(last.id, ve.Current.id));
                     }
-                    else
-                    {
-                        edges.Add(new Edge(last.id, pt.id));
 
-                        last = pt;
-                    }
+                    last = ve.Current;
                 }
 
-                if (region.Bounded && first != null)
+                if (region.Bounded && region.ID < region.GetNeighbor(last).ID)
                 {
                     edges.Add(new Edge(last.id, first.id));
                 }

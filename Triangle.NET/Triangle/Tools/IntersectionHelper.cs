@@ -113,11 +113,42 @@ namespace TriangleNet.Tools
         /// <returns>Returns false, if startpoint is outside the box.</returns>
         public static bool BoxRayIntersection(Rectangle rect, Point p0, Point p1, ref Point c1)
         {
-            double x = p0.X;
-            double y = p0.Y;
+            return BoxRayIntersection(rect, p0, p1.x - p0.x, p1.y - p0.y, ref c1);
+        }
 
-            double dx = p1.x - x;
-            double dy = p1.y - y;
+        /// <summary>
+        /// Intersect a ray with a bounding box.
+        /// </summary>
+        /// <param name="rect">The clip rectangle.</param>
+        /// <param name="p">The ray startpoint (inside the box).</param>
+        /// <param name="dx">X direction.</param>
+        /// <param name="dy">Y direction.</param>
+        /// <returns>Returns false, if startpoint is outside the box.</returns>
+        public static Point BoxRayIntersection(Rectangle rect, Point p, double dx, double dy)
+        {
+            var intersection = new Point();
+
+            if (BoxRayIntersection(rect, p, dx, dy, ref intersection))
+            {
+                return intersection;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Intersect a ray with a bounding box.
+        /// </summary>
+        /// <param name="rect">The clip rectangle.</param>
+        /// <param name="p">The ray startpoint (inside the box).</param>
+        /// <param name="dx">X direction.</param>
+        /// <param name="dy">Y direction.</param>
+        /// <param name="c">The intersection point.</param>
+        /// <returns>Returns false, if startpoint is outside the box.</returns>
+        public static bool BoxRayIntersection(Rectangle rect, Point p, double dx, double dy, ref Point c)
+        {
+            double x = p.X;
+            double y = p.Y;
 
             double t1, x1, y1, t2, x2, y2;
 
@@ -179,13 +210,13 @@ namespace TriangleNet.Tools
 
             if (t1 < t2)
             {
-                c1.x = x1;
-                c1.y = y1;
+                c.x = x1;
+                c.y = y1;
             }
             else
             {
-                c1.x = x2;
-                c1.y = y2;
+                c.x = x2;
+                c.y = y2;
             }
 
             return true;

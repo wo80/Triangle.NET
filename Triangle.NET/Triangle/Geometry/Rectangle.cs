@@ -95,7 +95,7 @@ namespace TriangleNet.Geometry
         }
 
         /// <summary>
-        /// Scale bounds.
+        /// Update bounds.
         /// </summary>
         /// <param name="dx">Add dx to left and right bounds.</param>
         /// <param name="dy">Add dy to top and bottom bounds.</param>
