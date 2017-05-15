@@ -719,6 +719,9 @@ namespace TriangleNet.Meshing
                 newvertex.attributes[i] = torg.attributes[i] + split * (tdest.attributes[i] - torg.attributes[i]);
             }
 #endif
+#if USE_Z
+            newvertex.z = torg.z + split * (tdest.z - torg.z);
+#endif
 
             mesh.vertices.Add(newvertex.hash, newvertex);
 

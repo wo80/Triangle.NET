@@ -625,6 +625,9 @@ namespace TriangleNet.Meshing
                             + split * (edest.attributes[i] - eorg.attributes[i]);
                     }
 #endif
+#if USE_Z
+                    newvertex.z = eorg.z + split * (edest.z - eorg.z);
+#endif
                     if (!Behavior.NoExact)
                     {
                         // Roundoff in the above calculation may yield a 'newvertex'
@@ -790,6 +793,9 @@ namespace TriangleNet.Meshing
                         {
                             Interpolation.InterpolateAttributes(newvertex, newvertex.tri.tri, mesh.nextras);
                         }
+#endif
+#if USE_Z
+                        Interpolation.InterpolateZ(newvertex, newvertex.tri.tri);
 #endif
                         mesh.vertices.Add(newvertex.hash, newvertex);
 

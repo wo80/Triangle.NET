@@ -7,10 +7,16 @@
 namespace TriangleNet.Geometry
 {
     using System;
+    using System.Diagnostics;
 
     /// <summary>
     /// Represents a 2D point.
     /// </summary>
+#if USE_Z
+    [DebuggerDisplay("ID {ID} [{X}, {Y}, {Z}]")]
+#else
+    [DebuggerDisplay("ID {ID} [{X}, {Y}]")]
+#endif
     public class Point : IComparable<Point>, IEquatable<Point>
     {
         internal int id;
@@ -169,11 +175,6 @@ namespace TriangleNet.Geometry
             hash = hash * 31 + y.GetHashCode();
 
             return hash;
-        }
-
-        public override string ToString()
-        {
-            return String.Format("[{0},{1}]", x, y);
         }
     }
 }
