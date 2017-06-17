@@ -7,6 +7,7 @@
 namespace TriangleNet.Geometry
 {
     using System;
+    using System.Linq;    
     using System.Collections.Generic;
 
     /// <summary>
@@ -107,7 +108,7 @@ namespace TriangleNet.Geometry
         public Rectangle Bounds()
         {
             var bounds = new Rectangle();
-            bounds.Expand(this.points);
+            bounds.Expand(this.points.Cast<Point>());
 
             return bounds;
         }

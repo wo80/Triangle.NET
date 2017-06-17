@@ -7,6 +7,7 @@
 namespace TriangleNet.Geometry
 {
     using System;
+    using System.Linq;
     using System.Collections.Generic;
 
     public class Contour
@@ -130,7 +131,7 @@ namespace TriangleNet.Geometry
         private static Point FindPointInPolygon(List<Vertex> contour, int limit, double eps)
         {
             var bounds = new Rectangle();
-            bounds.Expand(contour);
+            bounds.Expand(contour.Cast<Point>());
 
             int length = contour.Count;
 

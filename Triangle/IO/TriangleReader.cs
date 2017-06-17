@@ -35,7 +35,7 @@ namespace TriangleNet.IO
 
             string line = reader.ReadLine().Trim();
 
-            while (String.IsNullOrWhiteSpace(line) || line.StartsWith("#"))
+            while (IsStringNullOrWhiteSpace(line) || line.StartsWith("#"))
             {
                 if (reader.EndOfStream)
                 {
@@ -736,6 +736,21 @@ namespace TriangleNet.IO
             }
 
             return data;
+        }
+
+        bool IsStringNullOrWhiteSpace(string value)
+        {
+            if (value != null)
+            {
+                for (int i = 0; i < value.Length; i++)
+                {
+                    if (!char.IsWhiteSpace(value[i]))
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
     }
 }
