@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{41022E0E-BD0F-439E-BC3A-AABB1B43471B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>TriangleNet.Rendering</RootNamespace>
+    <AssemblyName>Triangle.Rendering</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BoundingBox.cs" />
+    <Compile Include="Buffer\BufferBase.cs" />
+    <Compile Include="Buffer\ColorBuffer.cs" />
+    <Compile Include="Buffer\IBuffer.cs" />
+    <Compile Include="Buffer\IndexBuffer.cs" />
+    <Compile Include="Buffer\VertexBuffer.cs" />
+    <Compile Include="ColorManager.cs" />
+    <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="GDI\FunctionRenderer.cs" />
+    <Compile Include="GDI\ImageRenderer.cs" />
+    <Compile Include="GDI\LayerRenderer.cs" />
+    <Compile Include="GDI\MeshRenderer.cs" />
+    <Compile Include="GDI\Native\GradientFillMode.cs" />
+    <Compile Include="GDI\Native\GradientRect.cs" />
+    <Compile Include="GDI\Native\GradientTriangle.cs" />
+    <Compile Include="GDI\Native\NativeMethods.cs" />
+    <Compile Include="GDI\Native\TriVertex.cs" />
+    <Compile Include="GDI\RenderControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="IRenderContext.cs" />
+    <Compile Include="IRenderControl.cs" />
+    <Compile Include="IRenderer.cs" />
+    <Compile Include="IRenderLayer.cs" />
+    <Compile Include="Projection.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RenderContext.cs" />
+    <Compile Include="RenderLayer.cs" />
+    <Compile Include="RenderManager.cs" />
+    <Compile Include="Text\EdgeIterator.cs" />
+    <Compile Include="Text\EpsDocument.cs" />
+    <Compile Include="Text\EpsImage.cs" />
+    <Compile Include="Text\FormattingStreamWriter.cs" />
+    <Compile Include="Text\PageSize.cs" />
+    <Compile Include="Text\SvgImage.cs" />
+    <Compile Include="Util\BufferHelper.cs" />
+    <Compile Include="Util\ColorMap.cs" />
+    <Compile Include="Util\ReflectionHelper.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Triangle\Triangle.csproj">
+      <Project>{f7907a0a-b75f-400b-9e78-bfad00db4d6b}</Project>
+      <Name>Triangle</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -11,7 +11,7 @@ namespace TriangleNet.IO
     using System.IO;
     using System.IO.Compression;
     using System.Text;
-    using TriangleNet.Data;
+    using TriangleNet.Topology;
     using TriangleNet.Geometry;
 
     /// <summary>
@@ -129,7 +129,7 @@ namespace TriangleNet.IO
             }
         }
 
-        private void WriteGeometry(InputGeometry geometry)
+        private void WriteGeometry(IPolygon geometry)
         {
             stream.WriteLine("#!G{0}", this.iteration++);
         }
@@ -157,7 +157,7 @@ namespace TriangleNet.IO
                 foreach (var v in mesh.vertices.Values)
                 {
                     // Vertex number, x and y coordinates and marker.
-                    stream.WriteLine("{0} {1} {2} {3}", v.hash, v.x.ToString(nfi), v.y.ToString(nfi), v.mark);
+                    stream.WriteLine("{0} {1} {2} {3}", v.id, v.x.ToString(nfi), v.y.ToString(nfi), v.label);
                 }
             }
             else
@@ -184,7 +184,7 @@ namespace TriangleNet.IO
                 p2 = subseg.Dest();
 
                 // Segment number, indices of its two endpoints, and marker.
-                stream.WriteLine("{0} {1} {2} {3}", subseg.seg.hash, p1.hash, p2.hash, subseg.seg.boundary);
+                stream.WriteLine("{0} {1} {2} {3}", subseg.seg.hash, p1.id, p2.id, subseg.seg.boundary);
             }
 
             Otri tri = default(Otri), trisym = default(Otri);
@@ -195,32 +195,32 @@ namespace TriangleNet.IO
             // Number of triangles.
             stream.WriteLine("{0}", mesh.triangles.Count);
 
-            foreach (var item in mesh.triangles.Values)
+            foreach (var item in mesh.triangles)
             {
-                tri.triangle = item;
+                tri.tri = item;
 
                 p1 = tri.Org();
                 p2 = tri.Dest();
                 p3 = tri.Apex();
 
-                h1 = (p1 == null) ? -1 : p1.hash;
-                h2 = (p2 == null) ? -1 : p2.hash;
-                h3 = (p3 == null) ? -1 : p3.hash;
+                h1 = (p1 == null) ? -1 : p1.id;
+                h2 = (p2 == null) ? -1 : p2.id;
+                h3 = (p3 == null) ? -1 : p3.id;
 
                 // Triangle number, indices for three vertices.
-                stream.Write("{0} {1} {2} {3}", tri.triangle.hash, h1, h2, h3);
+                stream.Write("{0} {1} {2} {3}", tri.tri.hash, h1, h2, h3);
 
                 tri.orient = 1;
                 tri.Sym(ref trisym);
-                n1 = trisym.triangle.hash;
+                n1 = trisym.tri.hash;
 
                 tri.orient = 2;
                 tri.Sym(ref trisym);
-                n2 = trisym.triangle.hash;
+                n2 = trisym.tri.hash;
 
                 tri.orient = 0;
                 tri.Sym(ref trisym);
-                n3 = trisym.triangle.hash;
+                n3 = trisym.tri.hash;
 
                 // Neighboring triangle numbers.
                 stream.WriteLine(" {0} {1} {2}", n1, n2, n3);

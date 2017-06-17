@@ -8,60 +8,85 @@ namespace TriangleNet.IO
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using TriangleNet.Geometry;
     using System.IO;
+    using TriangleNet.Geometry;
+    using TriangleNet.Meshing;
 
     /// <summary>
     /// Implements geometry and mesh file formats of the the original Triangle code.
     /// </summary>
-    public class TriangleFormat : IGeometryFormat, IMeshFormat
+    public class TriangleFormat : IPolygonFormat, IMeshFormat
     {
-        public Mesh Import(string filename)
+        public bool IsSupported(string file)
+        {
+            string ext = Path.GetExtension(file).ToLower();
+
+            if (ext == ".node" || ext == ".poly" || ext == ".ele")
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public IMesh Import(string filename)
         {
             string ext = Path.GetExtension(filename);
 
             if (ext == ".node" || ext == ".poly" || ext == ".ele")
             {
                 List<ITriangle> triangles;
-                InputGeometry geometry;
+                Polygon geometry;
 
-                FileReader.Read(filename, out geometry, out triangles);
+                (new TriangleReader()).Read(filename, out geometry, out triangles);
 
                 if (geometry != null && triangles != null)
                 {
-                    Mesh mesh = new Mesh();
-                    mesh.Load(geometry, triangles);
-
-                    return mesh;
+                    return Converter.ToMesh(geometry, triangles.ToArray());
                 }
             }
 
             throw new NotSupportedException("Could not load '" + filename + "' file.");
         }
 
-        public void Write(Mesh mesh, string filename)
+        public void Write(IMesh mesh, string filename)
         {
-            FileWriter.WritePoly(mesh, Path.ChangeExtension(filename, ".poly"));
-            FileWriter.WriteElements(mesh, Path.ChangeExtension(filename, ".ele"));
+            var writer = new TriangleWriter();
+
+            writer.WritePoly((Mesh)mesh, Path.ChangeExtension(filename, ".poly"));
+            writer.WriteElements((Mesh)mesh, Path.ChangeExtension(filename, ".ele"));
         }
 
-        public InputGeometry Read(string filename)
+        public void Write(IMesh mesh, Stream stream)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IPolygon Read(string filename)
         {
             string ext = Path.GetExtension(filename);
 
             if (ext == ".node")
             {
-                return FileReader.ReadNodeFile(filename);
+                return (new TriangleReader()).ReadNodeFile(filename);
             }
-            
-            if (ext == ".poly")
+            else if (ext == ".poly")
             {
-                return FileReader.ReadPolyFile(filename);
+                return (new TriangleReader()).ReadPolyFile(filename);
             }
 
             throw new NotSupportedException("File format '" + ext + "' not supported.");
+        }
+
+
+        public void Write(IPolygon polygon, string filename)
+        {
+            (new TriangleWriter()).WritePoly(polygon, filename);
+        }
+
+        public void Write(IPolygon polygon, Stream stream)
+        {
+            throw new NotImplementedException();
         }
     }
 }

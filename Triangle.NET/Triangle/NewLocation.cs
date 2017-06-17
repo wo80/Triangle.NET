@@ -8,12 +8,12 @@
 namespace TriangleNet
 {
     using System;
-    using TriangleNet.Data;
+    using TriangleNet.Topology;
     using TriangleNet.Geometry;
     using TriangleNet.Tools;
 
     /// <summary>
-    /// Find new Steiner Point locations.
+    /// Find new Steiner point locations.
     /// </summary>
     /// <remarks>
     /// http://www.cise.ufl.edu/~ungor/aCute/index.html
@@ -22,37 +22,59 @@ namespace TriangleNet
     {
         const double EPS = 1e-50;
 
+        IPredicates predicates;
+
         Mesh mesh;
         Behavior behavior;
 
-        public NewLocation(Mesh mesh)
+        // Work arrays for wegde intersection
+        double[] petalx = new double[20];
+        double[] petaly = new double[20];
+        double[] petalr = new double[20];
+        double[] wedges = new double[500];
+        double[] initialConvexPoly = new double[500];
+
+        // Work arrays for smoothing
+        double[] points_p = new double[500];
+        double[] points_q = new double[500];
+        double[] points_r = new double[500];
+
+        // Work arrays for convex polygon split
+        double[] poly1 = new double[100];
+        double[] poly2 = new double[100];
+        double[][] polys = new double[3][];
+
+        public NewLocation(Mesh mesh, IPredicates predicates)
         {
             this.mesh = mesh;
+            this.predicates = predicates;
+
             this.behavior = mesh.behavior;
         }
 
         /// <summary>
         /// Find a new location for a Steiner point.
         /// </summary>
-        /// <param name="torg"></param>
-        /// <param name="tdest"></param>
-        /// <param name="tapex"></param>
+        /// <param name="org"></param>
+        /// <param name="dest"></param>
+        /// <param name="apex"></param>
         /// <param name="xi"></param>
         /// <param name="eta"></param>
         /// <param name="offcenter"></param>
         /// <param name="badotri"></param>
         /// <returns></returns>
-        public Point FindLocation(Vertex torg, Vertex tdest, Vertex tapex,
+        public Point FindLocation(Vertex org, Vertex dest, Vertex apex,
             ref double xi, ref double eta, bool offcenter, Otri badotri)
         {
             // Based on using -U switch, call the corresponding function
             if (behavior.MaxAngle == 0.0)
             {
-                return FindNewLocationWithoutMaxAngle(torg, tdest, tapex, ref xi, ref eta, true, badotri);
+                // Disable the "no max angle" code. It may return weired vertex locations.
+                return FindNewLocationWithoutMaxAngle(org, dest, apex, ref xi, ref eta, true, badotri);
             }
 
             // With max angle
-            return FindNewLocation(torg, tdest, tapex, ref xi, ref eta, true, badotri);
+            return FindNewLocation(org, dest, apex, ref xi, ref eta, true, badotri);
         }
 
         /// <summary>
@@ -80,7 +102,7 @@ namespace TriangleNet
 
             ////////////////////////////// HALE'S VARIABLES //////////////////////////////
             // keeps the difference of coordinates edge 
-            double xShortestEdge = 0, yShortestEdge = 0, xMiddleEdge, yMiddleEdge, xLongestEdge, yLongestEdge;
+            double xShortestEdge = 0, yShortestEdge = 0;
 
             // keeps the square of edge lengths
             double shortestEdgeDist = 0, middleEdgeDist = 0, longestEdgeDist = 0;
@@ -161,7 +183,7 @@ namespace TriangleNet
                 // Use the counterclockwise() routine to ensure a positive (and
                 //   reasonably accurate) result, avoiding any possibility of
                 //   division by zero.
-                denominator = 0.5 / Primitives.CounterClockwise(tdest, tapex, torg);
+                denominator = 0.5 / predicates.CounterClockwise(tdest, tapex, torg);
                 // Don't count the above as an orientation test.
                 Statistic.CounterClockwiseCount--;
             }
@@ -197,8 +219,6 @@ namespace TriangleNet
                     /// smallest angle corner: dest
                     /// largest angle corner: apex
                     xShortestEdge = xao; yShortestEdge = yao;
-                    xMiddleEdge = xda; yMiddleEdge = yda;
-                    xLongestEdge = xdo; yLongestEdge = ydo;
 
                     shortestEdgeDist = aodist;
                     middleEdgeDist = dadist;
@@ -213,8 +233,6 @@ namespace TriangleNet
                     /// smallest angle corner: dest
                     /// largest angle corner: org
                     xShortestEdge = xao; yShortestEdge = yao;
-                    xMiddleEdge = xdo; yMiddleEdge = ydo;
-                    xLongestEdge = xda; yLongestEdge = yda;
 
                     shortestEdgeDist = aodist;
                     middleEdgeDist = dodist;
@@ -229,8 +247,6 @@ namespace TriangleNet
                     /// smallest angle corner: org
                     /// largest angle corner: apex
                     xShortestEdge = xda; yShortestEdge = yda;
-                    xMiddleEdge = xao; yMiddleEdge = yao;
-                    xLongestEdge = xdo; yLongestEdge = ydo;
 
                     shortestEdgeDist = dadist;
                     middleEdgeDist = aodist;
@@ -244,8 +260,6 @@ namespace TriangleNet
                     /// smallest angle corner: org
                     /// largest angle corner: dest
                     xShortestEdge = xda; yShortestEdge = yda;
-                    xMiddleEdge = xdo; yMiddleEdge = ydo;
-                    xLongestEdge = xao; yLongestEdge = yao;
 
                     shortestEdgeDist = dadist;
                     middleEdgeDist = dodist;
@@ -259,8 +273,6 @@ namespace TriangleNet
                     /// smallest angle corner: apex
                     /// largest angle corner: org
                     xShortestEdge = xdo; yShortestEdge = ydo;
-                    xMiddleEdge = xao; yMiddleEdge = yao;
-                    xLongestEdge = xda; yLongestEdge = yda;
 
                     shortestEdgeDist = dodist;
                     middleEdgeDist = aodist;
@@ -275,8 +287,6 @@ namespace TriangleNet
                     /// smallest angle corner: apex
                     /// largest angle corner: dest
                     xShortestEdge = xdo; yShortestEdge = ydo;
-                    xMiddleEdge = xda; yMiddleEdge = yda;
-                    xLongestEdge = xao; yLongestEdge = yao;
 
                     shortestEdgeDist = dodist;
                     middleEdgeDist = dadist;
@@ -394,12 +404,12 @@ namespace TriangleNet
                             break;
                         case 2:
                             //printf("Relocate: (%f,%f)\n", tdest[0],tdest[1]);			
-                            delotri.LnextSelf();
+                            delotri.Lnext();
                             mesh.DeleteVertex(ref delotri);
                             break;
                         case 3:
                             //printf("Relocate: (%f,%f)\n", tapex[0],tapex[1]);						
-                            delotri.LprevSelf();
+                            delotri.Lprev();
                             mesh.DeleteVertex(ref delotri);
                             break;
 
@@ -456,7 +466,7 @@ namespace TriangleNet
                         neighborvertex_2 = neighborotri.Dest();
                         neighborvertex_3 = neighborotri.Apex();
                         // now calculate neighbor's circumcenter which is the voronoi site
-                        neighborCircumcenter = Primitives.FindCircumcenter(neighborvertex_1, neighborvertex_2, neighborvertex_3,
+                        neighborCircumcenter = predicates.FindCircumcenter(neighborvertex_1, neighborvertex_2, neighborvertex_3,
                             ref xi_tmp, ref eta_tmp);
 
                         /// compute petal and Voronoi edge intersection ///
@@ -587,7 +597,7 @@ namespace TriangleNet
                         neighborvertex_2 = neighborotri.Dest();
                         neighborvertex_3 = neighborotri.Apex();
                         // now calculate neighbor's circumcenter which is the voronoi site
-                        neighborCircumcenter = Primitives.FindCircumcenter(neighborvertex_1, neighborvertex_2, neighborvertex_3,
+                        neighborCircumcenter = predicates.FindCircumcenter(neighborvertex_1, neighborvertex_2, neighborvertex_3,
                             ref xi_tmp, ref eta_tmp);
 
                         /// compute petal and Voronoi edge intersection ///
@@ -780,7 +790,7 @@ namespace TriangleNet
 
             ////////////////////////////// HALE'S VARIABLES //////////////////////////////
             // keeps the difference of coordinates edge 
-            double xShortestEdge = 0, yShortestEdge = 0, xMiddleEdge, yMiddleEdge, xLongestEdge, yLongestEdge;
+            double xShortestEdge = 0, yShortestEdge = 0;
 
             // keeps the square of edge lengths
             double shortestEdgeDist = 0, middleEdgeDist = 0, longestEdgeDist = 0;
@@ -874,7 +884,7 @@ namespace TriangleNet
                 // Use the counterclockwise() routine to ensure a positive (and
                 //   reasonably accurate) result, avoiding any possibility of
                 //   division by zero.
-                denominator = 0.5 / Primitives.CounterClockwise(tdest, tapex, torg);
+                denominator = 0.5 / predicates.CounterClockwise(tdest, tapex, torg);
                 // Don't count the above as an orientation test.
                 Statistic.CounterClockwiseCount--;
             }
@@ -910,8 +920,6 @@ namespace TriangleNet
                     /// smallest angle corner: dest
                     /// largest angle corner: apex
                     xShortestEdge = xao; yShortestEdge = yao;
-                    xMiddleEdge = xda; yMiddleEdge = yda;
-                    xLongestEdge = xdo; yLongestEdge = ydo;
 
                     shortestEdgeDist = aodist;
                     middleEdgeDist = dadist;
@@ -926,8 +934,6 @@ namespace TriangleNet
                     /// smallest angle corner: dest
                     /// largest angle corner: org
                     xShortestEdge = xao; yShortestEdge = yao;
-                    xMiddleEdge = xdo; yMiddleEdge = ydo;
-                    xLongestEdge = xda; yLongestEdge = yda;
 
                     shortestEdgeDist = aodist;
                     middleEdgeDist = dodist;
@@ -942,8 +948,6 @@ namespace TriangleNet
                     /// smallest angle corner: org
                     /// largest angle corner: apex
                     xShortestEdge = xda; yShortestEdge = yda;
-                    xMiddleEdge = xao; yMiddleEdge = yao;
-                    xLongestEdge = xdo; yLongestEdge = ydo;
 
                     shortestEdgeDist = dadist;
                     middleEdgeDist = aodist;
@@ -957,8 +961,6 @@ namespace TriangleNet
                     /// smallest angle corner: org
                     /// largest angle corner: dest
                     xShortestEdge = xda; yShortestEdge = yda;
-                    xMiddleEdge = xdo; yMiddleEdge = ydo;
-                    xLongestEdge = xao; yLongestEdge = yao;
 
                     shortestEdgeDist = dadist;
                     middleEdgeDist = dodist;
@@ -972,8 +974,6 @@ namespace TriangleNet
                     /// smallest angle corner: apex
                     /// largest angle corner: org
                     xShortestEdge = xdo; yShortestEdge = ydo;
-                    xMiddleEdge = xao; yMiddleEdge = yao;
-                    xLongestEdge = xda; yLongestEdge = yda;
 
                     shortestEdgeDist = dodist;
                     middleEdgeDist = aodist;
@@ -988,8 +988,6 @@ namespace TriangleNet
                     /// smallest angle corner: apex
                     /// largest angle corner: dest
                     xShortestEdge = xdo; yShortestEdge = ydo;
-                    xMiddleEdge = xda; yMiddleEdge = yda;
-                    xLongestEdge = xao; yLongestEdge = yao;
 
                     shortestEdgeDist = dodist;
                     middleEdgeDist = dadist;
@@ -1107,12 +1105,12 @@ namespace TriangleNet
                             break;
                         case 2:
                             //printf("Relocate: (%f,%f)\n", tdest[0],tdest[1]);			
-                            delotri.LnextSelf();
+                            delotri.Lnext();
                             mesh.DeleteVertex(ref delotri);
                             break;
                         case 3:
                             //printf("Relocate: (%f,%f)\n", tapex[0],tapex[1]);						
-                            delotri.LprevSelf();
+                            delotri.Lprev();
                             mesh.DeleteVertex(ref delotri);
                             break;
                     }
@@ -1217,7 +1215,7 @@ namespace TriangleNet
                         neighborvertex_2 = neighborotri.Dest();
                         neighborvertex_3 = neighborotri.Apex();
                         // now calculate neighbor's circumcenter which is the voronoi site
-                        neighborCircumcenter = Primitives.FindCircumcenter(neighborvertex_1, neighborvertex_2, neighborvertex_3,
+                        neighborCircumcenter = predicates.FindCircumcenter(neighborvertex_1, neighborvertex_2, neighborvertex_3,
                             ref xi_tmp, ref eta_tmp);
 
                         /// compute petal and Voronoi edge intersection ///						
@@ -1499,7 +1497,7 @@ namespace TriangleNet
                         neighborvertex_2 = neighborotri.Dest();
                         neighborvertex_3 = neighborotri.Apex();
                         // now calculate neighbor's circumcenter which is the voronoi site
-                        neighborCircumcenter = Primitives.FindCircumcenter(neighborvertex_1, neighborvertex_2, neighborvertex_3,
+                        neighborCircumcenter = predicates.FindCircumcenter(neighborvertex_1, neighborvertex_2, neighborvertex_3,
                             ref xi_tmp, ref eta_tmp);
 
                         /// compute petal and Voronoi edge intersection ///
@@ -2044,10 +2042,6 @@ namespace TriangleNet
             int flag1 = 0, flag2 = 0, flag3 = 0;
             bool newLocFound = false;
 
-            double[] points_p = new double[500];// keeps the points in a star of point p, q, r
-            double[] points_q = new double[500];
-            double[] points_r = new double[500];
-
             //vertex v1, v2, v3;	// for ccw test
             //double p1[2], p2[2], p3[2];
             //double temp[2];
@@ -2351,7 +2345,7 @@ namespace TriangleNet
                 badotri.Sym(ref neighbor);
                 // check if it is the one we are looking for by checking the corners			
                 // first check if the neighbor is nonexistent, since it can be on the border
-                if ((neighbor.triangle != Mesh.dummytri))
+                if (neighbor.tri.id != Mesh.DUMMY)
                 {
                     // then check if two wanted corners are also in this triangle
                     // take the vertices of the candidate neighbor		
@@ -2500,17 +2494,21 @@ namespace TriangleNet
 
             //double p[5];
 
-            double[] petalx = new double[2 * numpoints];
-            double[] petaly = new double[2 * numpoints];
-            double[] petalr = new double[2 * numpoints];
+            // Resize work arrays
+            if (2 * numpoints > petalx.Length)
+            {
+                petalx = new double[2 * numpoints];
+                petaly = new double[2 * numpoints];
+                petalr = new double[2 * numpoints];
+                wedges = new double[2 * numpoints * 16 + 36];
+            }
 
-            double[] wedges = new double[2000];
             double xmid, ymid, dist, x3, y3;
             double x_1, y_1, x_2, y_2, x_3, y_3, x_4, y_4, tempx, tempy;
             double ux, uy;
             double alpha;
             double[] p1 = new double[3];
-            double[] initialConvexPoly = new double[500];
+
             //double poly_points;
             int numpolypoints = 0;
 
@@ -2758,16 +2756,24 @@ namespace TriangleNet
 
             //double p[5];
 
-            double[] petalx = new double[2 * numpoints];
-            double[] petaly = new double[2 * numpoints];
-            double[] petalr = new double[2 * numpoints];
+            // Resize work arrays
+            if (2 * numpoints > petalx.Length)
+            {
+                petalx = new double[2 * numpoints];
+                petaly = new double[2 * numpoints];
+                petalr = new double[2 * numpoints];
+                wedges = new double[2 * numpoints * 20 + 40];
+            }
 
-            double[] wedges = new double[2000];
             double xmid, ymid, dist, x3, y3;
             double x_1, y_1, x_2, y_2, x_3, y_3, x_4, y_4, tempx, tempy, x_5, y_5, x_6, y_6;
             double ux, uy;
-            double[] p1 = new double[3], p2 = new double[3], p3 = new double[3], p4 = new double[3];
-            double[] initialConvexPoly = new double[500];
+
+            double[] p1 = new double[3];
+            double[] p2 = new double[3];
+            double[] p3 = new double[3];
+            double[] p4 = new double[3];
+
             //double poly_points;
             int numpolypoints = 0;
             int howManyPoints = 0;	// keeps the number of points used for representing the wedge
@@ -3378,18 +3384,13 @@ namespace TriangleNet
             double z, min, max;
             int i, j;
 
-            double[][] polys = new double[3][];
-            polys[0] = new double[2];
-            polys[1] = new double[2];
-            polys[2] = new double[2];
-
             int numpolys;
             double[] res = null;
             int count = 0;
             int intFound = 0;
             dx = x2 - x1;
             dy = y2 - y1;
-            numpolys = SplitConvexPolygon(numvertices, convexPoly, x1, y1, x2, y2, ref polys);
+            numpolys = SplitConvexPolygon(numvertices, convexPoly, x1, y1, x2, y2, polys);
 
             if (numpolys == 3)
             {
@@ -3399,8 +3400,8 @@ namespace TriangleNet
             {
                 for (i = 0; i < numpolys; i++)
                 {
-                    min = 99999999999999999;
-                    max = -99999999999999999;
+                    min = double.MaxValue;
+                    max = double.MinValue;
                     // compute the minimum and maximum of the
                     // third coordinate of the cross product		
                     for (j = 1; j <= 2 * polys[i][0] - 1; j = j + 2)
@@ -3450,7 +3451,7 @@ namespace TriangleNet
         /// <remarks>
         /// http://www.mathematik.uni-ulm.de/stochastik/lehre/ws03_04/rt/Geometry2D.ps
         /// </remarks>
-        private int SplitConvexPolygon(int numvertices, double[] convexPoly, double x1, double y1, double x2, double y2, ref double[][] polys)
+        private int SplitConvexPolygon(int numvertices, double[] convexPoly, double x1, double y1, double x2, double y2, double[][] polys)
         {
             // state = 0: before the first intersection (with the line)
             // state = 1: after the first intersection (with the line)
@@ -3458,11 +3459,7 @@ namespace TriangleNet
 
             int state = 0;
             double[] p = new double[3];
-            // poly1 is constructed in states 0 and 2
-            double[] poly1 = new double[100];
             int poly1counter = 0;
-            // poly2 is constructed in state 1
-            double[] poly2 = new double[100];
             int poly2counter = 0;
             int numpolys;
             int i;
@@ -3602,10 +3599,11 @@ namespace TriangleNet
             // (depending whether the polygon was splitted or not)
             if (state != 0 && state != 2)
             {
-                // 		printf("there is something wrong state: %d\n", state);
-                // 		printf("polygon might not be convex!!\n");
-                // 		printf("case1: %d\ncase2: %d\ncase3: %d\ncase31: %d case311: %d case3111: %d\ncase32: %d\ncase33: %d\n", case1, case2, case3, case31, case311, case3111, case32, case33);
-                // 		printf("numvertices %d\n=============\n", numvertices);
+                // printf("there is something wrong state: %d\n", state);
+                // printf("polygon might not be convex!!\n");
+                // printf("case1: %d\ncase2: %d\ncase3: %d\ncase31: %d case311: %d case3111: %d\ncase32: %d\ncase33: %d\n", case1, case2, case3, case31, case311, case3111, case32, case33);
+                // printf("numvertices %d\n=============\n", numvertices);
+
                 // if there is something wrong with the intersection, just ignore this one				
                 numpolys = 3;
             }
@@ -3938,10 +3936,10 @@ namespace TriangleNet
             double dxod, dyod, dxda, dyda, dxao, dyao;
             double dxod2, dyod2, dxda2, dyda2, dxao2, dyao2;
 
-            double apexlen, orglen, destlen, minedge;
+            double apexlen, orglen, destlen;
             double angle;    // in order to check minimum angle condition 
 
-            double maxangle, maxedge;    // in order to check minimum angle condition
+            double maxangle;    // in order to check minimum angle condition
             // calculate the side lengths
 
             dxod = x1 - x2;
@@ -3966,64 +3964,48 @@ namespace TriangleNet
             // try to find the minimum edge and accordingly the pqr orientation
             if ((apexlen < orglen) && (apexlen < destlen))
             {
-                // The edge opposite the apex is shortest.
-                minedge = apexlen;
                 // Find the square of the cosine of the angle at the apex.
                 angle = dxda * dxao + dyda * dyao;
                 angle = angle * angle / (orglen * destlen);
-
-
             }
             else if (orglen < destlen)
             {
-                // The edge opposite the origin is shortest.
-                minedge = orglen;
                 // Find the square of the cosine of the angle at the origin.
                 angle = dxod * dxao + dyod * dyao;
                 angle = angle * angle / (apexlen * destlen);
-
-
             }
             else
             {
-                // The edge opposite the destination is shortest.
-                minedge = destlen;
                 // Find the square of the cosine of the angle at the destination.
                 angle = dxod * dxda + dyod * dyda;
                 angle = angle * angle / (apexlen * orglen);
 
             }
+
             // try to find the maximum edge and accordingly the pqr orientation
             if ((apexlen > orglen) && (apexlen > destlen))
             {
-                // The edge opposite the apex is longest.
-                maxedge = apexlen;
                 // Find the cosine of the angle at the apex.
                 maxangle = (orglen + destlen - apexlen) / (2 * Math.Sqrt(orglen * destlen));
             }
             else if (orglen > destlen)
             {
-                // The edge opposite the origin is longest.
-                maxedge = orglen;
                 // Find the cosine of the angle at the origin.
                 maxangle = (apexlen + destlen - orglen) / (2 * Math.Sqrt(apexlen * destlen));
             }
             else
             {
-                // The edge opposite the destination is longest.
-                maxedge = destlen;
                 // Find the cosine of the angle at the destination.
                 maxangle = (apexlen + orglen - destlen) / (2 * Math.Sqrt(apexlen * orglen));
             }
-
 
             // Check whether the angle is smaller than permitted.
             if ((angle > behavior.goodAngle) || (behavior.MaxAngle != 0.00 && maxangle < behavior.maxGoodAngle))
             {
                 return true;// it is a bad triangle
             }
-            return false;// it is a good triangle
 
+            return false;// it is a good triangle
         }
 
         /// <summary>
@@ -4065,19 +4047,19 @@ namespace TriangleNet
             }
             else if ((tdest.x == newvertex.x) && (tdest.y == newvertex.y))
             {
-                searchtri.LnextSelf();
+                searchtri.Lnext();
                 intersect = LocateResult.OnVertex;
                 searchtri.Copy(ref horiz);
             }
             else
             {
                 // Orient 'searchtri' to fit the preconditions of calling preciselocate().
-                ahead = Primitives.CounterClockwise(torg, tdest, newvertex);
+                ahead = predicates.CounterClockwise(torg, tdest, newvertex);
                 if (ahead < 0.0)
                 {
                     // Turn around so that 'searchpoint' is to the left of the
-                    //   edge specified by 'searchtri'.
-                    searchtri.SymSelf();
+                    // edge specified by 'searchtri'.
+                    searchtri.Sym();
                     searchtri.Copy(ref horiz);
                     intersect = mesh.locator.PreciseLocate(newvertex, ref horiz, false);
                 }

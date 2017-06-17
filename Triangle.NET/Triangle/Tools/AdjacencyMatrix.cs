@@ -1,5 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="AdjacencyMatrix.cs" company="">
+// Original Matlab code by John Burkardt, Florida State University
 // Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
 // </copyright>
 // -----------------------------------------------------------------------
@@ -7,49 +8,76 @@
 namespace TriangleNet.Tools
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
 
     /// <summary>
     /// The adjacency matrix of the mesh.
     /// </summary>
     public class AdjacencyMatrix
     {
-        // Number of nodes in the mesh.
-        int node_num;
-
         // Number of adjacency entries.
-        int adj_num;
+        int nnz;
 
         // Pointers into the actual adjacency structure adj. Information about row k is
-        // stored in entries adj_row(k) through adj_row(k+1)-1 of adj. Size: node_num + 1
-        int[] adj_row;
+        // stored in entries pcol(k) through pcol(k+1)-1 of adj. Size: N + 1
+        int[] pcol;
 
         // The adjacency structure. For each row, it contains the column indices 
-        // of the nonzero entries. Size: adj_num
-        int[] adj;
+        // of the nonzero entries. Size: nnz
+        int[] irow;
 
-        public int[] AdjacencyRow
+        /// <summary>
+        /// Gets the number of columns (nodes of the mesh).
+        /// </summary>
+        public readonly int N;
+
+        /// <summary>
+        /// Gets the column pointers.
+        /// </summary>
+        public int[] ColumnPointers
         {
-            get { return adj_row; }
+            get { return pcol; }
         }
 
-        public int[] Adjacency
+        /// <summary>
+        /// Gets the row indices.
+        /// </summary>
+        public int[] RowIndices
         {
-            get { return adj; }
+            get { return irow; }
         }
 
         public AdjacencyMatrix(Mesh mesh)
         {
-            this.node_num = mesh.vertices.Count;
+            this.N = mesh.vertices.Count;
 
             // Set up the adj_row adjacency pointer array.
-            this.adj_row = AdjacencyCount(mesh);
-            this.adj_num = adj_row[node_num] - 1;
+            this.pcol = AdjacencyCount(mesh);
+            this.nnz = pcol[N];
 
             // Set up the adj adjacency array.
-            this.adj = AdjacencySet(mesh, this.adj_row);
+            this.irow = AdjacencySet(mesh, this.pcol);
+
+            SortIndices();
+        }
+
+        public AdjacencyMatrix(int[] pcol, int[] irow)
+        {
+            this.N = pcol.Length - 1;
+
+            this.nnz = pcol[N];
+
+            this.pcol = pcol;
+            this.irow = irow;
+
+            if (pcol[0] != 0)
+            {
+                throw new ArgumentException("Expected 0-based indexing.", "pcol");
+            }
+
+            if (irow.Length < nnz)
+            {
+                throw new ArgumentException();
+            }
         }
 
         /// <summary>
@@ -66,11 +94,11 @@ namespace TriangleNet.Tools
             band_lo = 0;
             band_hi = 0;
 
-            for (i = 0; i < node_num; i++)
+            for (i = 0; i < N; i++)
             {
-                for (j = adj_row[i]; j <= adj_row[i + 1] - 1; j++)
+                for (j = pcol[i]; j < pcol[i + 1]; j++)
                 {
-                    col = adj[j - 1];
+                    col = irow[j];
                     band_lo = Math.Max(band_lo, i - col);
                     band_hi = Math.Max(band_hi, col - i);
                 }
@@ -93,129 +121,23 @@ namespace TriangleNet.Tools
         ///
         /// Two nodes are "adjacent" if they are both nodes in some triangle.
         /// Also, a node is considered to be adjacent to itself.
-        ///
-        /// Diagram:
-        ///
-        ///       3
-        ///    s  |\
-        ///    i  | \
-        ///    d  |  \
-        ///    e  |   \  side 1
-        ///       |    \
-        ///    2  |     \
-        ///       |      \
-        ///       1-------2
-        ///
-        ///         side 3
         /// </remarks>
         int[] AdjacencyCount(Mesh mesh)
         {
-            int i;
-            int node;
+            int n = N;
             int n1, n2, n3;
-            int tri_id;
-            int neigh_id;
+            int tid, nid;
 
-            int[] adj_rows = new int[node_num + 1];
+            int[] pcol = new int[n + 1];
 
             // Set every node to be adjacent to itself.
-            for (node = 0; node < node_num; node++)
+            for (int i = 0; i < n; i++)
             {
-                adj_rows[node] = 1;
+                pcol[i] = 1;
             }
 
             // Examine each triangle.
-            foreach (var tri in mesh.triangles.Values)
-            {
-                tri_id = tri.id;
-
-                n1 = tri.vertices[0].id;
-                n2 = tri.vertices[1].id;
-                n3 = tri.vertices[2].id;
-
-                // Add edge (1,2) if this is the first occurrence, that is, if 
-                // the edge (1,2) is on a boundary (nid <= 0) or if this triangle
-                // is the first of the pair in which the edge occurs (tid < nid).
-                neigh_id = tri.neighbors[2].triangle.id;
-
-                if (neigh_id < 0 || tri_id < neigh_id)
-                {
-                    adj_rows[n1] += 1;
-                    adj_rows[n2] += 1;
-                }
-
-                // Add edge (2,3).
-                neigh_id = tri.neighbors[0].triangle.id;
-
-                if (neigh_id < 0 || tri_id < neigh_id)
-                {
-                    adj_rows[n2] += 1;
-                    adj_rows[n3] += 1;
-                }
-
-                // Add edge (3,1).
-                neigh_id = tri.neighbors[1].triangle.id;
-
-                if (neigh_id < 0 || tri_id < neigh_id)
-                {
-                    adj_rows[n3] += 1;
-                    adj_rows[n1] += 1;
-                }
-            }
-
-            // We used ADJ_COL to count the number of entries in each column.
-            // Convert it to pointers into the ADJ array.
-            for (node = node_num; 1 <= node; node--)
-            {
-                adj_rows[node] = adj_rows[node - 1];
-            }
-
-            adj_rows[0] = 1;
-            for (i = 1; i <= node_num; i++)
-            {
-                adj_rows[i] = adj_rows[i - 1] + adj_rows[i];
-            }
-
-            return adj_rows;
-        }
-
-        /// <summary>
-        /// Sets adjacencies in a triangulation.
-        /// </summary>
-        /// <remarks>
-        /// This routine can be used to create the compressed column storage
-        /// for a linear triangle finite element discretization of Poisson's
-        /// equation in two dimensions.
-        /// </remarks>
-        int[] AdjacencySet(Mesh mesh, int[] rows)
-        {
-            // Output list, stores the actual adjacency information.
-            int[] list;
-
-            // Copy of the adjacency rows input.
-            int[] rowsCopy = new int[node_num];
-            Array.Copy(rows, rowsCopy, node_num);
-
-            int i, n = rows[node_num] - 1;
-
-            list = new int[n];
-            for (i = 0; i < n; i++)
-            {
-                list[i] = -1;
-            }
-
-            // Set every node to be adjacent to itself.
-            for (i = 0; i < node_num; i++)
-            {
-                list[rowsCopy[i] - 1] = i;
-                rowsCopy[i] += 1;
-            }
-
-            int n1, n2, n3; // Vertex numbers.
-            int tid, nid; // Triangle and neighbor id.
-
-            // Examine each triangle.
-            foreach (var tri in mesh.triangles.Values)
+            foreach (var tri in mesh.triangles)
             {
                 tid = tri.id;
 
@@ -226,177 +148,136 @@ namespace TriangleNet.Tools
                 // Add edge (1,2) if this is the first occurrence, that is, if 
                 // the edge (1,2) is on a boundary (nid <= 0) or if this triangle
                 // is the first of the pair in which the edge occurs (tid < nid).
-                nid = tri.neighbors[2].triangle.id;
+                nid = tri.neighbors[2].tri.id;
 
                 if (nid < 0 || tid < nid)
                 {
-                    list[rowsCopy[n1] - 1] = n2;
-                    rowsCopy[n1] += 1;
-                    list[rowsCopy[n2] - 1] = n1;
-                    rowsCopy[n2] += 1;
+                    pcol[n1] += 1;
+                    pcol[n2] += 1;
                 }
 
                 // Add edge (2,3).
-                nid = tri.neighbors[0].triangle.id;
+                nid = tri.neighbors[0].tri.id;
 
                 if (nid < 0 || tid < nid)
                 {
-                    list[rowsCopy[n2] - 1] = n3;
-                    rowsCopy[n2] += 1;
-                    list[rowsCopy[n3] - 1] = n2;
-                    rowsCopy[n3] += 1;
+                    pcol[n2] += 1;
+                    pcol[n3] += 1;
                 }
 
                 // Add edge (3,1).
-                nid = tri.neighbors[1].triangle.id;
+                nid = tri.neighbors[1].tri.id;
 
                 if (nid < 0 || tid < nid)
                 {
-                    list[rowsCopy[n1] - 1] = n3;
-                    rowsCopy[n1] += 1;
-                    list[rowsCopy[n3] - 1] = n1;
-                    rowsCopy[n3] += 1;
+                    pcol[n3] += 1;
+                    pcol[n1] += 1;
                 }
             }
 
-            int k1, k2;
-
-            // Ascending sort the entries for each node.
-            for (i = 0; i < node_num; i++)
+            // We used PCOL to count the number of entries in each column.
+            // Convert it to pointers into the ADJ array.
+            for (int i = n; i > 0; i--)
             {
-                k1 = rows[i];
-                k2 = rows[i + 1] - 1;
-                HeapSort(list, k1 - 1, k2 + 1 - k1);
+                pcol[i] = pcol[i - 1];
+            }
+
+            pcol[0] = 0;
+            for (int i = 1; i <= n; i++)
+            {
+                pcol[i] = pcol[i - 1] + pcol[i];
+            }
+
+            return pcol;
+        }
+
+        /// <summary>
+        /// Sets adjacencies in a triangulation.
+        /// </summary>
+        /// <remarks>
+        /// This routine can be used to create the compressed column storage
+        /// for a linear triangle finite element discretization of Poisson's
+        /// equation in two dimensions.
+        /// </remarks>
+        int[] AdjacencySet(Mesh mesh, int[] pcol)
+        {
+            int n = this.N;
+
+            int[] col = new int[n];
+
+            // Copy of the adjacency rows input.
+            Array.Copy(pcol, col, n);
+
+            int i, nnz = pcol[n];
+
+            // Output list, stores the actual adjacency information.
+            int[] list = new int[nnz];
+
+            // Set every node to be adjacent to itself.
+            for (i = 0; i < n; i++)
+            {
+                list[col[i]] = i;
+                col[i] += 1;
+            }
+
+            int n1, n2, n3; // Vertex numbers.
+            int tid, nid; // Triangle and neighbor id.
+
+            // Examine each triangle.
+            foreach (var tri in mesh.triangles)
+            {
+                tid = tri.id;
+
+                n1 = tri.vertices[0].id;
+                n2 = tri.vertices[1].id;
+                n3 = tri.vertices[2].id;
+
+                // Add edge (1,2) if this is the first occurrence, that is, if 
+                // the edge (1,2) is on a boundary (nid <= 0) or if this triangle
+                // is the first of the pair in which the edge occurs (tid < nid).
+                nid = tri.neighbors[2].tri.id;
+
+                if (nid < 0 || tid < nid)
+                {
+                    list[col[n1]++] = n2;
+                    list[col[n2]++] = n1;
+                }
+
+                // Add edge (2,3).
+                nid = tri.neighbors[0].tri.id;
+
+                if (nid < 0 || tid < nid)
+                {
+                    list[col[n2]++] = n3;
+                    list[col[n3]++] = n2;
+                }
+
+                // Add edge (3,1).
+                nid = tri.neighbors[1].tri.id;
+
+                if (nid < 0 || tid < nid)
+                {
+                    list[col[n1]++] = n3;
+                    list[col[n3]++] = n1;
+                }
             }
 
             return list;
         }
 
-        #endregion
-
-        #region Heap sort
-
-        /// <summary>
-        /// Reorders an array of integers into a descending heap.
-        /// </summary>
-        /// <param name="size">the size of the input array.</param>
-        /// <param name="a">an unsorted array.</param>
-        /// <remarks>
-        /// A heap is an array A with the property that, for every index J,
-        /// A[J] >= A[2*J+1] and A[J] >= A[2*J+2], (as long as the indices
-        /// 2*J+1 and 2*J+2 are legal).
-        ///
-        /// Diagram:
-        ///
-        ///                  A(0)
-        ///                /      \
-        ///            A(1)         A(2)
-        ///          /     \        /  \
-        ///      A(3)       A(4)  A(5) A(6)
-        ///      /  \       /   \
-        ///    A(7) A(8)  A(9) A(10)
-        /// </remarks>
-        private void CreateHeap(int[] a, int offset, int size)
+        public void SortIndices()
         {
-            int i;
-            int ifree;
-            int key;
-            int m;
+            int k1, k2, n = N;
 
-            // Only nodes (N/2)-1 down to 0 can be "parent" nodes.
-            for (i = (size / 2) - 1; 0 <= i; i--)
+            int[] list = this.irow;
+
+            // Ascending sort the entries for each column.
+            for (int i = 0; i < n; i++)
             {
-                // Copy the value out of the parent node.
-                // Position IFREE is now "open".
-                key = a[offset + i];
-                ifree = i;
-
-                for (; ; )
-                {
-                    // Positions 2*IFREE + 1 and 2*IFREE + 2 are the descendants of position
-                    // IFREE.  (One or both may not exist because they equal or exceed N.)
-                    m = 2 * ifree + 1;
-
-                    // Does the first position exist?
-                    if (size <= m)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        // Does the second position exist?
-                        if (m + 1 < size)
-                        {
-                            // If both positions exist, take the larger of the two values,
-                            // and update M if necessary.
-                            if (a[offset + m] < a[offset + m + 1])
-                            {
-                                m = m + 1;
-                            }
-                        }
-
-                        // If the large descendant is larger than KEY, move it up,
-                        // and update IFREE, the location of the free position, and
-                        // consider the descendants of THIS position.
-                        if (key < a[offset + m])
-                        {
-                            a[offset + ifree] = a[offset + m];
-                            ifree = m;
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                }
-
-                // When you have stopped shifting items up, return the item you
-                // pulled out back to the heap.
-                a[offset + ifree] = key;
+                k1 = pcol[i];
+                k2 = pcol[i + 1];
+                Array.Sort(list, k1, k2 - k1);
             }
-
-            return;
-        }
-
-
-        /// <summary>
-        /// ascending sorts an array of integers using heap sort.
-        /// </summary>
-        /// <param name="size">Number of entries in the array.</param>
-        /// <param name="a">Array to be sorted;</param>
-        private void HeapSort(int[] a, int offset, int size)
-        {
-            int n1;
-            int temp;
-
-            if (size <= 1)
-            {
-                return;
-            }
-
-            // 1: Put A into descending heap form.
-            CreateHeap(a, offset, size);
-
-            // 2: Sort A.
-            // The largest object in the heap is in A[0].
-            // Move it to position A[N-1].
-            temp = a[offset];
-            a[offset] = a[offset + size - 1];
-            a[offset + size - 1] = temp;
-
-            // Consider the diminished heap of size N1.
-            for (n1 = size - 1; 2 <= n1; n1--)
-            {
-                // Restore the heap structure of the initial N1 entries of A.
-                CreateHeap(a, offset, n1);
-
-                // Take the largest object from A[0] and move it to A[N1-1].
-                temp = a[offset];
-                a[offset] = a[offset + n1 - 1];
-                a[offset + n1 - 1] = temp;
-            }
-
-            return;
         }
 
         #endregion

@@ -8,9 +8,6 @@
 namespace TriangleNet.Tools
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using TriangleNet.Geometry;
 
     /// <summary>
@@ -182,7 +179,7 @@ namespace TriangleNet.Tools
 
             int n = 0;
 
-            foreach (var tri in mesh.triangles.Values)
+            foreach (var tri in mesh.triangles)
             {
                 n++;
 
@@ -247,7 +244,7 @@ namespace TriangleNet.Tools
 
             int gi, gj;
 
-            foreach (var tri in mesh.triangles.Values)
+            foreach (var tri in mesh.triangles)
             {
                 for (int j = 0; j < 3; j++)
                 {

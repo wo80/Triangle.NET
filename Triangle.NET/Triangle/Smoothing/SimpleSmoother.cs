@@ -6,12 +6,10 @@
 
 namespace TriangleNet.Smoothing
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using TriangleNet.Geometry;
-    using TriangleNet.Tools;
+    using TriangleNet.Meshing;
+    using TriangleNet.Topology.DCEL;
+    using TriangleNet.Voronoi;
 
     /// <summary>
     /// Simple mesh smoother implementation.
@@ -22,85 +20,151 @@ namespace TriangleNet.Smoothing
     /// </remarks>
     public class SimpleSmoother : ISmoother
     {
-        Mesh mesh;
+        TrianglePool pool;
+        Configuration config;
 
-        public SimpleSmoother(Mesh mesh)
+        IVoronoiFactory factory;
+
+        ConstraintOptions options;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SimpleSmoother" /> class.
+        /// </summary>
+        public SimpleSmoother()
+            : this(new VoronoiFactory())
         {
-            this.mesh = mesh;
         }
 
-        public void Smooth()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SimpleSmoother" /> class.
+        /// </summary>
+        public SimpleSmoother(IVoronoiFactory factory)
         {
-            mesh.behavior.Quality = false;
+            this.factory = factory;
+            this.pool = new TrianglePool();
 
-            // Take a few smoothing rounds.
-            for (int i = 0; i < 5; i++)
+            this.config = new Configuration(
+                () => RobustPredicates.Default,
+                () => pool.Restart());
+
+            this.options = new ConstraintOptions() { ConformingDelaunay = true };
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SimpleSmoother" /> class.
+        /// </summary>
+        /// <param name="factory">Voronoi object factory.</param>
+        /// <param name="config">Configuration.</param>
+        public SimpleSmoother(IVoronoiFactory factory, Configuration config)
+        {
+            this.factory = factory;
+            this.config = config;
+
+            this.options = new ConstraintOptions() { ConformingDelaunay = true };
+        }
+
+        public void Smooth(IMesh mesh)
+        {
+            Smooth(mesh, 10);
+        }
+
+        public void Smooth(IMesh mesh, int limit)
+        {
+            var smoothedMesh = (Mesh)mesh;
+
+            var mesher = new GenericMesher(config);
+            var predicates = config.Predicates();
+
+            // The smoother should respect the mesh segment splitting behavior.
+            this.options.SegmentSplitting = smoothedMesh.behavior.NoBisect;
+
+            // Take a few smoothing rounds (Lloyd's algorithm).
+            for (int i = 0; i < limit; i++)
             {
-                Step();
+                Step(smoothedMesh, factory, predicates);
 
-                // Actually, we only want to rebuild, if mesh is no longer
+                // Actually, we only want to rebuild, if the mesh is no longer
                 // Delaunay. Flipping edges could be the right choice instead 
                 // of re-triangulating...
-                mesh.Triangulate(Rebuild());
+                smoothedMesh = (Mesh)mesher.Triangulate(Rebuild(smoothedMesh), options);
+
+                factory.Reset();
+            }
+
+            smoothedMesh.CopyTo((Mesh)mesh);
+        }
+
+        private void Step(Mesh mesh, IVoronoiFactory factory, IPredicates predicates)
+        {
+            var voronoi = new BoundedVoronoi(mesh, factory, predicates);
+
+            double x, y;
+
+            foreach (var face in voronoi.Faces)
+            {
+                if (face.generator.label == 0)
+                {
+                    Centroid(face, out x, out y);
+
+                    face.generator.x = x;
+                    face.generator.y = y;
+                }
             }
         }
 
         /// <summary>
-        /// Smooth all free nodes.
+        /// Calculate the centroid of a polygon.
         /// </summary>
-        private void Step()
+        private void Centroid(Face face, out double x, out double y)
         {
-            BoundedVoronoi voronoi = new BoundedVoronoi(this.mesh, false);
+            double ai, atmp = 0, xtmp = 0, ytmp = 0;
 
-            var cells = voronoi.Regions;
+            var edge = face.Edge;
+            var first = edge.Next.ID;
 
-            double x, y;
-            int n;
+            Point p, q;
 
-            foreach (var cell in cells)
+            do
             {
-                n = 0;
-                x = y = 0.0;
-                foreach (var p in cell.Vertices)
-                {
-                    n++;
-                    x += p.x;
-                    y += p.y;
-                }
+                p = edge.Origin;
+                q = edge.Twin.Origin;
 
-                cell.Generator.x = x / n;
-                cell.Generator.y = y / n;
-            }
+                ai = p.x * q.y - q.x * p.y;
+                atmp += ai;
+                xtmp += (q.x + p.x) * ai;
+                ytmp += (q.y + p.y) * ai;
+
+                edge = edge.Next;
+
+            } while (edge.Next.ID != first);
+
+            x = xtmp / (3 * atmp);
+            y = ytmp / (3 * atmp);
+
+            //area = atmp / 2;
         }
 
         /// <summary>
         /// Rebuild the input geometry.
         /// </summary>
-        private InputGeometry Rebuild()
+        private Polygon Rebuild(Mesh mesh)
         {
-            InputGeometry geometry = new InputGeometry(mesh.vertices.Count);
+            var data = new Polygon(mesh.vertices.Count);
 
-            foreach (var vertex in mesh.vertices.Values)
+            foreach (var v in mesh.vertices.Values)
             {
-                geometry.AddPoint(vertex.x, vertex.y, vertex.mark);
+                // Reset to input vertex.
+                v.type = VertexType.InputVertex;
+
+                data.Points.Add(v);
             }
 
-            foreach (var segment in mesh.subsegs.Values)
-            {
-                geometry.AddSegment(segment.P0, segment.P1, segment.Boundary);
-            }
+            data.Segments.AddRange(mesh.subsegs.Values);
 
-            foreach (var hole in mesh.holes)
-            {
-                geometry.AddHole(hole.x, hole.y);
-            }
+            data.Holes.AddRange(mesh.holes);
+            data.Regions.AddRange(mesh.regions);
 
-            foreach (var region in mesh.regions)
-            {
-                geometry.AddRegion(region.point.x, region.point.y, region.id);
-            }
-
-            return geometry;
+            return data;
         }
     }
 }

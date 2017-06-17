@@ -1,0 +1,198 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{336AAF8A-5316-4303-9E73-5E38BD0B28AF}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MeshExplorer</RootNamespace>
+    <AssemblyName>Mesh Explorer</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Controls\ColorScheme.cs" />
+    <Compile Include="Controls\DarkButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\DarkCheckBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\AngleHistogram.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\DarkListBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\DarkSlider.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\DarkTabControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\DarkTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\DarkToolStripRenderer.cs" />
+    <Compile Include="DarkMessageBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormExport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormExport.Designer.cs">
+      <DependentUpon>FormExport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormGenerator.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormGenerator.Designer.cs">
+      <DependentUpon>FormGenerator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormLog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormLog.Designer.cs">
+      <DependentUpon>FormLog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormMain.Designer.cs">
+      <DependentUpon>FormMain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormTopology.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormTopology.Designer.cs">
+      <DependentUpon>FormTopology.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\BaseGenerator.cs" />
+    <Compile Include="Generators\BoxWithHole.cs" />
+    <Compile Include="Generators\CircleWithHole.cs" />
+    <Compile Include="Generators\IGenerator.cs" />
+    <Compile Include="Generators\RandomPoints.cs" />
+    <Compile Include="Generators\RandomPointsCircle.cs" />
+    <Compile Include="Generators\RingPolygon.cs" />
+    <Compile Include="Generators\StarInBox.cs" />
+    <Compile Include="GenericEventArgs.cs" />
+    <Compile Include="IO\FileProcessor.cs" />
+    <Compile Include="IO\Formats\JsonFile.cs" />
+    <Compile Include="IO\Formats\TriangleFile.cs" />
+    <Compile Include="IO\ImageWriter.cs" />
+    <Compile Include="IO\IMeshFile.cs" />
+    <Compile Include="IO\JsonParser.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="Topology\TopologyControlView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Topology\TopologyControlView.Designer.cs">
+      <DependentUpon>TopologyControlView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Topology\TopologyRenderControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Topology\TopologyRenderer.cs" />
+    <Compile Include="Util.cs" />
+    <Compile Include="Views\AboutView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Views\AboutView.Designer.cs">
+      <DependentUpon>AboutView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\IView.cs" />
+    <Compile Include="Views\MeshControlView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Views\MeshControlView.Designer.cs">
+      <DependentUpon>MeshControlView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\StatisticView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Views\StatisticView.Designer.cs">
+      <DependentUpon>StatisticView.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="FormExport.resx">
+      <DependentUpon>FormExport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormGenerator.resx">
+      <DependentUpon>FormGenerator.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormLog.resx">
+      <DependentUpon>FormLog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormMain.resx">
+      <DependentUpon>FormMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormTopology.resx">
+      <DependentUpon>FormTopology.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Topology\TopologyControlView.resx">
+      <DependentUpon>TopologyControlView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\AboutView.resx">
+      <DependentUpon>AboutView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\MeshControlView.resx">
+      <DependentUpon>MeshControlView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\StatisticView.resx">
+      <DependentUpon>StatisticView.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Triangle.Rendering\Triangle.Rendering.csproj">
+      <Project>{41022e0e-bd0f-439e-bc3a-aabb1b43471b}</Project>
+      <Name>Triangle.Rendering</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Triangle\Triangle.csproj">
+      <Project>{F7907A0A-B75F-400B-9E78-BFAD00DB4D6B}</Project>
+      <Name>Triangle</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

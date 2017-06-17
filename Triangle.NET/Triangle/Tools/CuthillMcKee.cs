@@ -8,24 +8,13 @@
 namespace TriangleNet.Tools
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using TriangleNet.Log;
 
     /// <summary>
     /// Applies the Cuthill and McKee renumbering algorithm to reduce the bandwidth of
     /// the adjacency matrix associated with the mesh.
     /// </summary>
-    /// <remarks>
-    /// Some useful slides:
-    /// http://bobbyness.net/NerdyStuff/node%20ordering/node_ordering.html
-    /// </remarks>
     public class CuthillMcKee
     {
-        // Number of nodes in the mesh.
-        int node_num;
-
         // The adjacency matrix of the mesh.
         AdjacencyMatrix matrix;
 
@@ -36,65 +25,47 @@ namespace TriangleNet.Tools
         /// <returns>Permutation vector.</returns>
         public int[] Renumber(Mesh mesh)
         {
-            int bandwidth1, bandwidth2;
-
-            this.node_num = mesh.vertices.Count;
-
             // Algorithm needs linear numbering of the nodes.
             mesh.Renumber(NodeNumbering.Linear);
 
-            // Set up the adj_row adjacency pointer array.
-            matrix = new AdjacencyMatrix(mesh);
+            return Renumber(new AdjacencyMatrix(mesh));
+        }
 
-            bandwidth1 = matrix.Bandwidth();
+        /// <summary>
+        /// Gets the permutation vector for the Reverse Cuthill-McKee numbering.
+        /// </summary>
+        /// <param name="mesh">The mesh.</param>
+        /// <returns>Permutation vector.</returns>
+        public int[] Renumber(AdjacencyMatrix matrix)
+        {
+            this.matrix = matrix;
+
+            int bandwidth1 = matrix.Bandwidth();
+
+            var pcol = matrix.ColumnPointers;
+
+            // Adjust column pointers (1-based indexing).
+            Shift(pcol, true);
+
+            // TODO: Make RCM work with 0-based matrix.
 
             // Compute the RCM permutation.
             int[] perm = GenerateRcm();
 
-            int[] perm_inv = PermInverse(node_num, perm);
+            int[] perm_inv = PermInverse(perm);
 
-            bandwidth2 = PermBandwidth(perm, perm_inv);
+            int bandwidth2 = PermBandwidth(perm, perm_inv);
 
-            if (Behavior.Verbose)
+            if (Log.Verbose)
             {
-                SimpleLog.Instance.Info(String.Format("Reverse Cuthill-McKee (Bandwidth: {0} > {1})",
+                Log.Instance.Info(String.Format("Reverse Cuthill-McKee (Bandwidth: {0} > {1})",
                     bandwidth1, bandwidth2));
             }
 
+            // Adjust column pointers (0-based indexing).
+            Shift(pcol, false);
+
             return perm_inv;
-        }
-
-        /// <summary>
-        /// Computes the bandwidth of a permuted adjacency matrix.
-        /// </summary>
-        /// <param name="perm">The permutation.</param>
-        /// <param name="perm_inv">The inverse permutation.</param>
-        /// <returns>Bandwidth of the permuted adjacency matrix.</returns>
-        /// <remarks>
-        /// The matrix is defined by the adjacency information and a permutation.  
-        /// The routine also computes the bandwidth and the size of the envelope.
-        /// </remarks>
-        int PermBandwidth(int[] perm, int[] perm_inv)
-        {
-            int[] adj_row = matrix.AdjacencyRow;
-            int[] adj = matrix.Adjacency;
-
-            int col, i, j;
-
-            int band_lo = 0;
-            int band_hi = 0;
-
-            for (i = 0; i < node_num; i++)
-            {
-                for (j = adj_row[perm[i]]; j <= adj_row[perm[i] + 1] - 1; j++)
-                {
-                    col = perm_inv[adj[j - 1]];
-                    band_lo = Math.Max(band_lo, i - col);
-                    band_hi = Math.Max(band_hi, col - i);
-                }
-            }
-
-            return band_lo + 1 + band_hi;
         }
 
         #region RCM
@@ -109,7 +80,10 @@ namespace TriangleNet.Tools
         /// </remarks>
         int[] GenerateRcm()
         {
-            int[] perm = new int[node_num];
+            // Number of nodes in the mesh.
+            int n = matrix.N;
+
+            int[] perm = new int[n];
 
             int i, num, root;
             int iccsze = 0;
@@ -117,19 +91,19 @@ namespace TriangleNet.Tools
 
             /// Index vector for a level structure. The level structure is stored in the
             /// currently unused  spaces in the permutation vector PERM.
-            int[] level_row = new int[node_num + 1];
+            int[] level_row = new int[n + 1];
 
             /// Marks variables that have been numbered.
-            int[] mask = new int[node_num];
+            int[] mask = new int[n];
 
-            for (i = 0; i < node_num; i++)
+            for (i = 0; i < n; i++)
             {
                 mask[i] = 1;
             }
 
             num = 1;
 
-            for (i = 0; i < node_num; i++)
+            for (i = 0; i < n; i++)
             {
                 // For each masked connected component...
                 if (mask[i] != 0)
@@ -146,7 +120,7 @@ namespace TriangleNet.Tools
                     num += iccsze;
 
                     // We can stop once every node is in one of the connected components.
-                    if (node_num < num)
+                    if (n < num)
                     {
                         return perm;
                     }
@@ -183,8 +157,8 @@ namespace TriangleNet.Tools
         /// </remarks>
         void Rcm(int root, int[] mask, int[] perm, int offset, ref int iccsze)
         {
-            int[] adj_row = matrix.AdjacencyRow;
-            int[] adj = matrix.Adjacency;
+            int[] pcol = matrix.ColumnPointers;
+            int[] irow = matrix.RowIndices;
 
             int fnbr;
             int i, j, k, l;
@@ -192,9 +166,12 @@ namespace TriangleNet.Tools
             int lbegin, lnbr, lperm, lvlend;
             int nbr, node;
 
+            // Number of nodes in the mesh.
+            int n = matrix.N;
+
             /// Workspace, int DEG[NODE_NUM], a temporary vector used to hold 
             /// the degree of the nodes in the section graph specified by mask and root.
-            int[] deg = new int[node_num];
+            int[] deg = new int[n];
 
             // Find the degrees of the nodes in the component specified by MASK and ROOT.
             Degree(root, mask, deg, ref iccsze, perm, offset);
@@ -220,8 +197,8 @@ namespace TriangleNet.Tools
                 {
                     // For each node in the current level...
                     node = perm[offset + i - 1];
-                    jstrt = adj_row[node];
-                    jstop = adj_row[node + 1] - 1;
+                    jstrt = pcol[node];
+                    jstop = pcol[node + 1] - 1;
 
                     // Find the unnumbered neighbors of NODE.
 
@@ -231,7 +208,7 @@ namespace TriangleNet.Tools
 
                     for (j = jstrt; j <= jstop; j++)
                     {
-                        nbr = adj[j - 1];
+                        nbr = irow[j - 1];
 
                         if (mask[nbr] != 0)
                         {
@@ -334,11 +311,11 @@ namespace TriangleNet.Tools
         ///    ACM Transactions on Mathematical Software,
         ///    Volume 2, pages 378-387, 1976.
         /// </remarks>
-        void FindRoot(ref int root, int[] mask, ref int level_num, int[] level_row, 
+        void FindRoot(ref int root, int[] mask, ref int level_num, int[] level_row,
             int[] level, int offset)
         {
-            int[] adj_row = matrix.AdjacencyRow;
-            int[] adj = matrix.Adjacency;
+            int[] pcol = matrix.ColumnPointers;
+            int[] irow = matrix.RowIndices;
 
             int iccsze;
             int j, jstrt;
@@ -380,12 +357,12 @@ namespace TriangleNet.Tools
                     {
                         node = level[offset + j - 1];
                         ndeg = 0;
-                        kstrt = adj_row[node - 1];
-                        kstop = adj_row[node] - 1;
+                        kstrt = pcol[node - 1];
+                        kstop = pcol[node] - 1;
 
                         for (k = kstrt; k <= kstop; k++)
                         {
-                            nghbor = adj[k - 1];
+                            nghbor = irow[k - 1];
                             if (mask[nghbor] > 0)
                             {
                                 ndeg += 1;
@@ -447,11 +424,11 @@ namespace TriangleNet.Tools
         ///    Computer Solution of Large Sparse Positive Definite Systems,
         ///    Prentice Hall, 1981.
         /// </remarks>
-        void GetLevelSet(ref int root, int[] mask, ref int level_num, int[] level_row, 
+        void GetLevelSet(ref int root, int[] mask, ref int level_num, int[] level_row,
             int[] level, int offset)
         {
-            int[] adj_row = matrix.AdjacencyRow;
-            int[] adj = matrix.Adjacency;
+            int[] pcol = matrix.ColumnPointers;
+            int[] irow = matrix.RowIndices;
 
             int i, iccsze;
             int j, jstop, jstrt;
@@ -479,12 +456,12 @@ namespace TriangleNet.Tools
                 for (i = lbegin; i <= lvlend; i++)
                 {
                     node = level[offset + i - 1];
-                    jstrt = adj_row[node];
-                    jstop = adj_row[node + 1] - 1;
+                    jstrt = pcol[node];
+                    jstop = pcol[node + 1] - 1;
 
                     for (j = jstrt; j <= jstop; j++)
                     {
-                        nbr = adj[j - 1];
+                        nbr = irow[j - 1];
 
                         if (mask[nbr] != 0)
                         {
@@ -537,18 +514,18 @@ namespace TriangleNet.Tools
         /// </remarks>
         void Degree(int root, int[] mask, int[] deg, ref int iccsze, int[] ls, int offset)
         {
-            int[] adj_row = matrix.AdjacencyRow;
-            int[] adj = matrix.Adjacency;
+            int[] pcol = matrix.ColumnPointers;
+            int[] irow = matrix.RowIndices;
 
             int i, ideg;
             int j, jstop, jstrt;
             int lbegin, lvlend;
             int lvsize = 1;
-            int nghbr, node;
+            int nbr, node;
 
             // The sign of ADJ_ROW(I) is used to indicate if node I has been considered.
             ls[offset] = root;
-            adj_row[root] = -adj_row[root];
+            pcol[root] = -pcol[root];
             lvlend = 0;
             iccsze = 1;
 
@@ -565,23 +542,23 @@ namespace TriangleNet.Tools
                 for (i = lbegin; i <= lvlend; i++)
                 {
                     node = ls[offset + i - 1];
-                    jstrt = -adj_row[node];
-                    jstop = Math.Abs(adj_row[node + 1]) - 1;
+                    jstrt = -pcol[node];
+                    jstop = Math.Abs(pcol[node + 1]) - 1;
                     ideg = 0;
 
                     for (j = jstrt; j <= jstop; j++)
                     {
-                        nghbr = adj[j - 1];
+                        nbr = irow[j - 1];
 
-                        if (mask[nghbr] != 0) // EDIT: [nbr - 1]
+                        if (mask[nbr] != 0) // EDIT: [nbr - 1]
                         {
                             ideg = ideg + 1;
 
-                            if (0 <= adj_row[nghbr]) // EDIT: [nbr - 1]
+                            if (0 <= pcol[nbr]) // EDIT: [nbr - 1]
                             {
-                                adj_row[nghbr] = -adj_row[nghbr]; // EDIT: [nbr - 1]
+                                pcol[nbr] = -pcol[nbr]; // EDIT: [nbr - 1]
                                 iccsze = iccsze + 1;
-                                ls[offset + iccsze - 1] = nghbr;
+                                ls[offset + iccsze - 1] = nbr;
                             }
                         }
                     }
@@ -596,7 +573,7 @@ namespace TriangleNet.Tools
             for (i = 0; i < iccsze; i++)
             {
                 node = ls[offset + i];
-                adj_row[node] = -adj_row[node];
+                pcol[node] = -pcol[node];
             }
 
             return;
@@ -607,18 +584,53 @@ namespace TriangleNet.Tools
         #region Tools
 
         /// <summary>
+        /// Computes the bandwidth of a permuted adjacency matrix.
+        /// </summary>
+        /// <param name="perm">The permutation.</param>
+        /// <param name="perm_inv">The inverse permutation.</param>
+        /// <returns>Bandwidth of the permuted adjacency matrix.</returns>
+        /// <remarks>
+        /// The matrix is defined by the adjacency information and a permutation.  
+        /// The routine also computes the bandwidth and the size of the envelope.
+        /// </remarks>
+        int PermBandwidth(int[] perm, int[] perm_inv)
+        {
+            int[] pcol = matrix.ColumnPointers;
+            int[] irow = matrix.RowIndices;
+
+            int col, i, j;
+
+            int band_lo = 0;
+            int band_hi = 0;
+
+            int n = matrix.N;
+
+            for (i = 0; i < n; i++)
+            {
+                for (j = pcol[perm[i]]; j < pcol[perm[i] + 1]; j++)
+                {
+                    col = perm_inv[irow[j - 1]];
+                    band_lo = Math.Max(band_lo, i - col);
+                    band_hi = Math.Max(band_hi, col - i);
+                }
+            }
+
+            return band_lo + 1 + band_hi;
+        }
+
+        /// <summary>
         /// Produces the inverse of a given permutation.
         /// </summary>
         /// <param name="n">Number of items permuted.</param>
         /// <param name="perm">PERM[N], a permutation.</param>
         /// <returns>The inverse permutation.</returns>
-        int[] PermInverse(int n, int[] perm)
+        int[] PermInverse(int[] perm)
         {
-            int[] perm_inv = new int[node_num];
+            int n = matrix.N;
 
-            int i;
+            int[] perm_inv = new int[n];
 
-            for (i = 0; i < n; i++)
+            for (int i = 0; i < n; i++)
             {
                 perm_inv[perm[i]] = i;
             }
@@ -652,6 +664,20 @@ namespace TriangleNet.Tools
             }
 
             return;
+        }
+
+        void Shift(int[] a, bool up)
+        {
+            int length = a.Length;
+
+            if (up)
+            {
+                for (int i = 0; i < length; a[i]++, i++) ;
+            }
+            else
+            {
+                for (int i = 0; i < length; a[i]--, i++) ;
+            }
         }
 
         #endregion

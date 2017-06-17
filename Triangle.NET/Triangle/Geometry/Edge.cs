@@ -6,16 +6,10 @@
 
 namespace TriangleNet.Geometry
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using TriangleNet.Data;
-
     /// <summary>
     /// Represents a straight line segment in 2D space.
     /// </summary>
-    public class Edge
+    public class Edge : IEdge
     {
         /// <summary>
         /// Gets the first endpoints index.
@@ -38,7 +32,7 @@ namespace TriangleNet.Geometry
         /// <summary>
         /// Gets the segments boundary mark.
         /// </summary>
-        public int Boundary
+        public int Label
         {
             get;
             private set;
@@ -54,11 +48,11 @@ namespace TriangleNet.Geometry
         /// <summary>
         /// Initializes a new instance of the <see cref="Edge" /> class.
         /// </summary>
-        public Edge(int p0, int p1, int boundary)
+        public Edge(int p0, int p1, int label)
         {
             this.P0 = p0;
             this.P1 = p1;
-            this.Boundary = boundary;
+            this.Label = label;
         }
     }
 }

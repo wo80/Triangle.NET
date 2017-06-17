@@ -6,7 +6,7 @@
 
 namespace TriangleNet.Geometry
 {
-    using TriangleNet.Data;
+    using TriangleNet.Topology;
 
     /// <summary>
     /// Triangle interface.
@@ -14,70 +14,56 @@ namespace TriangleNet.Geometry
     public interface ITriangle
     {
         /// <summary>
-        /// The triangle id.
+        /// Gets or sets the triangle ID.
         /// </summary>
-        int ID { get; }
+        int ID { get; set; }
 
         /// <summary>
-        /// First vertex id of the triangle.
+        /// Gets or sets a general-purpose label.
         /// </summary>
-        int P0 { get; }
-        /// <summary>
-        /// Second vertex id of the triangle.
-        /// </summary>
-        int P1 { get; }
-        /// <summary>
-        /// Third vertex id of the triangle.
-        /// </summary>
-        int P2 { get; }
+        /// <remarks>
+        /// This is used for region information.
+        /// </remarks>
+        int Label { get; set; }
 
         /// <summary>
-        /// Gets a triangles vertex.
-        /// </summary>
-        /// <param name="index">The vertex index (0, 1 or 2).</param>
-        /// <returns>The vertex of the specified corner index.</returns>
-        Vertex GetVertex(int index);
-
-        /// <summary>
-        /// True if the triangle implementation contains neighbor information.
-        /// </summary>
-        bool SupportsNeighbors { get; }
-
-        /// <summary>
-        /// First neighbor.
-        /// </summary>
-        int N0 { get; }
-        /// <summary>
-        /// Second neighbor.
-        /// </summary>
-        int N1 { get; }
-        /// <summary>
-        /// Third neighbor.
-        /// </summary>
-        int N2 { get; }
-
-        /// <summary>
-        /// Gets a triangles neighbor.
-        /// </summary>
-        /// <param name="index">The vertex index (0, 1 or 2).</param>
-        /// <returns>The neigbbor opposite of vertex with given index.</returns>
-        ITriangle GetNeighbor(int index);
-
-        /// <summary>
-        /// Gets a triangles segment.
-        /// </summary>
-        /// <param name="index">The vertex index (0, 1 or 2).</param>
-        /// <returns>The segment opposite of vertex with given index.</returns>
-        ISegment GetSegment(int index);
-
-        /// <summary>
-        /// Triangle area constraint.
+        /// Gets or sets the triangle area constraint.
         /// </summary>
         double Area { get; set; }
 
         /// <summary>
-        /// Region ID the triangle belongs to.
+        /// Gets the vertex at given index.
         /// </summary>
-        int Region { get; }
+        /// <param name="index">The local index (0, 1 or 2).</param>
+        /// <returns>The vertex.</returns>
+        Vertex GetVertex(int index);
+
+        /// <summary>
+        /// Gets the ID of the vertex at given index.
+        /// </summary>
+        /// <param name="index">The local index (0, 1 or 2).</param>
+        /// <returns>The vertex ID.</returns>
+        int GetVertexID(int index);
+
+        /// <summary>
+        /// Gets the neighbor triangle at given index.
+        /// </summary>
+        /// <param name="index">The local index (0, 1 or 2).</param>
+        /// <returns>The neighbor triangle.</returns>
+        ITriangle GetNeighbor(int index);
+
+        /// <summary>
+        /// Gets the ID of the neighbor triangle at given index.
+        /// </summary>
+        /// <param name="index">The local index (0, 1 or 2).</param>
+        /// <returns>The neighbor triangle ID.</returns>
+        int GetNeighborID(int index);
+
+        /// <summary>
+        /// Gets the segment at given index.
+        /// </summary>
+        /// <param name="index">The local index (0, 1 or 2).</param>
+        /// <returns>The segment.</returns>
+        ISegment GetSegment(int index);
     }
 }

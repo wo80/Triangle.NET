@@ -8,28 +8,25 @@
 namespace TriangleNet
 {
     using System;
-    using TriangleNet.Log;
+    using TriangleNet.Geometry;
 
     /// <summary>
     /// Controls the behavior of the meshing software.
     /// </summary>
-    public class Behavior
+    class Behavior
     {
-        #region Class members
-
         bool poly = false;
         bool quality = false;
         bool varArea = false;
-        bool usertest = false;
         bool convex = false;
         bool jettison = false;
         bool boundaryMarkers = true;
         bool noHoles = false;
         bool conformDel = false;
-        TriangulationAlgorithm algorithm = TriangulationAlgorithm.Dwyer;
+
+        Func<ITriangle, double, bool> usertest;
 
         int noBisect = 0;
-        int steiner = -1;
 
         double minAngle = 0.0;
         double maxAngle = 0.0;
@@ -41,8 +38,6 @@ namespace TriangleNet
         internal double goodAngle = 0.0;
         internal double maxGoodAngle = 0.0;
         internal double offconstant = 0.0;
-
-        #endregion
 
         /// <summary>
         /// Creates an instance of the Behavior class.
@@ -70,15 +65,15 @@ namespace TriangleNet
                 this.minAngle = 0;
                 this.quality = false;
 
-                SimpleLog.Instance.Warning("Invalid quality option (minimum angle).", "Mesh.Behavior");
+                Log.Instance.Warning("Invalid quality option (minimum angle).", "Mesh.Behavior");
             }
 
-            if ((this.maxAngle != 0.0) && this.maxAngle < 90 || this.maxAngle > 180)
+            if ((this.maxAngle != 0.0) && (this.maxAngle < 60 || this.maxAngle > 180))
             {
                 this.maxAngle = 0;
                 this.quality = false;
 
-                SimpleLog.Instance.Warning("Invalid quality option (maximum angle).", "Mesh.Behavior");
+                Log.Instance.Warning("Invalid quality option (maximum angle).", "Mesh.Behavior");
             }
 
             this.useSegments = this.Poly || this.Quality || this.Convex;
@@ -103,11 +98,6 @@ namespace TriangleNet
         /// No exact arithmetic.
         /// </summary>
         public static bool NoExact { get; set; }
-
-        /// <summary>
-        /// Log detailed information.
-        /// </summary>
-        public static bool Verbose { get; set; }
 
         #endregion
 
@@ -156,7 +146,7 @@ namespace TriangleNet
             set
             {
                 maxArea = value;
-                fixedArea = value > 0;
+                fixedArea = value > 0.0;
             }
         }
 
@@ -181,7 +171,7 @@ namespace TriangleNet
         /// <summary>
         /// Apply a user-defined triangle constraint.
         /// </summary>
-        public bool Usertest
+        public Func<ITriangle, double, bool> UserTest
         {
             get { return usertest; }
             set { usertest = value; }
@@ -206,15 +196,6 @@ namespace TriangleNet
         }
 
         /// <summary>
-        /// Algorithm to use for triangulation.
-        /// </summary>
-        public TriangulationAlgorithm Algorithm
-        {
-            get { return algorithm; }
-            set { algorithm = value; }
-        }
-
-        /// <summary>
         /// Suppresses boundary segment splitting.
         /// </summary>
         /// <remarks>
@@ -233,15 +214,6 @@ namespace TriangleNet
                     noBisect = 0;
                 }
             }
-        }
-
-        /// <summary>
-        /// Use maximum number of Steiner points.
-        /// </summary>
-        public int SteinerPoints
-        {
-            get { return steiner; }
-            set { steiner = value; }
         }
 
         /// <summary>
