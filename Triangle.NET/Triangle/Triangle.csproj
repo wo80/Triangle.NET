@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{F7907A0A-B75F-400B-9E78-BFAD00DB4D6B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>TriangleNet</RootNamespace>
+    <AssemblyName>Triangle</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Algorithm\ITriangulator.cs" />
+    <Compile Include="BadTriQueue.cs" />
+    <Compile Include="Behavior.cs" />
+    <Compile Include="Carver.cs" />
+    <Compile Include="Data\BadSubseg.cs" />
+    <Compile Include="Data\BadTriangle.cs" />
+    <Compile Include="Data\Osub.cs" />
+    <Compile Include="Data\Otri.cs" />
+    <Compile Include="Data\Segment.cs" />
+    <Compile Include="Data\Triangle.cs" />
+    <Compile Include="Data\Vertex.cs" />
+    <Compile Include="Algorithm\Dwyer.cs" />
+    <Compile Include="Geometry\BoundingBox.cs" />
+    <Compile Include="Geometry\Edge.cs" />
+    <Compile Include="Geometry\EdgeEnumerator.cs" />
+    <Compile Include="Geometry\InputGeometry.cs" />
+    <Compile Include="Geometry\ITriangle.cs" />
+    <Compile Include="Geometry\Point.cs" />
+    <Compile Include="Geometry\RegionPointer.cs" />
+    <Compile Include="Geometry\ISegment.cs" />
+    <Compile Include="IO\DataReader.cs" />
+    <Compile Include="IO\DebugWriter.cs" />
+    <Compile Include="IO\FileWriter.cs" />
+    <Compile Include="IO\IGeometryFormat.cs" />
+    <Compile Include="IO\IMeshFormat.cs" />
+    <Compile Include="IO\InputTriangle.cs" />
+    <Compile Include="IO\FileReader.cs" />
+    <Compile Include="IO\TriangleFormat.cs" />
+    <Compile Include="Log\ILog.cs" />
+    <Compile Include="Log\ILogItem.cs" />
+    <Compile Include="Log\SimpleLog.cs" />
+    <Compile Include="Log\SimpleLogItem.cs" />
+    <Compile Include="NewLocation.cs" />
+    <Compile Include="Quality.cs" />
+    <Compile Include="Enums.cs" />
+    <Compile Include="Algorithm\Incremental.cs" />
+    <Compile Include="Mesh.cs" />
+    <Compile Include="Primitives.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Sampler.cs" />
+    <Compile Include="Smoothing\ISmoother.cs" />
+    <Compile Include="Smoothing\SimpleSmoother.cs" />
+    <Compile Include="Tools\AdjacencyMatrix.cs" />
+    <Compile Include="Tools\BoundedVoronoi.cs" />
+    <Compile Include="Tools\CuthillMcKee.cs" />
+    <Compile Include="Tools\IVoronoi.cs" />
+    <Compile Include="Tools\QuadTree.cs" />
+    <Compile Include="Tools\QualityMeasure.cs" />
+    <Compile Include="Tools\RegionIterator.cs" />
+    <Compile Include="Tools\Statistic.cs" />
+    <Compile Include="Algorithm\SweepLine.cs" />
+    <Compile Include="Tools\Voronoi.cs" />
+    <Compile Include="Tools\VoronoiRegion.cs" />
+    <Compile Include="TriangleLocator.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
