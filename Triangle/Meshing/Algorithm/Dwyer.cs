@@ -47,7 +47,7 @@ namespace TriangleNet.Meshing.Algorithm
     public class Dwyer : ITriangulator
     {
         // Random is not threadsafe, so don't make this static.
-        Random rand = new Random(DateTime.Now.Millisecond);
+        // Random rand = new Random(DateTime.Now.Millisecond);
 
         IPredicates predicates;
 

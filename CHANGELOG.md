@@ -1,5 +1,10 @@
 Triangle.NET (Release)
 
+* beta 4.02
+
+	+ Contributions (to fix Unity compiler warnings) by [@eppz](https://github.com/eppz)
+		+ Supressed unused variable warning in `Dwyer.cs`
+
 * beta 4.01
 
 	+ Contributions (to fix Unity compiler errors) by [@eppz](https://github.com/eppz)
