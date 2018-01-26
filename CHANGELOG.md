@@ -1,5 +1,10 @@
 Triangle.NET (Release)
 
+
+* beta 4.03
+
+	+ Contributions (removed `AssemblyInfo.cs`)
+
 * beta 4.02
 
 	+ Contributions (to fix Unity compiler warnings) by [@eppz](https://github.com/eppz)
