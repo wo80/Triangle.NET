@@ -46,11 +46,11 @@ namespace TriangleNet.Meshing.Algorithm
     /// </remarks>
     public class Dwyer : ITriangulator
     {
-        // Random is not threadsafe, so don't make this static.
-        Random rand = new Random(DateTime.Now.Millisecond);
-
         IPredicates predicates;
 
+        /// <summary>
+        /// Gets or sets a value indicating whether to use alternating cuts (default = true).
+        /// </summary>
         public bool UseDwyer = true;
 
         Vertex[] sortarray;
