@@ -69,7 +69,7 @@ namespace TriangleNet.Geometry
         /// </summary>
         /// <param name="capacity">The default capacity for the points list.</param>
         public Polygon(int capacity)
-            : this(3, false)
+            : this(capacity, false)
         {
         }
 
