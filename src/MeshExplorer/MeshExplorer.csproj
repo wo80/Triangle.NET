@@ -6,44 +6,7 @@
     <OutDir>$(SolutionDir)bin\$(Configuration)</OutDir>
     <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Update="Controls\DarkButton.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Update="Controls\DarkCheckBox.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Update="Controls\AngleHistogram.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Update="Controls\DarkListBox.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Update="Controls\DarkSlider.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Update="Controls\DarkTabControl.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Update="Controls\DarkTextBox.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Update="Topology\TopologyControlView.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Update="Topology\TopologyRenderControl.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Update="Views\AboutView.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Update="Views\MeshControlView.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Update="Views\StatisticView.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Triangle.Rendering\Triangle.Rendering.csproj" />
     <ProjectReference Include="..\Triangle\Triangle.csproj" />
