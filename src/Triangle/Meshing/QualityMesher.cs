@@ -12,7 +12,6 @@ namespace TriangleNet.Meshing
     using TriangleNet.Geometry;
     using TriangleNet.Logging;
     using TriangleNet.Meshing.Data;
-    using TriangleNet.Tools;
     using TriangleNet.Topology;
 
     /// <summary>

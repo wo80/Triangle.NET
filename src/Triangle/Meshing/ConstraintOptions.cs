@@ -6,14 +6,6 @@ namespace TriangleNet.Meshing
     /// </summary>
     public class ConstraintOptions
     {
-        // TODO: remove ConstraintOptions.UseRegions
-
-        /// <summary>
-        /// Gets or sets a value indicating whether to use regions.
-        /// </summary>
-        [System.Obsolete("Not used anywhere, will be removed in beta 4.")]
-        public bool UseRegions { get; set; }
-
         /// <summary>
         /// Gets or sets a value indicating whether to create a Conforming
         /// Delaunay triangulation.

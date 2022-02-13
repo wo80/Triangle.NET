@@ -6,12 +6,10 @@
 
 namespace TriangleNet.Voronoi
 {
-    using System.Collections.Generic;
     using TriangleNet.Geometry;
     using TriangleNet.Tools;
     using TriangleNet.Topology.DCEL;
 
-    using HVertex = TriangleNet.Topology.DCEL.Vertex;
     using TVertex = TriangleNet.Geometry.Vertex;
 
     public class BoundedVoronoi : VoronoiBase
