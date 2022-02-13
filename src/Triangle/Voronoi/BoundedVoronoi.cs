@@ -119,6 +119,17 @@ namespace TriangleNet.Voronoi
             var e1 = edge.twin.next;
             var e2 = e1.twin.next;
 
+            // Check if the neighboring cell was closed before.
+            if (edge.twin.id != edge.twin.face.edge.id)
+            {
+                edge.twin.face.edge.next = e1;
+            }
+            else
+            {
+                // If the cell isn't closed yet, make sure to update the faces edge pointer.
+                e1.face.edge = e1;
+            }
+
             // Find the two intersections with boundary edge.
             IntersectionHelper.IntersectSegments(v1, v2, e1.origin, e1.twin.origin, ref p2);
             IntersectionHelper.IntersectSegments(v1, v2, e2.origin, e2.twin.origin, ref p1);
@@ -130,6 +141,7 @@ namespace TriangleNet.Voronoi
 
             e1.origin = edge.twin.origin;
 
+            // Dissolve edge from other edges (origin and face stay the same).
             edge.twin.twin = null;
             edge.twin = null;
 
@@ -137,8 +149,11 @@ namespace TriangleNet.Voronoi
             var gen = factory.CreateVertex(v1.x, v1.y);
             var he = factory.CreateHalfEdge(gen, edge.face);
 
+            gen.leaving = he;
+
             edge.next = he;
             he.next = edge.face.edge;
+            e2.twin.next = edge;
 
             // Let the face edge point to the edge leaving at generator.
             edge.face.edge = he;
