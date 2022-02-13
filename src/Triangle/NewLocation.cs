@@ -2290,6 +2290,12 @@ namespace TriangleNet
                     // now the second point is the neighbor's third vertex			
                     second_x = returnPoint[0];
                     second_y = returnPoint[1];
+
+                    if (numvertices == points.Length)
+                    {
+                        Array.Resize(ref points, numvertices * 2);
+                    }
+
                     // add a new point to the list of surrounding points
                     points[numvertices] = returnPoint[0];
                     numvertices++;
