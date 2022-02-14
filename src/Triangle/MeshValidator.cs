@@ -8,8 +8,11 @@
 namespace TriangleNet
 {
     using System;
-    using TriangleNet.Topology;
+    using System.Collections.Generic;
     using TriangleNet.Geometry;
+    using TriangleNet.Meshing;
+    using TriangleNet.Tools;
+    using TriangleNet.Topology;
 
     public static class MeshValidator
     {
@@ -18,6 +21,8 @@ namespace TriangleNet
         /// <summary>
         /// Test the mesh for topological consistency.
         /// </summary>
+        /// <param name="mesh">The mesh.</param>
+        /// <returns>True, if mesh is topologically consistent.</returns>
         public static bool IsConsistent(Mesh mesh)
         {
             Otri tri = default(Otri);
@@ -52,7 +57,7 @@ namespace TriangleNet
                         {
                             if (Log.Verbose)
                             {
-                                logger.Warning(String.Format("Triangle is flat or inverted (ID {0}).", t.id),
+                                logger.Warning(string.Format("Triangle is flat or inverted (ID {0}).", t.id),
                                     "MeshValidator.IsConsistent()");
                             }
 
@@ -112,16 +117,20 @@ namespace TriangleNet
         }
 
         /// <summary>
-        /// Check if the mesh is (conforming) Delaunay.
+        /// Check whether the mesh is (conforming) Delaunay.
         /// </summary>
+        /// <param name="mesh">The mesh.</param>
+        /// <returns>True, if mesh is (conforming) Delaunay.</returns>
         public static bool IsDelaunay(Mesh mesh)
         {
             return IsDelaunay(mesh, false);
         }
 
         /// <summary>
-        /// Check if that the mesh is (constrained) Delaunay.
+        /// Check whether the mesh is (constrained) Delaunay.
         /// </summary>
+        /// <param name="mesh">The mesh.</param>
+        /// <returns>True, if mesh is (constrained) Delaunay.</returns>
         public static bool IsConstrainedDelaunay(Mesh mesh)
         {
             return IsDelaunay(mesh, true);
@@ -195,7 +204,7 @@ namespace TriangleNet
                         {
                             if (Log.Verbose)
                             {
-                                logger.Warning(String.Format("Non-regular pair of triangles found (IDs {0}/{1}).",
+                                logger.Warning(string.Format("Non-regular pair of triangles found (IDs {0}/{1}).",
                                     loop.tri.id, oppotri.tri.id), "MeshValidator.IsDelaunay()");
                             }
 
@@ -210,6 +219,44 @@ namespace TriangleNet
             Behavior.NoExact = saveexact;
 
             return (horrors == 0);
+        }
+
+        /// <summary>
+        /// Check whether the mesh has degenerate boundary triangles.
+        /// </summary>
+        /// <param name="mesh">The mesh.</param>
+        /// <param name="threshold">Threshold for what angle is considered invalid (too small).</param>
+        /// <returns></returns>
+        public static IEnumerable<ITriangle> GetDegenerateBoundaryTriangles(IMesh mesh, double threshold = 1e-8)
+        {
+            // We will compare against the squared cosine of the maximum angle.
+            threshold = Math.Sqrt(threshold);
+
+            var data = new double[6];
+
+            foreach (var triangle in mesh.Triangles)
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    var neighbor = triangle.GetNeighbor(i);
+
+                    // Triangle lies on mesh boundary.
+                    if (neighbor == null)
+                    {
+                        Statistic.ComputeAngles(triangle, data);
+                        
+                        // The squared cosine of the maximum angle will be near 1.0 only
+                        // if the maximum angle is near 180 degrees.
+                        if (Math.Abs(1.0 - data[1]) < threshold)
+                        {
+                            yield return triangle;
+                        }
+
+                        // Next triangle.
+                        break;
+                    }
+                }
+            }
         }
     }
 }
