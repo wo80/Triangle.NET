@@ -11,6 +11,7 @@ namespace TriangleNet.Rendering.Text
     using System.Text;
     using TriangleNet;
     using TriangleNet.Geometry;
+    using TriangleNet.Meshing.Iterators;
 
     /// <summary>
     /// Writes a mesh to an SVG file.

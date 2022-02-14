@@ -124,11 +124,7 @@ namespace TriangleNet
         {
             get
             {
-                var e = new EdgeIterator(this);
-                while (e.MoveNext())
-                {
-                    yield return e.Current;
-                }
+                return new EdgeIterator().EnumerateEdges(this);
             }
         }
 

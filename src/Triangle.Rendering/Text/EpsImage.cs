@@ -11,7 +11,7 @@ namespace TriangleNet.Rendering.Text
     using System.IO;
     using TriangleNet;
     using TriangleNet.Geometry;
-
+    using TriangleNet.Meshing.Iterators;
     using Color = System.Drawing.Color;
     using IntPoint = System.Drawing.Point;
     using IntRectangle = System.Drawing.Rectangle;
