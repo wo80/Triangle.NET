@@ -28,5 +28,7 @@ namespace TriangleNet.Rendering
         void Add(int[] partition);
 
         void Enable(int layer, bool enabled);
+
+        void Clear();
     }
 }

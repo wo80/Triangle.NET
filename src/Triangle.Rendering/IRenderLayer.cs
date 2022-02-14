@@ -13,7 +13,6 @@ namespace TriangleNet.Rendering
     {
         int Count { get; }
 
-        // Points can be set, because layers may share vertices.
         IBuffer<float> Points { get; }
         IBuffer<int> Indices { get; }
 

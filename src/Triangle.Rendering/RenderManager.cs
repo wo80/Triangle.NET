@@ -77,6 +77,12 @@ namespace TriangleNet.Rendering
             control.HandleResize();
         }
 
+        public void Clear()
+        {
+            context.Clear();
+            control.Refresh();
+        }
+
         public void Enable(int layer, bool enabled)
         {
             context.Enable(layer, enabled);

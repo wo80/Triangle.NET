@@ -32,7 +32,6 @@ namespace TriangleNet.Rendering
         public IBuffer<float> Points
         {
             get { return points; }
-            set { points = value; }
         }
 
         public IBuffer<int> Indices
