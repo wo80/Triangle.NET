@@ -21,28 +21,16 @@ namespace TriangleNet.Geometry
         List<ISegment> segments;
 
         /// <inheritdoc />
-        public List<Vertex> Points
-        {
-            get { return points; }
-        }
+        public List<Vertex> Points => points;
 
         /// <inheritdoc />
-        public List<Point> Holes
-        {
-            get { return holes; }
-        }
+        public List<Point> Holes => holes;
 
         /// <inheritdoc />
-        public List<RegionPointer> Regions
-        {
-            get { return regions; }
-        }
+        public List<RegionPointer> Regions => regions;
 
         /// <inheritdoc />
-        public List<ISegment> Segments
-        {
-            get { return segments; }
-        }
+        public List<ISegment> Segments => segments;
 
         /// <inheritdoc />
         public bool HasPointMarkers { get; set; }
@@ -112,20 +100,13 @@ namespace TriangleNet.Geometry
             return bounds;
         }
 
-        /// <summary>
-        /// Add a vertex to the polygon.
-        /// </summary>
-        /// <param name="vertex">The vertex to insert.</param>
+        /// <inheritdoc />
         public void Add(Vertex vertex)
         {
             this.points.Add(vertex);
         }
 
-        /// <summary>
-        /// Add a segment to the polygon.
-        /// </summary>
-        /// <param name="segment">The segment to insert.</param>
-        /// <param name="insert">If true, both endpoints will be added to the points list.</param>
+        /// <inheritdoc />
         public void Add(ISegment segment, bool insert = false)
         {
             this.segments.Add(segment);
@@ -137,11 +118,7 @@ namespace TriangleNet.Geometry
             }
         }
 
-        /// <summary>
-        /// Add a segment to the polygon.
-        /// </summary>
-        /// <param name="segment">The segment to insert.</param>
-        /// <param name="index">The index of the segment endpoint to add to the points list (must be 0 or 1).</param>
+        /// <inheritdoc />
         public void Add(ISegment segment, int index)
         {
             this.segments.Add(segment);
@@ -149,11 +126,7 @@ namespace TriangleNet.Geometry
             this.points.Add(segment.GetVertex(index));
         }
 
-        /// <summary>
-        /// Add a contour to the polygon.
-        /// </summary>
-        /// <param name="contour">The contour to insert.</param>
-        /// <param name="hole">Treat contour as a hole.</param>
+        /// <inheritdoc />
         public void Add(Contour contour, bool hole = false)
         {
             if (hole)
@@ -167,11 +140,7 @@ namespace TriangleNet.Geometry
             }
         }
 
-        /// <summary>
-        /// Add a contour to the polygon.
-        /// </summary>
-        /// <param name="contour">The contour to insert.</param>
-        /// <param name="hole">Point inside the contour, making it a hole.</param>
+        /// <inheritdoc />
         public void Add(Contour contour, Point hole)
         {
             this.points.AddRange(contour.Points);

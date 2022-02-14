@@ -109,7 +109,7 @@ namespace TriangleNet.Tools
                 if (points[i - 1] == points[i])
                 {
                     horrors++;
-                    logger.Warning(String.Format("Found duplicate point {0}.", points[i]),
+                    logger.Warning(string.Format("Found duplicate point {0}.", points[i]),
                         "PolygonValidator.HasDuplicateVertices()");
                 }
             }
@@ -122,6 +122,11 @@ namespace TriangleNet.Tools
         /// </summary>
         /// <param name="poly">The polygon.</param>
         /// <param name="threshold">The angle threshold.</param>
+        /// <remarks>
+        /// This method assumes that segments are stored in order. There may be different,
+        /// unconnected contours in the polygon, but the segments of each contour have to
+        /// be in order to get a meaningful result.
+        /// </remarks>
         public static bool HasBadAngles(IPolygon poly, double threshold = 2e-12)
         {
             var logger = Log.Instance;
@@ -131,8 +136,6 @@ namespace TriangleNet.Tools
 
             Point p0 = null, p1 = null;
             Point q0, q1;
-
-            int count = poly.Points.Count;
 
             foreach (var seg in poly.Segments)
             {
@@ -156,7 +159,7 @@ namespace TriangleNet.Tools
                         if (IsBadAngle(q0, p0, p1,threshold))
                         {
                             horrors++;
-                            logger.Warning(String.Format("Bad segment angle found at index {0}.", i),
+                            logger.Warning(string.Format("Bad segment angle found at index {0}.", i),
                                 "PolygonValidator.HasBadAngles()");
                         }
                     }
@@ -208,14 +211,14 @@ namespace TriangleNet.Tools
                 if (p.id < 0 || p.id >= count)
                 {
                     horrors++;
-                    logger.Warning(String.Format("Segment {0} has invalid startpoint.", i),
+                    logger.Warning(string.Format("Segment {0} has invalid startpoint.", i),
                         "PolygonValidator.IsConsistent()");
                 }
 
                 if (q.id < 0 || q.id >= count)
                 {
                     horrors++;
-                    logger.Warning(String.Format("Segment {0} has invalid endpoint.", i),
+                    logger.Warning(string.Format("Segment {0} has invalid endpoint.", i),
                         "PolygonValidator.IsConsistent()");
                 }
 

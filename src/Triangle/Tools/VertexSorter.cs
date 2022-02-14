@@ -216,7 +216,7 @@ namespace TriangleNet.Tools
             int arraysize = right - left + 1;
             int oleft = left, oright = right;
             int pivot;
-            double pivot1, pivot2;
+            double px, py; // pivot x and y coordinatex
             Vertex temp;
 
             var array = this.points;
@@ -237,8 +237,8 @@ namespace TriangleNet.Tools
 
             // Choose a random pivot to split the array.
             pivot = rand.Next(left, right);
-            pivot1 = array[pivot].x;
-            pivot2 = array[pivot].y;
+            px = array[pivot].x;
+            py = array[pivot].y;
 
             left--;
             right++;
@@ -249,16 +249,16 @@ namespace TriangleNet.Tools
                 {
                     left++;
                 }
-                while ((left <= right) && ((array[left].x < pivot1) ||
-                    ((array[left].x == pivot1) && (array[left].y < pivot2))));
+                while ((left <= right) && ((array[left].x < px) ||
+                    ((array[left].x == px) && (array[left].y < py))));
 
                 // Search for a vertex whose x-coordinate is too small for the right.
                 do
                 {
                     right--;
                 }
-                while ((left <= right) && ((array[right].x > pivot1) ||
-                    ((array[right].x == pivot1) && (array[right].y > pivot2))));
+                while ((left <= right) && ((array[right].x > px) ||
+                    ((array[right].x == px) && (array[right].y > py))));
 
                 if (left < right)
                 {
@@ -269,7 +269,7 @@ namespace TriangleNet.Tools
                 }
             }
 
-            // Unlike in vertexsort(), at most one of the following conditionals is true.
+            // Unlike in QuickSort(), at most one of the following conditionals is true.
             if (left > median)
             {
                 // Recursively shuffle the left subset.
@@ -299,7 +299,7 @@ namespace TriangleNet.Tools
             int arraysize = right - left + 1;
             int oleft = left, oright = right;
             int pivot;
-            double pivot1, pivot2;
+            double px, py; // pivot x and y coordinatex
             Vertex temp;
 
             var array = this.points;
@@ -320,8 +320,8 @@ namespace TriangleNet.Tools
 
             // Choose a random pivot to split the array.
             pivot = rand.Next(left, right);
-            pivot1 = array[pivot].y;
-            pivot2 = array[pivot].x;
+            px = array[pivot].y;
+            py = array[pivot].x;
 
             left--;
             right++;
@@ -332,16 +332,16 @@ namespace TriangleNet.Tools
                 {
                     left++;
                 }
-                while ((left <= right) && ((array[left].y < pivot1) ||
-                    ((array[left].y == pivot1) && (array[left].x < pivot2))));
+                while ((left <= right) && ((array[left].y < px) ||
+                    ((array[left].y == px) && (array[left].x < py))));
 
                 // Search for a vertex whose x-coordinate is too small for the right.
                 do
                 {
                     right--;
                 }
-                while ((left <= right) && ((array[right].y > pivot1) ||
-                    ((array[right].y == pivot1) && (array[right].x > pivot2))));
+                while ((left <= right) && ((array[right].y > px) ||
+                    ((array[right].y == px) && (array[right].x > py))));
 
                 if (left < right)
                 {

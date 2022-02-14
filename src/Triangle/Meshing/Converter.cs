@@ -27,7 +27,7 @@ namespace TriangleNet.Meshing
         /// <summary>
         /// Reconstruct a triangulation from its raw data representation.
         /// </summary>
-        public static Mesh ToMesh(Polygon polygon, IList<ITriangle> triangles)
+        public static Mesh ToMesh(Polygon polygon, ICollection<ITriangle> triangles)
         {
             return ToMesh(polygon, triangles.ToArray());
         }
