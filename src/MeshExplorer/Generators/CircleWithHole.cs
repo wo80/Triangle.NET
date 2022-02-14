@@ -40,17 +40,17 @@ namespace MeshExplorer.Generators
 
             // Inner cirlce (radius = 1) (hole)
             r = 1;
-            input.AddContour(CreateCircle(r, (int)(r / h), 1), 1, new Point(0, 0));
+            input.Add(new Contour(CreateCircle(r, (int)(r / h), 1), 1), new Point(0, 0));
 
             // Center cirlce
             r = (radius + 1.0) / 2.0;
-            input.AddContour(CreateCircle(r, (int)(r / h), 2), 2);
+            input.Add(new Contour(CreateCircle(r, (int)(r / h), 2), 2));
 
             //count = input.Count;
 
             // Outer cirlce
             r = radius;
-            input.AddContour(CreateCircle(r, (int)(r / h), 3), 3);
+            input.Add(new Contour(CreateCircle(r, (int)(r / h), 3), 3));
 
             // Regions: |++++++|++++++|---|
             //          r             1   0

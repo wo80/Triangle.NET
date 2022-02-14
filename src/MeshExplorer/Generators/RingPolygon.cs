@@ -63,7 +63,7 @@ namespace MeshExplorer.Generators
                 inner.Add(new Vertex(r * Math.Cos(i * step), r * Math.Sin(i * step)));
             }
 
-            input.AddContour(inner, 1);
+            input.Add(new Contour(inner, 1));
 
             r = 1.5 * r;
 
@@ -85,7 +85,7 @@ namespace MeshExplorer.Generators
                 outer.Add(new Vertex(ro * Math.Cos(i * step + offset), ro * Math.Sin(i * step + offset)));
             }
 
-            input.AddContour(outer, 2);
+            input.Add(new Contour(outer, 2));
 
             input.Holes.Add(new Point(0, 0));
 

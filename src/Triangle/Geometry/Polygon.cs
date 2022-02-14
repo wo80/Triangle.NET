@@ -6,7 +6,6 @@
 
 namespace TriangleNet.Geometry
 {
-    using System;
     using System.Collections.Generic;
 
     /// <summary>
@@ -76,19 +75,6 @@ namespace TriangleNet.Geometry
 
             HasPointMarkers = markers;
             HasSegmentMarkers = markers;
-        }
-
-        [Obsolete("Use polygon.Add(contour) method instead.")]
-        public void AddContour(IEnumerable<Vertex> points, int marker = 0,
-            bool hole = false, bool convex = false)
-        {
-            this.Add(new Contour(points, marker, convex), hole);
-        }
-
-        [Obsolete("Use polygon.Add(contour) method instead.")]
-        public void AddContour(IEnumerable<Vertex> points, int marker, Point hole)
-        {
-            this.Add(new Contour(points, marker), hole);
         }
 
         /// <inheritdoc />

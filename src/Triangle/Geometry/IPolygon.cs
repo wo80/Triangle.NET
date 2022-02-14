@@ -6,7 +6,6 @@
 
 namespace TriangleNet.Geometry
 {
-    using System;
     using System.Collections.Generic;
 
     /// <summary>
@@ -43,12 +42,6 @@ namespace TriangleNet.Geometry
         /// Gets or sets a value indicating whether the segments have marks or not.
         /// </summary>
         bool HasSegmentMarkers { get; set; }
-
-        [Obsolete("Use polygon.Add(contour) method instead.")]
-        void AddContour(IEnumerable<Vertex> points, int marker, bool hole, bool convex);
-
-        [Obsolete("Use polygon.Add(contour) method instead.")]
-        void AddContour(IEnumerable<Vertex> points, int marker, Point hole);
 
         /// <summary>
         /// Compute the bounds of the polygon.

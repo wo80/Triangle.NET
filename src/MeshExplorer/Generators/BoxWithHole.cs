@@ -38,12 +38,12 @@ namespace MeshExplorer.Generators
             double r = GetParamValueInt(2, param2);
 
             // Generate circle (hole)
-            input.AddContour(CreateCircle(r, n, 1), 1, new Point(0, 0));
+            input.Add(new Contour(CreateCircle(r, n, 1), 1), new Point(0, 0));
 
             n = GetParamValueInt(0, param0);
 
             // Generate box
-            input.AddContour(CreateRectangle(new Rectangle(-50, -50, 100, 100), n, 2), 2);
+            input.Add(new Contour(CreateRectangle(new Rectangle(-50, -50, 100, 100), n, 2), 2));
 
             return input;
         }
