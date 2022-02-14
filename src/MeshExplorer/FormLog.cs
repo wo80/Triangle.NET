@@ -42,7 +42,7 @@ namespace MeshExplorer
 
         private ListViewItem CreateListViewItem(LogItem item)
         {
-            ListViewItem lvi = new ListViewItem(new string[] { item.Message, item.Info });
+            ListViewItem lvi = new ListViewItem(new string[] { item.Message, item.Details });
 
             if (item.Level == LogLevel.Error)
             {

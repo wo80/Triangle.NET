@@ -10,7 +10,6 @@ namespace TriangleNet.Meshing
     using System;
     using System.Collections.Generic;
     using TriangleNet.Geometry;
-    using TriangleNet.Logging;
     using TriangleNet.Meshing.Iterators;
     using TriangleNet.Topology;
 
@@ -24,7 +23,7 @@ namespace TriangleNet.Meshing
 
         List<Triangle> viri;
 
-        ILog<LogItem> logger;
+        Log logger = Log.Instance;
 
         public ConstraintMesher(Mesh mesh, Configuration config)
         {
@@ -35,8 +34,6 @@ namespace TriangleNet.Meshing
             this.locator = mesh.locator;
 
             this.viri = new List<Triangle>();
-
-            logger = Log.Instance;
         }
 
 

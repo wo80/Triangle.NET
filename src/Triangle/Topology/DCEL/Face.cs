@@ -29,6 +29,7 @@ namespace TriangleNet.Topology.DCEL
         internal int id;
         internal int mark;
 
+        // If the face is a Voronio cell, this is the point that generates the cell.
         internal Point generator;
 
         internal HalfEdge edge;

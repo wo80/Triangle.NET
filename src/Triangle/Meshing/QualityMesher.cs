@@ -10,7 +10,6 @@ namespace TriangleNet.Meshing
     using System;
     using System.Collections.Generic;
     using TriangleNet.Geometry;
-    using TriangleNet.Logging;
     using TriangleNet.Meshing.Data;
     using TriangleNet.Topology;
 
@@ -28,7 +27,7 @@ namespace TriangleNet.Meshing
 
         NewLocation newLocation;
 
-        ILog<LogItem> logger;
+        Log logger = Log.Instance;
 
         // Stores the vertices of the triangle that contains newvertex
         // in SplitTriangle method.
@@ -36,8 +35,6 @@ namespace TriangleNet.Meshing
 
         public QualityMesher(Mesh mesh, Configuration config)
         {
-            logger = Log.Instance;
-
             badsubsegs = new Queue<BadSubseg>();
             queue = new BadTriQueue();
 

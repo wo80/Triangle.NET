@@ -10,7 +10,6 @@ namespace TriangleNet
     using System;
     using System.Collections.Generic;
     using TriangleNet.Geometry;
-    using TriangleNet.Logging;
     using TriangleNet.Meshing;
     using TriangleNet.Meshing.Data;
     using TriangleNet.Meshing.Iterators;
@@ -26,7 +25,7 @@ namespace TriangleNet
 
         IPredicates predicates;
 
-        ILog<LogItem> logger;
+        Log logger = Log.Instance;
 
         QualityMesher qualityMesher;
 
@@ -235,8 +234,6 @@ namespace TriangleNet
         public Mesh(Configuration config)
         {
             Initialize();
-
-            logger = Log.Instance;
 
             behavior = new Behavior();
 
