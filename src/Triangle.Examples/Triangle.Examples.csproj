@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace>TriangleNet</RootNamespace>
+    <OutDir>$(SolutionDir)bin\$(Configuration)</OutDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Triangle.Rendering\Text\FormattingStreamWriter.cs" Link="Rendering\FormattingStreamWriter.cs" />
+    <Compile Include="..\Triangle.Rendering\Text\SvgImage.cs" Link="Rendering\SvgImage.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Triangle\Triangle.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Rendering\" />
+  </ItemGroup>
+
+</Project>

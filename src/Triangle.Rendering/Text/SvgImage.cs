@@ -11,6 +11,7 @@ namespace TriangleNet.Rendering.Text
     using System.Text;
     using TriangleNet;
     using TriangleNet.Geometry;
+    using TriangleNet.Meshing;
     using TriangleNet.Meshing.Iterators;
 
     /// <summary>
@@ -24,17 +25,31 @@ namespace TriangleNet.Rendering.Text
         float scale = 1f;
 
         /// <summary>
-        /// Export the mesh to SVG format.
+        /// Exports a mesh to SVG format.
+        /// </summary>
+        /// <param name="mesh">The mesh.</param>
+        /// <param name="file">The SVG filename.</param>
+        /// <param name="width">The desired width (pixel) of the image.</param>
+        /// <param name="regions">Enable rendering of regions.</param>
+        /// <param name="points">Enable rendering of points.</param>
+        public static void Save(IMesh mesh, string file = null, int width = 800,
+            bool regions = false, bool points = true)
+        {
+            new SvgImage().Export(mesh, file, width);
+        }
+
+        /// <summary>
+        /// Export a mesh to SVG format.
         /// </summary>
         /// <param name="mesh">The current mesh.</param>
         /// <param name="filename">The SVG filename.</param>
         /// <param name="width">The desired width of the image.</param>
-        public void Export(Mesh mesh, string filename, int width)
+        public void Export(IMesh mesh, string filename, int width)
         {
             // Check file name
-            if (String.IsNullOrWhiteSpace(filename))
+            if (string.IsNullOrWhiteSpace(filename))
             {
-                filename = String.Format("mesh-{0}.svg", DateTime.Now.ToString("yyyy-M-d-hh-mm-ss"));
+                filename = string.Format("mesh-{0}.svg", DateTime.Now.ToString("yyyy-M-d-hh-mm-ss"));
             }
 
             if (!filename.EndsWith(".svg"))
@@ -79,11 +94,11 @@ namespace TriangleNet.Rendering.Text
             }
         }
 
-        private void DrawTriangles(StreamWriter svg, Mesh mesh, bool label)
+        private void DrawTriangles(StreamWriter svg, IMesh mesh, bool label)
         {
             svg.Write("\t<path d=\"");
 
-            StringBuilder labels = new StringBuilder();
+            var labels = new StringBuilder();
 
             Vertex v1, v2, v3;
             double x1, y1, x2, y2, x3, y3, xa, ya;
@@ -136,11 +151,9 @@ namespace TriangleNet.Rendering.Text
             }
         }
 
-        private void DrawEdges(StreamWriter svg, Mesh mesh)
+        private void DrawEdges(StreamWriter svg, IMesh mesh)
         {
             svg.Write("\t<path d=\"");
-
-            StringBuilder labels = new StringBuilder();
 
             Vertex v1, v2;
             double x1, y1, x2, y2;
@@ -172,11 +185,9 @@ namespace TriangleNet.Rendering.Text
             svg.WriteLine("\" style=\"stroke:#c2c2c2; fill:none; stroke-linejoin:bevel;\"/>");
         }
 
-        private void DrawSegments(StreamWriter svg, Mesh mesh)
+        private void DrawSegments(StreamWriter svg, IMesh mesh)
         {
             svg.Write("\t<path d=\"");
-
-            StringBuilder labels = new StringBuilder();
 
             double x1, y1, x2, y2;
 
@@ -204,7 +215,7 @@ namespace TriangleNet.Rendering.Text
             svg.WriteLine("\" style=\"stroke:#4682B4; fill:none; stroke-linejoin:bevel; stroke-width:2px;\"/>");
         }
 
-        private void DrawPoints(StreamWriter svg, Mesh mesh, bool label)
+        private void DrawPoints(StreamWriter svg, IMesh mesh, bool label)
         {
             int n = mesh.Vertices.Count;
 
@@ -223,7 +234,7 @@ namespace TriangleNet.Rendering.Text
 
             double x, y;
 
-            StringBuilder labels = new StringBuilder();
+            var labels = new StringBuilder();
 
             foreach (var node in mesh.Vertices)
             {

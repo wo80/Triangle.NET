@@ -6,7 +6,7 @@ namespace TriangleNet.Rendering.Text
     using System.IO;
 
     /// <summary>
-    /// 
+    /// A <see cref="StreamWriter"/> class allowing to specify the <see cref="IFormatProvider"/>.
     /// </summary>
     /// <remarks>
     /// From http://stackoverflow.com/questions/12011789/streamwriter-and-iformatprovider
@@ -62,12 +62,6 @@ namespace TriangleNet.Rendering.Text
         /// <summary>
         /// Gets an object that controls formatting.
         /// </summary>
-        public override IFormatProvider FormatProvider
-        {
-            get
-            {
-                return this.formatProvider;
-            }
-        }
+        public override IFormatProvider FormatProvider => formatProvider;
     }
 }

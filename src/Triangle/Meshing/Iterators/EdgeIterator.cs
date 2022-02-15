@@ -15,7 +15,7 @@ namespace TriangleNet.Meshing.Iterators
     /// </summary>
     public class EdgeIterator
     {
-        public IEnumerable<Edge> EnumerateEdges(Mesh mesh)
+        public IEnumerable<Edge> EnumerateEdges(IMesh mesh)
         {
             Otri tri = default;
             Otri neighbor = default;
@@ -23,7 +23,7 @@ namespace TriangleNet.Meshing.Iterators
 
             Vertex p1, p2;
 
-            foreach (var t in mesh.triangles)
+            foreach (var t in mesh.Triangles)
             {
                 tri.tri = t;
                 tri.orient = 0;
@@ -57,10 +57,10 @@ namespace TriangleNet.Meshing.Iterators
         /// <param name="skipSegments"></param>
         /// <returns></returns>
         /// <remarks>
-        /// In contrast to the <see cref="EnumerateEdges(Mesh)"/> this method will return
+        /// In contrast to <see cref="EnumerateEdges(IMesh)"/> this method will return
         /// objects that include the vertex information (and not only the indices).
         /// </remarks>
-        public static IEnumerable<ISegment> EnumerateEdges(Mesh mesh, bool skipSegments = true)
+        public static IEnumerable<ISegment> EnumerateEdges(IMesh mesh, bool skipSegments = true)
         {
             Otri tri = default;
             Otri neighbor = default;
@@ -70,7 +70,7 @@ namespace TriangleNet.Meshing.Iterators
 
             bool segments = !skipSegments;
 
-            foreach (var t in mesh.triangles)
+            foreach (var t in mesh.Triangles)
             {
                 tri.tri = t;
                 tri.orient = 0;
