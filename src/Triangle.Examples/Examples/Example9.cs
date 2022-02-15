@@ -15,7 +15,7 @@ namespace TriangleNet.Examples
         {
             var pts = new List<Vertex>
             {
-                // The 4 corners of the square.
+                // The 4 corners of the rectangle.
                 new Vertex(1.5, 1.0),
                 new Vertex(1.5, -1.0),
                 new Vertex(-1.5, -1.0),

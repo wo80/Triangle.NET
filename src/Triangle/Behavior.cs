@@ -25,6 +25,7 @@ namespace TriangleNet
         bool conformDel = false;
 
         Func<ITriangle, double, bool> usertest;
+        Func<ITriangle, bool> exclude;
 
         int noBisect = 0;
 
@@ -175,6 +176,15 @@ namespace TriangleNet
         {
             get { return usertest; }
             set { usertest = value; }
+        }
+
+        /// <summary>
+        /// Exclude triangles from being refined.
+        /// </summary>
+        public Func<ITriangle, bool> Exclude
+        {
+            get { return exclude; }
+            set { exclude = value; }
         }
 
         /// <summary>

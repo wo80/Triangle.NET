@@ -64,6 +64,7 @@ namespace TriangleNet.Meshing
                 behavior.MaxAngle = quality.MaximumAngle;
                 behavior.MaxArea = quality.MaximumArea;
                 behavior.UserTest = quality.UserTest;
+                behavior.Exclude = quality.Exclude;
                 behavior.VarArea = quality.VariableArea;
 
                 behavior.ConformingDelaunay = behavior.ConformingDelaunay || delaunay;
@@ -249,6 +250,11 @@ namespace TriangleNet.Meshing
             double dist1, dist2;
 
             double maxangle;
+
+            if (behavior.Exclude != null && behavior.Exclude(testtri.tri))
+            {
+                return;
+            }
 
             torg = testtri.Org();
             tdest = testtri.Dest();

@@ -35,6 +35,15 @@ namespace TriangleNet.Meshing
         public Func<ITriangle, double, bool> UserTest { get; set; }
 
         /// <summary>
+        /// Gets or sets a test function for excluding triangles from refinement.
+        /// </summary>
+        /// <remarks>
+        /// The exclude test takes higher priority than all other test, i.e. if a
+        /// triangle passes the exclude test, no other test will be executed.
+        /// </remarks>
+        public Func<ITriangle, bool> Exclude { get; set; }
+
+        /// <summary>
         /// Gets or sets an area constraint per triangle.
         /// </summary>
         /// <remarks>
