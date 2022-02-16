@@ -47,10 +47,10 @@ namespace TriangleNet.Tests
             //
             // This is because, for example, and oriented triange will return as its
             // origin (Org() method) the element at index [(orientation + 1) % 3].
-            var t0 = triangles[0] = CreateTriangle(0, vertices[0], vertices[1], vertices[3]);
-            var t1 = triangles[1] = CreateTriangle(1, vertices[1], vertices[4], vertices[3]);
-            var t2 = triangles[2] = CreateTriangle(2, vertices[1], vertices[2], vertices[4]);
-            var t3 = triangles[3] = CreateTriangle(3, vertices[3], vertices[4], vertices[5]);
+            var t0 = triangles[0] = Helper.CreateTriangle(0, vertices[0], vertices[1], vertices[3]);
+            var t1 = triangles[1] = Helper.CreateTriangle(1, vertices[1], vertices[4], vertices[3]);
+            var t2 = triangles[2] = Helper.CreateTriangle(2, vertices[1], vertices[2], vertices[4]);
+            var t3 = triangles[3] = Helper.CreateTriangle(3, vertices[3], vertices[4], vertices[5]);
 
             // Setup connectivity of triangle 0.
             t0.neighbors[0].tri = dummy;
@@ -81,18 +81,6 @@ namespace TriangleNet.Tests
             return triangles;
         }
 
-        private Triangle CreateTriangle(int id, Vertex org, Vertex dest, Vertex apex)
-        {
-            var t = new Triangle() { id = id, hash = id };
-
-            // Node ordering 'plus 1 mod 3'.
-            t.vertices[0] = apex;
-            t.vertices[1] = org;
-            t.vertices[2] = dest;
-
-            return t;
-        }
-
         [SetUp]
         public void Initialize()
         {
@@ -111,7 +99,7 @@ namespace TriangleNet.Tests
         {
             Otri t = default;
 
-            t.tri = CreateTriangle(0, vertices[1], vertices[4], vertices[3]);
+            t.tri = Helper.CreateTriangle(0, vertices[1], vertices[4], vertices[3]);
 
             t.orient = 0;
             Assert.AreEqual(1, t.Org().ID);
@@ -128,7 +116,7 @@ namespace TriangleNet.Tests
         {
             Otri t = default;
 
-            t.tri = CreateTriangle(0, vertices[1], vertices[4], vertices[3]);
+            t.tri = Helper.CreateTriangle(0, vertices[1], vertices[4], vertices[3]);
 
             t.orient = 0;
             Assert.AreEqual(4, t.Dest().ID);
@@ -145,7 +133,7 @@ namespace TriangleNet.Tests
         {
             Otri t = default;
 
-            t.tri = CreateTriangle(0, vertices[1], vertices[4], vertices[3]);
+            t.tri = Helper.CreateTriangle(0, vertices[1], vertices[4], vertices[3]);
 
             t.orient = 0;
             Assert.AreEqual(3, t.Apex().ID);
@@ -423,8 +411,8 @@ namespace TriangleNet.Tests
 
             Otri tmp = default;
 
-            s.tri = CreateTriangle(0, vertices[0], vertices[1], vertices[3]);
-            t.tri = CreateTriangle(1, vertices[1], vertices[4], vertices[3]);
+            s.tri = Helper.CreateTriangle(0, vertices[0], vertices[1], vertices[3]);
+            t.tri = Helper.CreateTriangle(1, vertices[1], vertices[4], vertices[3]);
 
             s.orient = 1; // Edge  1 -> 3.
             t.orient = 2; // Edge  3 -> 1.
