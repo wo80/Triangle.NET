@@ -27,6 +27,11 @@ namespace TriangleNet
         // A stack of free triangles.
         Stack<Triangle> stack;
 
+        /// <summary>
+        /// Gets the total number of currently allocated triangles.
+        /// </summary>
+        public int Capacity => size;
+
         public TrianglePool()
         {
             size = 0;

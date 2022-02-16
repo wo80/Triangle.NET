@@ -11,7 +11,7 @@ namespace TriangleNet.Examples
     /// </summary>
     public class Example9
     {
-        public static void Run()
+        public static void Run(bool print = false)
         {
             var pts = new List<Vertex>
             {
@@ -39,7 +39,7 @@ namespace TriangleNet.Examples
 
                 var list = MeshValidator.GetDegenerateBoundaryTriangles(mesh);
 
-                if (list.Any())
+                if (print && list.Any())
                 {
                     Console.WriteLine("Iteration {0}: found {1} degenerate triangle(s) of {2}.",
                         i, list.Count(), mesh.Triangles.Count);

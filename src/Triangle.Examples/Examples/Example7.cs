@@ -1,8 +1,10 @@
 ﻿
 namespace TriangleNet.Examples
 {
+    using System;
     using TriangleNet.Geometry;
     using TriangleNet.Meshing;
+    using TriangleNet.Meshing.Iterators;
     using TriangleNet.Rendering.Text;
 
     /// <summary>
@@ -26,7 +28,18 @@ namespace TriangleNet.Examples
             };
 
             // Generate mesh using the polygons Triangulate extension method.
-            var mesh = poly.Triangulate(quality);
+            var mesh = (Mesh)poly.Triangulate(quality);
+
+            // Validate.
+            foreach (var e in EdgeIterator.EnumerateEdges(mesh))
+            {
+                double length = Math.Sqrt(DistSqr(e.GetVertex(0), e.GetVertex(1)));
+
+                if (length > MAX_EDGE_LENGTH)
+                {
+                    Console.WriteLine("Something's wrong in here ...");
+                }
+            }
 
             if (print) SvgImage.Save(mesh, "example-7.svg", 500);
         }

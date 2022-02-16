@@ -8,7 +8,7 @@ namespace TriangleNet.Examples
     using TriangleNet.Smoothing;
 
     /// <summary>
-    /// Refine only a part of a polygon mesh be using region pointers and an area constraint.
+    /// Refine only a part of a polygon mesh by using region pointers and an area constraint.
     /// </summary>
     public class Example4
     {

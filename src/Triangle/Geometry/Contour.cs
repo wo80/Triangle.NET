@@ -142,7 +142,7 @@ namespace TriangleNet.Geometry
             double dx, dy;
             double h;
 
-            var predicates = new RobustPredicates();
+            var predicates = RobustPredicates.Default;
 
             a = contour[0];
             b = contour[1];

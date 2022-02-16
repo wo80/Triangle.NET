@@ -37,17 +37,17 @@ namespace TriangleNet.Tools
                 if (p == null)
                 {
                     horrors++;
-                    logger.Warning(String.Format("Point {0} is null.", i), "PolygonValidator.IsConsistent()");
+                    logger.Warning(string.Format("Point {0} is null.", i), "PolygonValidator.IsConsistent()");
                 }
                 else if (double.IsNaN(p.x) || double.IsNaN(p.y))
                 {
                     horrors++;
-                    logger.Warning(String.Format("Point {0} has invalid coordinates.", i), "PolygonValidator.IsConsistent()");
+                    logger.Warning(string.Format("Point {0} has invalid coordinates.", i), "PolygonValidator.IsConsistent()");
                 }
                 else if (double.IsInfinity(p.x) || double.IsInfinity(p.y))
                 {
                     horrors++;
-                    logger.Warning(String.Format("Point {0} has invalid coordinates.", i), "PolygonValidator.IsConsistent()");
+                    logger.Warning(string.Format("Point {0} has invalid coordinates.", i), "PolygonValidator.IsConsistent()");
                 }
 
                 i++;
@@ -60,7 +60,7 @@ namespace TriangleNet.Tools
                 if (seg == null)
                 {
                     horrors++;
-                    logger.Warning(String.Format("Segment {0} is null.", i), "PolygonValidator.IsConsistent()");
+                    logger.Warning(string.Format("Segment {0} is null.", i), "PolygonValidator.IsConsistent()");
 
                     // Always abort if a NULL-segment is found.
                     return false;
@@ -72,7 +72,7 @@ namespace TriangleNet.Tools
                 if ((p.x == q.x) && (p.y == q.y))
                 {
                     horrors++;
-                    logger.Warning(String.Format("Endpoints of segment {0} are coincident (IDs {1} / {2}).", i, p.id, q.id),
+                    logger.Warning(string.Format("Endpoints of segment {0} are coincident (IDs {1} / {2}).", i, p.id, q.id),
                         "PolygonValidator.IsConsistent()");
                 }
 
@@ -109,12 +109,59 @@ namespace TriangleNet.Tools
                 if (points[i - 1] == points[i])
                 {
                     horrors++;
-                    logger.Warning(string.Format("Found duplicate point {0}.", points[i]),
+                    logger.Warning(string.Format("Found duplicate point ({0}, {1}).", points[i].x, points[i].y),
                         "PolygonValidator.HasDuplicateVertices()");
                 }
             }
 
             return horrors > 0;
+        }
+
+        /// <summary>
+        /// Get the ratio of the largest and smallest segment length.
+        /// </summary>
+        /// <param name="poly">The polygon.</param>
+        /// <param name="threshold">The ratio threshold.</param>
+        /// <remarks>
+        /// This method will also report zero-length segments.
+        /// </remarks>
+        public static double GetSegmentRatio(IPolygon poly, double threshold = 2e12)
+        {
+            var logger = Log.Instance;
+
+            double min = double.MaxValue;
+            double max = 0.0;
+
+            foreach (var seg in poly.Segments)
+            {
+                var p = seg.GetVertex(0);
+                var q = seg.GetVertex(1);
+
+                var dx = p.X - q.X;
+                var dy = p.Y - q.Y;
+
+                var length = Math.Sqrt(dx * dx + dy * dy);
+
+                if (length == 0.0)
+                {
+                    logger.Warning(string.Format("Found zero-length segment (vertex IDs {0} / {1}).", p.id, q.id),
+                        "PolygonValidator.GetSegmentRatio()");
+                    continue;
+                }
+
+                min = Math.Min(min, length);
+                max = Math.Max(max, length);
+            }
+
+            double ratio = max / min;
+
+            if (ratio > threshold)
+            {
+                logger.Warning(string.Format("Polygon has large segment ratio {0:G2}.", ratio),
+                    "PolygonValidator.GetSegmentRatio()");
+            }
+
+            return ratio;
         }
 
         /// <summary>
