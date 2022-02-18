@@ -52,17 +52,17 @@ namespace TriangleNet.Voronoi
         /// Generate the Voronoi diagram from given triangle mesh..
         /// </summary>
         /// <param name="mesh"></param>
-        /// <param name="bounded"></param>
         protected void Generate(Mesh mesh)
         {
-            mesh.Renumber();
-
             base.edges = new List<HalfEdge>();
             this.rays = new List<HalfEdge>();
 
+            // Undead vertices cannot be Voronoi cell generators.
+            int count = mesh.vertices.Count - mesh.undeads;
+
             // Allocate space for Voronoi diagram.
             var vertices = new Vertex[mesh.triangles.Count + mesh.hullsize];
-            var faces = new Face[mesh.vertices.Count];
+            var faces = new Face[count];
 
             if (factory == null)
             {
@@ -74,10 +74,21 @@ namespace TriangleNet.Voronoi
             // Compute triangles circumcenters.
             var map = ComputeVertices(mesh, vertices);
 
-            // Create all Voronoi faces.
+            // Ensure linear numbering of vertices (excluding undeads).
+            int vid = 0;
+
+            // Create all Voronoi faces, skipping undead vertices.
             foreach (var vertex in mesh.vertices.Values)
             {
-                faces[vertex.id] = factory.CreateFace(vertex);
+                if (vertex.type == VertexType.UndeadVertex)
+                {
+                    vertex.id = count++;
+                }
+                else
+                {
+                    vertex.id = vid++;
+                    faces[vertex.id] = factory.CreateFace(vertex);
+                }
             }
 
             ComputeEdges(mesh, vertices, faces, map);
@@ -93,13 +104,16 @@ namespace TriangleNet.Voronoi
         /// Compute the Voronoi vertices (the circumcenters of the triangles).
         /// </summary>
         /// <returns>An empty map, which will map all vertices to a list of leaving edges.</returns>
+        /// <remarks>
+        /// This method will also change triangle ids (to ensure linear numbering of triangles).
+        /// </remarks>
         protected List<HalfEdge>[] ComputeVertices(Mesh mesh, Vertex[] vertices)
         {
             Otri tri = default(Otri);
             double xi = 0, eta = 0;
             Vertex vertex;
             Point pt;
-            int id;
+            int id, i = 0;
 
             // Maps all vertices to a list of leaving edges.
             var map = new List<HalfEdge>[mesh.triangles.Count];
@@ -107,7 +121,7 @@ namespace TriangleNet.Voronoi
             // Compute triangle circumcenters
             foreach (var t in mesh.triangles)
             {
-                id = t.id;
+                t.id = id = i++;
                 tri.tri = t;
 
                 pt = predicates.FindCircumcenter(tri.Org(), tri.Dest(), tri.Apex(), ref xi, ref eta);

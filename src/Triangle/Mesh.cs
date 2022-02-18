@@ -383,7 +383,7 @@ namespace TriangleNet
         {
             numbering = NodeNumbering.None;
 
-            undeads = 0;               // No eliminated input vertices yet.
+            //undeads = 0;               // No eliminated input vertices yet.
             checksegments = false;     // There are no segments in the triangulation yet.
             checkquality = false;      // The quality triangulation stage has not begun.
 
