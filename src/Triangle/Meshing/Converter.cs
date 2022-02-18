@@ -35,19 +35,15 @@ namespace TriangleNet.Meshing
         /// <summary>
         /// Reconstruct a triangulation from its raw data representation.
         /// </summary>
-        public static Mesh ToMesh(Polygon polygon, ITriangle[] triangles)
+        public static Mesh ToMesh(Polygon polygon, ITriangle[] triangles, Configuration config = null)
         {
             Otri tri = default(Otri);
             Osub subseg = default(Osub);
-            int i = 0;
 
             int elements = triangles == null ? 0 : triangles.Length;
             int segments = polygon.Segments.Count;
 
-            // TODO: Configuration should be a function argument.
-            var mesh = new Mesh(new Configuration());
-
-            mesh.TransferNodes(polygon.Points);
+            var mesh = new Mesh(config ?? new Configuration(), polygon.Points);
 
             mesh.regions.AddRange(polygon.Regions);
             mesh.behavior.useRegions = polygon.Regions.Count > 0;
@@ -59,7 +55,7 @@ namespace TriangleNet.Meshing
             }
 
             // Create the triangles.
-            for (i = 0; i < elements; i++)
+            for (int i = 0; i < elements; i++)
             {
                 mesh.MakeTriangle(ref tri);
             }
@@ -69,7 +65,7 @@ namespace TriangleNet.Meshing
                 mesh.insegments = segments;
 
                 // Create the subsegments.
-                for (i = 0; i < segments; i++)
+                for (int i = 0; i < segments; i++)
                 {
                     mesh.MakeSegment(ref subseg);
                 }

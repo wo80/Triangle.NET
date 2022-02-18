@@ -66,16 +66,15 @@ namespace TriangleNet.Meshing.Algorithm
         /// </remarks>
         public IMesh Triangulate(IList<Vertex> points, Configuration config)
         {
-            this.predicates = config.Predicates();
+            predicates = config.Predicates();
 
-            this.mesh = new Mesh(config);
-            this.mesh.TransferNodes(points);
+            mesh = new Mesh(config, points);
 
             Otri hullleft = default(Otri), hullright = default(Otri);
             int i, j, n = points.Count;
 
             // Allocate an array of pointers to vertices for sorting.
-            this.sortarray = new Vertex[n];
+            sortarray = new Vertex[n];
             i = 0;
             foreach (var v in points)
             {
@@ -94,7 +93,7 @@ namespace TriangleNet.Meshing.Algorithm
                     if (Log.Verbose)
                     {
                         Log.Instance.Warning(
-                            String.Format("A duplicate vertex appeared and was ignored (ID {0}).", sortarray[j].id),
+                            string.Format("A duplicate vertex appeared and was ignored (ID {0}).", sortarray[j].id),
                             "Dwyer.Triangulate()");
                     }
                     sortarray[j].type = VertexType.UndeadVertex;
@@ -116,9 +115,9 @@ namespace TriangleNet.Meshing.Algorithm
             // Form the Delaunay triangulation.
             DivconqRecurse(0, i - 1, 0, ref hullleft, ref hullright);
 
-            this.mesh.hullsize = RemoveGhosts(ref hullleft);
+            mesh.hullsize = RemoveGhosts(ref hullleft);
 
-            return this.mesh;
+            return mesh;
         }
 
         /// <summary>

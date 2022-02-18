@@ -80,85 +80,52 @@ namespace TriangleNet
         /// <summary>
         /// Gets the mesh bounding box.
         /// </summary>
-        public Rectangle Bounds
-        {
-            get { return this.bounds; }
-        }
+        public Rectangle Bounds => bounds;
 
         /// <summary>
         /// Gets the mesh vertices.
         /// </summary>
-        public ICollection<Vertex> Vertices
-        {
-            get { return this.vertices.Values; }
-        }
+        public ICollection<Vertex> Vertices => vertices.Values;
 
         /// <summary>
         /// Gets the mesh holes.
         /// </summary>
-        public IList<Point> Holes
-        {
-            get { return this.holes; }
-        }
+        public IList<Point> Holes => holes;
 
         /// <summary>
         /// Gets the mesh triangles.
         /// </summary>
-        public ICollection<Triangle> Triangles
-        {
-            get { return this.triangles; }
-        }
+        public ICollection<Triangle> Triangles => triangles;
 
         /// <summary>
         /// Gets the mesh segments.
         /// </summary>
-        public ICollection<SubSegment> Segments
-        {
-            get { return this.subsegs.Values; }
-        }
+        public ICollection<SubSegment> Segments => subsegs.Values;
 
         /// <summary>
         /// Gets the mesh edges.
         /// </summary>
-        public IEnumerable<Edge> Edges
-        {
-            get
-            {
-                return new EdgeIterator().EnumerateEdges(this);
-            }
-        }
+        public IEnumerable<Edge> Edges => new EdgeIterator().EnumerateEdges(this);
 
         /// <summary>
         /// Gets the number of input vertices.
         /// </summary>
-        public int NumberOfInputPoints
-        {
-            get { return invertices; }
-        }
+        public int NumberOfInputPoints => invertices;
 
         /// <summary>
         /// Gets the number of mesh edges.
         /// </summary>
-        public int NumberOfEdges
-        {
-            get { return (3 * triangles.Count + hullsize) / 2; }
-        }
+        public int NumberOfEdges => (3 * triangles.Count + hullsize) / 2;
 
         /// <summary>
         /// Indicates whether the input is a PSLG or a point set.
         /// </summary>
-        public bool IsPolygon
-        {
-            get { return this.insegments > 0; }
-        }
+        public bool IsPolygon => insegments > 0;
 
         /// <summary>
         /// Gets the current node numbering.
         /// </summary>
-        public NodeNumbering CurrentNumbering
-        {
-            get { return numbering; }
-        }
+        public NodeNumbering CurrentNumbering => numbering;
 
         #endregion
 
@@ -227,13 +194,13 @@ namespace TriangleNet
         /// <summary>
         /// Initializes a new instance of the <see cref="Mesh" /> class.
         /// </summary>
-        public Mesh(Configuration config)
+        public Mesh(Configuration config, IList<Vertex> points)
         {
             Initialize();
 
             behavior = new Behavior();
 
-            vertices = new Dictionary<int, Vertex>();
+            vertices = new Dictionary<int, Vertex>(points.Count);
             subsegs = new Dictionary<int, SubSegment>();
 
             triangles = config.TrianglePool();
@@ -245,9 +212,11 @@ namespace TriangleNet
 
             steinerleft = -1;
 
-            this.predicates = config.Predicates();
+            predicates = config.Predicates();
 
-            this.locator = new TriangleLocator(this, predicates);
+            locator = new TriangleLocator(this, predicates);
+
+            TransferNodes(points);
         }
 
         public void Refine(QualityOptions quality, bool delaunay = false)
@@ -401,13 +370,13 @@ namespace TriangleNet
         /// Read the vertices from memory.
         /// </summary>
         /// <param name="data">The input data.</param>
-        internal void TransferNodes(IList<Vertex> points)
+        private void TransferNodes(IList<Vertex> points)
         {
-            this.invertices = points.Count;
-            this.mesh_dim = 2;
-            this.bounds = new Rectangle();
+            invertices = points.Count;
+            mesh_dim = 2;
+            bounds = new Rectangle();
 
-            if (this.invertices < 3)
+            if (invertices < 3)
             {
                 logger.Error("Input must have at least three input vertices.", "Mesh.TransferNodes()");
                 throw new Exception("Input must have at least three input vertices.");
@@ -439,8 +408,8 @@ namespace TriangleNet
                     p.hash = p.id = hash_vtx++;
                 }
 
-                this.vertices.Add(p.hash, p);
-                this.bounds.Expand(p);
+                vertices.Add(p.hash, p);
+                bounds.Expand(p);
             }
         }
 

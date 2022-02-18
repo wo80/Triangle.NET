@@ -35,10 +35,9 @@ namespace TriangleNet.Meshing.Algorithm
 
         public IMesh Triangulate(IList<Vertex> points, Configuration config)
         {
-            this.predicates = config.Predicates();
+            predicates = config.Predicates();
 
-            this.mesh = new Mesh(config);
-            this.mesh.TransferNodes(points);
+            mesh = new Mesh(config, points);
 
             // Nonexistent x value used as a flag to mark circle events in sweepline
             // Delaunay algorithm.

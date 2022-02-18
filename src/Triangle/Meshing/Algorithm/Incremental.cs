@@ -25,8 +25,7 @@ namespace TriangleNet.Meshing.Algorithm
         /// triangulation.</returns>
         public IMesh Triangulate(IList<Vertex> points, Configuration config)
         {
-            this.mesh = new Mesh(config);
-            this.mesh.TransferNodes(points);
+            mesh = new Mesh(config, points);
 
             Otri starttri = new Otri();
 
@@ -50,9 +49,9 @@ namespace TriangleNet.Meshing.Algorithm
             }
 
             // Remove the bounding box.
-            this.mesh.hullsize = RemoveBox();
+            mesh.hullsize = RemoveBox();
 
-            return this.mesh;
+            return mesh;
         }
 
         /// <summary>
