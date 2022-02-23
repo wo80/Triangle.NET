@@ -185,7 +185,7 @@ namespace TriangleNet.Geometry
                     test.x = bx + dx * h;
                     test.y = by + dy * h;
 
-                    if (bounds.Contains(test) && IsPointInPolygon(test, contour))
+                    if (bounds.Contains(test) && IsPointInPolygon(test, contour) && !IsPointOnSegment(test, contour))
                     {
                         return test;
                     }
@@ -194,7 +194,7 @@ namespace TriangleNet.Geometry
                     test.x = bx - dx * h;
                     test.y = by - dy * h;
 
-                    if (bounds.Contains(test) && IsPointInPolygon(test, contour))
+                    if (bounds.Contains(test) && IsPointInPolygon(test, contour) && !IsPointOnSegment(test, contour))
                     {
                         return test;
                     }
@@ -239,6 +239,31 @@ namespace TriangleNet.Geometry
             }
 
             return inside;
+        }
+
+
+        /// <summary>
+        /// Work around IsPointInPolygon() failing for points on segments.
+        /// </summary>
+        private static bool IsPointOnSegment(Point test, List<Vertex> contour, double esp = 1e-12)
+        {
+            var p = RobustPredicates.Default;
+
+            int count = contour.Count;
+
+            int i = count - 1;
+
+            for (int j = 0; j < count; j++)
+            {
+                if (Math.Abs(p.CounterClockwise(contour[i], test, contour[j])) < esp)
+                {
+                    return true;
+                }
+
+                i = j;
+            }
+
+            return false;
         }
 
         #endregion
