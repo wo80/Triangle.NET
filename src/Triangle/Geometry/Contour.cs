@@ -8,6 +8,7 @@ namespace TriangleNet.Geometry
 {
     using System;
     using System.Collections.Generic;
+    using TriangleNet.Tools;
 
     public class Contour
     {
@@ -245,17 +246,15 @@ namespace TriangleNet.Geometry
         /// <summary>
         /// Work around IsPointInPolygon() failing for points on segments.
         /// </summary>
-        private static bool IsPointOnSegment(Point test, List<Vertex> contour, double esp = 1e-12)
+        private static bool IsPointOnSegment(Point test, List<Vertex> contour, double eps = 1e-12)
         {
-            var p = RobustPredicates.Default;
-
             int count = contour.Count;
 
             int i = count - 1;
 
             for (int j = 0; j < count; j++)
             {
-                if (Math.Abs(p.CounterClockwise(contour[i], test, contour[j])) < esp)
+                if (IntersectionHelper.IsPointOnSegment(contour[i], contour[j], test, eps))
                 {
                     return true;
                 }
