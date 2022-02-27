@@ -227,7 +227,7 @@ namespace TriangleNet.Meshing
                 }
             }
 
-            return Converter.ToMesh(polygon, triangles);
+            return Converter.Instance.ToMesh(polygon, triangles);
         }
     }
 }

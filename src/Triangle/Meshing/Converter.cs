@@ -20,14 +20,25 @@ namespace TriangleNet.Meshing
     /// <summary>
     /// The Converter class provides methods for mesh reconstruction and conversion.
     /// </summary>
-    public static class Converter
+    public class Converter
     {
+        private static readonly Lazy<Converter> lazy = new Lazy<Converter>(() => new Converter());
+
+        /// <summary>
+        /// Gets the <see cref="Converter"/> instance.
+        /// </summary>
+        public static Converter Instance { get { return lazy.Value; } }
+
+        private Converter()
+        {
+        }
+
         #region Triangle mesh conversion
 
         /// <summary>
         /// Reconstruct a triangulation from its raw data representation.
         /// </summary>
-        public static Mesh ToMesh(Polygon polygon, ICollection<ITriangle> triangles)
+        public Mesh ToMesh(Polygon polygon, ICollection<ITriangle> triangles)
         {
             return ToMesh(polygon, triangles.ToArray());
         }
@@ -35,7 +46,7 @@ namespace TriangleNet.Meshing
         /// <summary>
         /// Reconstruct a triangulation from its raw data representation.
         /// </summary>
-        public static Mesh ToMesh(Polygon polygon, ITriangle[] triangles, Configuration config = null)
+        public Mesh ToMesh(Polygon polygon, ITriangle[] triangles, Configuration config = null)
         {
             Otri tri = default(Otri);
             Osub subseg = default(Osub);
@@ -82,7 +93,7 @@ namespace TriangleNet.Meshing
         /// Finds the adjacencies between triangles by forming a stack of triangles for
         /// each vertex. Each triangle is on three different stacks simultaneously.
         /// </summary>
-        private static List<Otri>[] SetNeighbors(Mesh mesh, ITriangle[] triangles)
+        private List<Otri>[] SetNeighbors(Mesh mesh, ITriangle[] triangles)
         {
             Otri tri = default(Otri);
             Otri triangleleft = default(Otri);
@@ -199,7 +210,7 @@ namespace TriangleNet.Meshing
         /// <summary>
         /// Finds the adjacencies between triangles and subsegments.
         /// </summary>
-        private static void SetSegments(Mesh mesh, Polygon polygon, List<Otri>[] vertexarray)
+        private void SetSegments(Mesh mesh, Polygon polygon, List<Otri>[] vertexarray)
         {
             Otri checktri = default(Otri);
             Otri nexttri; // Triangle
@@ -224,7 +235,6 @@ namespace TriangleNet.Meshing
             if (mesh.behavior.Poly)
             {
                 // Link the segments to their neighboring triangles.
-                boundmarker = 0;
                 i = 0;
                 foreach (var item in mesh.subsegs.Values)
                 {
@@ -341,7 +351,7 @@ namespace TriangleNet.Meshing
 
         #region DCEL conversion
 
-        public static DcelMesh ToDCEL(Mesh mesh)
+        public DcelMesh ToDCEL(Mesh mesh)
         {
             var dcel = new DcelMesh();
 
@@ -379,7 +389,7 @@ namespace TriangleNet.Meshing
             }
 
             Otri tri = default(Otri), neighbor = default(Otri);
-            TriangleNet.Geometry.Vertex org, dest;
+            TVertex org, dest;
 
             int id, nid, count = mesh.triangles.Count;
 
