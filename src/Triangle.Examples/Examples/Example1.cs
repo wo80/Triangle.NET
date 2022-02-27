@@ -25,7 +25,7 @@ namespace TriangleNet.Examples
             // Generate mesh.
             var mesh = mesher.Triangulate(points);
 
-            if (print) SvgImage.Save(mesh, "example-1.png", 500);
+            if (print) SvgImage.Save(mesh, "example-1.svg", 500);
         }
     }
 }

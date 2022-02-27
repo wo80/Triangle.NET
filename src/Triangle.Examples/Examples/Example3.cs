@@ -17,7 +17,7 @@ namespace TriangleNet.Examples
             // Generate mesh.
             var mesh = CreateMesh();
 
-            if (print) SvgImage.Save(mesh, "example-3.png", 500);
+            if (print) SvgImage.Save(mesh, "example-3.svg", 500);
         }
 
         public static IMesh CreateMesh()

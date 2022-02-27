@@ -20,7 +20,7 @@
             // Generate mesh using the polygons Triangulate extension method.
             var mesh = poly.Triangulate(quality);
 
-            if (print) SvgImage.Save(mesh, "example-2.png", 500);
+            if (print) SvgImage.Save(mesh, "example-2.svg", 500);
         }
 
         public static IPolygon CreatePolygon(double h = 0.2)

@@ -41,7 +41,7 @@ namespace TriangleNet.Examples
 
             smoother.Smooth(mesh, 5);
 
-            if (print) SvgImage.Save(mesh, "example-4.png", 500);
+            if (print) SvgImage.Save(mesh, "example-4.svg", 500);
         }
 
         public static IPolygon CreatePolygon()

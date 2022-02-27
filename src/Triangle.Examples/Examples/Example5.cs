@@ -19,11 +19,11 @@ namespace TriangleNet.Examples
 
             FindBoundary1(mesh);
 
-            if (print) SvgImage.Save(mesh, "example-5-1.png", 500, true, false);
+            if (print) SvgImage.Save(mesh, "example-5-1.svg", 500, true, false);
 
             FindBoundary2(mesh);
 
-            if (print) SvgImage.Save(mesh, "example-5-2.png", 500, true, false);
+            if (print) SvgImage.Save(mesh, "example-5-2.svg", 500, true, false);
         }
 
         /// <summary>

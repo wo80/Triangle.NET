@@ -8,11 +8,11 @@
     using TriangleNet.Topology;
 
     /// <summary>
-    /// Boolean operation on mesh regions (intersection, difference, xor).
+    /// Boolean operations on mesh regions (intersection, difference, xor).
     /// </summary>
     public static class Example6
     {
-        public static void Run() //FindRegions()
+        public static void Run()
         {
             // Generate the input geometry.
             var polygon = new Polygon(8, true);

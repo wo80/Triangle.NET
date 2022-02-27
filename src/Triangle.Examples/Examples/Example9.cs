@@ -72,8 +72,11 @@ namespace TriangleNet.Examples
                 double x = p.X;
                 double y = p.Y;
 
-                double xr = Math.Cos(radians) * x - Math.Sin(radians) * y;
-                double yr = Math.Sin(radians) * x + Math.Cos(radians) * y;
+                double s = Math.Sin(radians);
+                double c = Math.Cos(radians);
+
+                double xr = c * x - s * y;
+                double yr = s * x + c * y;
 
                 poly.Points.Add(new Vertex(xr, yr) { ID = id++ });
             }
