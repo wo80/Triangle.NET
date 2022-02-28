@@ -63,5 +63,24 @@ namespace TriangleNet.Tests.Geometry
                 i = j;
             }
         }
+
+        [Test]
+        public void TestFindInteriorPointDup()
+        {
+            // Rectangle contour with duplicate point.
+            var points = new List<Vertex>()
+            {
+                new Vertex(0.0, 0.0),
+                new Vertex(0.0, 1.0),
+                new Vertex(2.0, 1.0),
+                new Vertex(2.0, 0.5),
+                new Vertex(2.0, 0.5), // duplicate
+                new Vertex(2.0, 0.0)
+            };
+
+            var contour = new Contour(points);
+
+            Assert.DoesNotThrow(() => contour.FindInteriorPoint());
+        }
     }
 }

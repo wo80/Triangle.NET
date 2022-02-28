@@ -36,6 +36,9 @@ namespace TriangleNet.Tools
             // Length of the segment.
             double ab = (b.X - a.X) * (b.X - a.X) + (b.Y - a.Y) * (b.Y - a.Y);
 
+            // Ignore duplicate input points.
+            if (ab == 0) return false;
+
             // Check if test point is actually between a and b (right of b).
             if (dot > ab) return false;
 
