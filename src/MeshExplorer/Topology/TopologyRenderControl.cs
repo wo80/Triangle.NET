@@ -44,12 +44,10 @@ namespace MeshExplorer.Topology
         {
             renderer = new TopologyRenderer(mesh);
 
-            zoom = new Projection(this.ClientRectangle);
+            zoom = new Projection(ClientRectangle);
             //zoom.ClipMargin = 10.0f;
 
-            var b = mesh.Bounds;
-            zoom.Initialize(new BoundingBox((float)b.Left, (float)b.Right,
-                (float)b.Bottom, (float)b.Top));
+            zoom.Initialize(mesh.Bounds);
 
             InitializeBuffer();
 

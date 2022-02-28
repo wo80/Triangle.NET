@@ -5,42 +5,13 @@ namespace TriangleNet.Rendering.Util
     using TriangleNet.Topology;
     using TriangleNet.Geometry;
     using TriangleNet.Rendering.Buffer;
+    using System.Linq;
 
     internal static class BufferHelper
     {
-        public static IBuffer<float> CreateVertexBuffer(double[] points, ref BoundingBox bounds)
-        {
-            int length = points.Length;
-
-            var buffer = new VertexBuffer(length);
-
-            bounds.Reset();
-
-            var data = buffer.Data;
-
-            float x, y;
-
-            length = length >> 1;
-
-            for (int i = 0; i < length; i++)
-            {
-                x = (float)points[2 * i];
-                y = (float)points[2 * i + 1];
-
-                data[2 * i] = x;
-                data[2 * i + 1] = y;
-
-                bounds.Update(x, y);
-            }
-
-            return buffer as IBuffer<float>;
-        }
-
-        public static IBuffer<float> CreateVertexBuffer(ICollection<Point> points, ref BoundingBox bounds)
+        public static IBuffer<float> CreateVertexBuffer(ICollection<Point> points)
         {
             var buffer = new VertexBuffer(2 * points.Count);
-
-            bounds.Reset();
 
             var data = buffer.Data;
 
@@ -56,19 +27,15 @@ namespace TriangleNet.Rendering.Util
                 data[2 * i] = x;
                 data[2 * i + 1] = y;
 
-                bounds.Update(x, y);
-
                 i++;
             }
 
-            return buffer as IBuffer<float>;
+            return buffer;
         }
 
-        public static IBuffer<float> CreateVertexBuffer(ICollection<Vertex> points, ref BoundingBox bounds)
+        public static IBuffer<float> CreateVertexBuffer(ICollection<Vertex> points)
         {
             var buffer = new VertexBuffer(2 * points.Count);
-
-            bounds.Reset();
 
             var data = buffer.Data;
 
@@ -79,23 +46,21 @@ namespace TriangleNet.Rendering.Util
                 data[2 * i] = (float)p.X;
                 data[2 * i + 1] = (float)p.Y;
 
-                bounds.Update(p.X, p.Y);
-
                 i++;
             }
 
-            return buffer as IBuffer<float>;
+            return buffer;
         }
 
-        public static IBuffer<int> CreateIndexBuffer(IList<IEdge> segments, int size)
+        public static IBuffer<int> CreateIndexBuffer(IEnumerable<IEdge> edges, int size)
         {
-            var buffer = new IndexBuffer(size * segments.Count, size);
+            var buffer = new IndexBuffer(size * edges.Count(), size);
 
             var data = buffer.Data;
 
             int i = 0;
 
-            foreach (var e in segments)
+            foreach (var e in edges)
             {
                 data[size * i + 0] = e.P0;
                 data[size * i + 1] = e.P1;
@@ -103,20 +68,7 @@ namespace TriangleNet.Rendering.Util
                 i++;
             }
 
-            return buffer as IBuffer<int>;
-        }
-
-        public static IBuffer<int> CreateIndexBuffer(IEnumerable<IEdge> edges, int size)
-        {
-            var data = new List<int>();
-
-            foreach (var e in edges)
-            {
-                data.Add(e.P0);
-                data.Add(e.P1);
-            }
-
-            return new IndexBuffer(data.ToArray(), size) as IBuffer<int>;
+            return buffer;
         }
 
         public static IBuffer<int> CreateIndexBuffer(ICollection<Triangle> elements, int size)
@@ -136,7 +88,7 @@ namespace TriangleNet.Rendering.Util
                 i++;
             }
 
-            return buffer as IBuffer<int>;
+            return buffer;
         }
     }
 }

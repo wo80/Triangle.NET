@@ -264,7 +264,7 @@ namespace TriangleNet.Rendering.GDI
 
             if (colors.ColorDictionary == null)
             {
-                colors.CreateColorDictionary(regions, regions.Count);
+                colors.CreateColorDictionary(regions);
             }
 
             return labels;

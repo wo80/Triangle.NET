@@ -24,38 +24,31 @@ namespace TriangleNet.Rendering
             this.IsEnabled = false;
         }
 
-        public int Count
-        {
-            get { return count; }
-        }
+        /// <inheritdoc />
+        public int Count => count;
 
-        public IBuffer<float> Points
-        {
-            get { return points; }
-        }
+        /// <inheritdoc />
+        public IBuffer<float> Points => points;
 
-        public IBuffer<int> Indices
-        {
-            get { return indices; }
-        }
+        /// <inheritdoc />
+        public IBuffer<int> Indices => indices;
 
-        public IBuffer<int> Partition
-        {
-            get { return partition; }
-        }
+        /// <inheritdoc />
+        public IBuffer<int> Partition => partition;
 
-        public IBuffer<Color> Colors
-        {
-            get { return colors; }
-        }
+        /// <inheritdoc />
+        public IBuffer<Color> Colors => colors;
 
+        /// <inheritdoc />
         public bool IsEnabled { get; set; }
 
+        /// <inheritdoc />
         public bool IsEmpty()
         {
             return (points == null || points.Count == 0);
         }
 
+        /// <inheritdoc />
         public void Reset(bool clear)
         {
             if (clear)
@@ -69,12 +62,13 @@ namespace TriangleNet.Rendering
             colors = null;
         }
 
-        public BoundingBox SetPoints(IBuffer<float> buffer)
+        /// <inheritdoc />
+        public void SetPoints(IBuffer<float> buffer)
         {
-            BoundingBox bounds = new BoundingBox();
-
             if (points != null && points.Count < buffer.Count)
             {
+                // NOTE: we keep the old size to be able to render new Steiner
+                //       points in a different color than existing points.
                 count = points.Count / points.Size;
             }
             else
@@ -82,41 +76,31 @@ namespace TriangleNet.Rendering
                 count = buffer.Count / buffer.Size;
             }
 
-            this.points = buffer;
-
-            return bounds;
+            points = buffer;
         }
 
-        public BoundingBox SetPoints(IPolygon poly)
+        /// <inheritdoc />
+        public void SetPoints(IPolygon poly)
         {
-            BoundingBox bounds = new BoundingBox();
-
-            points = BufferHelper.CreateVertexBuffer(poly.Points, ref bounds);
+            points = BufferHelper.CreateVertexBuffer(poly.Points);
             count = points.Count / points.Size;
-
-            return bounds;
         }
 
-        public BoundingBox SetPoints(IMesh mesh)
+        /// <inheritdoc />
+        public void SetPoints(IMesh mesh)
         {
-            BoundingBox bounds = new BoundingBox();
-
-            points = BufferHelper.CreateVertexBuffer(mesh.Vertices, ref bounds);
+            points = BufferHelper.CreateVertexBuffer(mesh.Vertices);
             count = points.Count / points.Size;
-
-            return bounds;
         }
 
-        public BoundingBox SetPoints(ICollection<Point> vertices)
+        /// <inheritdoc />
+        public void SetPoints(ICollection<Point> vertices)
         {
-            BoundingBox bounds = new BoundingBox();
-
-            points = BufferHelper.CreateVertexBuffer(vertices, ref bounds);
+            points = BufferHelper.CreateVertexBuffer(vertices);
             count = points.Count / points.Size;
-
-            return bounds;
         }
 
+        /// <inheritdoc />
         public void SetPolygon(IPolygon poly)
         {
             indices = BufferHelper.CreateIndexBuffer(poly.Segments, 2);
@@ -127,11 +111,13 @@ namespace TriangleNet.Rendering
             indices = BufferHelper.CreateIndexBuffer(mesh.Segments, 2);
         }
 
+        /// <inheritdoc />
         public void SetMesh(IEnumerable<IEdge> edges)
         {
             indices = BufferHelper.CreateIndexBuffer(edges, 2);
         }
 
+        /// <inheritdoc />
         public void SetMesh(IMesh mesh, bool elements)
         {
             mesh.Renumber();
@@ -147,12 +133,10 @@ namespace TriangleNet.Rendering
             }
         }
 
-        // TODO: remove colormap argument
+        /// <inheritdoc />
         public void AttachLayerData(float[] values, ColorMap colormap)
         {
             int length = values.Length;
-
-            Color[] data = new Color[length];
 
             double min = double.MaxValue;
             double max = double.MinValue;
@@ -171,14 +155,17 @@ namespace TriangleNet.Rendering
                 }
             }
 
+            var colorData = new Color[length];
+
             for (int i = 0; i < length; i++)
             {
-                data[i] = colormap.GetColor(values[i], min, max);
+                colorData[i] = colormap.GetColor(values[i], min, max);
             }
 
-            colors = new ColorBuffer(data, 1);
+            colors = new ColorBuffer(colorData, 1);
         }
 
+        /// <inheritdoc />
         public void AttachLayerData(int[] partition)
         {
             this.partition = new IndexBuffer(partition, 1);

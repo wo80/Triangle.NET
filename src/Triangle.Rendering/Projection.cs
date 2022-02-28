@@ -44,10 +44,10 @@ namespace TriangleNet.Rendering
         public float ClipMargin { get; set; }
 
         // The y-direction of windows screen coordinates is upside down,
-        // so inverY must be set to true.
-        bool invertY = false;
+        // so invertY should be set to true.
+        bool invertY;
 
-        int maxZoomLevel = 100;
+        const int maxZoomLevel = 100;
 
         public Projection(Rectangle screen, bool invertY = true)
         {
@@ -66,26 +66,29 @@ namespace TriangleNet.Rendering
         /// Inititialize the projection.
         /// </summary>
         /// <param name="world">The world that should be transformed to screen coordinates.</param>
-        public void Initialize(BoundingBox world)
+        public void Initialize(Geometry.Rectangle world)
         {
             this.Level = 1;
 
+            float width = (float)world.Width;
+            float height = (float)world.Height;
+
             // Add a margin so there's some space around the border
-            float worldMargin = (world.Width < world.Height) ? world.Height * 0.05f : world.Width * 0.05f;
+            float worldMargin = (width < height) ? height * 0.05f : width * 0.05f;
 
             // Get the initial viewport (complete mesh centered on the screen)
             float screenRatio = screen.Width / (float)screen.Height;
-            float worldRatio = world.Width / world.Height;
+            float worldRatio = width / height;
 
-            float scale = (world.Width + worldMargin) / screen.Width;
+            float scale = (width + worldMargin) / screen.Width;
 
             if (screenRatio > worldRatio)
             {
-                scale = (world.Height + worldMargin) / screen.Height;
+                scale = (height + worldMargin) / screen.Height;
             }
 
-            float centerX = world.Left + world.Width / 2;
-            float centerY = world.Bottom + world.Height / 2;
+            float centerX = (float)world.Left + width / 2;
+            float centerY = (float)world.Bottom + height / 2;
 
             // TODO: Add initial margin
             this.Viewport = new RectangleF(centerX - screen.Width * scale / 2,

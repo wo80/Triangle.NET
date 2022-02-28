@@ -5,7 +5,6 @@ namespace TriangleNet.Rendering
     using System.Linq;
     using TriangleNet.Geometry;
     using TriangleNet.Meshing;
-    using TriangleNet.Voronoi.Legacy;
 
     /// <summary>
     /// The RenderContext class brings all the rendering parts together.
@@ -13,16 +12,14 @@ namespace TriangleNet.Rendering
     public class RenderContext : IRenderContext
     {
         private ColorManager colorManager;
-        private BoundingBox bounds;
         private Projection zoom;
+        private Rectangle bounds;
         private IMesh mesh;
 
         private List<IRenderLayer> renderLayers;
 
         public RenderContext(Projection zoom, ColorManager colorManager)
         {
-            bounds = new BoundingBox();
-
             renderLayers = new List<IRenderLayer>(6);
 
             renderLayers.Add(new RenderLayer()); // 0 = mesh (filled)
@@ -41,39 +38,22 @@ namespace TriangleNet.Rendering
             this.colorManager = colorManager;
         }
 
-        public ColorManager ColorManager
-        {
-            get { return colorManager; }
-        }
+        /// <inheritdoc />
+        public ColorManager ColorManager => colorManager;
 
-        public BoundingBox Bounds
-        {
-            get { return bounds; }
-        }
+        /// <inheritdoc />
+        public IList<IRenderLayer> RenderLayers => renderLayers;
 
-        public IList<IRenderLayer> RenderLayers
-        {
-            get { return renderLayers; }
-        }
+        /// <inheritdoc />
+        public Projection Zoom => zoom;
 
-        public Projection Zoom
-        {
-            get { return zoom; }
-        }
+        /// <inheritdoc />
+        public IMesh Mesh => mesh;
 
-        public IMesh Mesh
-        {
-            get { return mesh; }
-        }
+        /// <inheritdoc />
+        public bool HasData => renderLayers.Any(layer => !layer.IsEmpty());
 
-        public bool HasData
-        {
-            get
-            {
-                return renderLayers.Any(layer => !layer.IsEmpty());
-            }
-        }
-
+        /// <inheritdoc />
         public void Add(IPolygon data)
         {
             foreach (var layer in RenderLayers)
@@ -92,13 +72,16 @@ namespace TriangleNet.Rendering
                 p.ID = i++;
             }
 
-            this.bounds = RenderLayers[2].SetPoints(data);
-            this.zoom.Initialize(bounds);
+            bounds = data.Bounds();
 
+            zoom.Initialize(bounds);
+
+            RenderLayers[2].SetPoints(data);
             RenderLayers[2].SetPolygon(data);
             RenderLayers[3].SetPoints(RenderLayers[2].Points);
         }
 
+        /// <inheritdoc />
         public void Add(IMesh data, bool reset)
         {
             foreach (var layer in RenderLayers)
@@ -110,11 +93,12 @@ namespace TriangleNet.Rendering
             RenderLayers[4].Reset(true);
 
             // Save reference to mesh.
-            this.mesh = data;
+            mesh = data;
+            bounds = data.Bounds;
 
-            this.bounds = RenderLayers[1].SetPoints(data);
-            this.zoom.Initialize(bounds);
+            zoom.Initialize(bounds);
 
+            RenderLayers[1].SetPoints(data);
             RenderLayers[1].SetMesh(data, false);
 
             RenderLayers[2].SetPoints(RenderLayers[1].Points);
@@ -123,6 +107,7 @@ namespace TriangleNet.Rendering
             RenderLayers[3].SetPoints(RenderLayers[1].Points);
         }
 
+        /// <inheritdoc />
         public void Add(ICollection<Point> points, IEnumerable<IEdge> edges, bool reset)
         {
             RenderLayers[4].SetPoints(points);
@@ -130,6 +115,7 @@ namespace TriangleNet.Rendering
             RenderLayers[4].IsEnabled = true;
         }
 
+        /// <inheritdoc />
         public void Add(float[] data)
         {
             // Add function values for filled mesh.
@@ -140,6 +126,7 @@ namespace TriangleNet.Rendering
             RenderLayers[0].IsEnabled = true;
         }
 
+        /// <inheritdoc />
         public void Add(int[] data)
         {
             // Add partition data for filled mesh.
@@ -150,13 +137,19 @@ namespace TriangleNet.Rendering
             RenderLayers[0].IsEnabled = true;
         }
 
+        /// <inheritdoc />
         public void Enable(int layer, bool enabled)
         {
             renderLayers[layer].IsEnabled = enabled;
         }
 
+        /// <inheritdoc />
         public void Clear()
         {
+            foreach (var layer in RenderLayers)
+            {
+                layer.Reset(true);
+            }
         }
     }
 }

@@ -12,12 +12,12 @@ namespace TriangleNet.Rendering
 
         public float Width
         {
-            get { return this.Right - this.Left; }
+            get { return Right - Left; }
         }
 
         public float Height
         {
-            get { return this.Top - this.Bottom; }
+            get { return Top - Bottom; }
         }
 
         public BoundingBox()
@@ -27,20 +27,20 @@ namespace TriangleNet.Rendering
 
         public BoundingBox(float left, float right, float bottom, float top)
         {
-            this.Left = left;
-            this.Right = right;
-            this.Bottom = bottom;
-            this.Top = top;
+            Left = left;
+            Right = right;
+            Bottom = bottom;
+            Top = top;
         }
 
         public void Update(Point pt)
         {
-            this.Update(pt.X, pt.Y);
+            Update(pt.X, pt.Y);
         }
 
         public void Update(PointF pt)
         {
-            this.Update(pt.X, pt.Y);
+            Update(pt.X, pt.Y);
         }
 
         public void Update(double x, double y)
@@ -51,18 +51,18 @@ namespace TriangleNet.Rendering
         public void Update(float x, float y)
         {
             // Update bounding box
-            if (this.Left > x) this.Left = x;
-            if (this.Right < x) this.Right = x;
-            if (this.Bottom > y) this.Bottom = y;
-            if (this.Top < y) this.Top = y;
+            if (Left > x) Left = x;
+            if (Right < x) Right = x;
+            if (Bottom > y) Bottom = y;
+            if (Top < y) Top = y;
         }
 
         public void Reset()
         {
-            this.Left = float.MaxValue;
-            this.Right = -float.MaxValue;
-            this.Bottom = float.MaxValue;
-            this.Top = -float.MaxValue;
+            Left = float.MaxValue;
+            Right = -float.MaxValue;
+            Bottom = float.MaxValue;
+            Top = -float.MaxValue;
         }
     }
 }

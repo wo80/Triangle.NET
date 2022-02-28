@@ -98,7 +98,7 @@ namespace TriangleNet.Rendering
         public Dictionary<int, Color> ColorDictionary { get; set; }
 
         /// <summary>
-        /// Gets or sets a colormap which is used for function plotting.
+        /// Gets or sets a colormap used for function plotting.
         /// </summary>
         public ColorMap ColorMap { get; set; }
 
@@ -128,10 +128,10 @@ namespace TriangleNet.Rendering
                 keys[i] = i;
             }
 
-            CreateColorDictionary(keys, length);
+            CreateColorDictionary(keys);
         }
 
-        public void CreateColorDictionary(IEnumerable<int> keys, int length)
+        public void CreateColorDictionary(IEnumerable<int> keys)
         {
             this.ColorDictionary = new Dictionary<int, Color>();
 

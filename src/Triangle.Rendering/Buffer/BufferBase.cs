@@ -5,11 +5,10 @@ namespace TriangleNet.Rendering.Buffer
     {
         protected T[] data;
         protected int size;
-        
+
         public BufferBase(int capacity, int size)
+            : this(new T[capacity], size)
         {
-            this.data = new T[capacity];
-            this.size = size;
         }
 
         public BufferBase(T[] data, int size)
@@ -18,24 +17,16 @@ namespace TriangleNet.Rendering.Buffer
             this.size = size;
         }
 
-        public T[] Data
-        {
-            get { return data; }
-        }
+        /// <inheritdoc/>
+        public T[] Data => data;
 
-        public int Count
-        {
-            get { return data == null ? 0 : data.Length; }
-        }
+        /// <inheritdoc/>
+        public int Count => data == null ? 0 : data.Length;
 
-        public abstract int Size
-        {
-            get;
-        }
+        /// <inheritdoc/>
+        public abstract int Size { get; }
 
-        public abstract BufferTarget Target
-        {
-            get;
-        }
+        /// <inheritdoc/>
+        public abstract BufferTarget Target { get; }
     }
 }

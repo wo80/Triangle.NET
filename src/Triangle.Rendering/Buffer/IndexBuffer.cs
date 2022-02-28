@@ -3,28 +3,30 @@ namespace TriangleNet.Rendering.Buffer
 {
     public class IndexBuffer : BufferBase<int>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IndexBuffer"/> class.
+        /// </summary>
+        /// <param name="capacity">The buffer capacity.</param>
+        /// <param name="size">The size of one element in the buffer (i.e. 2 for 2D points)</param>
         public IndexBuffer(int capacity, int size)
             : base(capacity, size)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IndexBuffer"/> class.
+        /// </summary>
+        /// <param name="data">The buffer data.</param>
+        /// <param name="size">The size of one element in the buffer (i.e. 2 for 2D points)</param>
         public IndexBuffer(int[] data, int size)
             : base(data, size)
         {
         }
 
-        /// <summary>
-        /// Gets the number of indices for one element (i.e. 2 for segments
-        /// or 3 for triangles).
-        /// </summary>
-        public override int Size
-        {
-            get { return size; }
-        }
+        /// <inheritdoc/>
+        public override int Size => size;
 
-        public override BufferTarget Target
-        {
-            get { return BufferTarget.IndexBuffer; }
-        }
+        /// <inheritdoc/>
+        public override BufferTarget Target => BufferTarget.IndexBuffer;
     }
 }
