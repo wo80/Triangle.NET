@@ -63,9 +63,9 @@ namespace TriangleNet.Rendering
         }
 
         /// <inheritdoc />
-        public void SetPoints(IBuffer<float> buffer)
+        public void SetPoints(IBuffer<float> buffer, bool reset = true)
         {
-            if (points != null && points.Count < buffer.Count)
+            if (!reset && points != null && points.Count < buffer.Count)
             {
                 // NOTE: we keep the old size to be able to render new Steiner
                 //       points in a different color than existing points.
@@ -80,57 +80,9 @@ namespace TriangleNet.Rendering
         }
 
         /// <inheritdoc />
-        public void SetPoints(IPolygon poly)
+        public void SetIndices(IBuffer<int> buffer)
         {
-            points = BufferHelper.CreateVertexBuffer(poly.Points);
-            count = points.Count / points.Size;
-        }
-
-        /// <inheritdoc />
-        public void SetPoints(IMesh mesh)
-        {
-            points = BufferHelper.CreateVertexBuffer(mesh.Vertices);
-            count = points.Count / points.Size;
-        }
-
-        /// <inheritdoc />
-        public void SetPoints(ICollection<Point> vertices)
-        {
-            points = BufferHelper.CreateVertexBuffer(vertices);
-            count = points.Count / points.Size;
-        }
-
-        /// <inheritdoc />
-        public void SetPolygon(IPolygon poly)
-        {
-            indices = BufferHelper.CreateIndexBuffer(poly.Segments, 2);
-        }
-
-        public void SetPolygon(IMesh mesh)
-        {
-            indices = BufferHelper.CreateIndexBuffer(mesh.Segments, 2);
-        }
-
-        /// <inheritdoc />
-        public void SetMesh(IEnumerable<IEdge> edges)
-        {
-            indices = BufferHelper.CreateIndexBuffer(edges, 2);
-        }
-
-        /// <inheritdoc />
-        public void SetMesh(IMesh mesh, bool elements)
-        {
-            mesh.Renumber();
-
-            if (!elements)
-            {
-                indices = BufferHelper.CreateIndexBuffer(mesh.Edges, 2);
-            }
-
-            if (elements || indices.Count == 0)
-            {
-                indices = BufferHelper.CreateIndexBuffer(mesh.Triangles, 3);
-            }
+            indices = buffer;
         }
 
         /// <inheritdoc />

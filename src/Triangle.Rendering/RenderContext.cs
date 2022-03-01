@@ -5,6 +5,7 @@ namespace TriangleNet.Rendering
     using System.Linq;
     using TriangleNet.Geometry;
     using TriangleNet.Meshing;
+    using TriangleNet.Rendering.Buffer;
 
     /// <summary>
     /// The RenderContext class brings all the rendering parts together.
@@ -76,8 +77,9 @@ namespace TriangleNet.Rendering
 
             zoom.Initialize(bounds);
 
-            RenderLayers[2].SetPoints(data);
-            RenderLayers[2].SetPolygon(data);
+            RenderLayers[2].SetPoints(VertexBuffer.Create(data.Points, bounds));
+            RenderLayers[2].SetIndices(IndexBuffer.Create(data.Segments, 2));
+
             RenderLayers[3].SetPoints(RenderLayers[2].Points);
         }
 
@@ -96,22 +98,25 @@ namespace TriangleNet.Rendering
             mesh = data;
             bounds = data.Bounds;
 
+            // Ensure linear numbering of vertices.
+            mesh.Renumber();
+
             zoom.Initialize(bounds);
 
-            RenderLayers[1].SetPoints(data);
-            RenderLayers[1].SetMesh(data, false);
+            RenderLayers[1].SetPoints(VertexBuffer.Create(data.Vertices, bounds));
+            RenderLayers[1].SetIndices(IndexBuffer.Create(data.Edges, 2));
 
             RenderLayers[2].SetPoints(RenderLayers[1].Points);
-            RenderLayers[2].SetPolygon(data);
+            RenderLayers[2].SetIndices(IndexBuffer.Create(data.Segments, 2));
 
-            RenderLayers[3].SetPoints(RenderLayers[1].Points);
+            RenderLayers[3].SetPoints(RenderLayers[1].Points, false);
         }
 
         /// <inheritdoc />
         public void Add(ICollection<Point> points, IEnumerable<IEdge> edges, bool reset)
         {
-            RenderLayers[4].SetPoints(points);
-            RenderLayers[4].SetMesh(edges);
+            RenderLayers[4].SetPoints(VertexBuffer.Create(points, bounds));
+            RenderLayers[4].SetIndices(IndexBuffer.Create(edges, 2));
             RenderLayers[4].IsEnabled = true;
         }
 
@@ -120,7 +125,7 @@ namespace TriangleNet.Rendering
         {
             // Add function values for filled mesh.
             RenderLayers[0].SetPoints(RenderLayers[1].Points);
-            RenderLayers[0].SetMesh(this.mesh, true);
+            RenderLayers[0].SetIndices(IndexBuffer.Create(mesh.Triangles, 3));
             RenderLayers[0].AttachLayerData(data, colorManager.ColorMap);
 
             RenderLayers[0].IsEnabled = true;
@@ -131,7 +136,7 @@ namespace TriangleNet.Rendering
         {
             // Add partition data for filled mesh.
             RenderLayers[0].SetPoints(RenderLayers[1].Points);
-            RenderLayers[0].SetMesh(this.mesh, true);
+            RenderLayers[0].SetIndices(IndexBuffer.Create(mesh.Triangles, 3));
             RenderLayers[0].AttachLayerData(data);
 
             RenderLayers[0].IsEnabled = true;
