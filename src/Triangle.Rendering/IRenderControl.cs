@@ -6,8 +6,6 @@
 
 namespace TriangleNet.Rendering
 {
-    using System;
-    using System.Windows.Forms;
     using System.Drawing;
 
     /// <summary>
@@ -16,9 +14,11 @@ namespace TriangleNet.Rendering
     public interface IRenderControl
     {
         IRenderer Renderer { get; set; }
+
         Rectangle ClientRectangle { get; }
 
         void Initialize();
+
         void Refresh();
 
         void HandleResize();

@@ -26,7 +26,7 @@ namespace TriangleNet.Rendering.GDI
 
         bool initialized = false;
 
-        string coordinate = String.Empty;
+        string coordinate = string.Empty;
 
         Timer timer;
 
@@ -51,7 +51,7 @@ namespace TriangleNet.Rendering.GDI
             timer.Tick += (sender, e) =>
             {
                 timer.Stop();
-                coordinate = String.Empty;
+                coordinate = string.Empty;
                 this.Invalidate();
             };
         }
@@ -117,7 +117,7 @@ namespace TriangleNet.Rendering.GDI
 
         private void Render()
         {
-            coordinate = String.Empty;
+            coordinate = string.Empty;
 
             if (buffer == null)
             {
@@ -154,7 +154,7 @@ namespace TriangleNet.Rendering.GDI
 
             buffer.Render();
 
-            if (!String.IsNullOrEmpty(coordinate) && Renderer.Context.HasData)
+            if (!string.IsNullOrEmpty(coordinate) && Renderer.Context.HasData)
             {
                 Graphics g = e.Graphics;
                 g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
@@ -204,9 +204,9 @@ namespace TriangleNet.Rendering.GDI
                 timer.Stop();
 
                 PointF c = new PointF((float)e.X / Width, (float)e.Y / Height);
-                zoom.ScreenToWorld(ref c);
-                coordinate = String.Format(NumberFormatInfo.InvariantInfo,
-                    "X:{0} Y:{1}", c.X, c.Y);
+                zoom.ScreenToWorld(c, out double x, out double y);
+                coordinate = string.Format(NumberFormatInfo.InvariantInfo,
+                    "X:{0} Y:{1}", x, y);
 
                 this.Invalidate();
 

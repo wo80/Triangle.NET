@@ -18,15 +18,9 @@ namespace TriangleNet.Rendering
         IRenderer renderer;
         Projection zoom;
 
-        public IRenderControl Control
-        {
-            get { return control; }
-        }
+        public IRenderControl Control => control; 
 
-        public IRenderContext Context
-        {
-            get { return context; }
-        }
+        public IRenderContext Context => context;
 
         public RenderManager()
         {

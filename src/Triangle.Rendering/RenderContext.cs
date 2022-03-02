@@ -62,7 +62,7 @@ namespace TriangleNet.Rendering
                 layer.Reset(true);
             }
 
-            // Always clear voronoi layer.
+            // Always clear Voronoi layer.
             RenderLayers[4].Reset(true);
 
             int i = 0;

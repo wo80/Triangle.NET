@@ -17,7 +17,7 @@ namespace TriangleNet.Rendering.GDI.Native
         /// <summary>
         /// The GradientFill function fills rectangle and triangle structures
         /// </summary>
-        /// <param name="hdc">Handle to the destination device contex</param>
+        /// <param name="hdc">Handle to the destination device context</param>
         /// <param name="pVertex">Array of TRIVERTEX structures that each define a triangle vertex</param>
         /// <param name="nVertex">The number of vertices in pVertex</param>
         /// <param name="pMesh">Array of elements</param>
@@ -33,7 +33,7 @@ namespace TriangleNet.Rendering.GDI.Native
         /// <summary>
         /// The GradientFill function fills rectangle and triangle structures
         /// </summary>
-        /// <param name="hdc">Handle to the destination device contex</param>
+        /// <param name="hdc">Handle to the destination device context</param>
         /// <param name="pVertex">Array of TRIVERTEX structures that each define a triangle vertex</param>
         /// <param name="nVertex">The number of vertices in pVertex</param>
         /// <param name="pMesh">Array of GRADIENT_TRIANGLE structures in triangle mode</param>
@@ -49,7 +49,7 @@ namespace TriangleNet.Rendering.GDI.Native
         /// <summary>
         /// The GradientFill function fills rectangle and triangle structures
         /// </summary>
-        /// <param name="hdc">Handle to the destination device contex</param>
+        /// <param name="hdc">Handle to the destination device context</param>
         /// <param name="pVertex">Array of TRIVERTEX structures that each define a triangle vertex</param>
         /// <param name="nVertex">The number of vertices in pVertex</param>
         /// <param name="pMesh">an array of GRADIENT_RECT structures in rectangle mode</param>

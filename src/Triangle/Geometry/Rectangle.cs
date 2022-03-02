@@ -21,8 +21,8 @@ namespace TriangleNet.Geometry
         /// </summary>
         public Rectangle()
         {
-            this.xmin = this.ymin = double.MaxValue;
-            this.xmax = this.ymax = -double.MaxValue;
+            xmin = ymin = double.MaxValue;
+            xmax = ymax = -double.MaxValue;
         }
 
         public Rectangle(Rectangle other)
@@ -40,59 +40,51 @@ namespace TriangleNet.Geometry
         /// <param name="height">Height of the rectangle.</param>
         public Rectangle(double x, double y, double width, double height)
         {
-            this.xmin = x;
-            this.ymin = y;
-            this.xmax = x + width;
-            this.ymax = y + height;
+            xmin = x;
+            ymin = y;
+            xmax = x + width;
+            ymax = y + height;
         }
 
         /// <summary>
         /// Gets the minimum x value (left boundary).
         /// </summary>
-        public double Left
-        {
-            get { return xmin; }
-        }
+        public double Left => xmin;
 
         /// <summary>
         /// Gets the maximum x value (right boundary).
         /// </summary>
-        public double Right
-        {
-            get { return xmax; }
-        }
+        public double Right => xmax;
 
         /// <summary>
         /// Gets the minimum y value (bottom boundary).
         /// </summary>
-        public double Bottom
-        {
-            get { return ymin; }
-        }
+        public double Bottom => ymin;
 
         /// <summary>
         /// Gets the maximum y value (top boundary).
         /// </summary>
-        public double Top
-        {
-            get { return ymax; }
-        }
+        public double Top => ymax;
+
+        /// <summary>
+        /// Gets the minimum x value (left boundary).
+        /// </summary>
+        public double X => xmin;
+
+        /// <summary>
+        /// Gets the minimum y value (bottom boundary).
+        /// </summary>
+        public double Y => ymin;
 
         /// <summary>
         /// Gets the width of the rectangle.
         /// </summary>
-        public double Width
-        {
-            get { return xmax - xmin; }
-        }
+        public double Width => xmax - xmin;
 
         /// <summary>
         /// Gets the height of the rectangle.
         /// </summary>
-        public double Height
-        {
-            get { return ymax - ymin; }
-        }
+        public double Height => ymax - ymin;
 
         /// <summary>
         /// Update bounds.
@@ -151,7 +143,7 @@ namespace TriangleNet.Geometry
         /// <returns>Return true, if rectangle contains given point.</returns>
         public bool Contains(double x, double y)
         {
-            return ((x >= xmin) && (x <= xmax) && (y >= ymin) && (y <= ymax));
+            return (x >= xmin) && (x <= xmax) && (y >= ymin) && (y <= ymax);
         }
 
         /// <summary>
@@ -171,8 +163,8 @@ namespace TriangleNet.Geometry
         /// <returns>Return true, if this rectangle contains given rectangle.</returns>
         public bool Contains(Rectangle other)
         {
-            return (xmin <= other.Left && other.Right <= xmax
-                && ymin <= other.Bottom && other.Top <= ymax);
+            return xmin <= other.Left && other.Right <= xmax
+                && ymin <= other.Bottom && other.Top <= ymax;
         }
 
         /// <summary>
@@ -182,8 +174,8 @@ namespace TriangleNet.Geometry
         /// <returns>Return true, if given rectangle intersects this rectangle.</returns>
         public bool Intersects(Rectangle other)
         {
-            return (other.Left < xmax && xmin < other.Right
-                && other.Bottom < ymax && ymin < other.Top);
+            return other.Left < xmax && xmin < other.Right
+                && other.Bottom < ymax && ymin < other.Top;
         }
     }
 }
