@@ -1,11 +1,11 @@
 ﻿
+using System.Collections.Generic;
+using System.Linq;
+using TriangleNet.Geometry;
+using TriangleNet.Topology;
+
 namespace TriangleNet.Rendering.Buffer
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using TriangleNet.Geometry;
-    using TriangleNet.Topology;
-
     public class IndexBuffer : BufferBase<int>
     {
         #region Static methods

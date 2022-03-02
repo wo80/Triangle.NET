@@ -6,7 +6,7 @@ namespace MeshExplorer.Topology
     using TriangleNet;
     using TriangleNet.Geometry;
     using TriangleNet.Rendering;
-    
+
     public class TopologyRenderer
     {
         Projection zoom;
@@ -39,9 +39,16 @@ namespace MeshExplorer.Topology
 
             int k = 0;
 
+            var b = mesh.Bounds;
+
+            double s = 1d / Math.Max(b.Width, b.Height);
+            double dx = b.X;
+            double dy = b.Y;
+
             foreach (var v in mesh.Vertices)
             {
-                points[k++] = new PointF((float)v.X, (float)v.Y);
+                // Normalized device coordinates.
+                points[k++] = new PointF((float)((v.X - dx) * s), (float)((v.Y - dy) * s));
             }
 
             font = new Font("Arial", 7.5f);
@@ -146,7 +153,7 @@ namespace MeshExplorer.Topology
                 var brush = i == id ? Brushes.DarkRed : Point;
 
                 pt = points[i];
-                zoom.WorldToScreen(ref pt);
+                zoom.NdcToScreen(ref pt);
                 g.FillEllipse(brush, pt.X - 10f, pt.Y - 10f, 20, 20);
 
                 pt.X -= i > 9 ? 7 : 4;
@@ -168,9 +175,9 @@ namespace MeshExplorer.Topology
                 p1 = points[tri.GetVertexID(1)];
                 p2 = points[tri.GetVertexID(2)];
 
-                zoom.WorldToScreen(ref p0);
-                zoom.WorldToScreen(ref p1);
-                zoom.WorldToScreen(ref p2);
+                zoom.NdcToScreen(ref p0);
+                zoom.NdcToScreen(ref p1);
+                zoom.NdcToScreen(ref p2);
 
                 g.DrawLine(Line, p0, p1);
                 g.DrawLine(Line, p1, p2);
@@ -197,9 +204,9 @@ namespace MeshExplorer.Topology
                 p1 = points[tri.GetVertexID(1)];
                 p2 = points[tri.GetVertexID(2)];
 
-                zoom.WorldToScreen(ref p0);
-                zoom.WorldToScreen(ref p1);
-                zoom.WorldToScreen(ref p2);
+                zoom.NdcToScreen(ref p0);
+                zoom.NdcToScreen(ref p1);
+                zoom.NdcToScreen(ref p2);
 
                 center = GetIncenter(p0, p1, p2);
                 center.X -= 5;
@@ -221,8 +228,8 @@ namespace MeshExplorer.Topology
                 p0 = points[edge.P0];
                 p1 = points[edge.P1];
 
-                zoom.WorldToScreen(ref p0);
-                zoom.WorldToScreen(ref p1);
+                zoom.NdcToScreen(ref p0);
+                zoom.NdcToScreen(ref p1);
 
                 g.DrawLine(Line, p0, p1);
             }
@@ -239,8 +246,8 @@ namespace MeshExplorer.Topology
                 p0 = points[seg.P0];
                 p1 = points[seg.P1];
 
-                zoom.WorldToScreen(ref p0);
-                zoom.WorldToScreen(ref p1);
+                zoom.NdcToScreen(ref p0);
+                zoom.NdcToScreen(ref p1);
 
                 g.DrawLine(Segment, p0, p1);
             }
@@ -255,8 +262,8 @@ namespace MeshExplorer.Topology
                 p0 = points[currentOrg.ID];
                 p1 = points[currentDest.ID];
 
-                zoom.WorldToScreen(ref p0);
-                zoom.WorldToScreen(ref p1);
+                zoom.NdcToScreen(ref p0);
+                zoom.NdcToScreen(ref p1);
 
                 g.DrawLine(SelectedEdge, p0, p1);
             }
@@ -272,9 +279,9 @@ namespace MeshExplorer.Topology
                 p[1] = points[currentTri.GetVertexID(1)];
                 p[2] = points[currentTri.GetVertexID(2)];
 
-                zoom.WorldToScreen(ref p[0]);
-                zoom.WorldToScreen(ref p[1]);
-                zoom.WorldToScreen(ref p[2]);
+                zoom.NdcToScreen(ref p[0]);
+                zoom.NdcToScreen(ref p[1]);
+                zoom.NdcToScreen(ref p[2]);
 
                 g.FillPolygon(SelectedTriangle, p);
             }

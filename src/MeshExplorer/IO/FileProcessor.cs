@@ -6,13 +6,12 @@
 
 namespace MeshExplorer.IO
 {
+    using MeshExplorer.IO.Formats;
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using MeshExplorer.IO.Formats;
-    using TriangleNet.IO;
-    using TriangleNet.Geometry;
     using TriangleNet;
+    using TriangleNet.Geometry;
 
     /// <summary>
     /// Provides static methods to read and write mesh files.

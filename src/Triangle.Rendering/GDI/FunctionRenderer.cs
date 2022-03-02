@@ -48,7 +48,7 @@ namespace TriangleNet.Rendering.GDI
             Color color;
             PointF p = new PointF((float)data[0], (float)data[1]);
 
-            zoom.WorldToScreen(ref p);
+            zoom.NdcToScreen(ref p);
 
             // Get correction distance
             float dx = (p.X - (int)p.X) * 2.0f;
@@ -60,7 +60,7 @@ namespace TriangleNet.Rendering.GDI
                 p.X = (float)data[size * i];
                 p.Y = (float)data[size * i + 1];
 
-                zoom.WorldToScreen(ref p);
+                zoom.NdcToScreen(ref p);
 
                 color = colors[i];
 

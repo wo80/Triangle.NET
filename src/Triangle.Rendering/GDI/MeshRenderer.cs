@@ -58,7 +58,7 @@ namespace TriangleNet.Rendering.GDI
 
                 if (zoom.Viewport.Contains(p))
                 {
-                    zoom.WorldToScreen(ref p);
+                    zoom.NdcToScreen(ref p);
                     g.FillEllipse(brush, p.X - 1.5f, p.Y - 1.5f, 3, 3);
                 }
             }
@@ -109,9 +109,9 @@ namespace TriangleNet.Rendering.GDI
 
                 if (zoom.Viewport.Intersects(tri[0], tri[1], tri[2]))
                 {
-                    zoom.WorldToScreen(ref tri[0]);
-                    zoom.WorldToScreen(ref tri[1]);
-                    zoom.WorldToScreen(ref tri[2]);
+                    zoom.NdcToScreen(ref tri[0]);
+                    zoom.NdcToScreen(ref tri[1]);
+                    zoom.NdcToScreen(ref tri[2]);
 
                     if (filled)
                     {
@@ -162,8 +162,8 @@ namespace TriangleNet.Rendering.GDI
 
                 if (zoom.Viewport.Intersects(p0, p1))
                 {
-                    zoom.WorldToScreen(ref p0);
-                    zoom.WorldToScreen(ref p1);
+                    zoom.NdcToScreen(ref p0);
+                    zoom.NdcToScreen(ref p1);
 
                     g.DrawLine(pen, p0, p1);
                 }

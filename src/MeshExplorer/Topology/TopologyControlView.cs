@@ -15,11 +15,11 @@ namespace MeshExplorer.Topology
             InitializeComponent();
         }
 
-        public void SetPosition(PointF p)
+        public void SetPosition(double x, double y)
         {
             var nfi = NumberFormatInfo.InvariantInfo;
 
-            lbPosition.Text = String.Format(nfi, "X: {0:0.0}, Y: {1:0.0}", p.X, p.Y);
+            lbPosition.Text = string.Format(nfi, "X: {0:0.0}, Y: {1:0.0}", x, y);
         }
 
         public void SetTriangle(ITriangle tri)

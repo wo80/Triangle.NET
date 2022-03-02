@@ -52,20 +52,20 @@ namespace MeshExplorer
             topoControlView.SetTriangle(current.Triangle);
         }
 
-        private ITriangle FindTriangleAt(float x, float y)
+        private ITriangle FindTriangleAt(float xr, float yr)
         {
             // Get mesh coordinates
-            var p = new System.Drawing.PointF(x, y);
-            renderControl.Zoom.ScreenToWorld(ref p);
+            var p = new System.Drawing.PointF(xr, yr);
+            renderControl.Zoom.ScreenToWorld(p, out double x, out double y);
 
-            topoControlView.SetPosition(p);
+            topoControlView.SetPosition(x, y);
 
             if (tree == null)
             {
                 tree = new TriangleQuadTree(mesh, 5, 2);
             }
 
-            return tree.Query(p.X, p.Y);
+            return tree.Query(x, y);
         }
 
         private void InvokePrimitive(string name)

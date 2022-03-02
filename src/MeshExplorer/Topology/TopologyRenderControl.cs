@@ -45,15 +45,13 @@ namespace MeshExplorer.Topology
             renderer = new TopologyRenderer(mesh);
 
             zoom = new Projection(ClientRectangle);
-            //zoom.ClipMargin = 10.0f;
-
             zoom.Initialize(mesh.Bounds);
 
             InitializeBuffer();
 
             initialized = true;
 
-            this.Render();
+            Render();
         }
 
         public void Update(Otri otri)

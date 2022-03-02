@@ -1,9 +1,10 @@
 ﻿
+using System;
+using System.Collections.Generic;
+using TriangleNet.Geometry;
+
 namespace TriangleNet.Rendering.Buffer
 {
-    using System.Collections.Generic;
-    using TriangleNet.Geometry;
-
     public class VertexBuffer : BufferBase<float>
     {
         #region Static methods
@@ -12,25 +13,40 @@ namespace TriangleNet.Rendering.Buffer
         /// Create a vertex buffer from given point collection.
         /// </summary>
         /// <param name="points">The points to render.</param>
-        /// <param name="bounds">The points bounding box.</param>
-        /// <returns></returns>
+        /// <returns>Returns the vertex buffer.</returns>
+        public static IBuffer<float> Create(ICollection<Point> points)
+        {
+            return Create(points, new Rectangle(0d, 0d, 1d, 1d));
+        }
+
+        /// <summary>
+        /// Create a normalized vertex buffer from given point collection.
+        /// </summary>
+        /// <param name="points">The points to render.</param>
+        /// <param name="bounds">The bounding box used for normalization.</param>
+        /// <returns>Returns a buffer of normalized coordinates.</returns>
         public static IBuffer<float> Create(ICollection<Point> points, Rectangle bounds)
         {
             var buffer = new VertexBuffer(2 * points.Count);
 
             var data = buffer.Data;
 
-            float x, y;
+            double dx = bounds.X;
+            double dy = bounds.Y;
+
+            double scale = 1.0 / Math.Max(bounds.Width, bounds.Height);
 
             int i = 0;
 
+            double x, y;
+
             foreach (var p in points)
             {
-                x = (float)p.X;
-                y = (float)p.Y;
+                x = (p.X - dx) * scale;
+                y = (p.Y - dy) * scale;
 
-                data[2 * i] = x;
-                data[2 * i + 1] = y;
+                data[2 * i] = (float)x;
+                data[2 * i + 1] = (float)y;
 
                 i++;
             }
@@ -39,23 +55,43 @@ namespace TriangleNet.Rendering.Buffer
         }
 
         /// <summary>
-        /// Create a vertex buffer from given vertex collection.
+        /// Create a vertex buffer from given point collection.
+        /// </summary>
+        /// <param name="points">The points to render.</param>
+        /// <returns>Returns the vertex buffer.</returns>
+        public static IBuffer<float> Create(ICollection<Vertex> points)
+        {
+            return Create(points, new Rectangle(0d, 0d, 1d, 1d));
+        }
+
+        /// <summary>
+        /// Create a normalized vertex buffer from given vertex collection.
         /// </summary>
         /// <param name="points">The vertices to render.</param>
-        /// <param name="bounds">The vertices bounding box.</param>
-        /// <returns></returns>
+        /// <param name="bounds">The bounding box used for normalization.</param>
+        /// <returns>Returns a buffer of normalized coordinates.</returns>
         public static IBuffer<float> Create(ICollection<Vertex> points, Rectangle bounds)
         {
             var buffer = new VertexBuffer(2 * points.Count);
 
             var data = buffer.Data;
 
+            double dx = bounds.X;
+            double dy = bounds.Y;
+
+            double scale = 1.0 / Math.Max(bounds.Width, bounds.Height);
+
             int i = 0;
+
+            double x, y;
 
             foreach (var p in points)
             {
-                data[2 * i] = (float)p.X;
-                data[2 * i + 1] = (float)p.Y;
+                x = (p.X - dx) * scale;
+                y = (p.Y - dy) * scale;
+
+                data[2 * i] = (float)x;
+                data[2 * i + 1] = (float)y;
 
                 i++;
             }
