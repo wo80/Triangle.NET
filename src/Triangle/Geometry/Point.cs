@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="Point.cs" company="">
-// Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
+// Triangle.NET Copyright (c) 2012-2022 Christian Woltering
 // </copyright>
 // -----------------------------------------------------------------------
 

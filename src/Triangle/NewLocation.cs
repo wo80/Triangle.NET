@@ -1,7 +1,7 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="NewLocation.cs">
-// Original code by Hale Erten and Alper Üngör, http://www.cise.ufl.edu/~ungor/aCute/index.html
-// Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
+// Original code by Hale Erten and Alper Üngör, https://www.cise.ufl.edu/~ungor/aCute/index.html
+// Triangle.NET code by Christian Woltering
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -16,7 +16,7 @@ namespace TriangleNet
     /// Find new Steiner point locations.
     /// </summary>
     /// <remarks>
-    /// http://www.cise.ufl.edu/~ungor/aCute/index.html
+    /// See https://www.cise.ufl.edu/~ungor/aCute/index.html
     /// </remarks>
     class NewLocation
     {

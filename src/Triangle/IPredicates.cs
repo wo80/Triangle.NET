@@ -1,9 +1,4 @@
-﻿// -----------------------------------------------------------------------
-// <copyright file="IPredicates.cs">
-// Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
-// </copyright>
-// -----------------------------------------------------------------------
-
+﻿
 namespace TriangleNet
 {
     using TriangleNet.Geometry;

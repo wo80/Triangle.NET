@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="Face.cs">
-// Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
+// Triangle.NET Copyright (c) 2012-2022 Christian Woltering
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -29,7 +29,7 @@ namespace TriangleNet.Topology.DCEL
         internal int id;
         internal int mark;
 
-        // If the face is a Voronio cell, this is the point that generates the cell.
+        // If the face is a Voronoi cell, this is the point that generates the cell.
         internal Point generator;
 
         internal HalfEdge edge;

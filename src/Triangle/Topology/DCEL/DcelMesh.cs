@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="DcelMesh.cs">
-// Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
+// Triangle.NET Copyright (c) 2012-2022 Christian Woltering
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -70,7 +70,7 @@ namespace TriangleNet.Topology.DCEL
         }
 
         /// <summary>
-        /// Check if the DCEL is consistend.
+        /// Check if the DCEL is consistent.
         /// </summary>
         /// <param name="closed">If true, faces are assumed to be closed (i.e. all edges must have
         /// a valid next pointer).</param>

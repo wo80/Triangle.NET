@@ -1,7 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="VoronoiBase.cs">
-// Original Triangle code by Jonathan Richard Shewchuk, http://www.cs.cmu.edu/~quake/triangle.html
-// Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
+// Triangle.NET Copyright (c) 2012-2022 Christian Woltering
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -16,7 +15,7 @@ namespace TriangleNet.Voronoi
     using Vertex = TriangleNet.Topology.DCEL.Vertex;
 
     /// <summary>
-    /// The Voronoi diagram is the dual of a pointset triangulation.
+    /// The Voronoi diagram is the dual of a point set triangulation.
     /// </summary>
     public abstract class VoronoiBase : DcelMesh
     {
@@ -34,7 +33,7 @@ namespace TriangleNet.Voronoi
         /// <param name="mesh">Triangle mesh.</param>
         /// <param name="factory">Voronoi object factory.</param>
         /// <param name="predicates">Geometric predicates implementation.</param>
-        /// <param name="generate">If set to true, the constuctor will call the Generate
+        /// <param name="generate">If set to true, the constructor will call the Generate
         /// method, which builds the Voronoi diagram.</param>
         protected VoronoiBase(Mesh mesh, IVoronoiFactory factory, IPredicates predicates,
             bool generate) : base(false)
@@ -155,7 +154,7 @@ namespace TriangleNet.Voronoi
             HalfEdge edge, twin;
             Vertex vertex, end;
 
-            // Count infinte edges (vertex id for their endpoints).
+            // Count infinite edges (vertex id for their endpoints).
             int j = 0;
 
             // Count half-edges (edge ids).

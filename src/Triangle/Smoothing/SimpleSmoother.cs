@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="SimpleSmoother.cs" company="">
-// Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
+// Triangle.NET Copyright (c) 2012-2022 Christian Woltering
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -12,10 +12,10 @@ namespace TriangleNet.Smoothing
     using TriangleNet.Voronoi;
 
     /// <summary>
-    /// Simple mesh smoother implementation.
+    /// Simple mesh smoother implementation (Lloyd's relaxation algorithm).
     /// </summary>
     /// <remarks>
-    /// Vertices wich should not move (e.g. segment vertices) MUST have a
+    /// Vertices which should not move (e.g. segment vertices) MUST have a
     /// boundary mark greater than 0.
     /// </remarks>
     public class SimpleSmoother : ISmoother
@@ -63,11 +63,13 @@ namespace TriangleNet.Smoothing
             this.options = new ConstraintOptions() { ConformingDelaunay = true };
         }
 
+        /// <inheritdoc/>
         public void Smooth(IMesh mesh)
         {
             Smooth(mesh, 10);
         }
 
+        /// <inheritdoc/>
         public void Smooth(IMesh mesh, int limit)
         {
             var smoothedMesh = (Mesh)mesh;

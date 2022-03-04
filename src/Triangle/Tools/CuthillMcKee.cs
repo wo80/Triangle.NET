@@ -1,7 +1,7 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="CuthillMcKee.cs" company="">
 // Original Matlab code by John Burkardt, Florida State University
-// Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
+// Triangle.NET code by Christian Woltering
 // </copyright>
 // -----------------------------------------------------------------------
 

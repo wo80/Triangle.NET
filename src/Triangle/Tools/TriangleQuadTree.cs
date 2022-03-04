@@ -1,7 +1,7 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="TriangleQuadTree.cs" company="">
-// Original code by Frank Dockhorn, [not available anymore: http://sourceforge.net/projects/quadtreesim/]
-// Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
+// Copyright(c) 2018 Frank Dockhorn, MIT license, https://sourceforge.net/projects/quadtreedemo/
+// Triangle.NET code by Christian Woltering
 // </copyright>
 // -----------------------------------------------------------------------
 

@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="Log.cs" company="">
-// Triangle.NET code by Christian Woltering, http://triangle.codeplex.com/
+// Triangle.NET Copyright (c) 2012-2022 Christian Woltering
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -135,7 +135,7 @@ namespace TriangleNet
         /// Log warning message.
         /// </summary>
         /// <param name="message">The message.</param>
-        /// <param name="details">Message details, for example the code location where the error occured (class, method).</param>
+        /// <param name="details">Message details, for example the code location where the error occurred (class, method).</param>
         public void Warning(string message, string details)
         {
             data.Add(new LogItem(LogLevel.Warning, message, details));
@@ -145,7 +145,7 @@ namespace TriangleNet
         /// Log error message.
         /// </summary>
         /// <param name="message">The message.</param>
-        /// <param name="details">Message details, for example the code location where the error occured (class, method).</param>
+        /// <param name="details">Message details, for example the code location where the error occurred (class, method).</param>
         public void Error(string message, string details)
         {
             data.Add(new LogItem(LogLevel.Error, message, details));
