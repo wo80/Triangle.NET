@@ -142,10 +142,10 @@ namespace TriangleNet.Tools
         /// Intersect a ray with a bounding box.
         /// </summary>
         /// <param name="rect">The clip rectangle.</param>
-        /// <param name="p0">The ray startpoint (inside the box).</param>
+        /// <param name="p0">The ray start point (inside the box).</param>
         /// <param name="p1">Any point in ray direction (NOT the direction vector).</param>
         /// <param name="c1">The intersection point.</param>
-        /// <returns>Returns false, if startpoint is outside the box.</returns>
+        /// <returns>Returns false, if start point is outside the box.</returns>
         public static bool BoxRayIntersection(Rectangle rect, Point p0, Point p1, ref Point c1)
         {
             return BoxRayIntersection(rect, p0, p1.x - p0.x, p1.y - p0.y, ref c1);
@@ -155,10 +155,10 @@ namespace TriangleNet.Tools
         /// Intersect a ray with a bounding box.
         /// </summary>
         /// <param name="rect">The clip rectangle.</param>
-        /// <param name="p">The ray startpoint (inside the box).</param>
+        /// <param name="p">The ray start point (inside the box).</param>
         /// <param name="dx">X direction.</param>
         /// <param name="dy">Y direction.</param>
-        /// <returns>Returns false, if startpoint is outside the box.</returns>
+        /// <returns>Returns false, if start point is outside the box.</returns>
         public static Point BoxRayIntersection(Rectangle rect, Point p, double dx, double dy)
         {
             var intersection = new Point();

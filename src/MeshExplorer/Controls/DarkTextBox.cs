@@ -7,10 +7,7 @@
 namespace MeshExplorer.Controls
 {
     using System;
-    using System.Collections.Generic;
-    using System.Text;
     using System.Drawing;
-    using System.Drawing.Drawing2D;
     using System.Windows.Forms;
 
     /// <summary>
@@ -103,6 +100,20 @@ namespace MeshExplorer.Controls
             {
                 textBox.ForeColor = ColorScheme.ColorGray68;
             };
+
+            textBox.KeyDown += delegate(object sender, KeyEventArgs e)
+            {
+                if (e.KeyCode == Keys.Enter)
+                {
+                    e.SuppressKeyPress = true;
+                    OnKeyDown(e);
+                }
+            };
+        }
+
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
         }
 
         protected override void OnPaint(PaintEventArgs e)

@@ -6,7 +6,6 @@
 
 namespace TriangleNet.Rendering.GDI
 {
-    using System;
     using System.Drawing;
     using System.Drawing.Drawing2D;
     using System.Drawing.Text;
@@ -158,7 +157,7 @@ namespace TriangleNet.Rendering.GDI
             {
                 Graphics g = e.Graphics;
                 g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
-                g.DrawString(coordinate, this.Font, Brushes.White, 10, 10);
+                TextRenderer.DrawText(g, coordinate, Font, new Point(10, 10), Color.White);
             }
         }
 

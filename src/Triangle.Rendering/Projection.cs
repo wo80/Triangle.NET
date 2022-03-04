@@ -24,7 +24,7 @@ namespace TriangleNet.Rendering
     /// </para>
     /// <para>
     /// Since the upper-left corner of the display is usually the screen coordinate origin
-    /// (0,0), the project will automatically invert the y-axis.
+    /// (0,0), the projection will automatically invert the y-axis.
     /// </para>
     /// </remarks>
     public class Projection
@@ -63,13 +63,16 @@ namespace TriangleNet.Rendering
 
             world = viewport = new RectangleF(screen.X, screen.Y, screen.Width, screen.Height);
 
+            world_ = new TRectangle();
+            scale_ = 0;
+
             Level = 1;
         }
 
         /// <summary>
         /// Initialize the projection.
         /// </summary>
-        /// <param name="nworld">The world that should be transformed to screen coordinates.</param>
+        /// <param name="world">The world that should be transformed to screen coordinates.</param>
         public void Initialize(TRectangle world)
         {
             Level = 1;

@@ -18,7 +18,7 @@ namespace TriangleNet.IO
     /// </summary>
     public class TriangleReader
     {
-        static NumberFormatInfo nfi = NumberFormatInfo.InvariantInfo;
+        private static readonly NumberFormatInfo nfi = NumberFormatInfo.InvariantInfo;
 
         int startIndex = 0;
 
@@ -35,7 +35,7 @@ namespace TriangleNet.IO
 
             string line = reader.ReadLine().Trim();
 
-            while (String.IsNullOrWhiteSpace(line) || line.StartsWith("#"))
+            while (string.IsNullOrWhiteSpace(line) || line.StartsWith("#"))
             {
                 if (reader.EndOfStream)
                 {
@@ -101,8 +101,6 @@ namespace TriangleNet.IO
         /// </summary>
         public void Read(string filename, out Polygon polygon)
         {
-            polygon = null;
-
             string path = Path.ChangeExtension(filename, ".poly");
 
             if (File.Exists(path))
@@ -138,9 +136,7 @@ namespace TriangleNet.IO
         /// </summary>
         public IPolygon Read(string filename)
         {
-            Polygon geometry = null;
-
-            Read(filename, out geometry);
+            Read(filename, out Polygon geometry);
 
             return geometry;
         }
@@ -280,7 +276,7 @@ namespace TriangleNet.IO
             startIndex = 0;
 
             string[] line;
-            int invertices = 0, attributes = 0, nodemarkers = 0;
+            int invertices, attributes = 0, nodemarkers = 0;
 
             using (var reader = new StreamReader(polyfilename))
             {
@@ -398,7 +394,7 @@ namespace TriangleNet.IO
                         if (Log.Verbose)
                         {
                             Log.Instance.Warning("Invalid first endpoint of segment.",
-                                "MeshReader.ReadPolyfile()");
+                                "TriangleReader.ReadPolyfile()");
                         }
                     }
                     else if ((end2 < 0) || (end2 >= invertices))
@@ -406,7 +402,7 @@ namespace TriangleNet.IO
                         if (Log.Verbose)
                         {
                             Log.Instance.Warning("Invalid second endpoint of segment.",
-                                "MeshReader.ReadPolyfile()");
+                                "TriangleReader.ReadPolyfile()");
                         }
                     }
                     else
@@ -520,7 +516,6 @@ namespace TriangleNet.IO
         /// Read the elements from an .ele file.
         /// </summary>
         /// <param name="elefilename"></param>
-        /// <param name="data"></param>
         /// <param name="readArea"></param>
         private List<ITriangle> ReadEleFile(string elefilename, bool readArea)
         {
@@ -541,7 +536,7 @@ namespace TriangleNet.IO
 
                 intriangles = int.Parse(line[0]);
 
-                // We irgnore index 1 (number of nodes per triangle)
+                // We ignore index 1 (number of nodes per triangle)
                 attributes = 0;
                 if (line.Length > 2)
                 {
@@ -551,7 +546,8 @@ namespace TriangleNet.IO
 
                 if (attributes > 1)
                 {
-                    Log.Instance.Warning("Triangle attributes not supported.", "FileReader.Read");
+                    Log.Instance.Warning("Triangle attributes not supported.",
+                        "TriangleReader.ReadEleFile()");
                 }
 
                 triangles = new List<ITriangle>(intriangles);
@@ -624,7 +620,7 @@ namespace TriangleNet.IO
                 if (int.Parse(line[0]) != intriangles)
                 {
                     Log.Instance.Warning("Number of area constraints doesn't match number of triangles.",
-                        "ReadAreaFile()");
+                        "TriangleReader.ReadAreaFile()");
                     return null;
                 }
 
@@ -717,7 +713,7 @@ namespace TriangleNet.IO
                         if (Log.Verbose)
                         {
                             Log.Instance.Warning("Invalid first endpoint of segment.",
-                                "MeshReader.ReadPolyfile()");
+                                "TriangleReader.ReadEdgeFile()");
                         }
                     }
                     else if ((end2 < 0) || (end2 >= invertices))
@@ -725,7 +721,7 @@ namespace TriangleNet.IO
                         if (Log.Verbose)
                         {
                             Log.Instance.Warning("Invalid second endpoint of segment.",
-                                "MeshReader.ReadPolyfile()");
+                                "TriangleReader.ReadEdgeFile()");
                         }
                     }
                     else

@@ -51,7 +51,7 @@ namespace TriangleNet.Geometry
         public Vertex(double x, double y, int mark)
             : base(x, y, mark)
         {
-            this.type = VertexType.InputVertex;
+            type = VertexType.InputVertex;
         }
 
 #if USE_ATTRIBS
@@ -87,10 +87,7 @@ namespace TriangleNet.Geometry
         /// <summary>
         /// Gets the vertex type.
         /// </summary>
-        public VertexType Type
-        {
-            get { return this.type; }
-        }
+        public VertexType Type => type;
 
         /// <summary>
         /// Gets the specified coordinate of the vertex.
@@ -101,15 +98,8 @@ namespace TriangleNet.Geometry
         {
             get
             {
-                if (i == 0)
-                {
-                    return x;
-                }
-
-                if (i == 1)
-                {
-                    return y;
-                }
+                if (i == 0) return x;
+                if (i == 1) return y;
 
                 throw new ArgumentOutOfRangeException("Index must be 0 or 1.");
             }
@@ -117,9 +107,6 @@ namespace TriangleNet.Geometry
 
         #endregion
 
-        public override int GetHashCode()
-        {
-            return this.hash;
-        }
+        public override int GetHashCode() => hash;
     }
 }

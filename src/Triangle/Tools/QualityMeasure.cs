@@ -271,7 +271,7 @@ namespace TriangleNet.Tools
             public double area_max = -double.MaxValue;
             // Total area of geometry
             public double area_total = 0;
-            // Nmber of triangles with zero area
+            // Number of triangles with zero area
             public int area_zero = 0;
 
             /// <summary>

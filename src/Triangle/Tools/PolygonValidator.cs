@@ -258,7 +258,7 @@ namespace TriangleNet.Tools
                 if (p.id < 0 || p.id >= count)
                 {
                     horrors++;
-                    logger.Warning(string.Format("Segment {0} has invalid startpoint.", i),
+                    logger.Warning(string.Format("Segment {0} has invalid start point.", i),
                         "PolygonValidator.IsConsistent()");
                 }
 

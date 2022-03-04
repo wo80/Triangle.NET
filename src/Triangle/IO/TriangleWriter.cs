@@ -184,7 +184,6 @@ namespace TriangleNet.IO
         /// </summary>
         /// <param name="polygon">Data source.</param>
         /// <param name="filename">File name.</param>
-        /// <param name="writeNodes">Write nodes into this file.</param>
         /// <remarks>If the nodes should not be written into this file, 
         /// make sure a .node file was written before, so that the nodes 
         /// are numbered right.</remarks>

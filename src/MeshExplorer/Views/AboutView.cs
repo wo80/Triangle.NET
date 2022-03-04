@@ -17,7 +17,11 @@ namespace MeshExplorer.Views
         {
             try
             {
-                ProcessStartInfo info = new ProcessStartInfo("http://triangle.codeplex.com/");
+                var info = new ProcessStartInfo("https://github.com/wo80/Triangle.NET")
+                {
+                    UseShellExecute = true
+                };
+
                 Process.Start(info);
             }
             catch (Exception)

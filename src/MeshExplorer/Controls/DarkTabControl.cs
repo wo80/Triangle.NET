@@ -7,11 +7,9 @@
 
 namespace MeshExplorer.Controls
 {
-    using System;
-    using System.ComponentModel;
     using System.Drawing;
-    using System.Windows.Forms;
     using System.Drawing.Text;
+    using System.Windows.Forms;
 
     /// <summary>
     /// Summary description for FlatTabControl.

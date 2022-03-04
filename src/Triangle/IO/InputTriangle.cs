@@ -6,7 +6,7 @@
 
 namespace TriangleNet.IO
 {
-    using TriangleNet.Topology;
+    using System;
     using TriangleNet.Geometry;
 
     /// <summary>
@@ -20,32 +20,26 @@ namespace TriangleNet.IO
 
         public InputTriangle(int p0, int p1, int p2)
         {
-            this.vertices = new int[] { p0, p1, p2 };
+            vertices = new int[] { p0, p1, p2 };
         }
 
         #region Public properties
 
-        /// <summary>
-        /// Gets the triangle id.
-        /// </summary>
+        /// <inheritdoc/>
         public int ID
         {
             get { return 0; }
             set { }
         }
 
-        /// <summary>
-        /// Region ID the triangle belongs to.
-        /// </summary>
+        /// <inheritdoc/>
         public int Label
         {
             get { return label; }
             set { label = value; }
         }
 
-        /// <summary>
-        /// Gets the triangle area constraint.
-        /// </summary>
+        /// <inheritdoc/>
         public double Area
         {
             get { return area; }
@@ -53,31 +47,41 @@ namespace TriangleNet.IO
         }
 
         /// <summary>
-        /// Gets the specified corners vertex.
+        /// WARNING: not implemented.
         /// </summary>
         public Vertex GetVertex(int index)
         {
-            return null; // TODO: throw NotSupportedException?
+            throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public int GetVertexID(int index)
         {
             return vertices[index];
         }
 
+        /// <summary>
+        /// WARNING: not implemented.
+        /// </summary>
         public ITriangle GetNeighbor(int index)
         {
-            return null;
+            throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// WARNING: not implemented.
+        /// </summary>
         public int GetNeighborID(int index)
         {
-            return -1;
+            throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// WARNING: not implemented.
+        /// </summary>
         public ISegment GetSegment(int index)
         {
-            return null;
+            throw new NotImplementedException();
         }
 
         #endregion

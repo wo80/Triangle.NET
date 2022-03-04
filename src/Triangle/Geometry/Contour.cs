@@ -58,7 +58,7 @@ namespace TriangleNet.Geometry
         {
             var segments = new List<ISegment>();
 
-            var p = this.Points;
+            var p = Points;
 
             int count = p.Count - 1;
 
@@ -93,14 +93,16 @@ namespace TriangleNet.Geometry
         {
             if (convex)
             {
-                int count = this.Points.Count;
+                var p = Points;
+
+                int count = p.Count;
 
                 var point = new Point(0.0, 0.0);
 
                 for (int i = 0; i < count; i++)
                 {
-                    point.x += this.Points[i].x;
-                    point.y += this.Points[i].y;
+                    point.x += p[i].x;
+                    point.y += p[i].y;
                 }
 
                 // If the contour is convex, use its centroid.
@@ -115,7 +117,7 @@ namespace TriangleNet.Geometry
 
         private void AddPoints(IEnumerable<Vertex> points)
         {
-            this.Points = new List<Vertex>(points);
+            Points = new List<Vertex>(points);
 
             int count = Points.Count - 1;
 

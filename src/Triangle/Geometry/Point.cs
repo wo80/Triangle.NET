@@ -52,8 +52,8 @@ namespace TriangleNet.Geometry
         /// </summary>
         public int ID
         {
-            get { return this.id; }
-            set { this.id = value; }
+            get { return id; }
+            set { id = value; }
         }
 
         /// <summary>
@@ -61,8 +61,8 @@ namespace TriangleNet.Geometry
         /// </summary>
         public double X
         {
-            get { return this.x; }
-            set { this.x = value; }
+            get { return x; }
+            set { x = value; }
         }
 
         /// <summary>
@@ -70,8 +70,8 @@ namespace TriangleNet.Geometry
         /// </summary>
         public double Y
         {
-            get { return this.y; }
-            set { this.y = value; }
+            get { return y; }
+            set { y = value; }
         }
 
 #if USE_Z
@@ -80,8 +80,8 @@ namespace TriangleNet.Geometry
         /// </summary>
         public double Z
         {
-            get { return this.z; }
-            set { this.z = value; }
+            get { return z; }
+            set { z = value; }
         }
 #endif
 
@@ -93,29 +93,26 @@ namespace TriangleNet.Geometry
         /// </remarks>
         public int Label
         {
-            get { return this.label; }
-            set { this.label = value; }
+            get { return label; }
+            set { label = value; }
         }
 
         #endregion
 
-        #region Operator overloading / overriding Equals
-
-        // Compare "Guidelines for Overriding Equals() and Operator =="
-        // http://msdn.microsoft.com/en-us/library/ms173147.aspx
+        #region Overriding Equals() and == Operator
 
         public static bool operator ==(Point a, Point b)
         {
-            // If both are null, or both are same instance, return true.
-            if (Object.ReferenceEquals(a, b))
+            if (a is null)
             {
-                return true;
+                // If one is null, but not both, return false.
+                return b is null;
             }
 
-            // If one is null, but not both, return false.
-            if (((object)a == null) || ((object)b == null))
+            // If both are same instance, return true.
+            if (ReferenceEquals(a, b))
             {
-                return false;
+                return true;
             }
 
             return a.Equals(b);
@@ -126,33 +123,17 @@ namespace TriangleNet.Geometry
             return !(a == b);
         }
 
-        public override bool Equals(object obj)
-        {
-            // If parameter is null return false.
-            if (obj == null)
-            {
-                return false;
-            }
-
-            Point p = obj as Point;
-
-            if ((object)p == null)
-            {
-                return false;
-            }
-
-            return (x == p.x) && (y == p.y);
-        }
+        public override bool Equals(object obj) => Equals(obj as Point);
 
         public bool Equals(Point p)
         {
-            // If vertex is null return false.
-            if ((object)p == null)
+            // If object is null return false.
+            if (p is null)
             {
                 return false;
             }
 
-            // Return true if the fields match:
+            // Return true if the fields match.
             return (x == p.x) && (y == p.y);
         }
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Windows.Forms;
-using MeshExplorer.Topology;
 using TriangleNet;
 using TriangleNet.Geometry;
 using TriangleNet.Meshing;

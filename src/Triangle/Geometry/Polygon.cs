@@ -13,11 +13,10 @@ namespace TriangleNet.Geometry
     /// </summary>
     public class Polygon : IPolygon
     {
-        List<Vertex> points;
-        List<Point> holes;
-        List<RegionPointer> regions;
-
-        List<ISegment> segments;
+        private readonly List<Vertex> points;
+        private readonly List<ISegment> segments;
+        private readonly List<Point> holes;
+        private readonly List<RegionPointer> regions;
 
         /// <inheritdoc />
         public List<Vertex> Points => points;
@@ -81,7 +80,7 @@ namespace TriangleNet.Geometry
         public Rectangle Bounds()
         {
             var bounds = new Rectangle();
-            bounds.Expand(this.points);
+            bounds.Expand(points);
 
             return bounds;
         }
@@ -89,27 +88,27 @@ namespace TriangleNet.Geometry
         /// <inheritdoc />
         public void Add(Vertex vertex)
         {
-            this.points.Add(vertex);
+            points.Add(vertex);
         }
 
         /// <inheritdoc />
         public void Add(ISegment segment, bool insert = false)
         {
-            this.segments.Add(segment);
+            segments.Add(segment);
 
             if (insert)
             {
-                this.points.Add(segment.GetVertex(0));
-                this.points.Add(segment.GetVertex(1));
+                points.Add(segment.GetVertex(0));
+                points.Add(segment.GetVertex(1));
             }
         }
 
         /// <inheritdoc />
         public void Add(ISegment segment, int index)
         {
-            this.segments.Add(segment);
+            segments.Add(segment);
 
-            this.points.Add(segment.GetVertex(index));
+            points.Add(segment.GetVertex(index));
         }
 
         /// <inheritdoc />
@@ -117,22 +116,22 @@ namespace TriangleNet.Geometry
         {
             if (hole)
             {
-                this.Add(contour, contour.FindInteriorPoint());
+                Add(contour, contour.FindInteriorPoint());
             }
             else
             {
-                this.points.AddRange(contour.Points);
-                this.segments.AddRange(contour.GetSegments());
+                points.AddRange(contour.Points);
+                segments.AddRange(contour.GetSegments());
             }
         }
 
         /// <inheritdoc />
         public void Add(Contour contour, Point hole)
         {
-            this.points.AddRange(contour.Points);
-            this.segments.AddRange(contour.GetSegments());
+            points.AddRange(contour.Points);
+            segments.AddRange(contour.GetSegments());
 
-            this.holes.Add(hole);
+            holes.Add(hole);
         }
     }
 }

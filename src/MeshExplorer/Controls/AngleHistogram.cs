@@ -6,13 +6,9 @@
 
 namespace MeshExplorer.Controls
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
     using System.Drawing;
-    using System.Drawing.Drawing2D;
-    using System.Windows.Forms;
     using System.Drawing.Text;
+    using System.Windows.Forms;
 
     /// <summary>
     /// Displays an angle histogram.
@@ -75,7 +71,7 @@ namespace MeshExplorer.Controls
         /// </summary>
         public AngleHistogram()
         {
-            this.BackColor = ColorScheme.ColorGray78;
+            BackColor = ColorScheme.ColorGray78;
             InitializeComponent();
         }
 
@@ -86,19 +82,19 @@ namespace MeshExplorer.Controls
         {
             maxAngleCount = 0;
 
-            this.minAngles = dataMin;
-            this.maxAngles = dataMax;
+            minAngles = dataMin;
+            maxAngles = dataMax;
 
             ParseData(dataMin);
             ParseData(dataMax);
 
             if (maxAngleCount == 0)
             {
-                this.maxAngles = null;
+                maxAngles = null;
                 return;
             }
 
-            this.Invalidate();
+            Invalidate();
         }
 
         private void ParseData(int[] data)
@@ -122,28 +118,27 @@ namespace MeshExplorer.Controls
         private void DrawHistogram(Graphics g, int offset, int left, int size, int[] data, Brush brush, Brush brushTop)
         {
             int count = maxAngleCount;
-            int totalHeight = this.Height - paddingBottom - paddingTop;
+            int totalHeight = Height - paddingBottom - paddingTop;
 
             int n = offset == 0 ? data.Length / 3 : data.Length;
-            float value = 0;
 
             for (int i = offset; i < n; i++)
             {
                 if (data[i] > 0)
                 {
                     // Scale to control height
-                    value = totalHeight * data[i] / count;
+                    float value = totalHeight * data[i] / count;
 
                     // Fill bar
                     g.FillRectangle(brush,
-                        left + i * size, this.Height - paddingBottom - value,
+                        left + i * size, Height - paddingBottom - value,
                         size - 1, value);
 
                     // Draw top of bar (just a little effect ...)
                     if (value > 2)
                     {
                         g.FillRectangle(brushTop,
-                            left + i * size, this.Height - paddingBottom - value,
+                            left + i * size, Height - paddingBottom - value,
                             size - 1, 2);
                     }
                 }
@@ -156,50 +151,55 @@ namespace MeshExplorer.Controls
         private void DrawStrings(Graphics g, SizeF fSize, int size, int middle)
         {
             int fHeight = (int)(fSize.Height + 2);
-            g.FillRectangle(textBack, 0, this.Height - fHeight, this.Width, fHeight);
 
-            g.DrawString("0", this.Font, Brushes.White, padding, this.Height - fSize.Height - 1);
-            g.DrawString("60", this.Font, Brushes.White,
-                this.minAngles.Length * size / 3.0f - 2 * fSize.Width,
-                this.Height - fSize.Height - 1);
+            g.FillRectangle(textBack, 0, Height - fHeight, Width, fHeight);
 
-            g.DrawString("60", this.Font, Brushes.White, middle, this.Height - fSize.Height - 1);
-            g.DrawString("180", this.Font, Brushes.White,
-                this.Width - 3 * fSize.Width,
-                this.Height - fSize.Height - 1);
+            var p = new Point(0, Height - (int)fSize.Height - 1);
+
+            p.X = padding;
+            TextRenderer.DrawText(g, "0", Font, p, Color.White);
+
+            p.X = (int)(minAngles.Length * size / 3.0f - 2 * fSize.Width);
+            TextRenderer.DrawText(g, "60", Font, p, Color.White);
+
+            p.X = middle;
+            TextRenderer.DrawText(g, "60", Font, p, Color.White);
+
+            p.X = (int)(Width - 3 * fSize.Width);
+            TextRenderer.DrawText(g, "180", Font, p, Color.White);
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
             Graphics g = e.Graphics;
 
-            g.FillRectangle(new SolidBrush(this.BackColor), this.ClientRectangle);
+            g.FillRectangle(new SolidBrush(BackColor), ClientRectangle);
 
-            if (this.minAngles == null || this.maxAngles == null)
+            if (minAngles == null || maxAngles == null)
             {
                 return;
             }
 
-            SizeF fSize = g.MeasureString("0", this.Font, this.Width);
-
-            int n = this.minAngles.Length;
+            int n = minAngles.Length;
 
             // Hack --- TODO: Change stats class
-            if (n != this.maxAngles.Length)
+            if (n != maxAngles.Length)
             {
-                n = this.minAngles.Length + this.maxAngles.Length;
+                n = minAngles.Length + maxAngles.Length;
             }
 
             // Each bar takes up this space
-            int size = (this.Width - 2 * padding) / (n + 1);
+            int size = (Width - 2 * padding) / (n + 1);
 
             // Make pixel align
-            int middle = this.Width - padding - n * size;
+            int middle = Width - padding - n * size;
 
-            DrawHistogram(g, 0, padding, size, this.minAngles, Brushes.DarkGreen, Brushes.Green);
-            DrawHistogram(g, n / 3, middle, size, this.maxAngles, fillBlue1, fillBlue2);
+            DrawHistogram(g, 0, padding, size, minAngles, Brushes.DarkGreen, Brushes.Green);
+            DrawHistogram(g, n / 3, middle, size, maxAngles, fillBlue1, fillBlue2);
 
             g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
+
+            SizeF fSize = g.MeasureString("0", Font, Width);
 
             DrawStrings(g, fSize, size, middle + n / 3 * size);
         }

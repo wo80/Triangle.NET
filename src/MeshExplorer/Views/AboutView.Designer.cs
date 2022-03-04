@@ -40,30 +40,30 @@
             // lbCodeplex
             // 
             this.lbCodeplex.AutoSize = true;
-            this.lbCodeplex.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbCodeplex.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point);
             this.lbCodeplex.ForeColor = System.Drawing.Color.White;
             this.lbCodeplex.Location = new System.Drawing.Point(72, 82);
             this.lbCodeplex.Name = "lbCodeplex";
-            this.lbCodeplex.Size = new System.Drawing.Size(153, 13);
+            this.lbCodeplex.Size = new System.Drawing.Size(166, 13);
             this.lbCodeplex.TabIndex = 9;
-            this.lbCodeplex.Text = "http://triangle.codeplex.com";
+            this.lbCodeplex.Text = "github.com/wo80/Triangle.NET";
             this.lbCodeplex.Click += new System.EventHandler(this.lbCodeplex_Clicked);
             // 
             // label15
             // 
             this.label15.AutoSize = true;
-            this.label15.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label15.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.label15.ForeColor = System.Drawing.Color.White;
             this.label15.Location = new System.Drawing.Point(10, 17);
             this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(73, 13);
+            this.label15.Size = new System.Drawing.Size(72, 13);
             this.label15.TabIndex = 7;
             this.label15.Text = "Triangle.NET";
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.label1.ForeColor = System.Drawing.Color.White;
             this.label1.Location = new System.Drawing.Point(10, 132);
             this.label1.Name = "label1";
@@ -73,13 +73,13 @@
             // 
             // label19
             // 
-            this.label19.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label19.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.label19.ForeColor = System.Drawing.Color.White;
             this.label19.Location = new System.Drawing.Point(72, 42);
             this.label19.Name = "label19";
             this.label19.Size = new System.Drawing.Size(134, 40);
             this.label19.TabIndex = 6;
-            this.label19.Text = "Beta 4 (2014-05-30)\r\nChristian Woltering\r\nMIT";
+            this.label19.Text = "Beta 5 (2022-03-05)\r\nChristian Woltering";
             // 
             // label18
             // 
@@ -88,12 +88,12 @@
             this.label18.Name = "label18";
             this.label18.Size = new System.Drawing.Size(51, 40);
             this.label18.TabIndex = 4;
-            this.label18.Text = "Version:\r\nAuthor:\r\nLicense:";
+            this.label18.Text = "Version:\r\nAuthor:";
             this.label18.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // label7
             // 
-            this.label7.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label7.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.label7.ForeColor = System.Drawing.Color.White;
             this.label7.Location = new System.Drawing.Point(72, 155);
             this.label7.Name = "label7";
@@ -123,7 +123,7 @@
             this.Controls.Add(this.label18);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.lbShortcuts);
-            this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.ForeColor = System.Drawing.Color.DarkGray;
             this.Name = "AboutView";
             this.Size = new System.Drawing.Size(272, 509);
