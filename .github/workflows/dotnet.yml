@@ -21,7 +21,7 @@ jobs:
       run: dotnet restore Triangle.sln
       working-directory: ./src
     - name: Build
-      run: dotnet build Triangle.sln --no-restore --configuration Release
+      run: dotnet build Triangle.sln --no-restore
       working-directory: ./src
     - name: Test
       run: dotnet test Triangle.sln --no-build --verbosity normal
