@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace>TriangleNet</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Triangle\Triangle.csproj" />
+    <ProjectReference Include="..\Triangle.Rendering\Triangle.Rendering.csproj" />
+  </ItemGroup>
+
+</Project>

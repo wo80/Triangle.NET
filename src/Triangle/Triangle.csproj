@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>TriangleNet</RootNamespace>
+    <AssemblyName>Triangle</AssemblyName>
+    <Platforms>AnyCPU;x64</Platforms>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Authors>Christian Woltering</Authors>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <Version>1.0.0-beta5</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Triangle.Tests" />
+  </ItemGroup>
+
+</Project>

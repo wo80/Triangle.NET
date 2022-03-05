@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <RootNamespace>TriangleNet.Rendering.GDI</RootNamespace>
+    <AssemblyName>Triangle.Rendering.GDI</AssemblyName>
+    <Platforms>AnyCPU;x64</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Triangle\Triangle.csproj" />
+    <ProjectReference Include="..\Triangle.Rendering\Triangle.Rendering.csproj" />
+  </ItemGroup>
+
+</Project>

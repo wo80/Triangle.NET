@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <RootNamespace>MeshExplorer</RootNamespace>
+    <AssemblyName>Triangle.Viewer</AssemblyName>
+    <Platforms>AnyCPU;x64</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Triangle\Triangle.csproj" />
+    <ProjectReference Include="..\Triangle.Rendering\Triangle.Rendering.csproj" />
+    <ProjectReference Include="..\Triangle.Rendering.GDI\Triangle.Rendering.GDI.csproj" />
+  </ItemGroup>
+</Project>
