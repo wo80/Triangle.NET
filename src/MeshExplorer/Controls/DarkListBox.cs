@@ -70,11 +70,7 @@ namespace MeshExplorer.Controls
                 e.Graphics.FillRectangle(background, e.Bounds);
             }
 
-            using (SolidBrush pen = new SolidBrush(Color.White))
-            {
-                e.Graphics.DrawString(content, this.Font, pen,
-                    new PointF(10, e.Bounds.Y + 3), StringFormat.GenericDefault);
-            }
+            TextRenderer.DrawText(e.Graphics, content, Font, new Point(10, e.Bounds.Y + 3), Color.White, TextFormatFlags.EndEllipsis);
         }
     }
 }

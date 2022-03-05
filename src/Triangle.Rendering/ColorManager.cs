@@ -7,88 +7,37 @@ namespace TriangleNet.Rendering
 
     public class ColorManager
     {
-        Color background;
-        SolidBrush point;
-        SolidBrush steinerPoint;
-        Pen line;
-        Pen segment;
-        Pen voronoiLine;
-
         #region Public properties
 
         /// <summary>
         /// Gets or sets the background color.
         /// </summary>
-        public Color Background
-        {
-            get { return background; }
-            set { background = value; }
-        }
+        public Color Background { get; set; }
 
         /// <summary>
         /// Gets or sets the brush used for points.
         /// </summary>
-        public SolidBrush Point
-        {
-            get { return point; }
-            set
-            {
-                if (point != null) point.Dispose();
-                point = value;
-            }
-        }
+        public Color Point { get; set; }
 
         /// <summary>
         /// Gets or sets the brush used for steiner points.
         /// </summary>
-        public SolidBrush SteinerPoint
-        {
-            get { return steinerPoint; }
-            set
-            {
-                if (steinerPoint != null) steinerPoint.Dispose();
-                steinerPoint = value;
-            }
-        }
+        public Color SteinerPoint { get; set; }
 
         /// <summary>
         /// Gets or sets the pen used for mesh edges.
         /// </summary>
-        public Pen Line
-        {
-            get { return line; }
-            set
-            {
-                if (line != null) line.Dispose();
-                line = value;
-            }
-        }
+        public Color Line { get; set; }
 
         /// <summary>
         /// Gets or sets the pen used for mesh segments.
         /// </summary>
-        public Pen Segment
-        {
-            get { return segment; }
-            set
-            {
-                if (segment != null) segment.Dispose();
-                segment = value;
-            }
-        }
+        public Color Segment { get; set; }
 
         /// <summary>
         /// Gets or sets the pen used for Voronoi edges.
         /// </summary>
-        public Pen VoronoiLine
-        {
-            get { return voronoiLine; }
-            set
-            {
-                if (voronoiLine != null) voronoiLine.Dispose();
-                voronoiLine = value;
-            }
-        }
+        public Color VoronoiLine { get; set; }
 
         #endregion
 
@@ -98,7 +47,7 @@ namespace TriangleNet.Rendering
         public Dictionary<int, Color> ColorDictionary { get; set; }
 
         /// <summary>
-        /// Gets or sets a colormap used for function plotting.
+        /// Gets or sets a color map used for function plotting.
         /// </summary>
         public ColorMap ColorMap { get; set; }
 
@@ -110,11 +59,11 @@ namespace TriangleNet.Rendering
             var colors = new ColorManager();
 
             colors.Background = Color.FromArgb(0, 0, 0);
-            colors.Point = new SolidBrush(Color.Green);
-            colors.SteinerPoint = new SolidBrush(Color.Peru);
-            colors.Line = new Pen(Color.FromArgb(30, 30, 30));
-            colors.Segment = new Pen(Color.DarkBlue);
-            colors.VoronoiLine = new Pen(Color.FromArgb(40, 50, 60));
+            colors.Point = Color.Green;
+            colors.SteinerPoint = Color.Peru;
+            colors.Line = Color.FromArgb(30, 30, 30);
+            colors.Segment = Color.DarkBlue;
+            colors.VoronoiLine = Color.FromArgb(40, 50, 60);
 
             return colors;
         }
@@ -143,26 +92,6 @@ namespace TriangleNet.Rendering
 
                 i = (i + 1) % n;
             }
-        }
-
-        internal void Dispose(Dictionary<int, SolidBrush> brushes)
-        {
-            foreach (var brush in brushes.Values)
-            {
-                brush.Dispose();
-            }
-        }
-
-        internal Dictionary<int, SolidBrush> GetBrushDictionary()
-        {
-            var brushes = new Dictionary<int, SolidBrush>();
-
-            foreach (var item in ColorDictionary)
-            {
-                brushes.Add(item.Key, new SolidBrush(item.Value));
-            }
-
-            return brushes;
         }
 
         // Change or add as many colors as you like...

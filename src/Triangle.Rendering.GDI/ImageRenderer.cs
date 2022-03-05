@@ -275,11 +275,11 @@ namespace TriangleNet.Rendering.GDI
             var colors = new ColorManager();
 
             colors.Background = Color.White;
-            colors.Point = new SolidBrush(Color.FromArgb(60, 80, 120));
-            colors.SteinerPoint = new SolidBrush(Color.DarkGreen);
-            colors.Line = new Pen(Color.FromArgb(200, 200, 200));
-            colors.Segment = new Pen(Color.SteelBlue);
-            colors.VoronoiLine = new Pen(Color.FromArgb(160, 170, 180));
+            colors.Point = Color.FromArgb(60, 80, 120);
+            colors.SteinerPoint = Color.DarkGreen;
+            colors.Line = Color.FromArgb(200, 200, 200);
+            colors.Segment = Color.SteelBlue;
+            colors.VoronoiLine = Color.FromArgb(160, 170, 180);
 
             return colors;
         }

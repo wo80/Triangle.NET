@@ -62,7 +62,7 @@ namespace MeshExplorer
             if (control != null)
             {
                 InitializeRenderControl((Control)control);
-                renderManager.Initialize(control);
+                renderManager.Initialize(control, new TriangleNet.Rendering.GDI.LayerRenderer());
             }
             else
             {

@@ -7,7 +7,6 @@
 namespace TriangleNet.Rendering.GDI
 {
     using System.Drawing;
-    using TriangleNet.Rendering.GDI.Native;
 
     /// <summary>
     /// Renders a mesh.
@@ -30,13 +29,16 @@ namespace TriangleNet.Rendering.GDI
             int n = points.Length / size;
             int m = limit > 0 ? limit : n;
 
+            using var Point = new SolidBrush(Context.ColorManager.Point);
+            using var SteinerPoint = new SolidBrush(Context.ColorManager.SteinerPoint);
+
             // Draw unchanged points
-            RenderPoints(points, size, 0, m, Context.ColorManager.Point);
+            RenderPoints(points, size, 0, m, Point);
 
             // Draw new (Steiner) points
             if (limit > 0)
             {
-                RenderPoints(points, size, m, n, Context.ColorManager.SteinerPoint);
+                RenderPoints(points, size, m, n, SteinerPoint);
             }
         }
 
@@ -86,9 +88,9 @@ namespace TriangleNet.Rendering.GDI
 
             bool filled = partition != null;
 
-            var brushes = filled ? Context.ColorManager.GetBrushDictionary() : null;
+            var brushes = filled ? Helper.GetBrushDictionary(Context.ColorManager.ColorDictionary) : null;
 
-            // TODO: remove hardcoded color
+            // TODO: remove hard-coded color
             var pen = new Pen(Color.FromArgb(20, 20, 20));
 
             // Draw triangles
@@ -133,7 +135,7 @@ namespace TriangleNet.Rendering.GDI
 
             if (filled)
             {
-                Context.ColorManager.Dispose(brushes);
+                Helper.Dispose(brushes);
             }
         }
 

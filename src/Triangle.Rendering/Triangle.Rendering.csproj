@@ -2,9 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
-    <UseWindowsForms>true</UseWindowsForms>
-    <OutDir>$(SolutionDir)bin\$(Configuration)</OutDir>
+    <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>TriangleNet.Rendering</RootNamespace>
     <AssemblyName>Triangle.Rendering</AssemblyName>
     <Platforms>AnyCPU;x64</Platforms>

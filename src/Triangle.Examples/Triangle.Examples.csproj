@@ -4,7 +4,6 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>TriangleNet</RootNamespace>
-    <OutDir>$(SolutionDir)bin\$(Configuration)</OutDir>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,11 +12,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Triangle\Triangle.csproj" />
+    <Folder Include="Rendering\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Rendering\" />
+    <ProjectReference Include="..\Triangle\Triangle.csproj" />
   </ItemGroup>
 
 </Project>

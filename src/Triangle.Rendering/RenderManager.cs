@@ -2,10 +2,8 @@
 namespace TriangleNet.Rendering
 {
     using System.Collections.Generic;
-    using System.Windows.Forms;
     using TriangleNet.Geometry;
     using TriangleNet.Meshing;
-    using TriangleNet.Rendering.GDI;
     using TriangleNet.Rendering.Util;
 
     public class RenderManager
@@ -26,19 +24,9 @@ namespace TriangleNet.Rendering
         {
         }
 
-        public RenderManager(IRenderControl control)
-        {
-            Initialize(control);
-        }
-
         public RenderManager(IRenderControl control, IRenderer renderer)
         {
             Initialize(control, renderer);
-        }
-
-        public void Initialize(IRenderControl control)
-        {
-            Initialize(control, new LayerRenderer());
         }
 
         public void Initialize(IRenderControl control, IRenderer renderer)
@@ -58,12 +46,7 @@ namespace TriangleNet.Rendering
         public bool TryCreateControl(string assemblyName, IEnumerable<string> dependencies,
             out IRenderControl control)
         {
-            if (!ReflectionHelper.TryCreateControl(assemblyName, dependencies, out control))
-            {
-                return false;
-            }
-
-            return control is Control;
+            return ReflectionHelper.TryCreateControl(assemblyName, dependencies, out control);
         }
 
         public void Resize()

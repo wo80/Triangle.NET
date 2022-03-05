@@ -88,13 +88,17 @@ namespace TriangleNet.Rendering.GDI
             }
             else
             {
-                meshRenderer.RenderEdges(layer.Points.Data, layer.Indices.Data, Context.ColorManager.Line);
+                using var pen = new Pen(Context.ColorManager.Line);
+
+                meshRenderer.RenderEdges(layer.Points.Data, layer.Indices.Data, pen);
             }
         }
 
         private void RenderPolygon(IRenderLayer layer)
         {
-            meshRenderer.RenderSegments(layer.Points.Data, layer.Indices.Data, Context.ColorManager.Segment);
+            using var pen = new Pen(Context.ColorManager.Segment);
+
+            meshRenderer.RenderSegments(layer.Points.Data, layer.Indices.Data, pen);
         }
 
         private void RenderPoints(IRenderLayer layer)
@@ -111,7 +115,9 @@ namespace TriangleNet.Rendering.GDI
             }
             else
             {
-                meshRenderer.RenderEdges(layer.Points.Data, layer.Indices.Data, Context.ColorManager.VoronoiLine);
+                using var pen = new Pen(Context.ColorManager.VoronoiLine);
+
+                meshRenderer.RenderEdges(layer.Points.Data, layer.Indices.Data, pen);
             }
         }
     }
