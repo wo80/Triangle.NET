@@ -13,10 +13,11 @@ namespace TriangleNet
             Check("Example  3", Example3.Run());
             Check("Example  4", Example4.Run());
             Check("Example  5", Example5.Run());
-            Check("Example  6", Example8.Run());
-            Check("Example  7", Example6.Run());
-            Check("Example  8", Example7.Run());
+            Check("Example  6", Example6.Run());
+            Check("Example  7", Example7.Run());
+            Check("Example  8", Example8.Run());
             Check("Example  9", Example9.Run());
+            Check("Example 10", Example10.Run());
         }
 
         static void Check(string item, bool success)

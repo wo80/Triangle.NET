@@ -16,12 +16,10 @@ namespace TriangleNet.Examples
         {
             var mesh = (Mesh)Example3.CreateMesh();
 
-            FindAdjacencyMatrix(mesh);
-
-            return true;
+            return FindAdjacencyMatrix(mesh);
         }
 
-        private static void FindAdjacencyMatrix(Mesh mesh)
+        private static bool FindAdjacencyMatrix(Mesh mesh)
         {
             mesh.Renumber();
 
@@ -57,8 +55,10 @@ namespace TriangleNet.Examples
             // Column pointers should be exactly the same.
             if (!CompareArray(matrix1.ColumnPointers, matrix2.ColumnPointers))
             {
-                Console.WriteLine("Something's wrong in here ...");
+                return false;
             }
+
+            return true;
         }
 
         private static bool CompareArray(int[] a, int[] b)

@@ -1,10 +1,54 @@
-﻿
+﻿// -----------------------------------------------------------------------
+// <copyright file="Interpolation.cs">
+// Triangle Copyright (c) 1993, 1995, 1997, 1998, 2002, 2005 Jonathan Richard Shewchuk
+// Triangle.NET code by Christian Woltering
+// </copyright>
+// -----------------------------------------------------------------------
+
 namespace TriangleNet.Tools
 {
     using TriangleNet.Geometry;
 
     public static class Interpolation
     {
+        /// <summary>
+        /// Linear interpolation of a point.
+        /// </summary>
+        /// <param name="tri">The triangle containing the point <paramref name="p"/></param>
+        /// <param name="p">The point to interpolate.</param>
+        /// <param name="data">The vertex data (z values).</param>
+        /// <returns>The linear interpolation value.</returns>
+        /// <remarks>
+        /// IMPORTANT: this method assumes the mesh vertex ids correspond to the data array indices.
+        /// </remarks>
+        public static double InterpolatePoint(ITriangle tri, Point p, double[] data)
+        {
+            var org = tri.GetVertex(0);
+            var dest = tri.GetVertex(1);
+            var apex = tri.GetVertex(2);
+
+            double xdo = dest.x - org.x;
+            double ydo = dest.y - org.y;
+            double xao = apex.x - org.x;
+            double yao = apex.y - org.y;
+
+            double denominator = 0.5 / (xdo * yao - xao * ydo);
+
+            double dx = p.x - org.x;
+            double dy = p.y - org.y;
+
+            // To interpolate z value for the given point inserted, define a
+            // coordinate system with a xi-axis, directed from the triangle's
+            // origin to its destination, and an eta-axis, directed from its
+            // origin to its apex.
+            double xi = (yao * dx - xao * dy) * (2.0 * denominator);
+            double eta = (xdo * dy - ydo * dx) * (2.0 * denominator);
+
+            double orgz = data[org.id];
+
+            return orgz + xi * (data[dest.id] - orgz) + eta * (data[apex.id] - orgz);
+        }
+
 #if USE_ATTRIBS
         /// <summary>
         /// Linear interpolation of vertex attributes.
@@ -17,35 +61,26 @@ namespace TriangleNet.Tools
         /// </remarks>
         public static void InterpolateAttributes(Vertex vertex, ITriangle triangle, int n)
         {
-            Vertex org = triangle.GetVertex(0);
-            Vertex dest = triangle.GetVertex(1);
-            Vertex apex = triangle.GetVertex(2);
+            var org = triangle.GetVertex(0);
+            var dest = triangle.GetVertex(1);
+            var apex = triangle.GetVertex(2);
 
-            double xdo, ydo, xao, yao;
-            double denominator;
-            double dx, dy;
-            double xi, eta;
+            double xdo = dest.x - org.x;
+            double ydo = dest.y - org.y;
+            double xao = apex.x - org.x;
+            double yao = apex.y - org.y;
 
-            // Compute the circumcenter of the triangle.
-            xdo = dest.x - org.x;
-            ydo = dest.y - org.y;
-            xao = apex.x - org.x;
-            yao = apex.y - org.y;
+            double denominator = 0.5 / (xdo * yao - xao * ydo);
 
-            denominator = 0.5 / (xdo * yao - xao * ydo);
-
-            //dx = (yao * dodist - ydo * aodist) * denominator;
-            //dy = (xdo * aodist - xao * dodist) * denominator;
-
-            dx = vertex.x - org.x;
-            dy = vertex.y - org.y;
+            double dx = vertex.x - org.x;
+            double dy = vertex.y - org.y;
 
             // To interpolate vertex attributes for the new vertex, define a
             // coordinate system with a xi-axis directed from the triangle's
             // origin to its destination, and an eta-axis, directed from its
             // origin to its apex.
-            xi = (yao * dx - xao * dy) * (2.0 * denominator);
-            eta = (xdo * dy - ydo * dx) * (2.0 * denominator);
+            double xi = (yao * dx - xao * dy) * (2.0 * denominator);
+            double eta = (xdo * dy - ydo * dx) * (2.0 * denominator);
         
             for (int i = 0; i < n; i++)
             {
@@ -68,35 +103,27 @@ namespace TriangleNet.Tools
         /// </remarks>
         public static void InterpolateZ(Point p, ITriangle triangle)
         {
-            Vertex org = triangle.GetVertex(0);
-            Vertex dest = triangle.GetVertex(1);
-            Vertex apex = triangle.GetVertex(2);
-
-            double xdo, ydo, xao, yao;
-            double denominator;
-            double dx, dy;
-            double xi, eta;
+            var org = triangle.GetVertex(0);
+            var dest = triangle.GetVertex(1);
+            var apex = triangle.GetVertex(2);
 
             // Compute the circumcenter of the triangle.
-            xdo = dest.x - org.x;
-            ydo = dest.y - org.y;
-            xao = apex.x - org.x;
-            yao = apex.y - org.y;
+            double xdo = dest.x - org.x;
+            double ydo = dest.y - org.y;
+            double xao = apex.x - org.x;
+            double yao = apex.y - org.y;
 
-            denominator = 0.5 / (xdo * yao - xao * ydo);
+            double denominator = 0.5 / (xdo * yao - xao * ydo);
 
-            //dx = (yao * dodist - ydo * aodist) * denominator;
-            //dy = (xdo * aodist - xao * dodist) * denominator;
-
-            dx = p.x - org.x;
-            dy = p.y - org.y;
+            double dx = p.x - org.x;
+            double dy = p.y - org.y;
 
             // To interpolate z value for the given point inserted, define a
             // coordinate system with a xi-axis, directed from the triangle's
             // origin to its destination, and an eta-axis, directed from its
             // origin to its apex.
-            xi = (yao * dx - xao * dy) * (2.0 * denominator);
-            eta = (xdo * dy - ydo * dx) * (2.0 * denominator);
+            double xi = (yao * dx - xao * dy) * (2.0 * denominator);
+            double eta = (xdo * dy - ydo * dx) * (2.0 * denominator);
 
             p.z = org.z + xi * (dest.z - org.z) + eta * (apex.z - org.z);
         }

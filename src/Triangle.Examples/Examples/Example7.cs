@@ -37,7 +37,7 @@ namespace TriangleNet.Examples
 
                 if (length > MAX_EDGE_LENGTH)
                 {
-                    Console.WriteLine("Something's wrong in here ...");
+                    return false;
                 }
             }
 

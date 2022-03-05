@@ -22,7 +22,7 @@
 
             if (print) SvgImage.Save(mesh, "example-2.svg", 500);
 
-            return true;
+            return mesh.Triangles.Count > 0;
         }
 
         public static IPolygon CreatePolygon(double h = 0.2)

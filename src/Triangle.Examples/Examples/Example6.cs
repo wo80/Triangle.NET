@@ -4,6 +4,7 @@
     using TriangleNet;
     using TriangleNet.Geometry;
     using TriangleNet.Meshing.Iterators;
+    using TriangleNet.Rendering.Text;
     using TriangleNet.Tools;
     using TriangleNet.Topology;
 
@@ -12,20 +13,22 @@
     /// </summary>
     public static class Example6
     {
-        public static bool Run()
+        public static bool Run(bool print = true)
         {
             // Generate the input geometry.
             var polygon = new Polygon(8, true);
 
             // Two intersecting rectangles.
-            var A = Generate.Rectangle(0.0, 0.0, 4.0, 4.0, 1);
-            var B = Generate.Rectangle(1.0, 1.0, 4.0, 4.0, 2);
+            var A = Generate.Rectangle(0d, 0d, 4d, 4d, label: 1);
+            var B = Generate.Rectangle(1d, 1d, 4d, 4d, label: 2);
 
             polygon.Add(A);
             polygon.Add(B);
 
             // Generate mesh.
             var mesh = (Mesh)polygon.Triangulate();
+
+            if (print) SvgImage.Save(mesh, "example-6.svg", 500);
 
             // Find a seeding triangle (in this case, the point (2, 2) lies in
             // both rectangles).
@@ -47,7 +50,7 @@
             // The xor of A and B.
             var xor = mesh.Triangles.Where(t => t.Label == 1 || t.Label == 2);
 
-            return true;
+            return intersection.Any() && difference.Any() && xor.Any();
         }
     }
 }

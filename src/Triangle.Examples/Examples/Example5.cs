@@ -25,7 +25,7 @@ namespace TriangleNet.Examples
 
             if (print) SvgImage.Save(mesh, "example-5-2.svg", 500, true, false);
 
-            return true;
+            return mesh.Triangles.Count > 0;
         }
 
         /// <summary>
