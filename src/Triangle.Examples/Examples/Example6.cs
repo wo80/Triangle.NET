@@ -13,7 +13,7 @@
     /// </summary>
     public static class Example6
     {
-        public static bool Run(bool print = true)
+        public static bool Run(bool print = false)
         {
             // Generate the input geometry.
             var polygon = new Polygon(8, true);

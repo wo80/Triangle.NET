@@ -76,7 +76,7 @@ namespace TriangleNet.Examples
                 Console.WriteLine("   Number of invalid triangulations: {0}", invalid);
             }
 
-            return true;
+            return invalid == 0;
         }
 
         private static void ProcessMesh(IMesh mesh, MeshResult result)
