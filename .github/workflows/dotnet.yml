@@ -19,7 +19,10 @@ jobs:
         dotnet-version: 6.0.x
     - name: Restore dependencies
       run: dotnet restore
+      working-directory: ./src
     - name: Build
-      run: dotnet build src/Triangle.sln --no-restore --configuration Release
+      run: dotnet build Triangle.sln --no-restore --configuration Release
+      working-directory: ./src
     - name: Test
-      run: dotnet test src/Triangle.sln --no-build --verbosity normal
+      run: dotnet test Triangle.sln --no-build --verbosity normal
+      working-directory: ./src
