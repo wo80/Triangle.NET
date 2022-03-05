@@ -9,7 +9,7 @@
     /// </summary>
     public static class Example2
     {
-        public static void Run(bool print = false)
+        public static bool Run(bool print = false)
         {
             // Generate the input geometry.
             var poly = CreatePolygon();
@@ -21,6 +21,8 @@
             var mesh = poly.Triangulate(quality);
 
             if (print) SvgImage.Save(mesh, "example-2.svg", 500);
+
+            return true;
         }
 
         public static IPolygon CreatePolygon(double h = 0.2)

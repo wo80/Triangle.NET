@@ -1,21 +1,32 @@
 ﻿
 namespace TriangleNet
 {
+    using System;
     using TriangleNet.Examples;
 
     class Program
     {
         static void Main(string[] args)
         {
-            Example1.Run();
-            Example2.Run();
-            Example3.Run();
-            Example4.Run();
-            Example5.Run();
-            Example8.Run();
-            Example6.Run();
-            Example7.Run();
-            Example9.Run();
+            Check("Example  1", Example1.Run());
+            Check("Example  2", Example2.Run());
+            Check("Example  3", Example3.Run());
+            Check("Example  4", Example4.Run());
+            Check("Example  5", Example5.Run());
+            Check("Example  6", Example8.Run());
+            Check("Example  7", Example6.Run());
+            Check("Example  8", Example7.Run());
+            Check("Example  9", Example9.Run());
+        }
+
+        static void Check(string item, bool success)
+        {
+            var color = Console.ForegroundColor;
+
+            Console.Write(item + " ");
+            Console.ForegroundColor = success ? ConsoleColor.DarkGreen : ConsoleColor.DarkRed;
+            Console.WriteLine(success ? "OK" : "Failed");
+            Console.ForegroundColor = color;
         }
     }
 }

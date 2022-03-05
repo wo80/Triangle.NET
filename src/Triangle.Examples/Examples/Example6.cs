@@ -12,14 +12,14 @@
     /// </summary>
     public static class Example6
     {
-        public static void Run()
+        public static bool Run()
         {
             // Generate the input geometry.
             var polygon = new Polygon(8, true);
 
             // Two intersecting rectangles.
-            var A = Generate.Rectangle(0.0, 4.0, 4.0, 0.0, 1);
-            var B = Generate.Rectangle(1.0, 5.0, 3.0, 1.0, 2);
+            var A = Generate.Rectangle(0.0, 0.0, 4.0, 4.0, 1);
+            var B = Generate.Rectangle(1.0, 1.0, 4.0, 4.0, 2);
 
             polygon.Add(A);
             polygon.Add(B);
@@ -46,6 +46,8 @@
 
             // The xor of A and B.
             var xor = mesh.Triangles.Where(t => t.Label == 1 || t.Label == 2);
+
+            return true;
         }
     }
 }

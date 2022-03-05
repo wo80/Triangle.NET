@@ -11,7 +11,7 @@ namespace TriangleNet.Examples
     /// </summary>
     public class Example9
     {
-        public static void Run(bool print = false)
+        public static bool Run(bool print = false)
         {
             var pts = new List<Vertex>
             {
@@ -56,6 +56,8 @@ namespace TriangleNet.Examples
                 // Random rotation.
                 poly = Rotate(pts, Math.PI * r.NextDouble());
             }
+
+            return true;
         }
 
         /// <summary>

@@ -14,12 +14,12 @@ namespace TriangleNet.Examples
     {
         const double MAX_EDGE_LENGTH = 0.2;
 
-        public static void Run(bool print = false)
+        public static bool Run(bool print = false)
         {
             var poly = new Polygon();
 
             // Generate the input geometry.
-            poly.Add(Generate.Rectangle(0.0, 1.0, 1.0, 0.0));
+            poly.Add(Generate.Rectangle(0.0, 0.0, 1.0, 1.0));
 
             // Set minimum angle quality option, ignoring holes.
             var quality = new QualityOptions()
@@ -42,6 +42,8 @@ namespace TriangleNet.Examples
             }
 
             if (print) SvgImage.Save(mesh, "example-7.svg", 500);
+
+            return true;
         }
 
         static bool MaxEdgeLength(ITriangle tri, double area)

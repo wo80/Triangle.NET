@@ -11,7 +11,7 @@ namespace TriangleNet.Examples
     /// </summary>
     public class Example1
     {
-        public static void Run(bool print = false)
+        public static bool Run(bool print = false)
         {
             // Generate points.
             var points = Generate.RandomPoints(50, new Rectangle(0, 0, 100, 100));
@@ -26,6 +26,8 @@ namespace TriangleNet.Examples
             var mesh = mesher.Triangulate(points);
 
             if (print) SvgImage.Save(mesh, "example-1.svg", 500);
+
+            return true;
         }
     }
 }

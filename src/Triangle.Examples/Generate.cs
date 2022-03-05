@@ -7,10 +7,9 @@ namespace TriangleNet
 
     static class Generate
     {
-        private const int RANDOM_SEED = 63841;
+        private static readonly Random random = new Random(63841);
 
-        public static List<Vertex> RandomPoints(int n, Rectangle bounds,
-            int seed = RANDOM_SEED)
+        public static List<Vertex> RandomPoints(int n, Rectangle bounds)
         {
             var points = new List<Vertex>(n);
 
@@ -19,8 +18,6 @@ namespace TriangleNet
 
             var width = bounds.Width;
             var height = bounds.Height;
-
-            var random = new Random(seed);
 
             for (int i = 0; i < n; i++)
             {
@@ -32,17 +29,68 @@ namespace TriangleNet
             return points;
         }
 
-        public static Contour Rectangle(double left, double top,
-            double right, double bottom, int mark = 0)
+        /// <summary>
+        /// Creates a rectangle contour.
+        /// </summary>
+        public static Contour Rectangle(Rectangle rect, double size = 0d, int label = 0)
         {
-            var points = new List<Vertex>(4);
+            return Rectangle(rect.X, rect.Y, rect.Width, rect.Height, size, label);
+        }
 
-            points.Add(new Vertex(left, top, mark));
-            points.Add(new Vertex(right, top, mark));
-            points.Add(new Vertex(right, bottom, mark));
-            points.Add(new Vertex(left, bottom, mark));
+        /// <summary>
+        /// Creates a rectangle contour.
+        /// </summary>
+        public static Contour Rectangle(double x, double y, double width, double height,
+            double size = 0d, int label = 0)
+        {
+            // Horizontal and vertical step sizes.
+            double stepH = 0d;
+            double stepV = 0d;
 
-            return new Contour(points, mark, true);
+            int nH = 1;
+            int nV = 1;
+
+            if (size > 0d)
+            {
+                size = Math.Min(size, Math.Min(width, height));
+
+                nH = (int)Math.Ceiling(width / size);
+                nV = (int)Math.Ceiling(height / size);
+
+                stepH = width / nH;
+                stepV = height / nV;
+            }
+
+            var points = new List<Vertex>(2 * nH + 2 * nV);
+
+            double right = x + width;
+            double top = y + height;
+
+            // Left box boundary points
+            for (int i = 0; i < nV; i++)
+            {
+                points.Add(new Vertex(x, y + i * stepV, label));
+            }
+
+            // Top box boundary points
+            for (int i = 0; i < nH; i++)
+            {
+                points.Add(new Vertex(x + i * stepH, top, label));
+            }
+
+            // Right box boundary points
+            for (int i = 0; i < nV; i++)
+            {
+                points.Add(new Vertex(right, top - i * stepV, label));
+            }
+
+            // Bottom box boundary points
+            for (int i = 0; i < nH; i++)
+            {
+                points.Add(new Vertex(right - i * stepH, y, label));
+            }
+
+            return new Contour(points, label, true);
         }
 
         /// <summary>

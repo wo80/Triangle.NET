@@ -13,7 +13,7 @@ namespace TriangleNet.Examples
     /// </summary>
     public static class Example5
     {
-        public static void Run(bool print = false)
+        public static bool Run(bool print = false)
         {
             var mesh = Example3.CreateMesh();
 
@@ -24,6 +24,8 @@ namespace TriangleNet.Examples
             FindBoundary2(mesh);
 
             if (print) SvgImage.Save(mesh, "example-5-2.svg", 500, true, false);
+
+            return true;
         }
 
         /// <summary>

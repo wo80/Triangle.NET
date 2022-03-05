@@ -12,7 +12,7 @@ namespace TriangleNet.Examples
     /// </summary>
     public class Example4
     {
-        public static void Run(bool print = false)
+        public static bool Run(bool print = false)
         {
             // Generate the input geometry.
             var poly = CreatePolygon();
@@ -42,6 +42,8 @@ namespace TriangleNet.Examples
             smoother.Smooth(mesh, 5);
 
             if (print) SvgImage.Save(mesh, "example-4.svg", 500);
+
+            return true;
         }
 
         public static IPolygon CreatePolygon()

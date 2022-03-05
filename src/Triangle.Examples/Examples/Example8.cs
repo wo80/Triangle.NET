@@ -12,11 +12,13 @@ namespace TriangleNet.Examples
     /// </summary>
     public class Example8
     {
-        public static void Run()
+        public static bool Run()
         {
             var mesh = (Mesh)Example3.CreateMesh();
 
             FindAdjacencyMatrix(mesh);
+
+            return true;
         }
 
         private static void FindAdjacencyMatrix(Mesh mesh)

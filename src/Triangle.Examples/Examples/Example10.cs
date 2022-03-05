@@ -18,7 +18,7 @@ namespace TriangleNet.Examples
         /// <summary>
         /// Reads all .poly files from given directory and processes them in parallel.
         /// </summary>
-        public static void Run(string dir)
+        public static bool Run(string dir)
         {
             var files = Directory.EnumerateFiles(dir, "*.poly", SearchOption.AllDirectories);
 
@@ -75,6 +75,8 @@ namespace TriangleNet.Examples
             {
                 Console.WriteLine("   Number of invalid triangulations: {0}", invalid);
             }
+
+            return true;
         }
 
         private static void ProcessMesh(IMesh mesh, MeshResult result)

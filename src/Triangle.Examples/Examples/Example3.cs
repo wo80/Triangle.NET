@@ -12,12 +12,14 @@ namespace TriangleNet.Examples
     /// </summary>
     public class Example3
     {
-        public static void Run(bool print = false)
+        public static bool Run(bool print = false)
         {
             // Generate mesh.
             var mesh = CreateMesh();
 
             if (print) SvgImage.Save(mesh, "example-3.svg", 500);
+
+            return true;
         }
 
         public static IMesh CreateMesh()

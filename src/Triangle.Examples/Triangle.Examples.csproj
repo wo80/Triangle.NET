@@ -7,16 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\Triangle.Rendering\Text\FormattingStreamWriter.cs" Link="Rendering\FormattingStreamWriter.cs" />
-    <Compile Include="..\Triangle.Rendering\Text\SvgImage.cs" Link="Rendering\SvgImage.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Rendering\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Triangle\Triangle.csproj" />
+    <ProjectReference Include="..\Triangle.Rendering\Triangle.Rendering.csproj" />
   </ItemGroup>
 
 </Project>
