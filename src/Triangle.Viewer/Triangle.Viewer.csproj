@@ -3,7 +3,8 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
-    <OutDir>$(SolutionDir)bin\$(Configuration)</OutDir>
+    <RootNamespace>MeshExplorer</RootNamespace>
+    <AssemblyName>Triangle.Viewer</AssemblyName>
     <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
