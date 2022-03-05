@@ -13,7 +13,7 @@ namespace TriangleNet.Examples
     /// <summary>
     /// Processing meshes in parallel.
     /// </summary>
-    public class Example10
+    public class ExamplePar
     {
         /// <summary>
         /// Reads all .poly files from given directory and processes them in parallel.
