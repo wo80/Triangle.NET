@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>TriangleNet.Rendering</RootNamespace>
     <AssemblyName>Triangle.Rendering</AssemblyName>
     <Platforms>AnyCPU;x64</Platforms>
