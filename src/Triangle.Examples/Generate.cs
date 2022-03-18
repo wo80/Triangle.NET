@@ -7,8 +7,6 @@ namespace TriangleNet
 
     static class Generate
     {
-        private static readonly Random random = new Random(63841);
-
         public static List<Vertex> RandomPoints(int n, Rectangle bounds)
         {
             var points = new List<Vertex>(n);
@@ -18,6 +16,8 @@ namespace TriangleNet
 
             var width = bounds.Width;
             var height = bounds.Height;
+
+            var random = Random.Shared;
 
             for (int i = 0; i < n; i++)
             {

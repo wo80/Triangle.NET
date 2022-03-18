@@ -17,6 +17,9 @@ namespace TriangleNet.Examples
         // The function we are sampling.
         private static readonly Func<Point, double> F = p => Math.Sin(p.X) * Math.Cos(p.Y);
 
+        // The mesh size, for a structured grid (SIZE x SIZE) points.
+        private const int SIZE = 20;
+
         public static bool Run(bool print = false)
         {
             // The input domain.
@@ -35,14 +38,17 @@ namespace TriangleNet.Examples
             double error = xy.Max(p => Math.Abs(xyData[p.ID] - F(p)));
 
             // L2 error
-           // double error = Math.Sqrt(xy.Sum(p => Math.Pow(xyData[p.ID] - F(p), 2)));
+            //double error = Math.Sqrt(xy.Sum(p => Math.Pow(xyData[p.ID] - F(p), 2)));
 
-            return error < 0.5;
+            // Define tolerance dependent on mesh dimensions and size.
+            double tolerance = 0.5 * Math.Max(r.Width, r.Height) / SIZE;
+
+            return error < tolerance;
         }
 
         private static IMesh GetStructuredDataMesh(Rectangle domain, out double[] data)
         {
-            var mesh = GenericMesher.StructuredMesh(domain, 20, 20);
+            var mesh = GenericMesher.StructuredMesh(domain, SIZE, SIZE);
 
             mesh.Renumber();
 
@@ -61,7 +67,7 @@ namespace TriangleNet.Examples
         {
             var r = new Rectangle(domain);
 
-            double h = domain.Width / 20;
+            double h = domain.Width / SIZE;
 
             // Generate a rectangle boundary point set (20 points on each side).
             var input = Generate.Rectangle(r, 0.5);
@@ -70,8 +76,10 @@ namespace TriangleNet.Examples
             h = -h / 2;
             r.Resize(h, h);
 
+            int n = Math.Max(1, SIZE * SIZE - input.Points.Count);
+
             // Add more input points (more sampling points, better interpolation).
-            input.Points.AddRange(Generate.RandomPoints(350, r));
+            input.Points.AddRange(Generate.RandomPoints(n, r));
 
             var mesher = new GenericMesher(new Dwyer());
 
