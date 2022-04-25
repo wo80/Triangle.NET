@@ -2,83 +2,72 @@
 namespace TriangleNet.Examples
 {
     using System;
-    using System.Collections.Generic;
-    using TriangleNet;
+    using TriangleNet.Geometry;
+    using TriangleNet.Meshing;
     using TriangleNet.Meshing.Iterators;
-    using TriangleNet.Tools;
+    using TriangleNet.Rendering.Text;
 
     /// <summary>
-    /// Compute the adjacency matrix of the mesh vertices.
+    /// Using a user test function to define a maximum edge length constraint.
     /// </summary>
-    public class Example8
+    public static class Example7
     {
-        public static bool Run()
+        const double MAX_EDGE_LENGTH = 0.2;
+
+        public static bool Run(bool print = false)
         {
-            var mesh = (Mesh)Example3.CreateMesh();
+            var poly = new Polygon();
 
-            return FindAdjacencyMatrix(mesh);
-        }
+            // Generate the input geometry.
+            poly.Add(Generate.Rectangle(0.0, 0.0, 1.0, 1.0));
 
-        private static bool FindAdjacencyMatrix(Mesh mesh)
-        {
-            mesh.Renumber();
-
-            var ap = new List<int>(mesh.Vertices.Count); // Column pointers.
-            var ai = new List<int>(4 * mesh.Vertices.Count); // Row indices.
-
-            var circulator = new VertexCirculator(mesh);
-
-            int k = 0;
-
-            foreach (var vertex in mesh.Vertices)
+            // Set minimum angle quality option, ignoring holes.
+            var quality = new QualityOptions()
             {
-                var star = circulator.EnumerateVertices(vertex);
+                UserTest = MaxEdgeLength
+            };
 
-                ap.Add(k);
+            // Generate mesh using the polygons Triangulate extension method.
+            var mesh = (Mesh)poly.Triangulate(quality);
 
-                // Each vertex is adjacent to itself.
-                ai.Add(vertex.ID);
-                k++;
-
-                foreach (var item in star)
-                {
-                    ai.Add(item.ID);
-                    k++;
-                }
-            }
-
-            ap.Add(k);
-
-            var matrix1 = new AdjacencyMatrix(ap.ToArray(), ai.ToArray());
-            var matrix2 = new AdjacencyMatrix(mesh);
-
-            // Column pointers should be exactly the same.
-            if (!CompareArray(matrix1.ColumnPointers, matrix2.ColumnPointers))
+            // Validate.
+            foreach (var e in EdgeIterator.EnumerateEdges(mesh))
             {
-                return false;
-            }
+                double length = Math.Sqrt(DistSqr(e.GetVertex(0), e.GetVertex(1)));
 
-            return true;
-        }
-
-        private static bool CompareArray(int[] a, int[] b)
-        {
-            int length = a.Length;
-
-            if (b.Length != length)
-            {
-                return false;
-            }
-
-            for (int i = 0; i < length; i++)
-            {
-                if (a[i] != b[i])
+                if (length > MAX_EDGE_LENGTH)
                 {
                     return false;
                 }
             }
 
+            if (print) SvgImage.Save(mesh, "example-7.svg", 500);
+
             return true;
+        }
+
+        static bool MaxEdgeLength(ITriangle tri, double area)
+        {
+            var p0 = tri.GetVertex(0);
+            var p1 = tri.GetVertex(1);
+            var p2 = tri.GetVertex(2);
+
+            var s1 = DistSqr(p0, p1);
+            var s2 = DistSqr(p1, p2);
+            var s3 = DistSqr(p2, p0);
+
+            // Comparing against squared max leg length.
+            var maxlen = MAX_EDGE_LENGTH * MAX_EDGE_LENGTH;
+
+            return s1 > maxlen || s2 > maxlen || s3 > maxlen;
+        }
+
+        static double DistSqr(Vertex a, Vertex b)
+        {
+            var dx = a.X - b.X;
+            var dy = a.Y - b.Y;
+
+            return dx * dx + dy * dy;
         }
     }
 }

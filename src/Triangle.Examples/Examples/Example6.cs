@@ -1,56 +1,98 @@
-﻿namespace TriangleNet.Examples
+﻿
+namespace TriangleNet.Examples
 {
-    using System.Linq;
+    using System.Collections.Generic;
     using TriangleNet;
     using TriangleNet.Geometry;
+    using TriangleNet.Meshing;
     using TriangleNet.Meshing.Iterators;
     using TriangleNet.Rendering.Text;
-    using TriangleNet.Tools;
-    using TriangleNet.Topology;
 
     /// <summary>
-    /// Boolean operations on mesh regions (intersection, difference, xor).
+    /// Two ways finding boundary triangles.
     /// </summary>
-    public static class Example6
+    public static class Example5
     {
         public static bool Run(bool print = false)
         {
-            // Generate the input geometry.
-            var polygon = new Polygon(8, true);
+            var mesh = Example3.CreateMesh();
 
-            // Two intersecting rectangles.
-            var A = Generate.Rectangle(0d, 0d, 4d, 4d, label: 1);
-            var B = Generate.Rectangle(1d, 1d, 4d, 4d, label: 2);
+            FindBoundary1(mesh);
 
-            polygon.Add(A);
-            polygon.Add(B);
+            if (print) SvgImage.Save(mesh, "example-5-1.svg", 500, true, false);
 
-            // Generate mesh.
-            var mesh = (Mesh)polygon.Triangulate();
+            FindBoundary2(mesh);
 
-            if (print) SvgImage.Save(mesh, "example-6.svg", 500);
+            if (print) SvgImage.Save(mesh, "example-5-2.svg", 500, true, false);
 
-            // Find a seeding triangle (in this case, the point (2, 2) lies in
-            // both rectangles).
-            var seed = (new TriangleQuadTree(mesh)).Query(2.0, 2.0) as Triangle;
+            return mesh.Triangles.Count > 0;
+        }
 
-            var iterator = new RegionIterator(mesh);
+        /// <summary>
+        /// Find boundary triangles using segments.
+        /// </summary>
+        private static void FindBoundary1(IMesh mesh, bool neigbours = true)
+        {
+            mesh.Renumber();
 
-            iterator.Process(seed, t => t.Label ^= 1, 1);
-            iterator.Process(seed, t => t.Label ^= 2, 2);
+            var cache = new List<Vertex>(mesh.Segments.Count + 1);
 
-            // At this point, all triangles will have label 1, 2 or 3 (= 1 xor 2).
+            var circulator = new VertexCirculator((Mesh)mesh);
 
-            // The intersection of A and B.
-            var intersection = mesh.Triangles.Where(t => t.Label == 3);
+            foreach (var s in mesh.Segments)
+            {
+                int label = s.Label;
 
-            // The difference A \ B.
-            var difference = mesh.Triangles.Where(t => t.Label == 1);
+                for (int i = 0; i < 2; i++)
+                {
+                    var vertex = s.GetVertex(i);
 
-            // The xor of A and B.
-            var xor = mesh.Triangles.Where(t => t.Label == 1 || t.Label == 2);
+                    // Check the vertex ID to see if it was processed already.
+                    if (vertex.ID >= 0)
+                    {
+                        var star = circulator.EnumerateTriangles(vertex);
 
-            return intersection.Any() && difference.Any() && xor.Any();
+                        foreach (var triangle in star)
+                        {
+                            triangle.Label = label;
+                        }
+
+                        // Mark the vertex as "processed".
+                        vertex.ID = -vertex.ID;
+
+                        cache.Add(vertex);
+                    }
+                }
+            }
+
+            // Undo the vertex ID changes.
+            foreach (var vertex in cache)
+            {
+                vertex.ID = -vertex.ID;
+            }
+        }
+
+        /// <summary>
+        /// Find boundary triangles using vertices.
+        /// </summary>
+        private static void FindBoundary2(IMesh mesh)
+        {
+            var circulator = new VertexCirculator((Mesh)mesh);
+
+            foreach (var vertex in mesh.Vertices)
+            {
+                int label = vertex.Label;
+
+                if (label > 0)
+                {
+                    var star = circulator.EnumerateTriangles(vertex);
+
+                    foreach (var triangle in star)
+                    {
+                        triangle.Label = label;
+                    }
+                }
+            }
         }
     }
 }

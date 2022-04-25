@@ -3,87 +3,82 @@ namespace TriangleNet.Examples
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using TriangleNet.Geometry;
+    using TriangleNet;
+    using TriangleNet.Meshing.Iterators;
+    using TriangleNet.Tools;
 
     /// <summary>
-    /// Troubleshooting: finding degenerate boundary triangles.
+    /// Compute the adjacency matrix of the mesh vertices.
     /// </summary>
-    public class Example9
+    public class Example8
     {
-        public static bool Run(bool print = false)
+        public static bool Run()
         {
-            var pts = new List<Vertex>
+            var mesh = (Mesh)Example3.CreateMesh();
+
+            return FindAdjacencyMatrix(mesh);
+        }
+
+        private static bool FindAdjacencyMatrix(Mesh mesh)
+        {
+            mesh.Renumber();
+
+            var ap = new List<int>(mesh.Vertices.Count); // Column pointers.
+            var ai = new List<int>(4 * mesh.Vertices.Count); // Row indices.
+
+            var circulator = new VertexCirculator(mesh);
+
+            int k = 0;
+
+            foreach (var vertex in mesh.Vertices)
             {
-                // The 4 corners of the rectangle.
-                new Vertex(1.5, 1.0),
-                new Vertex(1.5, -1.0),
-                new Vertex(-1.5, -1.0),
-                new Vertex(-1.5, 1.0),
+                var star = circulator.EnumerateVertices(vertex);
 
-                // The edge midpoints.
-                new Vertex(0.0, 1.0),
-                new Vertex(0.0, -1.0),
-                new Vertex(1.5, 0.0),
-                new Vertex(-1.5, 0.0)
-            };
+                ap.Add(k);
 
-            var r = new Random(78403);
+                // Each vertex is adjacent to itself.
+                ai.Add(vertex.ID);
+                k++;
 
-            // The original rectangle.
-            var poly = Rotate(pts, 0);
-
-            for (int i = 0; i < 10; i++)
-            {
-                var mesh = poly.Triangulate();
-
-                var list = MeshValidator.GetDegenerateBoundaryTriangles(mesh);
-
-                if (print && list.Any())
+                foreach (var item in star)
                 {
-                    Console.WriteLine("Iteration {0}: found {1} degenerate triangle(s) of {2}.",
-                        i, list.Count(), mesh.Triangles.Count);
-
-                    foreach (var t in list)
-                    {
-                        Console.WriteLine("   [{0} {1} {2}]",
-                            t.GetVertexID(0),
-                            t.GetVertexID(1),
-                            t.GetVertexID(2));
-                    }
+                    ai.Add(item.ID);
+                    k++;
                 }
+            }
 
-                // Random rotation.
-                poly = Rotate(pts, Math.PI * r.NextDouble());
+            ap.Add(k);
+
+            var matrix1 = new AdjacencyMatrix(ap.ToArray(), ai.ToArray());
+            var matrix2 = new AdjacencyMatrix(mesh);
+
+            // Column pointers should be exactly the same.
+            if (!CompareArray(matrix1.ColumnPointers, matrix2.ColumnPointers))
+            {
+                return false;
             }
 
             return true;
         }
 
-        /// <summary>
-        /// Rotate given point set around the origin.
-        /// </summary>
-        private static IPolygon Rotate(List<Vertex> points, double radians)
+        private static bool CompareArray(int[] a, int[] b)
         {
-            var poly = new Polygon(points.Count);
+            int length = a.Length;
 
-            int id = 0;
-
-            foreach (var p in points)
+            if (b.Length != length)
             {
-                double x = p.X;
-                double y = p.Y;
-
-                double s = Math.Sin(radians);
-                double c = Math.Cos(radians);
-
-                double xr = c * x - s * y;
-                double yr = s * x + c * y;
-
-                poly.Points.Add(new Vertex(xr, yr) { ID = id++ });
+                return false;
             }
 
-            return poly;
+            for (int i = 0; i < length; i++)
+            {
+                if (a[i] != b[i])
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

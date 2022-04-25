@@ -1,54 +1,48 @@
-﻿
-namespace TriangleNet.Examples
+﻿namespace TriangleNet.Examples
 {
-    using System;
     using TriangleNet.Geometry;
     using TriangleNet.Meshing;
     using TriangleNet.Rendering.Text;
-    using TriangleNet.Smoothing;
 
     /// <summary>
-    /// Triangulate a polygon with hole with maximum area constraint, followed by mesh smoothing.
+    /// Triangulate a polygon with hole and set minimum angle constraint.
     /// </summary>
-    public class Example3
+    public static class Example2
     {
         public static bool Run(bool print = false)
         {
-            // Generate mesh.
-            var mesh = CreateMesh();
+            // Generate the input geometry.
+            var poly = CreatePolygon();
 
-            if (print) SvgImage.Save(mesh, "example-3.svg", 500);
+            // Set minimum angle quality option.
+            var quality = new QualityOptions() { MinimumAngle = 30.0 };
+
+            // Generate mesh using the polygons Triangulate extension method.
+            var mesh = poly.Triangulate(quality);
+
+            if (print) SvgImage.Save(mesh, "example-2.svg", 500);
 
             return mesh.Triangles.Count > 0;
         }
 
-        public static IMesh CreateMesh()
+        public static IPolygon CreatePolygon(double h = 0.2)
         {
             // Generate the input geometry.
-            var poly = Example2.CreatePolygon();
+            var poly = new Polygon();
 
-            // Since we want to do CVT smoothing, ensure that the mesh
-            // is conforming Delaunay.
-            var options = new ConstraintOptions() { ConformingDelaunay = true };
+            // Center point.
+            var center = new Point(0, 0);
 
-            // Set maximum area quality option (we don't need to set a minimum
-            // angle, since smoothing will improve the triangle shapes).
-            var quality = new QualityOptions()
-            {
-                // The boundary segments have a length of 0.2, so we set a
-                // maximum area constraint assuming equilateral triangles.
-                MaximumArea = (Math.Sqrt(3) / 4 * 0.2 * 0.2) * 1.45
-            };
+            // Inner contour (hole).
+            poly.Add(Generate.Circle(1.0, center, h, 1), center);
 
-            // Generate mesh using the polygons Triangulate extension method.
-            var mesh = poly.Triangulate(options, quality);
+            // Internal contour.
+            poly.Add(Generate.Circle(2.0, center, h, 2));
 
-            var smoother = new SimpleSmoother();
+            // Outer contour.
+            poly.Add(Generate.Circle(3.0, center, h, 3));
 
-            // Smooth mesh.
-            smoother.Smooth(mesh, 25);
-
-            return mesh;
+            return poly;
         }
     }
 }

@@ -1,71 +1,54 @@
 ﻿
 namespace TriangleNet.Examples
 {
-    using TriangleNet;
+    using System;
     using TriangleNet.Geometry;
     using TriangleNet.Meshing;
     using TriangleNet.Rendering.Text;
     using TriangleNet.Smoothing;
 
     /// <summary>
-    /// Refine only a part of a polygon mesh by using region pointers and an area constraint.
+    /// Triangulate a polygon with hole with maximum area constraint, followed by mesh smoothing.
     /// </summary>
-    public class Example4
+    public class Example3
     {
         public static bool Run(bool print = false)
         {
-            // Generate the input geometry.
-            var poly = CreatePolygon();
-            
-            // Define regions (first one defines the area constraint).
-            poly.Regions.Add(new RegionPointer(1.5, 0.0, 1, 0.01));
-            poly.Regions.Add(new RegionPointer(2.5, 0.0, 2));
+            // Generate mesh.
+            var mesh = CreateMesh();
 
-            // Set quality and constraint options.
-            var options = new ConstraintOptions()
-            {
-                ConformingDelaunay = true
-            };
-
-            var quality = new QualityOptions()
-            {
-                MinimumAngle = 25.0,
-                VariableArea = true
-            };
-
-            //quality.UserTest = (t, area) => t.Label == 1 && area > 0.01;
-
-            var mesh = poly.Triangulate(options, quality);
-
-            var smoother = new SimpleSmoother();
-
-            smoother.Smooth(mesh, 5);
-
-            if (print) SvgImage.Save(mesh, "example-4.svg", 500);
+            if (print) SvgImage.Save(mesh, "example-3.svg", 500);
 
             return mesh.Triangles.Count > 0;
         }
 
-        public static IPolygon CreatePolygon()
+        public static IMesh CreateMesh()
         {
-            // Generate three concentric circles.
-            var poly = new Polygon();
+            // Generate the input geometry.
+            var poly = Example2.CreatePolygon();
 
-            // Center point.
-            var center = new Point(0, 0);
+            // Since we want to do CVT smoothing, ensure that the mesh
+            // is conforming Delaunay.
+            var options = new ConstraintOptions() { ConformingDelaunay = true };
 
-            // Inner contour (hole).
-            poly.Add(Generate.Circle(1.0, center, 0.1, 1), center);
+            // Set maximum area quality option (we don't need to set a minimum
+            // angle, since smoothing will improve the triangle shapes).
+            var quality = new QualityOptions()
+            {
+                // The boundary segments have a length of 0.2, so we set a
+                // maximum area constraint assuming equilateral triangles.
+                MaximumArea = (Math.Sqrt(3) / 4 * 0.2 * 0.2) * 1.45
+            };
 
-            // Internal contour.
-            poly.Add(Generate.Circle(2.0, center, 0.1, 2));
+            // Generate mesh using the polygons Triangulate extension method.
+            var mesh = poly.Triangulate(options, quality);
 
-            // Outer contour.
-            poly.Add(Generate.Circle(3.0, center, 0.3, 3));
+            var smoother = new SimpleSmoother();
 
-            // Note that the outer contour has a larger segment size!
+            // Smooth mesh.
+            smoother.Smooth(mesh, 25);
 
-            return poly;
+            return mesh;
         }
     }
 }

@@ -1,133 +1,89 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using TriangleNet.Geometry;
-using TriangleNet.Meshing;
-using TriangleNet.Meshing.Algorithm;
-using TriangleNet.Rendering.Text;
-using TriangleNet.Tools;
-
+﻿
 namespace TriangleNet.Examples
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using TriangleNet.Geometry;
+
     /// <summary>
-    /// Scattered data interpolation without USE_Z or USE_ATTRIBS.
+    /// Troubleshooting: finding degenerate boundary triangles.
     /// </summary>
-    internal class Example10
+    public class Example9
     {
-        // The function we are sampling.
-        private static readonly Func<Point, double> F = p => Math.Sin(p.X) * Math.Cos(p.Y);
-
-        // The mesh size, for a structured grid (SIZE x SIZE) points.
-        private const int SIZE = 20;
-
         public static bool Run(bool print = false)
         {
-            // The input domain.
-            var r = new Rectangle(0d, 0d, 10d, 10d);
-
-            var mesh = GetScatteredDataMesh(r, out double[] data);
-            //var mesh = GetStructuredDataMesh(r, out double[] data);
-
-            if (print) SvgImage.Save(mesh, "example-10.svg", 500);
-
-            // The points to interpolate.
-            var xy = Generate.RandomPoints(50, r);
-
-            var xyData = InterpolateData((Mesh)mesh, data, xy);
-
-            double error = xy.Max(p => Math.Abs(xyData[p.ID] - F(p)));
-
-            // L2 error
-            //double error = Math.Sqrt(xy.Sum(p => Math.Pow(xyData[p.ID] - F(p), 2)));
-
-            // Define tolerance dependent on mesh dimensions and size.
-            double tolerance = 0.5 * Math.Max(r.Width, r.Height) / SIZE;
-
-            return error < tolerance;
-        }
-
-        private static IMesh GetStructuredDataMesh(Rectangle domain, out double[] data)
-        {
-            var mesh = GenericMesher.StructuredMesh(domain, SIZE, SIZE);
-
-            mesh.Renumber();
-
-            // Generate function values for mesh points.
-            data = new double[mesh.Vertices.Count];
-
-            foreach (var item in mesh.Vertices)
+            var pts = new List<Vertex>
             {
-                data[item.ID] = F(item);
-            }
+                // The 4 corners of the rectangle.
+                new Vertex(1.5, 1.0),
+                new Vertex(1.5, -1.0),
+                new Vertex(-1.5, -1.0),
+                new Vertex(-1.5, 1.0),
 
-            return mesh;
-        }
+                // The edge midpoints.
+                new Vertex(0.0, 1.0),
+                new Vertex(0.0, -1.0),
+                new Vertex(1.5, 0.0),
+                new Vertex(-1.5, 0.0)
+            };
 
-        private static IMesh GetScatteredDataMesh(Rectangle domain, out double[] data)
-        {
-            var r = new Rectangle(domain);
+            var r = new Random(78403);
 
-            double h = domain.Width / SIZE;
+            // The original rectangle.
+            var poly = Rotate(pts, 0);
 
-            // Generate a rectangle boundary point set (20 points on each side).
-            var input = Generate.Rectangle(r, 0.5);
-
-            // Making sure we add some margin to the boundary.
-            h = -h / 2;
-            r.Resize(h, h);
-
-            int n = Math.Max(1, SIZE * SIZE - input.Points.Count);
-
-            // Add more input points (more sampling points, better interpolation).
-            input.Points.AddRange(Generate.RandomPoints(n, r));
-
-            var mesher = new GenericMesher(new Dwyer());
-
-            // Generate mesh.
-            var mesh = mesher.Triangulate(input.Points);
-
-            mesh.Renumber();
-
-            // Generate function values for mesh points.
-            data = new double[mesh.Vertices.Count];
-
-            foreach (var item in mesh.Vertices)
+            for (int i = 0; i < 10; i++)
             {
-                data[item.ID] = F(item);
-            }
+                var mesh = poly.Triangulate();
 
-            return mesh;
-        }
+                var list = MeshValidator.GetDegenerateBoundaryTriangles(mesh);
 
-        private static double[] InterpolateData(Mesh mesh, double[] data, IEnumerable<Point> xy)
-        {
-            // The interpolated values.
-            var values = new double[xy.Count()];
-
-            var qtree = new TriangleQuadTree(mesh);
-
-            int i = 0;
-
-            foreach (var p in xy)
-            {
-                var tri = qtree.Query(p.X, p.Y);
-
-                // For easy access of the interpolated values.
-                p.ID = i;
-
-                if (tri == null)
+                if (print && list.Any())
                 {
-                    values[i] = float.NaN;
-                }
-                else
-                {
-                    values[i] = Interpolation.InterpolatePoint(tri, p, data);
+                    Console.WriteLine("Iteration {0}: found {1} degenerate triangle(s) of {2}.",
+                        i, list.Count(), mesh.Triangles.Count);
+
+                    foreach (var t in list)
+                    {
+                        Console.WriteLine("   [{0} {1} {2}]",
+                            t.GetVertexID(0),
+                            t.GetVertexID(1),
+                            t.GetVertexID(2));
+                    }
                 }
 
-                i++;
+                // Random rotation.
+                poly = Rotate(pts, Math.PI * r.NextDouble());
             }
 
-            return values;
+            return true;
+        }
+
+        /// <summary>
+        /// Rotate given point set around the origin.
+        /// </summary>
+        private static IPolygon Rotate(List<Vertex> points, double radians)
+        {
+            var poly = new Polygon(points.Count);
+
+            int id = 0;
+
+            foreach (var p in points)
+            {
+                double x = p.X;
+                double y = p.Y;
+
+                double s = Math.Sin(radians);
+                double c = Math.Cos(radians);
+
+                double xr = c * x - s * y;
+                double yr = s * x + c * y;
+
+                poly.Points.Add(new Vertex(xr, yr) { ID = id++ });
+            }
+
+            return poly;
         }
     }
 }

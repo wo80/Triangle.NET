@@ -1,98 +1,71 @@
 ﻿
 namespace TriangleNet.Examples
 {
-    using System.Collections.Generic;
     using TriangleNet;
     using TriangleNet.Geometry;
     using TriangleNet.Meshing;
-    using TriangleNet.Meshing.Iterators;
     using TriangleNet.Rendering.Text;
+    using TriangleNet.Smoothing;
 
     /// <summary>
-    /// Two ways finding boundary triangles.
+    /// Refine only a part of a polygon mesh by using region pointers and an area constraint.
     /// </summary>
-    public static class Example5
+    public class Example4
     {
         public static bool Run(bool print = false)
         {
-            var mesh = Example3.CreateMesh();
+            // Generate the input geometry.
+            var poly = CreatePolygon();
+            
+            // Define regions (first one defines the area constraint).
+            poly.Regions.Add(new RegionPointer(1.5, 0.0, 1, 0.01));
+            poly.Regions.Add(new RegionPointer(2.5, 0.0, 2));
 
-            FindBoundary1(mesh);
+            // Set quality and constraint options.
+            var options = new ConstraintOptions()
+            {
+                ConformingDelaunay = true
+            };
 
-            if (print) SvgImage.Save(mesh, "example-5-1.svg", 500, true, false);
+            var quality = new QualityOptions()
+            {
+                MinimumAngle = 25.0,
+                VariableArea = true
+            };
 
-            FindBoundary2(mesh);
+            //quality.UserTest = (t, area) => t.Label == 1 && area > 0.01;
 
-            if (print) SvgImage.Save(mesh, "example-5-2.svg", 500, true, false);
+            var mesh = poly.Triangulate(options, quality);
+
+            var smoother = new SimpleSmoother();
+
+            smoother.Smooth(mesh, 5);
+
+            if (print) SvgImage.Save(mesh, "example-4.svg", 500);
 
             return mesh.Triangles.Count > 0;
         }
 
-        /// <summary>
-        /// Find boundary triangles using segments.
-        /// </summary>
-        private static void FindBoundary1(IMesh mesh, bool neigbours = true)
+        public static IPolygon CreatePolygon()
         {
-            mesh.Renumber();
+            // Generate three concentric circles.
+            var poly = new Polygon();
 
-            var cache = new List<Vertex>(mesh.Segments.Count + 1);
+            // Center point.
+            var center = new Point(0, 0);
 
-            var circulator = new VertexCirculator((Mesh)mesh);
+            // Inner contour (hole).
+            poly.Add(Generate.Circle(1.0, center, 0.1, 1), center);
 
-            foreach (var s in mesh.Segments)
-            {
-                int label = s.Label;
+            // Internal contour.
+            poly.Add(Generate.Circle(2.0, center, 0.1, 2));
 
-                for (int i = 0; i < 2; i++)
-                {
-                    var vertex = s.GetVertex(i);
+            // Outer contour.
+            poly.Add(Generate.Circle(3.0, center, 0.3, 3));
 
-                    // Check the vertex ID to see if it was processed already.
-                    if (vertex.ID >= 0)
-                    {
-                        var star = circulator.EnumerateTriangles(vertex);
+            // Note that the outer contour has a larger segment size!
 
-                        foreach (var triangle in star)
-                        {
-                            triangle.Label = label;
-                        }
-
-                        // Mark the vertex as "processed".
-                        vertex.ID = -vertex.ID;
-
-                        cache.Add(vertex);
-                    }
-                }
-            }
-
-            // Undo the vertex ID changes.
-            foreach (var vertex in cache)
-            {
-                vertex.ID = -vertex.ID;
-            }
-        }
-
-        /// <summary>
-        /// Find boundary triangles using vertices.
-        /// </summary>
-        private static void FindBoundary2(IMesh mesh)
-        {
-            var circulator = new VertexCirculator((Mesh)mesh);
-
-            foreach (var vertex in mesh.Vertices)
-            {
-                int label = vertex.Label;
-
-                if (label > 0)
-                {
-                    var star = circulator.EnumerateTriangles(vertex);
-
-                    foreach (var triangle in star)
-                    {
-                        triangle.Label = label;
-                    }
-                }
-            }
+            return poly;
         }
     }
 }

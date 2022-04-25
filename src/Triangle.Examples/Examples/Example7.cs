@@ -1,73 +1,56 @@
-﻿
-namespace TriangleNet.Examples
+﻿namespace TriangleNet.Examples
 {
-    using System;
+    using System.Linq;
+    using TriangleNet;
     using TriangleNet.Geometry;
-    using TriangleNet.Meshing;
     using TriangleNet.Meshing.Iterators;
     using TriangleNet.Rendering.Text;
+    using TriangleNet.Tools;
+    using TriangleNet.Topology;
 
     /// <summary>
-    /// Using a user test function to define a maximum edge length constraint.
+    /// Boolean operations on mesh regions (intersection, difference, xor).
     /// </summary>
-    public static class Example7
+    public static class Example6
     {
-        const double MAX_EDGE_LENGTH = 0.2;
-
         public static bool Run(bool print = false)
         {
-            var poly = new Polygon();
-
             // Generate the input geometry.
-            poly.Add(Generate.Rectangle(0.0, 0.0, 1.0, 1.0));
+            var polygon = new Polygon(8, true);
 
-            // Set minimum angle quality option, ignoring holes.
-            var quality = new QualityOptions()
-            {
-                UserTest = MaxEdgeLength
-            };
+            // Two intersecting rectangles.
+            var A = Generate.Rectangle(0d, 0d, 4d, 4d, label: 1);
+            var B = Generate.Rectangle(1d, 1d, 4d, 4d, label: 2);
 
-            // Generate mesh using the polygons Triangulate extension method.
-            var mesh = (Mesh)poly.Triangulate(quality);
+            polygon.Add(A);
+            polygon.Add(B);
 
-            // Validate.
-            foreach (var e in EdgeIterator.EnumerateEdges(mesh))
-            {
-                double length = Math.Sqrt(DistSqr(e.GetVertex(0), e.GetVertex(1)));
+            // Generate mesh.
+            var mesh = (Mesh)polygon.Triangulate();
 
-                if (length > MAX_EDGE_LENGTH)
-                {
-                    return false;
-                }
-            }
+            if (print) SvgImage.Save(mesh, "example-6.svg", 500);
 
-            if (print) SvgImage.Save(mesh, "example-7.svg", 500);
+            // Find a seeding triangle (in this case, the point (2, 2) lies in
+            // both rectangles).
+            var seed = (new TriangleQuadTree(mesh)).Query(2.0, 2.0) as Triangle;
 
-            return true;
-        }
+            var iterator = new RegionIterator(mesh);
 
-        static bool MaxEdgeLength(ITriangle tri, double area)
-        {
-            var p0 = tri.GetVertex(0);
-            var p1 = tri.GetVertex(1);
-            var p2 = tri.GetVertex(2);
+            iterator.Process(seed, t => t.Label ^= 1, 1);
+            iterator.Process(seed, t => t.Label ^= 2, 2);
 
-            var s1 = DistSqr(p0, p1);
-            var s2 = DistSqr(p1, p2);
-            var s3 = DistSqr(p2, p0);
+            // At this point, all triangles will have label 1, 2 or 3 (= 1 xor 2).
 
-            // Comparing against squared max leg length.
-            var maxlen = MAX_EDGE_LENGTH * MAX_EDGE_LENGTH;
+            // The intersection of A and B.
+            var intersection = mesh.Triangles.Where(t => t.Label == 3);
 
-            return s1 > maxlen || s2 > maxlen || s3 > maxlen;
-        }
+            // The difference A \ B.
+            var difference = mesh.Triangles.Where(t => t.Label == 1);
 
-        static double DistSqr(Vertex a, Vertex b)
-        {
-            var dx = a.X - b.X;
-            var dy = a.Y - b.Y;
+            // The xor of A and B.
+            var xor = mesh.Triangles.Where(t => t.Label == 1 || t.Label == 2);
 
-            return dx * dx + dy * dy;
+            return intersection.Any() && difference.Any() && xor.Any();
         }
     }
 }
