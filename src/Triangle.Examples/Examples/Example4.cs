@@ -10,14 +10,14 @@ namespace TriangleNet.Examples
     /// <summary>
     /// Triangulate a polygon with hole with maximum area constraint, followed by mesh smoothing.
     /// </summary>
-    public class Example3
+    public class Example4
     {
         public static bool Run(bool print = false)
         {
             // Generate mesh.
             var mesh = CreateMesh();
 
-            if (print) SvgImage.Save(mesh, "example-3.svg", 500);
+            if (print) SvgImage.Save(mesh, "example-4.svg", 500);
 
             return mesh.Triangles.Count > 0;
         }
@@ -25,7 +25,7 @@ namespace TriangleNet.Examples
         public static IMesh CreateMesh()
         {
             // Generate the input geometry.
-            var poly = Example2.CreatePolygon();
+            var poly = Example3.CreatePolygon();
 
             // Since we want to do CVT smoothing, ensure that the mesh
             // is conforming Delaunay.

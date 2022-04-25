@@ -7,7 +7,7 @@
     /// <summary>
     /// Triangulate a polygon with hole and set minimum angle constraint.
     /// </summary>
-    public static class Example2
+    public static class Example3
     {
         public static bool Run(bool print = false)
         {
@@ -20,7 +20,7 @@
             // Generate mesh using the polygons Triangulate extension method.
             var mesh = poly.Triangulate(quality);
 
-            if (print) SvgImage.Save(mesh, "example-2.svg", 500);
+            if (print) SvgImage.Save(mesh, "example-3.svg", 500);
 
             return mesh.Triangles.Count > 0;
         }

@@ -11,19 +11,19 @@ namespace TriangleNet.Examples
     /// <summary>
     /// Two ways finding boundary triangles.
     /// </summary>
-    public static class Example5
+    public static class Example6
     {
         public static bool Run(bool print = false)
         {
-            var mesh = Example3.CreateMesh();
+            var mesh = Example4.CreateMesh();
 
             FindBoundary1(mesh);
 
-            if (print) SvgImage.Save(mesh, "example-5-1.svg", 500, true, false);
+            if (print) SvgImage.Save(mesh, "example-6-1.svg", 500, true, false);
 
             FindBoundary2(mesh);
 
-            if (print) SvgImage.Save(mesh, "example-5-2.svg", 500, true, false);
+            if (print) SvgImage.Save(mesh, "example-6-2.svg", 500, true, false);
 
             return mesh.Triangles.Count > 0;
         }

@@ -9,7 +9,7 @@ namespace TriangleNet.Examples
     /// <summary>
     /// Troubleshooting: finding degenerate boundary triangles.
     /// </summary>
-    public class Example9
+    public class Example10
     {
         public static bool Run(bool print = false)
         {

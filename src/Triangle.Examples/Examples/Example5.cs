@@ -10,7 +10,7 @@ namespace TriangleNet.Examples
     /// <summary>
     /// Refine only a part of a polygon mesh by using region pointers and an area constraint.
     /// </summary>
-    public class Example4
+    public class Example5
     {
         public static bool Run(bool print = false)
         {
@@ -41,7 +41,7 @@ namespace TriangleNet.Examples
 
             smoother.Smooth(mesh, 5);
 
-            if (print) SvgImage.Save(mesh, "example-4.svg", 500);
+            if (print) SvgImage.Save(mesh, "example-5.svg", 500);
 
             return mesh.Triangles.Count > 0;
         }

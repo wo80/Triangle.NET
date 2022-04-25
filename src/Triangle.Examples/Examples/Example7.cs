@@ -11,7 +11,7 @@
     /// <summary>
     /// Boolean operations on mesh regions (intersection, difference, xor).
     /// </summary>
-    public static class Example6
+    public static class Example7
     {
         public static bool Run(bool print = false)
         {
@@ -28,7 +28,7 @@
             // Generate mesh.
             var mesh = (Mesh)polygon.Triangulate();
 
-            if (print) SvgImage.Save(mesh, "example-6.svg", 500);
+            if (print) SvgImage.Save(mesh, "example-7.svg", 500);
 
             // Find a seeding triangle (in this case, the point (2, 2) lies in
             // both rectangles).

@@ -10,7 +10,7 @@ namespace TriangleNet.Examples
     /// <summary>
     /// Using a user test function to define a maximum edge length constraint.
     /// </summary>
-    public static class Example7
+    public static class Example8
     {
         const double MAX_EDGE_LENGTH = 0.2;
 
@@ -41,7 +41,7 @@ namespace TriangleNet.Examples
                 }
             }
 
-            if (print) SvgImage.Save(mesh, "example-7.svg", 500);
+            if (print) SvgImage.Save(mesh, "example-8.svg", 500);
 
             return true;
         }

@@ -10,11 +10,11 @@ namespace TriangleNet.Examples
     /// <summary>
     /// Compute the adjacency matrix of the mesh vertices.
     /// </summary>
-    public class Example8
+    public class Example9
     {
         public static bool Run()
         {
-            var mesh = (Mesh)Example3.CreateMesh();
+            var mesh = (Mesh)Example4.CreateMesh();
 
             return FindAdjacencyMatrix(mesh);
         }

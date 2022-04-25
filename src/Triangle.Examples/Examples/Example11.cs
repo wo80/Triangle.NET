@@ -12,7 +12,7 @@ namespace TriangleNet.Examples
     /// <summary>
     /// Scattered data interpolation without USE_Z or USE_ATTRIBS.
     /// </summary>
-    internal class Example10
+    internal class Example11
     {
         // The function we are sampling.
         private static readonly Func<Point, double> F = p => Math.Sin(p.X) * Math.Cos(p.Y);
@@ -28,7 +28,7 @@ namespace TriangleNet.Examples
             var mesh = GetScatteredDataMesh(r, out double[] data);
             //var mesh = GetStructuredDataMesh(r, out double[] data);
 
-            if (print) SvgImage.Save(mesh, "example-10.svg", 500);
+            if (print) SvgImage.Save(mesh, "example-11.svg", 500);
 
             // The points to interpolate.
             var xy = Generate.RandomPoints(50, r);
@@ -69,8 +69,8 @@ namespace TriangleNet.Examples
 
             double h = domain.Width / SIZE;
 
-            // Generate a rectangle boundary point set (20 points on each side).
-            var input = Generate.Rectangle(r, 0.5);
+            // Generate a rectangle boundary point set (SIZE points on each side).
+            var input = Generate.Rectangle(r, h);
 
             // Making sure we add some margin to the boundary.
             h = -h / 2;
