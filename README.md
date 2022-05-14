@@ -12,7 +12,7 @@ Triangle.NET generates 2D (constrained) Delaunay triangulations and high-quality
 * Node renumbering (Cuthill-McKee)
 * Read and write Triangle format files (.node, .poly, .ele)
 
-To get started, take a look the [wiki](https://github.com/wo80/Triangle.NET/wiki). There's also an extensive list of examples in the [Triangle.Examples](https://github.com/wo80/Triangle.NET/tree/master/src/Triangle.Examples) project (see [overview](https://github.com/wo80/Triangle.NET/wiki/Examples) in the wiki).
+To get started, take a look at the [wiki](https://github.com/wo80/Triangle.NET/wiki). There's also an extensive list of examples in the [Triangle.Examples](https://github.com/wo80/Triangle.NET/tree/master/src/Triangle.Examples) project (see [overview](https://github.com/wo80/Triangle.NET/wiki/Examples) in the wiki).
 
 ## License
 
