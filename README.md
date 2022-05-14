@@ -12,11 +12,11 @@ Triangle.NET generates 2D (constrained) Delaunay triangulations and high-quality
 * Node renumbering (Cuthill-McKee)
 * Read and write Triangle format files (.node, .poly, .ele)
 
-Until the wiki is setup, please refer to the [Examples](https://github.com/wo80/Triangle.NET/tree/master/src/Triangle.Examples) project to get started.
+To get started, take a look the [wiki](https://github.com/wo80/Triangle.NET/wiki). There's also an extensive list of examples in the [Triangle.Examples](https://github.com/wo80/Triangle.NET/tree/master/src/Triangle.Examples) project (see [overview](https://github.com/wo80/Triangle.NET/wiki/Examples) in the wiki).
 
 ## License
 
-The original C code published by Jonathan Shewchuk comes with a proprietary license (see [Triangle README](https://github.com/wo80/Triangle/blob/master/src/Triangle/README)) which, unfortunately, isn't very clear about how a derived work like Triangle.NET should be handled. Though Triangle.NET was published on Codeplex ([triangle.codeplex.com](https://triangle.codeplex.com), no longer available) under the MIT license in 2012, I recommend not using this code in a commercial context. This restriction only applies to the *Triangle* project and specifically those files containing a copyright header pointing to Jonathan Richard Shewchuk. The code contained in the other projects (like *Triangle.Rendering* or *Triangle.Viewer*) is released under MIT license.
+The original C code published by Jonathan Shewchuk comes with a proprietary license (see [Triangle README](https://github.com/wo80/Triangle/blob/master/src/Triangle/README)) which, unfortunately, isn't very clear about how a derived work like Triangle.NET should be handled. Though Triangle.NET was published on Codeplex under the MIT license in 2012 ([triangle.codeplex.com](https://triangle.codeplex.com), no longer available), I recommend not using this code in a commercial context. This restriction only applies to the *Triangle* project and specifically those files containing a copyright header pointing to Jonathan Richard Shewchuk. The code contained in the other projects (like *Triangle.Rendering* or *Triangle.Viewer*) is released under MIT license.
 
 Due to the unclear licensing situation, there will also be no Nuget package release. For further discussion, please refer to the open issue [License Confusion](https://github.com/wo80/Triangle.NET/issues/6).
 
