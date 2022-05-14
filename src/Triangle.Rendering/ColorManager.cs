@@ -68,7 +68,7 @@ namespace TriangleNet.Rendering
             return colors;
         }
 
-        public void CreateColorDictionary(int length)
+        public Dictionary<int, Color> CreateColorDictionary(int length)
         {
             var keys = new int[length];
 
@@ -77,34 +77,35 @@ namespace TriangleNet.Rendering
                 keys[i] = i;
             }
 
-            CreateColorDictionary(keys);
+            return CreateColorDictionary(keys);
         }
 
-        public void CreateColorDictionary(IEnumerable<int> keys)
+        public Dictionary<int, Color> CreateColorDictionary(IEnumerable<int> keys)
         {
-            this.ColorDictionary = new Dictionary<int, Color>();
+            ColorDictionary = new Dictionary<int, Color>();
 
             int i = 0, n = regionColors.Length;
 
             foreach (var key in keys)
             {
-                this.ColorDictionary.Add(key, regionColors[i]);
+                ColorDictionary.Add(key, regionColors[i]);
 
                 i = (i + 1) % n;
             }
+
+            return ColorDictionary;
         }
 
         // Change or add as many colors as you like...
         private static Color[] regionColors = {
-            Color.Transparent,
-            Color.FromArgb(200,   0, 255,   0),
-            Color.FromArgb(200, 255,   0,   0),
-            Color.FromArgb(200,   0,   0, 255),
-            Color.FromArgb(200,   0, 255, 255),
-            Color.FromArgb(200, 255, 255,   0),
-            Color.FromArgb(200, 255,   0, 255),
-            Color.FromArgb(200, 127,   0, 255),
-            Color.FromArgb(200,   0, 127, 255)
+            Color.FromArgb(127,   0, 255,   0),
+            Color.FromArgb(127, 255,   0,   0),
+            Color.FromArgb(127,   0,   0, 255),
+            Color.FromArgb(127,   0, 255, 255),
+            Color.FromArgb(127, 255, 255,   0),
+            Color.FromArgb(127, 255,   0, 255),
+            Color.FromArgb(127, 127,   0, 255),
+            Color.FromArgb(127,   0, 127, 255)
         };
     }
 }
