@@ -25,8 +25,11 @@ namespace TriangleNet.Examples
             // The input domain.
             var r = new Rectangle(0d, 0d, 10d, 10d);
 
-            var mesh = GetScatteredDataMesh(r, out double[] data);
-            //var mesh = GetStructuredDataMesh(r, out double[] data);
+            var mesh = GetScatteredDataMesh(r);
+            //var mesh = GetStructuredDataMesh(r);
+
+            // Generate function values for mesh points.
+            double[] data = GetFunctionValues(mesh.Vertices);
 
             if (print) SvgImage.Save(mesh, "example-11.svg", 500);
 
@@ -46,24 +49,16 @@ namespace TriangleNet.Examples
             return error < tolerance;
         }
 
-        private static IMesh GetStructuredDataMesh(Rectangle domain, out double[] data)
+        private static IMesh GetStructuredDataMesh(Rectangle domain)
         {
             var mesh = GenericMesher.StructuredMesh(domain, SIZE, SIZE);
 
             mesh.Renumber();
 
-            // Generate function values for mesh points.
-            data = new double[mesh.Vertices.Count];
-
-            foreach (var item in mesh.Vertices)
-            {
-                data[item.ID] = F(item);
-            }
-
             return mesh;
         }
 
-        private static IMesh GetScatteredDataMesh(Rectangle domain, out double[] data)
+        private static IMesh GetScatteredDataMesh(Rectangle domain)
         {
             var r = new Rectangle(domain);
 
@@ -88,15 +83,19 @@ namespace TriangleNet.Examples
 
             mesh.Renumber();
 
-            // Generate function values for mesh points.
-            data = new double[mesh.Vertices.Count];
+            return mesh;
+        }
 
-            foreach (var item in mesh.Vertices)
+        private static double[] GetFunctionValues(ICollection<Vertex> vertices)
+        {
+            var data = new double[vertices.Count];
+
+            foreach (var item in vertices)
             {
                 data[item.ID] = F(item);
             }
 
-            return mesh;
+            return data;
         }
 
         private static double[] InterpolateData(Mesh mesh, double[] data, IEnumerable<Point> xy)
