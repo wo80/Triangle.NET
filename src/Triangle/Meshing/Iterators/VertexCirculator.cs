@@ -10,10 +10,16 @@ namespace TriangleNet.Meshing.Iterators
     using TriangleNet.Geometry;
     using TriangleNet.Topology;
 
+    /// <summary>
+    /// Vertex circulator to enumerate the vertices connected to a mesh vertex.
+    /// </summary>
     public class VertexCirculator
     {
         List<Otri> cache = new List<Otri>();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="VertexCirculator" /> class.
+        /// </summary>
         public VertexCirculator(Mesh mesh)
         {
             mesh.MakeVertexMap();

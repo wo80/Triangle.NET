@@ -23,11 +23,12 @@ namespace TriangleNet.Topology
         internal SubSegment seg;
         internal int orient; // Ranges from 0 to 1.
 
-        public SubSegment Segment
-        {
-            get { return seg; }
-        }
+        /// <summary>
+        /// Gets the subsegment.
+        /// </summary>
+        public SubSegment Segment => seg;
 
+        /// <inheritdoc />
         public override string ToString()
         {
             if (seg == null)

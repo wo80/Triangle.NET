@@ -14,6 +14,9 @@ namespace TriangleNet
     using TriangleNet.Tools;
     using TriangleNet.Topology;
 
+    /// <summary>
+    /// Mesh validation helper.
+    /// </summary>
     public static class MeshValidator
     {
         private static RobustPredicates predicates = RobustPredicates.Default;

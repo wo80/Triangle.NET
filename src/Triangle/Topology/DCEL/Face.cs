@@ -10,12 +10,15 @@ namespace TriangleNet.Topology.DCEL
     using TriangleNet.Geometry;
 
     /// <summary>
-    /// A face of DCEL mesh.
+    /// A face of the DCEL datastructure.
     /// </summary>
     public class Face
     {
         #region Static initialization of "Outer Space" face
 
+        /// <summary>
+        /// A face representing "outer space".
+        /// </summary>
         public static readonly Face Empty;
 
         static Face()
@@ -105,6 +108,7 @@ namespace TriangleNet.Topology.DCEL
             } while (edge.ID != first);
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return string.Format("F-ID {0}", id);

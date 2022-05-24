@@ -77,11 +77,18 @@ namespace TriangleNet.Topology
         /// <summary>
         /// Gets the specified corners vertex.
         /// </summary>
+        /// <param name="index">The corner index (0, 1 or 2).</param>
+        /// <returns></returns>
         public Vertex GetVertex(int index)
         {
             return this.vertices[index]; // TODO: Check range?
         }
 
+        /// <summary>
+        /// Gets the specified corners vertex id.
+        /// </summary>
+        /// <param name="index">The corner index (0, 1 or 2).</param>
+        /// <returns></returns>
         public int GetVertexID(int index)
         {
             return this.vertices[index].id;
@@ -115,11 +122,13 @@ namespace TriangleNet.Topology
 
         #endregion
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             return this.hash;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return String.Format("TID {0}", hash);

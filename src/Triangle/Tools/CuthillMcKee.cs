@@ -34,7 +34,7 @@ namespace TriangleNet.Tools
         /// <summary>
         /// Gets the permutation vector for the Reverse Cuthill-McKee numbering.
         /// </summary>
-        /// <param name="mesh">The mesh.</param>
+        /// <param name="matrix">The adjacency matrix.</param>
         /// <returns>Permutation vector.</returns>
         public int[] Renumber(AdjacencyMatrix matrix)
         {
@@ -89,11 +89,11 @@ namespace TriangleNet.Tools
             int iccsze = 0;
             int level_num = 0;
 
-            /// Index vector for a level structure. The level structure is stored in the
-            /// currently unused  spaces in the permutation vector PERM.
+            // Index vector for a level structure. The level structure is stored in the
+            // currently unused  spaces in the permutation vector PERM.
             int[] level_row = new int[n + 1];
 
-            /// Marks variables that have been numbered.
+            // Marks variables that have been numbered.
             int[] mask = new int[n];
 
             for (i = 0; i < n; i++)
@@ -139,8 +139,8 @@ namespace TriangleNet.Tools
         /// nonzero input mask values are considered by the routine. The nodes numbered by RCM will have 
         /// their mask values set to zero.</param>
         /// <param name="perm">Output, int PERM(NODE_NUM), the RCM ordering.</param>
+        /// <param name="offset">Internal array offset.</param>
         /// <param name="iccsze">Output, int ICCSZE, the size of the connected component that has been numbered.</param>
-        /// <param name="node_num">the number of nodes.</param>
         /// <remarks>
         ///    The connected component is specified by a node ROOT and a mask.
         ///    The numbering starts at the root node.
@@ -169,8 +169,8 @@ namespace TriangleNet.Tools
             // Number of nodes in the mesh.
             int n = matrix.N;
 
-            /// Workspace, int DEG[NODE_NUM], a temporary vector used to hold 
-            /// the degree of the nodes in the section graph specified by mask and root.
+            // Workspace, int DEG[NODE_NUM], a temporary vector used to hold 
+            // the degree of the nodes in the section graph specified by mask and root.
             int[] deg = new int[n];
 
             // Find the degrees of the nodes in the component specified by MASK and ROOT.
@@ -269,7 +269,7 @@ namespace TriangleNet.Tools
         /// containing the level structure found.</param>
         /// <param name="level">Output, int LEVEL(NODE_NUM), the level structure array pair 
         /// containing the level structure found.</param>
-        /// <param name="node_num">the number of nodes.</param>
+        /// <param name="offset">Internal array offset.</param>
         /// <remarks>
         /// The diameter of a graph is the maximum distance (number of edges)
         /// between any two nodes of the graph.
@@ -409,7 +409,7 @@ namespace TriangleNet.Tools
         /// in level 1.  The neighbors of ROOT are in level 2, and so on.</param>
         /// <param name="level_row">Output, int LEVEL_ROW[NODE_NUM+1], the rooted level structure.</param>
         /// <param name="level">Output, int LEVEL[NODE_NUM], the rooted level structure.</param>
-        /// <param name="node_num">the number of nodes.</param>
+        /// <param name="offset">Internal array offset.</param>
         /// <remarks>
         /// Only nodes for which MASK is nonzero will be considered.
         ///
@@ -502,7 +502,7 @@ namespace TriangleNet.Tools
         /// <param name="iccsze">Output, int ICCSIZE, the number of nodes in the connected component.</param>
         /// <param name="ls">Output, int LS[NODE_NUM], stores in entries 1 through ICCSIZE the nodes in the 
         /// connected component, starting with ROOT, and proceeding by levels.</param>
-        /// <param name="node_num">the number of nodes.</param>
+        /// <param name="offset">Internal array offset.</param>
         /// <remarks>
         ///    The connected component is specified by MASK and ROOT.
         ///    Nodes for which MASK is zero are ignored.
@@ -621,7 +621,6 @@ namespace TriangleNet.Tools
         /// <summary>
         /// Produces the inverse of a given permutation.
         /// </summary>
-        /// <param name="n">Number of items permuted.</param>
         /// <param name="perm">PERM[N], a permutation.</param>
         /// <returns>The inverse permutation.</returns>
         int[] PermInverse(int[] perm)
@@ -642,6 +641,7 @@ namespace TriangleNet.Tools
         /// Reverses the elements of an integer vector.
         /// </summary>
         /// <param name="size">number of entries in the array.</param>
+        /// <param name="offset">Internal array offset.</param>
         /// <param name="a">the array to be reversed.</param>
         /// <example>
         ///   Input:

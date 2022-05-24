@@ -106,6 +106,7 @@ namespace TriangleNet.Geometry
 
         #endregion
 
+        /// <inheritdoc />
         public override int GetHashCode() => hash;
     }
 }

@@ -32,12 +32,21 @@ namespace TriangleNet
         // Pointer to a recently visited triangle. Improves point location if
         // proximate vertices are inserted sequentially.
         internal Otri recenttri;
-
+        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TriangleLocator" /> class.
+        /// </summary>
+        /// <param name="mesh">The mesh.</param>
         public TriangleLocator(Mesh mesh)
             : this(mesh, RobustPredicates.Default)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TriangleLocator" /> class.
+        /// </summary>
+        /// <param name="mesh">The mesh.</param>
+        /// <param name="predicates">The predicates.</param>
         public TriangleLocator(Mesh mesh, IPredicates predicates)
         {
             this.mesh = mesh;
@@ -55,7 +64,8 @@ namespace TriangleNet
             otri.Copy(ref recenttri);
         }
 
-        public void Reset()
+        // TODO: Remove unused method.
+        internal void Reset()
         {
             sampler.Reset();
             recenttri.tri = null; // No triangle has been visited yet.

@@ -100,8 +100,11 @@ namespace TriangleNet.IO
         /// <summary>
         /// Write the vertices to a stream.
         /// </summary>
-        /// <param name="nodes"></param>
         /// <param name="writer"></param>
+        /// <param name="nodes"></param>
+        /// <param name="markers"></param>
+        /// <param name="attribs"></param>
+        /// <param name="jettison"></param>
         private void WriteNodes(StreamWriter writer, IEnumerable<Vertex> nodes, bool markers,
             int attribs, bool jettison)
         {

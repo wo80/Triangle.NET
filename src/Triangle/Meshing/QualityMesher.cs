@@ -52,7 +52,7 @@ namespace TriangleNet.Meshing
         /// Apply quality constraints to a mesh.
         /// </summary>
         /// <param name="quality">The quality constraints.</param>
-        /// <param name="delaunay">A value indicating, if the refined mesh should be Conforming Delaunay.</param>
+        /// <param name="delaunay">A value indicating, whether the refined mesh should be Conforming Delaunay.</param>
         public void Apply(QualityOptions quality, bool delaunay = false)
         {
             // Copy quality options

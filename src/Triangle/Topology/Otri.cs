@@ -23,12 +23,16 @@ namespace TriangleNet.Topology
         internal Triangle tri;
         internal int orient; // Ranges from 0 to 2.
 
+        /// <summary>
+        /// Gets or sets the triangle.
+        /// </summary>
         public Triangle Triangle
         {
             get { return tri; }
             set { tri = value; }
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             if (tri == null)
@@ -77,6 +81,7 @@ namespace TriangleNet.Topology
         /// <summary>
         /// Find the abutting triangle; same edge. [sym(abc) -> ba*]
         /// </summary>
+        /// <remarks>
         /// Note that the edge direction is necessarily reversed, because the handle specified 
         /// by an oriented triangle is directed counterclockwise around the triangle.
         /// </remarks>

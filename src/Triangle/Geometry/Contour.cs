@@ -10,6 +10,9 @@ namespace TriangleNet.Geometry
     using System.Collections.Generic;
     using TriangleNet.Tools;
 
+    /// <summary>
+    /// Represents a contour of a polygon (outer boundary or internal holes).
+    /// </summary>
     public class Contour
     {
         int marker;
@@ -54,6 +57,10 @@ namespace TriangleNet.Geometry
             this.convex = convex;
         }
 
+        /// <summary>
+        /// Gets the list of segments of the contour.
+        /// </summary>
+        /// <returns></returns>
         public List<ISegment> GetSegments()
         {
             var segments = new List<ISegment>();

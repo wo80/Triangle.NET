@@ -267,7 +267,7 @@ namespace TriangleNet.IO
         /// </summary>
         /// <param name="polyfilename"></param>
         /// <param name="readElements">If true, look for an associated .ele file.</param>
-        /// <param name="readElements">If true, look for an associated .area file.</param>
+        /// <param name="readArea">If true, look for an associated .area file.</param>
         public Polygon ReadPolyFile(string polyfilename, bool readElements, bool readArea)
         {
             // Read poly file
@@ -603,7 +603,6 @@ namespace TriangleNet.IO
         /// </summary>
         /// <param name="areafilename"></param>
         /// <param name="intriangles"></param>
-        /// <param name="data"></param>
         private double[] ReadAreaFile(string areafilename, int intriangles)
         {
             double[] data = null;

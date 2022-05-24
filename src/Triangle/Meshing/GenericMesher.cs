@@ -15,26 +15,45 @@ namespace TriangleNet.Meshing
     /// <summary>
     /// Create meshes of point sets or polygons.
     /// </summary>
+    /// <remarks>
+    /// If not specified otherwise, the default triangulation algorithm used is <see cref="Dwyer" />.
+    /// </remarks>
     public class GenericMesher
     {
         Configuration config;
         ITriangulator triangulator;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GenericMesher" /> class.
+        /// </summary>
         public GenericMesher()
             : this(new Dwyer(), new Configuration())
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GenericMesher" /> class.
+        /// </summary>
+        /// <param name="triangulator">The <see cref="ITriangulator" /> algorithm implementation.</param>
         public GenericMesher(ITriangulator triangulator)
             : this(triangulator, new Configuration())
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GenericMesher" /> class.
+        /// </summary>
+        /// <param name="config">The <see cref="Configuration" />.</param>
         public GenericMesher(Configuration config)
             : this(new Dwyer(), config)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GenericMesher" /> class.
+        /// </summary>
+        /// <param name="triangulator">The <see cref="ITriangulator" /> algorithm implementation.</param>
+        /// <param name="config">The <see cref="Configuration" />.</param>
         public GenericMesher(ITriangulator triangulator, Configuration config)
         {
             this.config = config;

@@ -57,7 +57,7 @@ namespace TriangleNet.Meshing.Algorithm
         Mesh mesh;
 
         /// <summary>
-        /// Form a Delaunay triangulation by the divide-and-conquer method.
+        /// Compute a Delaunay triangulation by the divide-and-conquer method.
         /// </summary>
         /// <returns></returns>
         /// <remarks>

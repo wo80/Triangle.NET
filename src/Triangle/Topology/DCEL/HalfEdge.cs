@@ -6,6 +6,9 @@
 
 namespace TriangleNet.Topology.DCEL
 {
+    /// <summary>
+    /// A half-edge of the DCEL datastructure.
+    /// </summary>
     public class HalfEdge
     {
         internal int id;
@@ -25,6 +28,9 @@ namespace TriangleNet.Topology.DCEL
             set { id = value; }
         }
 
+        /// <summary>
+        /// Gets or sets a boundary marker.
+        /// </summary>
         public int Boundary
         {
             get { return mark; }
@@ -93,6 +99,7 @@ namespace TriangleNet.Topology.DCEL
             }
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return string.Format("HE-ID {0} (Origin = VID-{1})", id, origin.id);

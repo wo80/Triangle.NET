@@ -28,16 +28,30 @@ namespace TriangleNet.Geometry
         internal double z;
 #endif
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Point" /> class.
+        /// </summary>
         public Point()
             : this(0.0, 0.0, 0)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Point" /> class.
+        /// </summary>
+        /// <param name="x">The x coordinate.</param>
+        /// <param name="y">The y coordinate.</param>
         public Point(double x, double y)
             : this(x, y, 0)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Point" /> class.
+        /// </summary>
+        /// <param name="x">The x coordinate.</param>
+        /// <param name="y">The y coordinate.</param>
+        /// <param name="label">The point label.</param>
         public Point(double x, double y, int label)
         {
             this.x = x;
@@ -101,6 +115,7 @@ namespace TriangleNet.Geometry
 
         #region Overriding Equals() and == Operator
 
+        /// <inheritdoc />
         public static bool operator ==(Point a, Point b)
         {
             if (a is null)
@@ -118,13 +133,16 @@ namespace TriangleNet.Geometry
             return a.Equals(b);
         }
 
+        /// <inheritdoc />
         public static bool operator !=(Point a, Point b)
         {
             return !(a == b);
         }
 
+        /// <inheritdoc />
         public override bool Equals(object obj) => Equals(obj as Point);
 
+        /// <inheritdoc />
         public bool Equals(Point p)
         {
             // If object is null return false.
@@ -139,6 +157,7 @@ namespace TriangleNet.Geometry
 
         #endregion
 
+        /// <inheritdoc />
         public int CompareTo(Point other)
         {
             if (x == other.x && y == other.y)
@@ -149,6 +168,7 @@ namespace TriangleNet.Geometry
             return (x < other.x || (x == other.x && y < other.y)) ? -1 : 1;
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             int hash = 19;

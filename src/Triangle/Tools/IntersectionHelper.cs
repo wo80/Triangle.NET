@@ -9,6 +9,9 @@ namespace TriangleNet.Tools
     using System;
     using TriangleNet.Geometry;
 
+    /// <summary>
+    /// Segment intersection helper.
+    /// </summary>
     public static class IntersectionHelper
     {
         /// <summary>

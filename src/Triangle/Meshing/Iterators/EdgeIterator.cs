@@ -15,6 +15,11 @@ namespace TriangleNet.Meshing.Iterators
     /// </summary>
     public class EdgeIterator
     {
+        /// <summary>
+        /// Enumerate all edges of the given mesh.
+        /// </summary>
+        /// <param name="mesh"></param>
+        /// <returns></returns>
         public IEnumerable<Edge> EnumerateEdges(IMesh mesh)
         {
             Otri tri = default;
@@ -51,7 +56,7 @@ namespace TriangleNet.Meshing.Iterators
         }
 
         /// <summary>
-        /// Enumerate the edges of the mesh.
+        /// Enumerate all edges of the given mesh.
         /// </summary>
         /// <param name="mesh"></param>
         /// <param name="skipSegments"></param>

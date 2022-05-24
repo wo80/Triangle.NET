@@ -10,6 +10,9 @@ namespace TriangleNet
     using System.Collections.Generic;
     using TriangleNet.Topology;
 
+    /// <summary>
+    /// Pool datastructure storing triangles of a <see cref="Mesh" />.
+    /// </summary>
     public class TrianglePool : ICollection<Triangle>
     {
         // Determines the size of each block in the pool.
@@ -32,6 +35,9 @@ namespace TriangleNet
         /// </summary>
         public int Capacity => size;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TrianglePool" /> class.
+        /// </summary>
         public TrianglePool()
         {
             size = 0;
@@ -97,6 +103,9 @@ namespace TriangleNet
             return triangle;
         }
 
+        /// <summary>
+        /// Release triangle (making it a free triangle).
+        /// </summary>
         public void Release(Triangle triangle)
         {
             stack.Push(triangle);
@@ -172,11 +181,17 @@ namespace TriangleNet
             }
         }
 
+        /// <summary>
+        /// Not supported for this <see cref="ICollection{Triangle}" />.
+        /// </summary>
         public void Add(Triangle item)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
+        /// <summary>
+        /// Clear the pool.
+        /// </summary>
         public void Clear()
         {
             stack.Clear();
@@ -199,6 +214,7 @@ namespace TriangleNet
             size = count = 0;
         }
 
+        /// <inheritdoc />
         public bool Contains(Triangle item)
         {
             int i = item.hash;
@@ -211,6 +227,7 @@ namespace TriangleNet
             return pool[i / BLOCKSIZE][i % BLOCKSIZE].hash >= 0;
         }
 
+        /// <inheritdoc />
         public void CopyTo(Triangle[] array, int index)
         {
             var enumerator = GetEnumerator();
@@ -222,21 +239,19 @@ namespace TriangleNet
             }
         }
 
-        public int Count
-        {
-            get { return count - stack.Count; }
-        }
+        /// <inheritdoc />
+        public int Count => count - stack.Count;
 
-        public bool IsReadOnly
-        {
-            get { return true; }
-        }
+        /// <inheritdoc />
+        public bool IsReadOnly => true;
 
+        /// <inheritdoc />
         public bool Remove(Triangle item)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc />
         public IEnumerator<Triangle> GetEnumerator()
         {
             return new Enumerator(this);

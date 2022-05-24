@@ -22,12 +22,20 @@ namespace TriangleNet.Tools
         /// Number of incircle tests performed.
         /// </summary>
         public static long InCircleCount = 0;
+
+        /// <summary>
+        /// Number of adaptive incircle tests performed.
+        /// </summary>
         public static long InCircleAdaptCount = 0;
 
         /// <summary>
         /// Number of counterclockwise tests performed.
         /// </summary>
         public static long CounterClockwiseCount = 0;
+
+        /// <summary>
+        /// Number of adaptive counterclockwise tests performed.
+        /// </summary>
         public static long CounterClockwiseAdaptCount = 0;
 
         /// <summary>
@@ -201,6 +209,8 @@ namespace TriangleNet.Tools
         /// Update statistics about the quality of the mesh.
         /// </summary>
         /// <param name="mesh"></param>
+        /// <param name="sampleDegrees">Number of degrees to sample
+        /// (currently fixed to 60 = sample every 3 degrees).</param>
         public void Update(Mesh mesh, int sampleDegrees)
         {
             Point[] p = new Point[3];

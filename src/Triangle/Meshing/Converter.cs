@@ -351,6 +351,11 @@ namespace TriangleNet.Meshing
 
         #region DCEL conversion
 
+        /// <summary>
+        /// Convert the triangle mesh topology to DCEL.
+        /// </summary>
+        /// <param name="mesh"></param>
+        /// <returns></returns>
         public DcelMesh ToDCEL(Mesh mesh)
         {
             var dcel = new DcelMesh();

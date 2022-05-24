@@ -59,6 +59,9 @@ namespace TriangleNet.Tools
 
         Mesh mesh;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="QualityMeasure" /> class.
+        /// </summary>
         public QualityMeasure()
         {
             areaMeasure = new AreaMeasure();
@@ -158,6 +161,9 @@ namespace TriangleNet.Tools
 
         #endregion
 
+        /// <summary>
+        /// Update all quality measures.
+        /// </summary>
         public void Update(Mesh mesh)
         {
             this.mesh = mesh;

@@ -9,6 +9,9 @@ namespace TriangleNet
     using System;
     using System.Collections.Generic;
 
+    /// <summary>
+    /// The log level.
+    /// </summary>
     public enum LogLevel { Info, Warning, Error }
 
     /// <summary>
@@ -68,6 +71,7 @@ namespace TriangleNet
 
     /// <summary>
     /// A simple logger, which logs messages to a List.
+    /// </summary>
     public sealed class Log
     {
         /// <summary>
@@ -95,13 +99,10 @@ namespace TriangleNet
 
         private Log() { }
 
-        public static Log Instance
-        {
-            get
-            {
-                return instance;
-            }
-        }
+        /// <summary>
+        /// Gets the <see cref="Log"/> instance.
+        /// </summary>
+        public static Log Instance => instance;
 
         #endregion
 

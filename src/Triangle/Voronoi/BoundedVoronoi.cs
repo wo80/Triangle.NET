@@ -12,15 +12,28 @@ namespace TriangleNet.Voronoi
 
     using TVertex = TriangleNet.Geometry.Vertex;
 
+    /// <summary>
+    /// Computing the bounded Voronoi diagram of a constrained and conforming Delaunay triangulation.
+    /// </summary>
     public class BoundedVoronoi : VoronoiBase
     {
         int offset;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StandardVoronoi" /> class.
+        /// </summary>
+        /// <param name="mesh">The mesh.</param>
         public BoundedVoronoi(Mesh mesh)
             : this(mesh, new DefaultVoronoiFactory(), RobustPredicates.Default)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StandardVoronoi" /> class.
+        /// </summary>
+        /// <param name="mesh">The mesh.</param>
+        /// <param name="factory"></param>
+        /// <param name="predicates"></param>
         public BoundedVoronoi(Mesh mesh, IVoronoiFactory factory, IPredicates predicates)
             : base(mesh, factory, predicates, true)
         {

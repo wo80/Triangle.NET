@@ -4,6 +4,9 @@ namespace TriangleNet.Geometry
     using System;
     using TriangleNet.Meshing;
 
+    /// <summary>
+    /// Extension methods.
+    /// </summary>
     public static class ExtensionMethods
     {
         #region IPolygon extensions
@@ -19,6 +22,7 @@ namespace TriangleNet.Geometry
         /// <summary>
         /// Triangulates a polygon, applying constraint options.
         /// </summary>
+        /// <param name="polygon">Polygon instance.</param>
         /// <param name="options">Constraint options.</param>
         public static IMesh Triangulate(this IPolygon polygon, ConstraintOptions options)
         {
@@ -28,6 +32,7 @@ namespace TriangleNet.Geometry
         /// <summary>
         /// Triangulates a polygon, applying quality options.
         /// </summary>
+        /// <param name="polygon">Polygon instance.</param>
         /// <param name="quality">Quality options.</param>
         public static IMesh Triangulate(this IPolygon polygon, QualityOptions quality)
         {
@@ -37,6 +42,7 @@ namespace TriangleNet.Geometry
         /// <summary>
         /// Triangulates a polygon, applying quality and constraint options.
         /// </summary>
+        /// <param name="polygon">Polygon instance.</param>
         /// <param name="options">Constraint options.</param>
         /// <param name="quality">Quality options.</param>
         public static IMesh Triangulate(this IPolygon polygon, ConstraintOptions options, QualityOptions quality)
@@ -47,6 +53,7 @@ namespace TriangleNet.Geometry
         /// <summary>
         /// Triangulates a polygon, applying quality and constraint options.
         /// </summary>
+        /// <param name="polygon">Polygon instance.</param>
         /// <param name="options">Constraint options.</param>
         /// <param name="quality">Quality options.</param>
         /// <param name="triangulator">The triangulation algorithm.</param>
@@ -67,6 +74,7 @@ namespace TriangleNet.Geometry
         /// <summary>
         /// Test whether a given point lies inside a triangle or not.
         /// </summary>
+        /// <param name="triangle">Triangle instance.</param>
         /// <param name="p">Point to locate.</param>
         /// <returns>True, if point is inside or on the edge of this triangle.</returns>
         public static bool Contains(this ITriangle triangle, Point p)
@@ -77,6 +85,7 @@ namespace TriangleNet.Geometry
         /// <summary>
         /// Test whether a given point lies inside a triangle or not.
         /// </summary>
+        /// <param name="triangle">Triangle instance.</param>
         /// <param name="x">Point to locate.</param>
         /// <param name="y">Point to locate.</param>
         /// <returns>True, if point is inside or on the edge of this triangle.</returns>
@@ -117,6 +126,11 @@ namespace TriangleNet.Geometry
             return false;
         }
 
+        /// <summary>
+        /// Returns the bounding box of the triangle.
+        /// </summary>
+        /// <param name="triangle">Triangle instance.</param>
+        /// <returns></returns>
         public static Rectangle Bounds(this ITriangle triangle)
         {
             var bounds = new Rectangle();

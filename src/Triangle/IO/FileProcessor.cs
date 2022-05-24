@@ -64,7 +64,7 @@ namespace TriangleNet.IO
         /// <summary>
         /// Save a polygon geometry to disk.
         /// </summary>
-        /// <param name="mesh">An instance of the <see cref="IPolygon" /> class.</param>
+        /// <param name="polygon">An instance of the <see cref="IPolygon" /> class.</param>
         /// <param name="filename">The path of the file to save.</param>
         public static void Write(IPolygon polygon, string filename)
         {

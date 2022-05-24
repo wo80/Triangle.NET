@@ -17,6 +17,11 @@ namespace TriangleNet.IO
     /// </summary>
     public class TriangleFormat : IPolygonFormat, IMeshFormat
     {
+        /// <summary>
+        /// Returns a value indicating whether the given file is supported by this format.
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
         public bool IsSupported(string file)
         {
             string ext = Path.GetExtension(file).ToLower();
@@ -29,6 +34,7 @@ namespace TriangleNet.IO
             return false;
         }
 
+        /// <inheritdoc />
         public IMesh Import(string filename)
         {
             string ext = Path.GetExtension(filename);
@@ -49,6 +55,7 @@ namespace TriangleNet.IO
             throw new NotSupportedException("Could not load '" + filename + "' file.");
         }
 
+        /// <inheritdoc />
         public void Write(IMesh mesh, string filename)
         {
             var writer = new TriangleWriter();
@@ -57,11 +64,13 @@ namespace TriangleNet.IO
             writer.WriteElements((Mesh)mesh, Path.ChangeExtension(filename, ".ele"));
         }
 
+        /// <inheritdoc />
         public void Write(IMesh mesh, Stream stream)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc />
         public IPolygon Read(string filename)
         {
             string ext = Path.GetExtension(filename);
@@ -79,11 +88,13 @@ namespace TriangleNet.IO
         }
 
 
+        /// <inheritdoc />
         public void Write(IPolygon polygon, string filename)
         {
             (new TriangleWriter()).WritePoly(polygon, filename);
         }
 
+        /// <inheritdoc />
         public void Write(IPolygon polygon, Stream stream)
         {
             throw new NotImplementedException();

@@ -33,6 +33,9 @@ namespace TriangleNet.Meshing.Algorithm
         double xminextreme; // Nonexistent x value used as a flag in sweepline.
         List<SplayNode> splaynodes;
 
+        /// <summary>
+        /// Compute a Delaunay triangulation by the sweepline method.
+        /// </summary>
         public IMesh Triangulate(IList<Vertex> points, Configuration config)
         {
             predicates = config.Predicates();

@@ -46,6 +46,10 @@ namespace TriangleNet.Tools
             get { return irow; }
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AdjacencyMatrix" /> class.
+        /// </summary>
+        /// <param name="mesh">The mesh.</param>
         public AdjacencyMatrix(Mesh mesh)
         {
             this.N = mesh.vertices.Count;
@@ -60,6 +64,12 @@ namespace TriangleNet.Tools
             SortIndices();
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AdjacencyMatrix" /> class.
+        /// </summary>
+        /// <param name="pcol">The column pointers.</param>
+        /// <param name="irow">The row indices.</param>
+        /// <exception cref="ArgumentException"></exception>
         public AdjacencyMatrix(int[] pcol, int[] irow)
         {
             this.N = pcol.Length - 1;
@@ -265,6 +275,9 @@ namespace TriangleNet.Tools
             return list;
         }
 
+        /// <summary>
+        /// Sort indices.
+        /// </summary>
         public void SortIndices()
         {
             int k1, k2, n = N;

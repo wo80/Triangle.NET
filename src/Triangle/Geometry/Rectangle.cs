@@ -25,6 +25,10 @@ namespace TriangleNet.Geometry
             xmax = ymax = -double.MaxValue;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Rectangle" /> class.
+        /// </summary>
+        /// <param name="other"></param>
         public Rectangle(Rectangle other)
             : this(other.Left, other.Bottom, other.Right, other.Top)
         {
@@ -125,8 +129,7 @@ namespace TriangleNet.Geometry
         /// <summary>
         /// Expand rectangle to include given rectangle.
         /// </summary>
-        /// <param name="x">X coordinate.</param>
-        /// <param name="y">Y coordinate.</param>
+        /// <param name="other">The other rectangle.</param>
         public void Expand(Rectangle other)
         {
             xmin = Math.Min(xmin, other.xmin);

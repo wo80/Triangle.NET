@@ -13,16 +13,28 @@ namespace TriangleNet
     /// </summary>
     public class Configuration
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Configuration" /> class.
+        /// </summary>
         public Configuration()
             : this(() => RobustPredicates.Default, () => new TrianglePool())
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Configuration" /> class.
+        /// </summary>
+        /// <param name="predicates">Factory method for <see cref="IPredicates" />.</param>
         public Configuration(Func<IPredicates> predicates)
             : this(predicates, () => new TrianglePool())
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Configuration" /> class.
+        /// </summary>
+        /// <param name="predicates">Factory method for <see cref="IPredicates" />.</param>
+        /// <param name="trianglePool">Factory method for <see cref="TrianglePool" />.</param>
         public Configuration(Func<IPredicates> predicates, Func<TrianglePool> trianglePool)
         {
             Predicates = predicates;

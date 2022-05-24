@@ -9,6 +9,9 @@ namespace TriangleNet.Tools
 {
     using TriangleNet.Geometry;
 
+    /// <summary>
+    /// Interpolation helper.
+    /// </summary>
     public static class Interpolation
     {
         /// <summary>

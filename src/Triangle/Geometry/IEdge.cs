@@ -6,6 +6,9 @@
 
 namespace TriangleNet.Geometry
 {
+    /// <summary>
+    /// Simple edge interface.
+    /// </summary>
     public interface IEdge
     {
         /// <summary>

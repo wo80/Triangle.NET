@@ -22,6 +22,9 @@ namespace TriangleNet.Meshing.Iterators
     {
         List<Triangle> region;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RegionIterator" /> class.
+        /// </summary>
         public RegionIterator(Mesh mesh)
         {
             this.region = new List<Triangle>();

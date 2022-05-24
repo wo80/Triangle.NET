@@ -14,9 +14,9 @@ namespace TriangleNet.Meshing.Data
     /// A (priority) queue for bad triangles.
     /// </summary>
     /// <remarks>
-    //  The queue is actually a set of 4096 queues. I use multiple queues to
-    //  give priority to smaller angles. I originally implemented a heap, but
-    //  the queues are faster by a larger margin than I'd suspected.
+    /// The queue is actually a set of 4096 queues. I use multiple queues to
+    /// give priority to smaller angles. I originally implemented a heap, but
+    /// the queues are faster by a larger margin than I'd suspected.
     /// </remarks>
     class BadTriQueue
     {

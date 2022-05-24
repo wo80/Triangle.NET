@@ -219,6 +219,11 @@ namespace TriangleNet
             TransferNodes(points);
         }
 
+        /// <summary>
+        /// Refine the mesh to match given quality options.
+        /// </summary>
+        /// <param name="quality">The quality constraints.</param>
+        /// <param name="delaunay">A value indicating, whether the refined mesh should be Conforming Delaunay.</param>
         public void Refine(QualityOptions quality, bool delaunay = false)
         {
             invertices = vertices.Count;
@@ -319,10 +324,8 @@ namespace TriangleNet
             target.hullsize = this.hullsize;
         }
 
-        /// <summary>
-        /// Reset all the mesh data. This method will also wipe 
-        /// out all mesh data.
-        /// </summary>
+
+        // TODO: Remove unused method.
         private void ResetData()
         {
             vertices.Clear();
@@ -369,7 +372,7 @@ namespace TriangleNet
         /// <summary>
         /// Read the vertices from memory.
         /// </summary>
-        /// <param name="data">The input data.</param>
+        /// <param name="points">The input data.</param>
         private void TransferNodes(IList<Vertex> points)
         {
             invertices = points.Count;
@@ -1392,55 +1395,55 @@ namespace TriangleNet
         /// <param name="triflaws">A flag that determines whether the new triangles should 
         /// be tested for quality, and enqueued if they are bad.</param>
         /// <remarks>
-        //  This is a conceptually difficult routine. The starting assumption is
-        //  that we have a polygon with n sides. n - 1 of these sides are currently
-        //  represented as edges in the mesh. One side, called the "base", need not
-        //  be.
-        //
-        //  Inside the polygon is a structure I call a "fan", consisting of n - 1
-        //  triangles that share a common origin. For each of these triangles, the
-        //  edge opposite the origin is one of the sides of the polygon. The
-        //  primary edge of each triangle is the edge directed from the origin to
-        //  the destination; note that this is not the same edge that is a side of
-        //  the polygon. 'firstedge' is the primary edge of the first triangle.
-        //  From there, the triangles follow in counterclockwise order about the
-        //  polygon, until 'lastedge', the primary edge of the last triangle.
-        //  'firstedge' and 'lastedge' are probably connected to other triangles
-        //  beyond the extremes of the fan, but their identity is not important, as
-        //  long as the fan remains connected to them.
-        //
-        //  Imagine the polygon oriented so that its base is at the bottom.  This
-        //  puts 'firstedge' on the far right, and 'lastedge' on the far left.
-        //  The right vertex of the base is the destination of 'firstedge', and the
-        //  left vertex of the base is the apex of 'lastedge'.
-        //
-        //  The challenge now is to find the right sequence of edge flips to
-        //  transform the fan into a Delaunay triangulation of the polygon.  Each
-        //  edge flip effectively removes one triangle from the fan, committing it
-        //  to the polygon.  The resulting polygon has one fewer edge. If 'doflip'
-        //  is set, the final flip will be performed, resulting in a fan of one
-        //  (useless?) triangle. If 'doflip' is not set, the final flip is not
-        //  performed, resulting in a fan of two triangles, and an unfinished
-        //  triangular polygon that is not yet filled out with a single triangle.
-        //  On completion of the routine, 'lastedge' is the last remaining triangle,
-        //  or the leftmost of the last two.
-        //
-        //  Although the flips are performed in the order described above, the
-        //  decisions about what flips to perform are made in precisely the reverse
-        //  order. The recursive triangulatepolygon() procedure makes a decision,
-        //  uses up to two recursive calls to triangulate the "subproblems"
-        //  (polygons with fewer edges), and then performs an edge flip.
-        //
-        //  The "decision" it makes is which vertex of the polygon should be
-        //  connected to the base. This decision is made by testing every possible
-        //  vertex.  Once the best vertex is found, the two edges that connect this
-        //  vertex to the base become the bases for two smaller polygons. These
-        //  are triangulated recursively. Unfortunately, this approach can take
-        //  O(n^2) time not only in the worst case, but in many common cases. It's
-        //  rarely a big deal for vertex deletion, where n is rarely larger than
-        //  ten, but it could be a big deal for segment insertion, especially if
-        //  there's a lot of long segments that each cut many triangles. I ought to
-        //  code a faster algorithm some day.
+        /// This is a conceptually difficult routine. The starting assumption is
+        /// that we have a polygon with n sides. n - 1 of these sides are currently
+        /// represented as edges in the mesh. One side, called the "base", need not
+        /// be.
+        ///
+        /// Inside the polygon is a structure I call a "fan", consisting of n - 1
+        /// triangles that share a common origin. For each of these triangles, the
+        /// edge opposite the origin is one of the sides of the polygon. The
+        /// primary edge of each triangle is the edge directed from the origin to
+        /// the destination; note that this is not the same edge that is a side of
+        /// the polygon. 'firstedge' is the primary edge of the first triangle.
+        /// From there, the triangles follow in counterclockwise order about the
+        /// polygon, until 'lastedge', the primary edge of the last triangle.
+        /// 'firstedge' and 'lastedge' are probably connected to other triangles
+        /// beyond the extremes of the fan, but their identity is not important, as
+        /// long as the fan remains connected to them.
+        ///
+        /// Imagine the polygon oriented so that its base is at the bottom.  This
+        /// puts 'firstedge' on the far right, and 'lastedge' on the far left.
+        /// The right vertex of the base is the destination of 'firstedge', and the
+        /// left vertex of the base is the apex of 'lastedge'.
+        ///
+        /// The challenge now is to find the right sequence of edge flips to
+        /// transform the fan into a Delaunay triangulation of the polygon.  Each
+        /// edge flip effectively removes one triangle from the fan, committing it
+        /// to the polygon.  The resulting polygon has one fewer edge. If 'doflip'
+        /// is set, the final flip will be performed, resulting in a fan of one
+        /// (useless?) triangle. If 'doflip' is not set, the final flip is not
+        /// performed, resulting in a fan of two triangles, and an unfinished
+        /// triangular polygon that is not yet filled out with a single triangle.
+        /// On completion of the routine, 'lastedge' is the last remaining triangle,
+        /// or the leftmost of the last two.
+        ///
+        /// Although the flips are performed in the order described above, the
+        /// decisions about what flips to perform are made in precisely the reverse
+        /// order. The recursive triangulatepolygon() procedure makes a decision,
+        /// uses up to two recursive calls to triangulate the "subproblems"
+        /// (polygons with fewer edges), and then performs an edge flip.
+        ///
+        /// The "decision" it makes is which vertex of the polygon should be
+        /// connected to the base. This decision is made by testing every possible
+        /// vertex.  Once the best vertex is found, the two edges that connect this
+        /// vertex to the base become the bases for two smaller polygons. These
+        /// are triangulated recursively. Unfortunately, this approach can take
+        /// O(n^2) time not only in the worst case, but in many common cases. It's
+        /// rarely a big deal for vertex deletion, where n is rarely larger than
+        /// ten, but it could be a big deal for segment insertion, especially if
+        /// there's a lot of long segments that each cut many triangles. I ought to
+        /// code a faster algorithm some day.
         /// </remarks>
         private void TriangulatePolygon(Otri firstedge, Otri lastedge,
                                 int edgecount, bool doflip, bool triflaws)

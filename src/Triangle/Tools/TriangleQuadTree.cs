@@ -50,6 +50,12 @@ namespace TriangleNet.Tools
             root.CreateSubRegion(++currentDepth);
         }
 
+        /// <summary>
+        /// Query the quadtree a given point.
+        /// </summary>
+        /// <param name="x">The x coordinate.</param>
+        /// <param name="y">The y coordinate.</param>
+        /// <returns></returns>
         public ITriangle Query(double x, double y)
         {
             var point = new Point(x, y);

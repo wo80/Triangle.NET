@@ -18,6 +18,9 @@ namespace TriangleNet.IO
         internal int label;
         internal double area;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InputTriangle" /> class.
+        /// </summary>
         public InputTriangle(int p0, int p1, int p2)
         {
             vertices = new int[] { p0, p1, p2 };

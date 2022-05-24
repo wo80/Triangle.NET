@@ -19,10 +19,9 @@ namespace TriangleNet.Meshing.Algorithm
         Mesh mesh;
 
         /// <summary>
-        /// Form a Delaunay triangulation by incrementally inserting vertices.
+        /// Compute a Delaunay triangulation by incrementally inserting vertices.
         /// </summary>
-        /// <returns>Returns the number of edges on the convex hull of the 
-        /// triangulation.</returns>
+        /// <returns></returns>
         public IMesh Triangulate(IList<Vertex> points, Configuration config)
         {
             mesh = new Mesh(config, points);

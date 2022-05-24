@@ -23,6 +23,9 @@ namespace TriangleNet.Topology
         internal Otri[] triangles;
         internal int boundary;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SubSegment" /> class.
+        /// </summary>
         public SubSegment()
         {
             // Four NULL vertices.
@@ -83,11 +86,13 @@ namespace TriangleNet.Topology
             return triangles[index].tri.hash == Mesh.DUMMY ? null : triangles[index].tri;
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             return this.hash;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return String.Format("SID {0}", hash);

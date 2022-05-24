@@ -9,10 +9,18 @@ namespace TriangleNet.Topology.DCEL
     using System.Collections.Generic;
     using TriangleNet.Geometry;
 
+    /// <summary>
+    /// DCEL mesh.
+    /// </summary>
     public class DcelMesh
     {
+        /// <summary>List of vertices.</summary>
         protected List<Vertex> vertices;
+        
+        /// <summary>List of half-edges.</summary>
         protected List<HalfEdge> edges;
+
+        /// <summary>List of faces.</summary>
         protected List<Face> faces;
 
         /// <summary>
@@ -24,7 +32,7 @@ namespace TriangleNet.Topology.DCEL
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="" /> class.
+        /// Initializes a new instance of the <see cref="DcelMesh" /> class.
         /// </summary>
         /// <param name="initialize">If false, lists will not be initialized.</param>
         protected DcelMesh(bool initialize)

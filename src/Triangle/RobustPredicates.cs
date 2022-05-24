@@ -121,22 +121,15 @@ namespace TriangleNet
 
         #endregion
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RobustPredicates" /> class.
+        /// </summary>
         public RobustPredicates()
         {
             AllocateWorkspace();
         }
 
-        /// <summary>
-        /// Check, if the three points appear in counterclockwise order. The result is 
-        /// also a rough approximation of twice the signed area of the triangle defined 
-        /// by the three points.
-        /// </summary>
-        /// <param name="pa">Point a.</param>
-        /// <param name="pb">Point b.</param>
-        /// <param name="pc">Point c.</param>
-        /// <returns>Return a positive value if the points pa, pb, and pc occur in 
-        /// counterclockwise order; a negative value if they occur in clockwise order; 
-        /// and zero if they are collinear.</returns>
+        /// <inheritdoc/>
         public double CounterClockwise(Point pa, Point pb, Point pc)
         {
             double detleft, detright, det;
@@ -190,18 +183,7 @@ namespace TriangleNet
             return CounterClockwiseAdapt(pa, pb, pc, detsum);
         }
 
-        /// <summary>
-        /// Check if the point pd lies inside the circle passing through pa, pb, and pc. The 
-        /// points pa, pb, and pc must be in counterclockwise order, or the sign of the result 
-        /// will be reversed.
-        /// </summary>
-        /// <param name="pa">Point a.</param>
-        /// <param name="pb">Point b.</param>
-        /// <param name="pc">Point c.</param>
-        /// <param name="pd">Point d.</param>
-        /// <returns>Return a positive value if the point pd lies inside the circle passing through 
-        /// pa, pb, and pc; a negative value if it lies outside; and zero if the four points 
-        /// are cocircular.</returns>
+        /// <inheritdoc/>
         public double InCircle(Point pa, Point pb, Point pc, Point pd)
         {
             double adx, bdx, cdx, ady, bdy, cdy;
@@ -273,16 +255,7 @@ namespace TriangleNet
             return InCircle(pa, pb, pc, pd);
         }
 
-        /// <summary>
-        /// Find the circumcenter of a triangle.
-        /// </summary>
-        /// <param name="org">Triangle point.</param>
-        /// <param name="dest">Triangle point.</param>
-        /// <param name="apex">Triangle point.</param>
-        /// <param name="xi">Relative coordinate of new location.</param>
-        /// <param name="eta">Relative coordinate of new location.</param>
-        /// <param name="offconstant">Off-center constant.</param>
-        /// <returns>Coordinates of the circumcenter (or off-center)</returns>
+        /// <inheritdoc/>
         public Point FindCircumcenter(Point org, Point dest, Point apex,
             ref double xi, ref double eta, double offconstant)
         {
@@ -384,24 +357,7 @@ namespace TriangleNet
             return new Point(org.x + dx, org.y + dy);
         }
 
-        /// <summary>
-        /// Find the circumcenter of a triangle.
-        /// </summary>
-        /// <param name="org">Triangle point.</param>
-        /// <param name="dest">Triangle point.</param>
-        /// <param name="apex">Triangle point.</param>
-        /// <param name="xi">Relative coordinate of new location.</param>
-        /// <param name="eta">Relative coordinate of new location.</param>
-        /// <returns>Coordinates of the circumcenter</returns>
-        /// <remarks>
-        /// The result is returned both in terms of x-y coordinates and xi-eta
-        /// (barycentric) coordinates. The xi-eta coordinate system is defined in
-        /// terms of the triangle: the origin of the triangle is the origin of the
-        /// coordinate system; the destination of the triangle is one unit along the
-        /// xi axis; and the apex of the triangle is one unit along the eta axis.
-        /// This procedure also returns the square of the length of the triangle's
-        /// shortest edge.
-        /// </remarks>
+        /// <inheritdoc/>
         public Point FindCircumcenter(Point org, Point dest, Point apex,
             ref double xi, ref double eta)
         {

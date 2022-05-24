@@ -10,6 +10,9 @@ namespace TriangleNet.Tools
     using System.Collections.Generic;
     using TriangleNet.Geometry;
 
+    /// <summary>
+    /// Polygon validation helper.
+    /// </summary>
     public static class PolygonValidator
     {
         /// <summary>
