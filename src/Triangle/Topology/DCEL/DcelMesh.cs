@@ -84,6 +84,12 @@ namespace TriangleNet.Topology.DCEL
         /// a valid next pointer).</param>
         /// <param name="depth">Maximum edge count of faces (default = 0 means skip check).</param>
         /// <returns></returns>
+        /// <remarks>
+        /// The <paramref name="depth"/> value relates to the maximum degree of a vertex in the
+        /// triangulation. For quality meshes, the maximum degree is usually low, but for meshes
+        /// build from PSLGs without quality constraints applied, either provide a larger value
+        /// or disable the check by setting <paramref name="depth"/> to 0 (default).
+        /// </remarks>
         public virtual bool IsConsistent(bool closed = true, int depth = 0)
         {
             // Check vertices for null pointers.

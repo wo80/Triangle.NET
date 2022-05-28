@@ -13,15 +13,11 @@ namespace TriangleNet.IO
     using TriangleNet.Meshing;
 
     /// <summary>
-    /// Implements geometry and mesh file formats of the the original Triangle code.
+    /// Implements geometry and mesh file formats of the original Triangle project.
     /// </summary>
     public class TriangleFormat : IPolygonFormat, IMeshFormat
     {
-        /// <summary>
-        /// Returns a value indicating whether the given file is supported by this format.
-        /// </summary>
-        /// <param name="file"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public bool IsSupported(string file)
         {
             string ext = Path.GetExtension(file).ToLower();

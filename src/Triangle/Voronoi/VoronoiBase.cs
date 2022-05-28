@@ -19,12 +19,16 @@ namespace TriangleNet.Voronoi
     /// </summary>
     public abstract class VoronoiBase : DcelMesh
     {
+        /// <summary>Predicates</summary>
         protected IPredicates predicates;
 
+        /// <summary>Voronoi factory</summary>
         protected IVoronoiFactory factory;
 
-        // List of infinite half-edges, i.e. half-edges that start at circumcenters of triangles
-        // which lie on the domain boundary.
+        /// <summary>
+        /// List of infinite half-edges, i.e. half-edges that start at circumcenters
+        /// of triangles on the domain boundary.
+        /// </summary>
         protected List<HalfEdge> rays;
 
         /// <summary>
@@ -278,6 +282,7 @@ namespace TriangleNet.Voronoi
             }
         }
 
+        /// <inheritdoc />
         protected override IEnumerable<IEdge> EnumerateEdges()
         {
             var edges = new List<IEdge>(this.edges.Count / 2);

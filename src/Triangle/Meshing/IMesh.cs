@@ -50,7 +50,7 @@ namespace TriangleNet.Meshing
         /// </summary>
         /// <param name="quality">The quality constraints.</param>
         /// <param name="delaunay">
-        /// A value indicating, if the refined mesh should be Conforming Delaunay.
+        /// A value indicating, whether the refined mesh should be Conforming Delaunay.
         /// </param>
         void Refine(QualityOptions quality, bool delaunay);
     }

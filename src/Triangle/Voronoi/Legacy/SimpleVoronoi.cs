@@ -63,16 +63,17 @@ namespace TriangleNet.Voronoi.Legacy
             get { return regions.Values; }
         }
 
+        /// <summary>
+        /// Enumerates the edges of the Voronoi diagram.
+        /// </summary>
         public IEnumerable<IEdge> Edges
         {
             get { return EnumerateEdges(); }
         }
 
         /// <summary>
-        /// Gets the Voronoi diagram as raw output data.
+        /// Generate the Voronoi diagram.
         /// </summary>
-        /// <param name="mesh"></param>
-        /// <returns></returns>
         /// <remarks>
         /// The Voronoi diagram is the geometric dual of the Delaunay triangulation.
         /// Hence, the Voronoi vertices are listed by traversing the Delaunay
