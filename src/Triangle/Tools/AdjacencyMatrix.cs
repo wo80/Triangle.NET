@@ -28,38 +28,46 @@ namespace TriangleNet.Tools
         /// <summary>
         /// Gets the number of columns (nodes of the mesh).
         /// </summary>
-        public readonly int N;
+        public readonly int ColumnCount;
 
         /// <summary>
         /// Gets the column pointers.
         /// </summary>
-        public int[] ColumnPointers
-        {
-            get { return pcol; }
-        }
+        public int[] ColumnPointers => pcol;
 
         /// <summary>
         /// Gets the row indices.
         /// </summary>
-        public int[] RowIndices
-        {
-            get { return irow; }
-        }
+        public int[] RowIndices => irow;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdjacencyMatrix" /> class.
         /// </summary>
         /// <param name="mesh">The mesh.</param>
+        /// <remarks>
+        /// NOTE: as a side effect, computing the adjacency matrix will affect the
+        /// node numbering of the mesh.
+        /// </remarks>
         public AdjacencyMatrix(Mesh mesh)
         {
-            this.N = mesh.vertices.Count;
+            int n = mesh.vertices.Count;
+
+            // Undead vertices should not be considered in the adjacency matrix.
+            ColumnCount = n - mesh.undeads;
+
+            // Renumber nodes, excluding undeads.
+            int i = 0;
+            foreach (var vertex in mesh.vertices.Values)
+            {
+                vertex.id = vertex.type == VertexType.UndeadVertex ? -i : i++;
+            }
 
             // Set up the adj_row adjacency pointer array.
-            this.pcol = AdjacencyCount(mesh);
-            this.nnz = pcol[N];
+            pcol = AdjacencyCount(mesh);
+            nnz = pcol[ColumnCount];
 
             // Set up the adj adjacency array.
-            this.irow = AdjacencySet(mesh, this.pcol);
+            irow = AdjacencySet(mesh, pcol);
 
             SortIndices();
         }
@@ -72,16 +80,16 @@ namespace TriangleNet.Tools
         /// <exception cref="ArgumentException"></exception>
         public AdjacencyMatrix(int[] pcol, int[] irow)
         {
-            this.N = pcol.Length - 1;
+            ColumnCount = pcol.Length - 1;
 
-            this.nnz = pcol[N];
+            nnz = pcol[ColumnCount];
 
             this.pcol = pcol;
             this.irow = irow;
 
             if (pcol[0] != 0)
             {
-                throw new ArgumentException("Expected 0-based indexing.", "pcol");
+                throw new ArgumentException("Expected 0-based indexing.", nameof(pcol));
             }
 
             if (irow.Length < nnz)
@@ -104,7 +112,7 @@ namespace TriangleNet.Tools
             band_lo = 0;
             band_hi = 0;
 
-            for (i = 0; i < N; i++)
+            for (i = 0; i < ColumnCount; i++)
             {
                 for (j = pcol[i]; j < pcol[i + 1]; j++)
                 {
@@ -134,7 +142,7 @@ namespace TriangleNet.Tools
         /// </remarks>
         int[] AdjacencyCount(Mesh mesh)
         {
-            int n = N;
+            int n = ColumnCount;
             int n1, n2, n3;
             int tid, nid;
 
@@ -211,7 +219,7 @@ namespace TriangleNet.Tools
         /// </remarks>
         int[] AdjacencySet(Mesh mesh, int[] pcol)
         {
-            int n = this.N;
+            int n = ColumnCount;
 
             int[] col = new int[n];
 
@@ -280,9 +288,9 @@ namespace TriangleNet.Tools
         /// </summary>
         public void SortIndices()
         {
-            int k1, k2, n = N;
+            int k1, k2, n = ColumnCount;
 
-            int[] list = this.irow;
+            var list = irow;
 
             // Ascending sort the entries for each column.
             for (int i = 0; i < n; i++)

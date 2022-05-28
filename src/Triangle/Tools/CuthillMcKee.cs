@@ -25,9 +25,6 @@ namespace TriangleNet.Tools
         /// <returns>Permutation vector.</returns>
         public int[] Renumber(Mesh mesh)
         {
-            // Algorithm needs linear numbering of the nodes.
-            mesh.Renumber(NodeNumbering.Linear);
-
             return Renumber(new AdjacencyMatrix(mesh));
         }
 
@@ -58,7 +55,7 @@ namespace TriangleNet.Tools
 
             if (Log.Verbose)
             {
-                Log.Instance.Info(String.Format("Reverse Cuthill-McKee (Bandwidth: {0} > {1})",
+                Log.Instance.Info(string.Format("Reverse Cuthill-McKee (Bandwidth: {0} > {1})",
                     bandwidth1, bandwidth2));
             }
 
@@ -81,7 +78,7 @@ namespace TriangleNet.Tools
         int[] GenerateRcm()
         {
             // Number of nodes in the mesh.
-            int n = matrix.N;
+            int n = matrix.ColumnCount;
 
             int[] perm = new int[n];
 
@@ -167,7 +164,7 @@ namespace TriangleNet.Tools
             int nbr, node;
 
             // Number of nodes in the mesh.
-            int n = matrix.N;
+            int n = matrix.ColumnCount;
 
             // Workspace, int DEG[NODE_NUM], a temporary vector used to hold 
             // the degree of the nodes in the section graph specified by mask and root.
@@ -603,7 +600,7 @@ namespace TriangleNet.Tools
             int band_lo = 0;
             int band_hi = 0;
 
-            int n = matrix.N;
+            int n = matrix.ColumnCount;
 
             for (i = 0; i < n; i++)
             {
@@ -625,7 +622,7 @@ namespace TriangleNet.Tools
         /// <returns>The inverse permutation.</returns>
         int[] PermInverse(int[] perm)
         {
-            int n = matrix.N;
+            int n = matrix.ColumnCount;
 
             int[] perm_inv = new int[n];
 

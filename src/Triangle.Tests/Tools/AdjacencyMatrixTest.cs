@@ -40,20 +40,19 @@ namespace TriangleNet.Tests.Tools
 
             var ai = matrix.RowIndices;
 
-            // Highest vertex id after renumbering is 5, since the duplicate
-            // vertex is still present in the mesh vertices list.
-            Assert.AreEqual(5, ai.Max());
+            // Highest vertex id after renumbering is 4, duplicates
+            // are ignored.
+            Assert.AreEqual(4, ai.Max());
 
             // Get the single, duplicate vertex.
             var dup = mesh.Vertices
                 .Where(v => v.Type == VertexType.UndeadVertex)
                 .Single();
 
-            // The duplicate vertex is part of the matrix, since it is assumed
-            // to be adjacent to itself.
-            Assert.AreEqual(1, ai.Count(i => i == dup.id));
-
-            // TODO: fix AdjacencyMatrix!!!
+            // Side effect: undead vertices will have negative indices
+            // after computing the adjacency matrix.
+            Assert.IsTrue(dup.id < 0);
+            Assert.IsTrue(!ai.Contains(dup.id));
         }
 
         private List<Vertex> GetVertices(bool includeDuplicate)
