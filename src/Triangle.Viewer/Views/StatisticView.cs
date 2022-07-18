@@ -9,7 +9,6 @@ namespace MeshExplorer.Views
     public partial class StatisticView : UserControl, IView
     {
         Statistic statistic = new Statistic();
-        QualityMeasure quality;
 
         public Statistic Statistic
         {
@@ -90,12 +89,7 @@ namespace MeshExplorer.Views
             lbAngleMax.Text = Util.AngleToString(statistic.LargestAngle);
 
             // Update quality
-            if (quality == null)
-            {
-                quality = new QualityMeasure();
-            }
-
-            quality.Update(mesh);
+            var quality = new QualityMeasure(mesh);
 
             lbQualAlphaMin.Text = Util.DoubleToString(quality.AlphaMinimum);
             lbQualAlphaAve.Text = Util.DoubleToString(quality.AlphaAverage);
