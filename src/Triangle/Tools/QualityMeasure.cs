@@ -9,6 +9,7 @@ namespace TriangleNet.Tools
 {
     using System;
     using TriangleNet.Geometry;
+    using TriangleNet.Meshing;
 
     /// <summary>
     /// Provides mesh quality information.
@@ -57,16 +58,16 @@ namespace TriangleNet.Tools
         AlphaMeasure alphaMeasure;
         Q_Measure qMeasure;
 
-        Mesh mesh;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="QualityMeasure" /> class.
         /// </summary>
-        public QualityMeasure()
+        public QualityMeasure(IMesh mesh)
         {
             areaMeasure = new AreaMeasure();
             alphaMeasure = new AlphaMeasure();
             qMeasure = new Q_Measure();
+
+            Compute(mesh);
         }
 
         #region Public properties
@@ -161,23 +162,13 @@ namespace TriangleNet.Tools
 
         #endregion
 
-        /// <summary>
-        /// Update all quality measures.
-        /// </summary>
-        public void Update(Mesh mesh)
+        private void Compute(IMesh mesh)
         {
-            this.mesh = mesh;
-
             // Reset all measures.
             areaMeasure.Reset();
             alphaMeasure.Reset();
             qMeasure.Reset();
 
-            Compute();
-        }
-
-        private void Compute()
-        {
             Point a, b, c;
             double ab, bc, ca;
             double lx, ly;
@@ -185,7 +176,7 @@ namespace TriangleNet.Tools
 
             int n = 0;
 
-            foreach (var tri in mesh.triangles)
+            foreach (var tri in mesh.Triangles)
             {
                 n++;
 
@@ -241,7 +232,7 @@ namespace TriangleNet.Tools
         /// Because the finite element node adjacency relationship is symmetric,
         /// we are guaranteed that ML = MU.
         /// </remarks>
-        public int Bandwidth()
+        public static int Bandwidth(IMesh mesh)
         {
             if (mesh == null) return 0;
 
@@ -250,15 +241,15 @@ namespace TriangleNet.Tools
 
             int gi, gj;
 
-            foreach (var tri in mesh.triangles)
+            foreach (var tri in mesh.Triangles)
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    gi = tri.GetVertex(j).id;
+                    gi = tri.GetVertexID(j);
 
                     for (int k = 0; k < 3; k++)
                     {
-                        gj = tri.GetVertex(k).id;
+                        gj = tri.GetVertexID(k);
 
                         mu = Math.Max(mu, gj - gi);
                         ml = Math.Max(ml, gi - gj);

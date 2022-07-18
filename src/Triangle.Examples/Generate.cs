@@ -40,6 +40,13 @@ namespace TriangleNet
         /// <summary>
         /// Creates a rectangle contour.
         /// </summary>
+        /// <param name="x">Minimum x value (left).</param>
+        /// <param name="y">Minimum y value (bottom).</param>
+        /// <param name="width">Width of the rectangle.</param>
+        /// <param name="height">Height of the rectangle.</param>
+        /// <param name="size">The desired boundary segment length.</param>
+        /// <param name="label">The vertices and boundary segment label.</param>
+        /// <returns></returns>
         public static Contour Rectangle(double x, double y, double width, double height,
             double size = 0d, int label = 0)
         {
