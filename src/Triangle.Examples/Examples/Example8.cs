@@ -21,7 +21,7 @@ namespace TriangleNet.Examples
             // Generate the input geometry.
             poly.Add(Generate.Rectangle(0.0, 0.0, 1.0, 1.0));
 
-            // Set minimum angle quality option, ignoring holes.
+            // Set user test function.
             var quality = new QualityOptions()
             {
                 UserTest = MaxEdgeLength
