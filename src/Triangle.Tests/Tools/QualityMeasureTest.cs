@@ -9,7 +9,7 @@ namespace TriangleNet.Tests.Tools
 {
     public class QualityMeasureTest
     {
-        [Test]
+        [Test, DefaultFloatingPointTolerance(1e-12)]
         public void TestEquilateralTriangles()
         {
             double sqrt3 = Math.Sqrt(3);
