@@ -12,7 +12,6 @@ namespace TriangleNet.Tests.Tools
         [Test, DefaultFloatingPointTolerance(1e-8)]
         public void TestInterpolatePoint()
         {
-
             var vertices = new List<Vertex>()
             {
                 new Vertex(0.0, 0.0) { ID = 0 },
