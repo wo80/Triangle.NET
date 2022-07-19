@@ -48,7 +48,8 @@ namespace TriangleNet.Examples
                     var config = new Configuration()
                     {
                         Predicates = () => predicates,
-                        TrianglePool = () => pool.Restart()
+                        TrianglePool = () => pool.Restart(),
+                        RandomSource = () => Random.Shared
                     };
 
                     var triangulator = new Dwyer();
@@ -118,7 +119,8 @@ namespace TriangleNet.Examples
                     var config = new Configuration()
                     {
                         Predicates = () => predicates,
-                        TrianglePool = () => pool.Restart()
+                        TrianglePool = () => pool.Restart(),
+                        RandomSource = () => Random.Shared
                     };
 
                     var mesher = new GenericMesher(config);

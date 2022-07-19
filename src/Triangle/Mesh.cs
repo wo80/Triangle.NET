@@ -214,7 +214,7 @@ namespace TriangleNet
 
             predicates = config.Predicates();
 
-            locator = new TriangleLocator(this, predicates);
+            locator = new TriangleLocator(this, predicates, config.RandomSource());
 
             TransferNodes(points);
         }

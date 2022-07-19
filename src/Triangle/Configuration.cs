@@ -34,11 +34,12 @@ namespace TriangleNet
         /// Initializes a new instance of the <see cref="Configuration" /> class.
         /// </summary>
         /// <param name="predicates">Factory method for <see cref="IPredicates" />.</param>
-        /// <param name="trianglePool">Factory method for <see cref="TrianglePool" />.</param>
+        /// <param name="trianglePool">Factory method for <see cref="TriangleNet.TrianglePool" />.</param>
         public Configuration(Func<IPredicates> predicates, Func<TrianglePool> trianglePool)
         {
             Predicates = predicates;
             TrianglePool = trianglePool;
+            RandomSource = () => new Random();
         }
 
         /// <summary>
@@ -47,8 +48,13 @@ namespace TriangleNet
         public Func<IPredicates> Predicates { get; set; }
 
         /// <summary>
-        /// Gets or sets the factory method for the <see cref="TrianglePool"/>.
+        /// Gets or sets the factory method for the <see cref="TriangleNet.TrianglePool"/>.
         /// </summary>
         public Func<TrianglePool> TrianglePool { get; set; }
+
+        /// <summary>
+        /// Gets or sets the factory method for a <see cref="Random"/> source.
+        /// </summary>
+        public Func<Random> RandomSource { get; set; }
     }
 }
