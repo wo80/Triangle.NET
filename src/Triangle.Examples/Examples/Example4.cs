@@ -18,21 +18,22 @@ namespace TriangleNet.Examples
             // Generate mesh.
             var mesh = CreateMesh();
 
+            // The ideal area if triangles were equilateral.
+            var area = Math.Sqrt(3) / 4 * h * h;
+
+            var quality = new QualityMeasure(mesh);
+
             if (print)
             {
-                // The ideal area if triangles were equilateral.
-                var area = Math.Sqrt(3) / 4 * h * h;
-
-                var quality = new QualityMeasure(mesh);
-
                 Console.WriteLine($"   Ideal area: {area}");
                 Console.WriteLine($"    Min. area: {quality.AreaMinimum}");
                 Console.WriteLine($"    Max. area: {quality.AreaMaximum}");
+                Console.WriteLine($"    Avg. area: {quality.AreaTotal / mesh.Triangles.Count}");
 
                 SvgImage.Save(mesh, "example-4.svg", 500);
             }
 
-            return mesh.Triangles.Count > 0;
+            return quality.AreaMinimum < area && quality.AreaMaximum > area;
         }
 
         // The boundary segment size of the input geometry.
