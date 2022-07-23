@@ -4,6 +4,8 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using System;
+
 namespace TriangleNet.Smoothing
 {
     using TriangleNet.Geometry;
@@ -20,6 +22,12 @@ namespace TriangleNet.Smoothing
     /// </remarks>
     public class SimpleSmoother : ISmoother
     {
+
+        /// <summary>
+        /// Default tolerance for Lloyd's algorithm.
+        /// </summary>
+        public const double DEFAULT_TOL = .01;
+
         TrianglePool pool;
         Configuration config;
 
@@ -69,8 +77,27 @@ namespace TriangleNet.Smoothing
             Smooth(mesh, 10);
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Smooth mesh with a maximum given number of rounds of Voronoi
+        /// iteration. <see cref="DEFAULT_TOL"/> is used.
+        /// </summary>
+        /// <param name="mesh">The mesh.</param>
+        /// <param name="limit">The maximum number of iterations.</param>
         public void Smooth(IMesh mesh, int limit)
+          => Smooth(mesh, limit, DEFAULT_TOL);
+
+        /// <summary>
+        /// Smooth mesh with a maximum given number of rounds of Voronoi
+        /// iteration.
+        /// </summary>
+        /// <param name="mesh">The mesh.</param>
+        /// <param name="limit">The maximum number of iterations.</param>
+        /// <param name="tol">The desired tolerance on the result. At each
+        /// iteration, the maximum movement by any side is considered, both for
+        /// the previous and the current solutions. If their relative difference
+        /// is not greater than the tolerance, the current solution is
+        /// considered good enough already.</param>
+        public void Smooth(IMesh mesh, int limit, double tol)
         {
             var smoothedMesh = (Mesh)mesh;
 
@@ -80,10 +107,20 @@ namespace TriangleNet.Smoothing
             // The smoother should respect the mesh segment splitting behavior.
             this.options.SegmentSplitting = smoothedMesh.behavior.NoBisect;
 
-            // Take a few smoothing rounds (Lloyd's algorithm).
-            for (int i = 0; i < limit; i++)
+            // The maximum distances moved from any site at the previous and
+            // current iterations. They are initialized at
+            // Double.PositiveInfinity. This is done in order not to fail the
+            // convergence criterium before right after the second iteration.
+            double
+                prevMax = Double.PositiveInfinity,
+                currMax = Double.PositiveInfinity;
+            // Take a few smoothing rounds (Lloyd's algorithm). The stop
+            // creteria are the maximum number of iterations and the convergence
+            // criterium.
+            for (int i = 0; i < limit && Math.Abs(currMax - prevMax) <= tol * currMax; i++)
             {
-                Step(smoothedMesh, factory, predicates);
+                prevMax = currMax;
+                currMax = Step(smoothedMesh, factory, predicates);
 
                 // Actually, we only want to rebuild, if the mesh is no longer
                 // Delaunay. Flipping edges could be the right choice instead 
@@ -96,11 +133,11 @@ namespace TriangleNet.Smoothing
             smoothedMesh.CopyTo((Mesh)mesh);
         }
 
-        private void Step(Mesh mesh, IVoronoiFactory factory, IPredicates predicates)
+        double Step(Mesh mesh, IVoronoiFactory factory, IPredicates predicates)
         {
             var voronoi = new BoundedVoronoi(mesh, factory, predicates);
 
-            double x, y;
+            double x, y, maxDistanceMoved = 0;
 
             foreach (var face in voronoi.Faces)
             {
@@ -108,10 +145,20 @@ namespace TriangleNet.Smoothing
                 {
                     Centroid(face, out x, out y);
 
+                    double
+                        xShift = face.generator.x - x,
+                        yShift = face.generator.y - y,
+                        distanceMoved = Math.Sqrt(xShift * xShift + yShift * yShift);
+                    if (distanceMoved > maxDistanceMoved)
+                        maxDistanceMoved = distanceMoved;
+
                     face.generator.x = x;
                     face.generator.y = y;
                 }
             }
+
+            // The maximumum distance moved from any site.
+            return maxDistanceMoved;
         }
 
         /// <summary>
