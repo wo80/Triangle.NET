@@ -78,8 +78,9 @@ namespace TriangleNet.Smoothing
         /// the previous and the current solutions. If their relative difference
         /// is not greater than the tolerance, the current solution is
         /// considered good enough already.</param>
-        /// <returns>The number of actual iterations performed. It is always
-        /// at least 1 and never greater than the limit passed as parameter.
+        /// <returns>The number of actual iterations performed. It is 0 if a
+        /// non-positive limit is passed. Otherwise, it is always a value
+        /// between 1 and the limit (inclusive).
         /// </returns>
         public int Smooth(IMesh mesh, int limit = 10, double tol = .01)
         {
