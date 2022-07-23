@@ -38,7 +38,7 @@ namespace TriangleNet.Tests.Smoothing
             var smoother = new SimpleSmoother();
 
             // Smooth mesh.
-            smoother.Smooth(mesh, 25);
+            Assert.IsTrue(smoother.Smooth(mesh, 25) > 0);
         }
 
         private Polygon GetPolygon()

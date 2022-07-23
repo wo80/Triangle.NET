@@ -68,7 +68,7 @@ namespace TriangleNet.Examples
             var smoother = new SimpleSmoother();
 
             // Smooth mesh.
-            smoother.Smooth(mesh, 25);
+            smoother.Smooth(mesh, 25, .05);
 
             return mesh;
         }

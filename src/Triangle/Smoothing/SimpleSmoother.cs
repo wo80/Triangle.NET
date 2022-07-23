@@ -4,6 +4,8 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using System;
+
 namespace TriangleNet.Smoothing
 {
     using TriangleNet.Geometry;
@@ -18,8 +20,9 @@ namespace TriangleNet.Smoothing
     /// Vertices which should not move (e.g. segment vertices) MUST have a
     /// boundary mark greater than 0.
     /// </remarks>
-    public class SimpleSmoother : ISmoother
+    public class SimpleSmoother
     {
+
         TrianglePool pool;
         Configuration config;
 
@@ -63,15 +66,27 @@ namespace TriangleNet.Smoothing
             this.options = new ConstraintOptions() { ConformingDelaunay = true };
         }
 
-        /// <inheritdoc/>
-        public void Smooth(IMesh mesh)
+        /// <summary>
+        /// Smooth mesh with a maximum given number of rounds of Voronoi
+        /// iteration.
+        /// </summary>
+        /// <param name="mesh">The mesh.</param>
+        /// <param name="limit">The maximum number of iterations. If
+        /// non-positive, no iteration is applied at all.</param>
+        /// <param name="tol">The desired tolerance on the result. At each
+        /// iteration, the maximum movement by any side is considered, both for
+        /// the previous and the current solutions. If their relative difference
+        /// is not greater than the tolerance, the current solution is
+        /// considered good enough already.</param>
+        /// <returns>The number of actual iterations performed. It is 0 if a
+        /// non-positive limit is passed. Otherwise, it is always a value
+        /// between 1 and the limit (inclusive).
+        /// </returns>
+        public int Smooth(IMesh mesh, int limit = 10, double tol = .01)
         {
-            Smooth(mesh, 10);
-        }
+            if (limit <= 0)
+              return 0;
 
-        /// <inheritdoc/>
-        public void Smooth(IMesh mesh, int limit)
-        {
             var smoothedMesh = (Mesh)mesh;
 
             var mesher = new GenericMesher(config);
@@ -80,10 +95,19 @@ namespace TriangleNet.Smoothing
             // The smoother should respect the mesh segment splitting behavior.
             this.options.SegmentSplitting = smoothedMesh.behavior.NoBisect;
 
-            // Take a few smoothing rounds (Lloyd's algorithm).
-            for (int i = 0; i < limit; i++)
+            // The maximum distances moved from any site at the previous and
+            // current iterations.
+            double
+                prevMax = Double.PositiveInfinity,
+                currMax = Step(smoothedMesh, factory, predicates);
+            // Take a few smoothing rounds (Lloyd's algorithm). The stop
+            // criteria are the maximum number of iterations and the convergence
+            // criterion.
+            int i = 1;
+            while (i < limit && Math.Abs(currMax - prevMax) > tol * currMax)
             {
-                Step(smoothedMesh, factory, predicates);
+                prevMax = currMax;
+                currMax = Step(smoothedMesh, factory, predicates);
 
                 // Actually, we only want to rebuild, if the mesh is no longer
                 // Delaunay. Flipping edges could be the right choice instead 
@@ -91,16 +115,20 @@ namespace TriangleNet.Smoothing
                 smoothedMesh = (Mesh)mesher.Triangulate(Rebuild(smoothedMesh), options);
 
                 factory.Reset();
+
+                i++;
             }
 
             smoothedMesh.CopyTo((Mesh)mesh);
+
+            return i;
         }
 
-        private void Step(Mesh mesh, IVoronoiFactory factory, IPredicates predicates)
+        private double Step(Mesh mesh, IVoronoiFactory factory, IPredicates predicates)
         {
             var voronoi = new BoundedVoronoi(mesh, factory, predicates);
 
-            double x, y;
+            double x, y, maxDistanceMoved = 0;
 
             foreach (var face in voronoi.Faces)
             {
@@ -108,10 +136,20 @@ namespace TriangleNet.Smoothing
                 {
                     Centroid(face, out x, out y);
 
+                    double
+                        xShift = face.generator.x - x,
+                        yShift = face.generator.y - y,
+                        distanceMoved = Math.Sqrt(xShift * xShift + yShift * yShift);
+                    if (distanceMoved > maxDistanceMoved)
+                        maxDistanceMoved = distanceMoved;
+
                     face.generator.x = x;
                     face.generator.y = y;
                 }
             }
+
+            // The maximum distance moved from any site.
+            return maxDistanceMoved;
         }
 
         /// <summary>
