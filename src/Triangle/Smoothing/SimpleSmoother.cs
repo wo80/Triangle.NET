@@ -23,11 +23,6 @@ namespace TriangleNet.Smoothing
     public class SimpleSmoother
     {
 
-        /// <summary>
-        /// Default tolerance for Lloyd's algorithm.
-        /// </summary>
-        public const double DEFAULT_TOL = .01;
-
         TrianglePool pool;
         Configuration config;
 
@@ -128,7 +123,7 @@ namespace TriangleNet.Smoothing
             return i;
         }
 
-        double Step(Mesh mesh, IVoronoiFactory factory, IPredicates predicates)
+        private double Step(Mesh mesh, IVoronoiFactory factory, IPredicates predicates)
         {
             var voronoi = new BoundedVoronoi(mesh, factory, predicates);
 
