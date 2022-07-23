@@ -20,7 +20,7 @@ namespace TriangleNet.Smoothing
     /// Vertices which should not move (e.g. segment vertices) MUST have a
     /// boundary mark greater than 0.
     /// </remarks>
-    public class SimpleSmoother : ISmoother
+    public class SimpleSmoother
     {
 
         /// <summary>
@@ -71,34 +71,26 @@ namespace TriangleNet.Smoothing
             this.options = new ConstraintOptions() { ConformingDelaunay = true };
         }
 
-        /// <inheritdoc/>
-        public void Smooth(IMesh mesh)
-        {
-            Smooth(mesh, 10);
-        }
-
-        /// <summary>
-        /// Smooth mesh with a maximum given number of rounds of Voronoi
-        /// iteration. <see cref="DEFAULT_TOL"/> is used.
-        /// </summary>
-        /// <param name="mesh">The mesh.</param>
-        /// <param name="limit">The maximum number of iterations.</param>
-        public void Smooth(IMesh mesh, int limit)
-          => Smooth(mesh, limit, DEFAULT_TOL);
-
         /// <summary>
         /// Smooth mesh with a maximum given number of rounds of Voronoi
         /// iteration.
         /// </summary>
         /// <param name="mesh">The mesh.</param>
-        /// <param name="limit">The maximum number of iterations.</param>
+        /// <param name="limit">The maximum number of iterations. If
+        /// non-positive, no iteration is applied at all.</param>
         /// <param name="tol">The desired tolerance on the result. At each
         /// iteration, the maximum movement by any side is considered, both for
         /// the previous and the current solutions. If their relative difference
         /// is not greater than the tolerance, the current solution is
         /// considered good enough already.</param>
-        public void Smooth(IMesh mesh, int limit, double tol)
+        /// <returns>The number of actual iterations performed. It is always
+        /// at least 1 and never greater than the limit passed as parameter.
+        /// </returns>
+        public int Smooth(IMesh mesh, int limit = 10, double tol = .01)
         {
+            if (limit <= 0)
+              return 0;
+
             var smoothedMesh = (Mesh)mesh;
 
             var mesher = new GenericMesher(config);
@@ -108,16 +100,15 @@ namespace TriangleNet.Smoothing
             this.options.SegmentSplitting = smoothedMesh.behavior.NoBisect;
 
             // The maximum distances moved from any site at the previous and
-            // current iterations. They are initialized at
-            // Double.PositiveInfinity. This is done in order not to fail the
-            // convergence criterium before right after the second iteration.
+            // current iterations.
             double
                 prevMax = Double.PositiveInfinity,
-                currMax = Double.PositiveInfinity;
+                currMax = Step(smoothedMesh, factory, predicates);
             // Take a few smoothing rounds (Lloyd's algorithm). The stop
-            // creteria are the maximum number of iterations and the convergence
-            // criterium.
-            for (int i = 0; i < limit && Math.Abs(currMax - prevMax) <= tol * currMax; i++)
+            // criteria are the maximum number of iterations and the convergence
+            // criterion.
+            int i = 1;
+            while (i < limit && Math.Abs(currMax - prevMax) > tol * currMax)
             {
                 prevMax = currMax;
                 currMax = Step(smoothedMesh, factory, predicates);
@@ -128,9 +119,13 @@ namespace TriangleNet.Smoothing
                 smoothedMesh = (Mesh)mesher.Triangulate(Rebuild(smoothedMesh), options);
 
                 factory.Reset();
+
+                i++;
             }
 
             smoothedMesh.CopyTo((Mesh)mesh);
+
+            return i;
         }
 
         double Step(Mesh mesh, IVoronoiFactory factory, IPredicates predicates)
@@ -157,7 +152,7 @@ namespace TriangleNet.Smoothing
                 }
             }
 
-            // The maximumum distance moved from any site.
+            // The maximum distance moved from any site.
             return maxDistanceMoved;
         }
 
