@@ -35,7 +35,7 @@ namespace TriangleNet.Topology
             {
                 return "O-TID [null]";
             }
-            return String.Format("O-SID {0}", seg.hash);
+            return string.Format("O-SID {0}", seg.hash);
         }
 
         #region Osub primitives

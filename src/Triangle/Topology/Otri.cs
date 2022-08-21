@@ -23,6 +23,8 @@ namespace TriangleNet.Topology
         internal Triangle tri;
         internal int orient; // Ranges from 0 to 2.
 
+        public int Orient => orient;
+
         /// <summary>
         /// Gets or sets the triangle.
         /// </summary>
@@ -355,6 +357,14 @@ namespace TriangleNet.Topology
         }
 
         /// <summary>
+        /// Finds a subsegment abutting a triangle.
+        /// </summary>
+        public void Pivot(ref Osub os)
+        {
+            os = tri.subsegs[orient];
+        }
+
+        /// <summary>
         /// Test for equality of oriented triangles.
         /// </summary>
         public bool Equals(Otri ot)
@@ -437,14 +447,6 @@ namespace TriangleNet.Topology
         internal bool IsInfected()
         {
             return tri.infected;
-        }
-
-        /// <summary>
-        /// Finds a subsegment abutting a triangle.
-        /// </summary>
-        internal void Pivot(ref Osub os)
-        {
-            os = tri.subsegs[orient];
         }
 
         /// <summary>

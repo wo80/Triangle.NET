@@ -47,26 +47,17 @@ namespace TriangleNet.Topology
         /// <summary>
         /// Gets the first endpoints vertex id.
         /// </summary>
-        public int P0
-        {
-            get { return this.vertices[0].id; }
-        }
+        public int P0 => vertices[0].id;
 
         /// <summary>
         /// Gets the seconds endpoints vertex id.
         /// </summary>
-        public int P1
-        {
-            get { return this.vertices[1].id; }
-        }
+        public int P1 => vertices[1].id;
 
         /// <summary>
         /// Gets the segment boundary mark.
         /// </summary>
-        public int Label
-        {
-            get { return this.boundary; }
-        }
+        public int Label => boundary;
 
         #endregion
 
@@ -75,7 +66,7 @@ namespace TriangleNet.Topology
         /// </summary>
         public Vertex GetVertex(int index)
         {
-            return this.vertices[index]; // TODO: Check range?
+            return vertices[index]; // TODO: Check range?
         }
 
         /// <summary>
@@ -86,16 +77,24 @@ namespace TriangleNet.Topology
             return triangles[index].tri.hash == Mesh.DUMMY ? null : triangles[index].tri;
         }
 
+        /// <summary>
+        /// Gets an adjoining triangle.
+        /// </summary>
+        public void GetTriangle(int index, ref Otri otri)
+        {
+            otri = triangles[index];
+        }
+
         /// <inheritdoc />
         public override int GetHashCode()
         {
-            return this.hash;
+            return hash;
         }
 
         /// <inheritdoc />
         public override string ToString()
         {
-            return String.Format("SID {0}", hash);
+            return string.Format("SID {0}", hash);
         }
     }
 }
