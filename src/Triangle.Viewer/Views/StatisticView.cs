@@ -89,13 +89,15 @@ namespace MeshExplorer.Views
             lbAngleMax.Text = Util.AngleToString(statistic.LargestAngle);
 
             // Update quality
-            var quality = new QualityMeasure(mesh);
+            var quality = new QualityMeasure();
 
-            lbQualAlphaMin.Text = Util.DoubleToString(quality.AlphaMinimum);
-            lbQualAlphaAve.Text = Util.DoubleToString(quality.AlphaAverage);
+            quality.Update(mesh);
 
-            lbQualAspectMin.Text = Util.DoubleToString(quality.Q_Minimum);
-            lbQualAspectAve.Text = Util.DoubleToString(quality.Q_Average);
+            lbQualAlphaMin.Text = Util.DoubleToString(quality.Alpha.Minimum);
+            lbQualAlphaAve.Text = Util.DoubleToString(quality.Alpha.Average);
+
+            lbQualAspectMin.Text = Util.DoubleToString(quality.Q.Minimum);
+            lbQualAspectAve.Text = Util.DoubleToString(quality.Q.Average);
         }
 
         #endregion

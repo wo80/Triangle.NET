@@ -39,6 +39,12 @@ namespace TriangleNet.Topology.DCEL
         internal bool bounded;
 
         /// <summary>
+        /// If part of a Voronoi diagram, returns the generator vertex
+        /// of the face. Otherwise <c>null</c>.
+        /// </summary>
+        public Point Generator => generator;
+
+        /// <summary>
         /// Gets or sets the face id.
         /// </summary>
         public int ID
@@ -83,11 +89,12 @@ namespace TriangleNet.Topology.DCEL
         {
             this.generator = generator;
             this.edge = edge;
-            this.bounded = true;
+
+            bounded = true;
 
             if (generator != null)
             {
-                this.id = generator.ID;
+                id = generator.ID;
             }
         }
 
@@ -97,7 +104,7 @@ namespace TriangleNet.Topology.DCEL
         /// <returns></returns>
         public IEnumerable<HalfEdge> EnumerateEdges()
         {
-            var edge = this.Edge;
+            var edge = Edge;
             int first = edge.ID;
 
             do

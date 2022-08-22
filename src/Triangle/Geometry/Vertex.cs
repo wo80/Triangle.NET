@@ -53,6 +53,19 @@ namespace TriangleNet.Geometry
             type = VertexType.InputVertex;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Vertex" /> class.
+        /// </summary>
+        /// <param name="x">The x coordinate of the vertex.</param>
+        /// <param name="y">The y coordinate of the vertex.</param>
+        /// <param name="mark">The boundary mark.</param>
+        /// <param name="type">The vertex type.</param>
+        public Vertex(double x, double y, int mark, VertexType type)
+            : base(x, y, mark)
+        {
+            this.type = type;
+        }
+
 #if USE_ATTRIBS
         /// <summary>
         /// Initializes a new instance of the <see cref="Vertex" /> class.

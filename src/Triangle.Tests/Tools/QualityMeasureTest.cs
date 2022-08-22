@@ -24,13 +24,17 @@ namespace TriangleNet.Tests.Tools
 
             var mesh = new Dwyer().Triangulate(vertices, new Configuration());
 
-            var quality = new QualityMeasure(mesh);
+            var quality = new QualityMeasure();
 
-            Assert.AreEqual(quality.AreaMinimum, quality.AreaMaximum);
-            Assert.AreEqual(1.0, quality.AlphaMinimum);
-            Assert.AreEqual(1.0, quality.AlphaMaximum);
-            Assert.AreEqual(1.0, quality.Q_Minimum);
-            Assert.AreEqual(1.0, quality.Q_Maximum);
+            quality.Update(mesh);
+
+            Assert.AreEqual(quality.Area.Minimum, quality.Area.Maximum);
+            Assert.AreEqual(1.0, quality.Alpha.Minimum);
+            Assert.AreEqual(1.0, quality.Alpha.Maximum);
+            Assert.AreEqual(1.0, quality.Eta.Minimum);
+            Assert.AreEqual(1.0, quality.Eta.Maximum);
+            Assert.AreEqual(1.0, quality.Q.Minimum);
+            Assert.AreEqual(1.0, quality.Q.Maximum);
         }
     }
 }

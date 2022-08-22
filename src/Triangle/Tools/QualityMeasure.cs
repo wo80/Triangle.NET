@@ -1,6 +1,5 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="QualityMeasure.cs" company="">
-// Original Matlab code by John Burkardt, Florida State University
 // Triangle.NET code by Christian Woltering
 // </copyright>
 // -----------------------------------------------------------------------
@@ -8,8 +7,69 @@
 namespace TriangleNet.Tools
 {
     using System;
+    using System.Collections.Generic;
     using TriangleNet.Geometry;
     using TriangleNet.Meshing;
+
+    /// <summary>
+    /// Base class for quality measures.
+    /// </summary>
+    public abstract class Measure
+    {
+        protected double min, max, avg, are;
+
+        /// <summary>
+        /// Gets the minimum value of the measure.
+        /// </summary>
+        public double Minimum => min;
+
+        /// <summary>
+        /// Gets the maximum value of the measure.
+        /// </summary>
+        public double Maximum => max;
+
+        /// <summary>
+        /// Gets the average value of the measure.
+        /// </summary>
+        public double Average => avg;
+
+        /// <summary>
+        /// Gets the value averaged over all triangles and weighted by area.
+        /// </summary>
+        public double Area => are;
+
+        /// <summary>
+        /// Initialize the measure.
+        /// </summary>
+        public virtual void Initialize()
+        {
+            min = double.MaxValue;
+            max = -double.MaxValue;
+            avg = 0d;
+            are = 0d;
+        }
+
+        /// <summary>
+        /// Compute measure of given triangle.
+        /// </summary>
+        /// <param name="ab">Side length ab.</param>
+        /// <param name="bc">Side length bc.</param>
+        /// <param name="ca">Side length ca.</param>
+        /// <param name="area">Triangle area.</param>
+        public abstract double Update(double ab, double bc, double ca, double area);
+
+        /// <summary>
+        /// Finalize the measure.
+        /// </summary>
+        /// <param name="n">Total number of triangles measured.</param>
+        /// <param name="totalArea">Total area of triangles measured.</param>
+        public virtual void Finalize(int n, double totalArea)
+        {
+            avg = n > 0 ? avg / n : avg;
+
+            are = totalArea > 0.0 ? are / totalArea : are;
+        }
+    }
 
     /// <summary>
     /// Provides mesh quality information.
@@ -54,84 +114,95 @@ namespace TriangleNet.Tools
     /// </remarks>
     public class QualityMeasure
     {
-        AreaMeasure areaMeasure;
-        AlphaMeasure alphaMeasure;
-        Q_Measure qMeasure;
-
+        MeasureArea _area;
+        MeasureAlpha _alpha;
+        MeasureEta _eta;
+        MeasureQ _q;
 
         #region Public properties
 
         /// <summary>
-        /// Minimum triangle area.
+        /// Gets the area measure.
         /// </summary>
-        public double AreaMinimum => areaMeasure.area_min;
+        public Measure Area => _area;
 
         /// <summary>
-        /// Maximum triangle area.
+        /// Gets the alpha measure.
         /// </summary>
-        public double AreaMaximum => areaMeasure.area_max;
+        /// <remarks>
+        /// The alpha measure computes the minimum angle among all triangles.
+        /// The best possible value is 1, and the worst 0.
+        /// </remarks>
+        public Measure Alpha => _alpha;
 
         /// <summary>
-        /// Total triangulation area.
+        /// Gets the eta measure.
         /// </summary>
-        public double AreaTotal => areaMeasure.area_total;
+        /// <remarks>
+        /// The eta measure relates the area of a triangle a to its edge lengths.
+        /// The best possible value is 1, and the worst 0.
+        /// </remarks>
+        public Measure Eta => _eta;
 
         /// <summary>
-        /// Ratio of maximum and minimum triangle area.
+        /// Gets the Q measure, also knows as normalized shape ratio (NSR).
         /// </summary>
-        public double AreaRatio => areaMeasure.area_max / areaMeasure.area_min;
+        /// <remarks>
+        /// The Q measure relates the incircle to the circumcircle radius.
+        /// In an ideally regular mesh, all triangles would have the same
+        /// equilateral shape, for which Q = 1.
+        /// </remarks>
+        public Measure Q => _q;
 
         /// <summary>
-        /// Smallest angle.
+        /// Gets the total triangulation area.
         /// </summary>
-        public double AlphaMinimum => alphaMeasure.alpha_min;
-
-        /// <summary>
-        /// Maximum smallest angle.
-        /// </summary>
-        public double AlphaMaximum => alphaMeasure.alpha_max;
-
-        /// <summary>
-        /// Average angle.
-        /// </summary>
-        public double AlphaAverage => alphaMeasure.alpha_ave;
-
-        /// <summary>
-        /// Average angle weighted by area.
-        /// </summary>
-        public double AlphaArea => alphaMeasure.alpha_area;
-
-        /// <summary>
-        /// Smallest aspect ratio.
-        /// </summary>
-        public double Q_Minimum => qMeasure.q_min;
-
-        /// <summary>
-        /// Largest aspect ratio.
-        /// </summary>
-        public double Q_Maximum => qMeasure.q_max;
-
-        /// <summary>
-        /// Average aspect ratio.
-        /// </summary>
-        public double Q_Average => qMeasure.q_ave;
-
-        /// <summary>
-        /// Average aspect ratio weighted by area.
-        /// </summary>
-        public double Q_Area => qMeasure.q_area;
+        public double AreaTotal => _area.Area;
 
         #endregion
+
+        List<Measure> measures;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="QualityMeasure" /> class.
         /// </summary>
-        public QualityMeasure(IMesh mesh)
+        public QualityMeasure()
         {
-            areaMeasure = new AreaMeasure();
-            alphaMeasure = new AlphaMeasure();
-            qMeasure = new Q_Measure();
+            _area = new MeasureArea();
+            _alpha = new MeasureAlpha();
+            _eta = new MeasureEta();
+            _q = new MeasureQ();
 
+            measures = new List<Measure>()
+            {
+                _area, _alpha, _eta, _q
+            };
+        }
+
+        /// <summary>
+        /// Add a custom measure.
+        /// </summary>
+        /// <param name="measure"></param>
+        public void Add(Measure measure)
+        {
+            measures.Add(measure);
+        }
+
+        /// <summary>
+        /// Update all measures for the given mesh.
+        /// </summary>
+        /// <param name="mesh">The mesh.</param>
+        public void Update(IMesh mesh)
+        {
+            Update(mesh.Triangles);
+        }
+
+        /// <summary>
+        /// Update all measures for the given triangles.
+        /// </summary>
+        /// <param name="triangles">The triangles.</param>
+        public void Update(IEnumerable<ITriangle> triangles)
+        {
             Point a, b, c;
             double ab, bc, ca;
             double lx, ly;
@@ -139,13 +210,18 @@ namespace TriangleNet.Tools
 
             int n = 0;
 
-            foreach (var tri in mesh.Triangles)
+            foreach (var m in measures)
+            {
+                m.Initialize();
+            }
+
+            foreach (var tri in triangles)
             {
                 n++;
 
-                a = tri.vertices[0];
-                b = tri.vertices[1];
-                c = tri.vertices[2];
+                a = tri.GetVertex(0);
+                b = tri.GetVertex(1);
+                c = tri.GetVertex(2);
 
                 lx = a.x - b.x;
                 ly = a.y - b.y;
@@ -157,14 +233,20 @@ namespace TriangleNet.Tools
                 ly = c.y - a.y;
                 ca = Math.Sqrt(lx * lx + ly * ly);
 
-                area = areaMeasure.Measure(a, b, c);
-                alphaMeasure.Measure(ab, bc, ca, area);
-                qMeasure.Measure(ab, bc, ca, area);
+                area = 0.5 * Math.Abs(a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y));
+
+                foreach (var m in measures)
+                {
+                    m.Update(ab, bc, ca, area);
+                }
             }
 
-            // Normalize measures
-            alphaMeasure.Normalize(n, areaMeasure.area_total);
-            qMeasure.Normalize(n, areaMeasure.area_total);
+            var totalArea = _area.Area;
+
+            foreach (var m in measures)
+            {
+                m.Finalize(n, totalArea);
+            }
         }
 
         /// <summary>
@@ -194,6 +276,8 @@ namespace TriangleNet.Tools
         ///
         /// Because the finite element node adjacency relationship is symmetric,
         /// we are guaranteed that ML = MU.
+        /// 
+        /// Based on Matlab code by John Burkardt, Florida State University.
         /// </remarks>
         public static int Bandwidth(IMesh mesh)
         {
@@ -223,73 +307,60 @@ namespace TriangleNet.Tools
             return ml + 1 + mu;
         }
 
-        class AreaMeasure
+        class MeasureArea : Measure
         {
-            // Minimum area
-            public double area_min = double.MaxValue;
-            // Maximum area
-            public double area_max = -double.MaxValue;
-            // Total area of geometry
-            public double area_total = 0;
+            private readonly double EPS = 0.0;
+
             // Number of triangles with zero area
-            public int area_zero = 0;
+            public int zero;
 
-            /// <summary>
-            /// Compute the area of given triangle.
-            /// </summary>
-            /// <param name="a">Triangle corner a.</param>
-            /// <param name="b">Triangle corner b.</param>
-            /// <param name="c">Triangle corner c.</param>
-            /// <returns>Triangle area.</returns>
-            public double Measure(Point a, Point b, Point c)
+            /// <inheritdoc />
+            public override void Initialize()
             {
-                double area = 0.5 * Math.Abs(a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y));
+                zero = 0;
 
-                area_min = Math.Min(area_min, area);
-                area_max = Math.Max(area_max, area);
-                area_total += area;
+                base.Initialize();
+            }
 
-                if (area == 0.0)
+            /// <inheritdoc />
+            public override double Update(double ab, double bc, double ca, double area)
+            {
+                min = Math.Min(min, area);
+                max = Math.Max(max, area);
+
+                are += area;
+
+                if (area <= EPS)
                 {
-                    area_zero++;
+                    zero++;
                 }
 
                 return area;
             }
+
+            /// <inheritdoc />
+            public override void Finalize(int n, double area_total)
+            {
+                avg = n > 0 ? are / n : are;
+            }
         }
 
         /// <summary>
-        /// The alpha measure determines the triangulated pointset quality.
+        /// The alpha measure determines the triangulated point set quality.
         /// </summary>
         /// <remarks>
         /// The alpha measure evaluates the uniformity of the shapes of the triangles
-        /// defined by a triangulated pointset.
+        /// defined by a triangulated point set.
         ///
         /// We compute the minimum angle among all the triangles in the triangulated
         /// dataset and divide by the maximum possible value (which, in degrees,
         /// is 60). The best possible value is 1, and the worst 0. A good
         /// triangulation should have an alpha score close to 1.
         /// </remarks>
-        class AlphaMeasure
+        class MeasureAlpha : Measure
         {
-            // Minimum value over all triangles
-            public double alpha_min = double.MaxValue;
-            // Maximum value over all triangles
-            public double alpha_max = -double.MaxValue;
-            // Value averaged over all triangles
-            public double alpha_ave = 0;
-            // Value averaged over all triangles and weighted by area
-            public double alpha_area = 0;
-
-            /// <summary>
-            /// Compute q value of given triangle.
-            /// </summary>
-            /// <param name="ab">Side length ab.</param>
-            /// <param name="bc">Side length bc.</param>
-            /// <param name="ca">Side length ca.</param>
-            /// <param name="area">Triangle area.</param>
-            /// <returns></returns>
-            public double Measure(double ab, double bc, double ca, double area)
+            /// <inheritdoc />
+            public override double Update(double ab, double bc, double ca, double area)
             {
                 double alpha = double.MaxValue;
 
@@ -345,48 +416,60 @@ namespace TriangleNet.Tools
                 // Normalize angle from [0,pi/3] radians into qualities in [0,1].
                 alpha = alpha * 3.0 / Math.PI;
 
-                alpha_ave += alpha;
-                alpha_area += area * alpha;
+                avg += alpha;
+                are += area * alpha;
 
-                alpha_min = Math.Min(alpha, alpha_min);
-                alpha_max = Math.Max(alpha, alpha_max);
+                min = Math.Min(alpha, min);
+                max = Math.Max(alpha, max);
 
                 return alpha;
 
-                double acos(double c) => (c <= -1.0) ? Math.PI : ((1.0 <= c) ? 0.0 : Math.Acos(c));
-            }
-
-            /// <summary>
-            /// Normalize values.
-            /// </summary>
-            public void Normalize(int n, double area_total)
-            {
-                if (n > 0)
-                {
-                    alpha_ave /= n;
-                }
-                else
-                {
-                    alpha_ave = 0.0;
-                }
-
-                if (0.0 < area_total)
-                {
-                    alpha_area /= area_total;
-                }
-                else
-                {
-                    alpha_area = 0.0;
-                }
+                double acos(double x) => (x <= -1.0) ? Math.PI : ((1.0 <= x) ? 0.0 : Math.Acos(x));
             }
         }
 
         /// <summary>
-        /// The Q measure determines the triangulated pointset quality.
+        /// The eta measure determines the triangulated point set quality.
+        /// </summary>
+        /// <remarks>
+        /// The eta measure evaluates the uniformity of the shapes of the triangles
+        /// defined by a triangulated point set.
+        ///
+        /// The measure relates the area of a triangle a to its edge lengths. The best
+        /// possible value is 1, and the worst 0. A good triangulation should have an
+        /// eta score close to 1.
+        /// </remarks>
+        class MeasureEta : Measure
+        {
+            // Normalization factor to ensure that a perfect triangle
+            // (equal edges) has a quality of 1.
+            private readonly static double Factor = 4d * Math.Sqrt(3);
+
+            /// <inheritdoc />
+            public override double Update(double ab, double bc, double ca, double area)
+            {
+                double ab2 = ab * ab;
+                double bc2 = bc * bc;
+                double ca2 = ca * ca;
+
+                double eta = Factor * area / (ab2 + bc2 + ca2);
+
+                avg += eta;
+                are += area * eta;
+
+                min = Math.Min(eta, min);
+                max = Math.Max(eta, max);
+
+                return eta;
+            }
+        }
+
+        /// <summary>
+        /// The Q measure determines the triangulated point set quality.
         /// </summary>
         /// <remarks>
         /// The Q measure evaluates the uniformity of the shapes of the triangles
-        /// defined by a triangulated pointset. It uses the aspect ratio
+        /// defined by a triangulated point set. It uses the aspect ratio
         ///
         ///    2 * (incircle radius) / (circumcircle radius)
         ///
@@ -394,60 +477,20 @@ namespace TriangleNet.Tools
         /// equilateral shape, for which Q = 1. A good mesh would have
         /// 0.5 &lt; Q.
         /// </remarks>
-        class Q_Measure
+        class MeasureQ : Measure
         {
-            // Minimum value over all triangles
-            public double q_min = double.MaxValue;
-            // Maximum value over all triangles
-            public double q_max = -double.MaxValue;
-            // Average value
-            public double q_ave = 0;
-            // Average value weighted by the area of each triangle
-            public double q_area = 0;
-
-            /// <summary>
-            /// Compute q value of given triangle.
-            /// </summary>
-            /// <param name="ab">Side length ab.</param>
-            /// <param name="bc">Side length bc.</param>
-            /// <param name="ca">Side length ca.</param>
-            /// <param name="area">Triangle area.</param>
-            /// <returns></returns>
-            public double Measure(double ab, double bc, double ca, double area)
+            /// <inheritdoc />
+            public override double Update(double ab, double bc, double ca, double area)
             {
                 double q = (bc + ca - ab) * (ca + ab - bc) * (ab + bc - ca) / (ab * bc * ca);
 
-                q_min = Math.Min(q_min, q);
-                q_max = Math.Max(q_max, q);
+                min = Math.Min(min, q);
+                max = Math.Max(max, q);
 
-                q_ave += q;
-                q_area += q * area;
+                avg += q;
+                are += q * area;
 
                 return q;
-            }
-
-            /// <summary>
-            /// Normalize values.
-            /// </summary>
-            public void Normalize(int n, double area_total)
-            {
-                if (n > 0)
-                {
-                    q_ave /= n;
-                }
-                else
-                {
-                    q_ave = 0.0;
-                }
-
-                if (area_total > 0.0)
-                {
-                    q_area /= area_total;
-                }
-                else
-                {
-                    q_area = 0.0;
-                }
             }
         }
     }
