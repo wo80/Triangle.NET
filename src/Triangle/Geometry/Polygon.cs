@@ -125,7 +125,7 @@ namespace TriangleNet.Geometry
                 if (regionlabel != 0)
                 {
                     var interiorPoint = contour.FindInteriorPoint();
-                    this.Regions.Add(new RegionPointer(interiorPoint.X, interiorPoint.Y, regionlabel));
+                    Regions.Add(new RegionPointer(interiorPoint.X, interiorPoint.Y, regionlabel));
                 }
             }
         }
