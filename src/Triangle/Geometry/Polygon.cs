@@ -111,6 +111,23 @@ namespace TriangleNet.Geometry
             points.Add(segment.GetVertex(index));
         }
 
+        private void AddContourPointsAndSegments(Contour contour)
+        {
+            points.AddRange(contour.Points);
+            segments.AddRange(contour.GetSegments());
+        }
+
+        /// <inheritdoc />
+        public void Add(Contour contour, int regionlabel )
+        {
+            if (regionlabel != 0)
+            {
+                var interiorPoint = contour.FindInteriorPoint();
+                Regions.Add(new RegionPointer(interiorPoint.X, interiorPoint.Y, regionlabel));
+            }
+            AddContourPointsAndSegments(contour);
+        }
+
         /// <inheritdoc />
         public void Add(Contour contour, bool hole = false)
         {
@@ -120,17 +137,14 @@ namespace TriangleNet.Geometry
             }
             else
             {
-                points.AddRange(contour.Points);
-                segments.AddRange(contour.GetSegments());
+                AddContourPointsAndSegments(contour);
             }
         }
 
         /// <inheritdoc />
         public void Add(Contour contour, Point hole)
         {
-            points.AddRange(contour.Points);
-            segments.AddRange(contour.GetSegments());
-
+            AddContourPointsAndSegments(contour);
             holes.Add(hole);
         }
     }

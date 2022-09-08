@@ -73,6 +73,13 @@ namespace TriangleNet.Geometry
         /// Add a contour to the polygon.
         /// </summary>
         /// <param name="contour">The contour to insert.</param>
+        /// <param name="regionlabel">label to ease finding contours in the created mesh.</param>
+        void Add(Contour contour, int regionlabel );
+
+        /// <summary>
+        /// Add a contour to the polygon.
+        /// </summary>
+        /// <param name="contour">The contour to insert.</param>
         /// <param name="hole">Treat contour as a hole.</param>
         void Add(Contour contour, bool hole = false);
 
