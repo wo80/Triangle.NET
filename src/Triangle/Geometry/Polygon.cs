@@ -120,9 +120,9 @@ namespace TriangleNet.Geometry
         /// <inheritdoc />
         public void Add(Contour contour, int regionlabel )
         {
-            var interiorPoint = contour.FindInteriorPoint();
             if (regionlabel != 0)
             {
+                var interiorPoint = contour.FindInteriorPoint();
                 Regions.Add(new RegionPointer(interiorPoint.X, interiorPoint.Y, regionlabel));
             }
             AddContourPointsAndSegments(contour);
