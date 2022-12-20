@@ -751,8 +751,8 @@ namespace TriangleNet.Meshing
                     if (Log.Verbose)
                     {
                         logger.Warning("New vertex falls on existing vertex.", "Quality.SplitTriangle()");
-                        errorflag = true;
                     }
+                    errorflag = true;
                 }
                 else
                 {
@@ -823,8 +823,8 @@ namespace TriangleNet.Meshing
                         if (Log.Verbose)
                         {
                             logger.Warning("New vertex falls on existing vertex.", "Quality.SplitTriangle()");
-                            errorflag = true;
                         }
+                        errorflag = true;
                     }
                 }
                 if (errorflag)
