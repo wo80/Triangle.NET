@@ -121,14 +121,15 @@ namespace TriangleNet.Tools
         }
 
         /// <summary>
-        /// Get the ratio of the largest and smallest segment length.
+        /// Gets the minimum and maximum feature size (segment length) of the input polygon.
         /// </summary>
         /// <param name="poly">The polygon.</param>
-        /// <param name="threshold">The ratio threshold.</param>
+        /// <param name="threshold">The ratio threshold (smallest to largest segment length, default = 2e-10).</param>
         /// <remarks>
-        /// This method will also report zero-length segments.
+        /// This method will also report zero-length segments. The method does NOT detect
+        /// free vertices lying close to segments.
         /// </remarks>
-        public static double GetSegmentRatio(IPolygon poly, double threshold = 2e12)
+        public static (double min, double max) GetSegmentRatio(IPolygon poly, double threshold = 2e-10)
         {
             var logger = Log.Instance;
 
@@ -156,15 +157,15 @@ namespace TriangleNet.Tools
                 max = Math.Max(max, length);
             }
 
-            double ratio = max / min;
+            double ratio = min / max;
 
-            if (ratio > threshold)
+            if (ratio < threshold)
             {
-                logger.Warning(string.Format("Polygon has large segment ratio {0:G2}.", ratio),
+                logger.Warning(string.Format("Polygon has tiny segment ratio {0:G2}.", ratio),
                     "PolygonValidator.GetSegmentRatio()");
             }
 
-            return ratio;
+            return (min, max);
         }
 
         /// <summary>
