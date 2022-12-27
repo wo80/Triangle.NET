@@ -33,6 +33,8 @@ namespace TriangleNet.Meshing
         // in SplitTriangle method.
         Triangle newvertex_tri;
 
+        bool enableAcute = true;
+
         public QualityMesher(Mesh mesh, Configuration config)
         {
             badsubsegs = new Queue<BadSubseg>();
@@ -70,6 +72,8 @@ namespace TriangleNet.Meshing
                 behavior.ConformingDelaunay = behavior.ConformingDelaunay || delaunay;
 
                 mesh.steinerleft = quality.SteinerPoints == 0 ? -1 : quality.SteinerPoints;
+
+                enableAcute = !quality.UseLegacyRefinement;
             }
 
             // TODO: remove
@@ -434,7 +438,7 @@ namespace TriangleNet.Meshing
 
         #endregion
 
-        #region Maintanance
+        #region Maintenance
 
         /// <summary>
         /// Traverse the entire list of subsegments, and check each to see if it 
@@ -729,18 +733,13 @@ namespace TriangleNet.Meshing
             {
                 errorflag = false;
                 // Create a new vertex at the triangle's circumcenter.
-
-                // Using the original (simpler) Steiner point location method
-                // for mesh refinement.
-                // TODO: NewLocation doesn't work for refinement. Why? Maybe 
-                // reset VertexType?
-                if (behavior.fixedArea || behavior.VarArea)
+                if (enableAcute)
                 {
-                    newloc = predicates.FindCircumcenter(borg, bdest, bapex, ref xi, ref eta, behavior.offconstant);
+                    newloc = newLocation.FindLocation(borg, bdest, bapex, ref xi, ref eta, true, badotri);
                 }
                 else
                 {
-                    newloc = newLocation.FindLocation(borg, bdest, bapex, ref xi, ref eta, true, badotri);
+                    newloc = predicates.FindCircumcenter(borg, bdest, bapex, ref xi, ref eta, behavior.offconstant);
                 }
 
                 // Check whether the new vertex lies on a triangle vertex.

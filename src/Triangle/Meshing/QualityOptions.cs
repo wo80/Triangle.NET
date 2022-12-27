@@ -60,5 +60,14 @@ namespace TriangleNet.Meshing
         /// to meet the other quality constraints.
         /// </remarks>
         public int SteinerPoints { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to use the legacy refinement strategy (default = <c>false</c>).
+        /// </summary>
+        /// <remarks>
+        /// If this flag is set to true, the original Triangle refinement algorithm will be
+        /// used (Ruppert's algorithm). Otherwise the aCute algorithm used.
+        /// </remarks>
+        public bool UseLegacyRefinement { get; set; }
     }
 }
