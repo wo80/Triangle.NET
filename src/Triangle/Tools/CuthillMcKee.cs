@@ -13,6 +13,23 @@ namespace TriangleNet.Tools
     /// Applies the Cuthill and McKee renumbering algorithm to reduce the bandwidth of
     /// the adjacency matrix associated with the mesh.
     /// </summary>
+    /// <remarks>
+    /// References:
+    /// 
+    /// Alan George, Joseph Liu,
+    /// Computer Solution of Large Sparse Positive Definite Systems,
+    /// Prentice Hall, 1981.
+    ///
+    /// Norman Gibbs, William Poole, Paul Stockmeyer,
+    /// An Algorithm for Reducing the Bandwidth and Profile of a Sparse Matrix,
+    /// SIAM Journal on Numerical Analysis,
+    /// Volume 13, pages 236-250, 1976.
+    ///
+    /// Norman Gibbs,
+    /// Algorithm 509: A Hybrid Profile Reduction Algorithm,
+    /// ACM Transactions on Mathematical Software,
+    /// Volume 2, pages 378-387, 1976.
+    /// </remarks>
     public class CuthillMcKee
     {
         // The adjacency matrix of the mesh.
@@ -37,8 +54,6 @@ namespace TriangleNet.Tools
         {
             this.matrix = matrix;
 
-            int bandwidth1 = matrix.Bandwidth();
-
             var pcol = matrix.ColumnPointers;
 
             // Adjust column pointers (1-based indexing).
@@ -51,16 +66,17 @@ namespace TriangleNet.Tools
 
             int[] perm_inv = PermInverse(perm);
 
-            int bandwidth2 = PermBandwidth(perm, perm_inv);
+            // Adjust column pointers (0-based indexing).
+            Shift(pcol, false);
 
             if (Log.Verbose)
             {
+                int bandwidth1 = matrix.Bandwidth();
+                int bandwidth2 = PermBandwidth(perm, perm_inv);
+
                 Log.Instance.Info(string.Format("Reverse Cuthill-McKee (Bandwidth: {0} > {1})",
                     bandwidth1, bandwidth2));
             }
-
-            // Adjust column pointers (0-based indexing).
-            Shift(pcol, false);
 
             return perm_inv;
         }
@@ -139,18 +155,18 @@ namespace TriangleNet.Tools
         /// <param name="offset">Internal array offset.</param>
         /// <param name="iccsze">Output, int ICCSZE, the size of the connected component that has been numbered.</param>
         /// <remarks>
-        ///    The connected component is specified by a node ROOT and a mask.
-        ///    The numbering starts at the root node.
+        /// The connected component is specified by a node ROOT and a mask.
+        /// The numbering starts at the root node.
         ///
-        ///    An outline of the algorithm is as follows:
+        /// An outline of the algorithm is as follows:
         ///
-        ///    X(1) = ROOT.
+        /// X(1) = ROOT.
         ///
-        ///    for ( I = 1 to N-1)
-        ///      Find all unlabeled neighbors of X(I),
-        ///      assign them the next available labels, in order of increasing degree.
+        /// for ( I = 1 to N-1)
+        ///   Find all unlabeled neighbors of X(I),
+        ///   assign them the next available labels, in order of increasing degree.
         ///
-        ///    When done, reverse the ordering.
+        /// When done, reverse the ordering.
         /// </remarks>
         void Rcm(int root, int[] mask, int[] perm, int offset, ref int iccsze)
         {
@@ -292,21 +308,6 @@ namespace TriangleNet.Tools
         /// returned as a list of nodes LS, and pointers to the beginning
         /// of the list of nodes that are at a distance of 0, 1, 2, ...,
         /// NODE_NUM-1 from the pseudo-peripheral node.
-        ///
-        /// Reference:
-        ///    Alan George, Joseph Liu,
-        ///    Computer Solution of Large Sparse Positive Definite Systems,
-        ///    Prentice Hall, 1981.
-        ///
-        ///    Norman Gibbs, William Poole, Paul Stockmeyer,
-        ///    An Algorithm for Reducing the Bandwidth and Profile of a Sparse Matrix,
-        ///    SIAM Journal on Numerical Analysis,
-        ///    Volume 13, pages 236-250, 1976.
-        ///
-        ///    Norman Gibbs,
-        ///    Algorithm 509: A Hybrid Profile Reduction Algorithm,
-        ///    ACM Transactions on Mathematical Software,
-        ///    Volume 2, pages 378-387, 1976.
         /// </remarks>
         void FindRoot(ref int root, int[] mask, ref int level_num, int[] level_row,
             int[] level, int offset)
@@ -415,11 +416,6 @@ namespace TriangleNet.Tools
         /// assigned level 2 and masked.  The process continues until there
         /// are no unmasked nodes adjacent to any node in the current level.
         /// The number of levels may vary between 2 and NODE_NUM.
-        ///
-        /// Reference:
-        ///    Alan George, Joseph Liu,
-        ///    Computer Solution of Large Sparse Positive Definite Systems,
-        ///    Prentice Hall, 1981.
         /// </remarks>
         void GetLevelSet(ref int root, int[] mask, ref int level_num, int[] level_row,
             int[] level, int offset)
@@ -501,13 +497,8 @@ namespace TriangleNet.Tools
         /// connected component, starting with ROOT, and proceeding by levels.</param>
         /// <param name="offset">Internal array offset.</param>
         /// <remarks>
-        ///    The connected component is specified by MASK and ROOT.
-        ///    Nodes for which MASK is zero are ignored.
-        ///
-        ///  Reference:
-        ///    Alan George, Joseph Liu,
-        ///    Computer Solution of Large Sparse Positive Definite Systems,
-        ///    Prentice Hall, 1981.
+        /// The connected component is specified by MASK and ROOT.
+        /// Nodes for which MASK is zero are ignored.
         /// </remarks>
         void Degree(int root, int[] mask, int[] deg, ref int iccsze, int[] ls, int offset)
         {
@@ -547,13 +538,13 @@ namespace TriangleNet.Tools
                     {
                         nbr = irow[j - 1];
 
-                        if (mask[nbr] != 0) // EDIT: [nbr - 1]
+                        if (mask[nbr] != 0)
                         {
                             ideg = ideg + 1;
 
-                            if (0 <= pcol[nbr]) // EDIT: [nbr - 1]
+                            if (0 <= pcol[nbr])
                             {
-                                pcol[nbr] = -pcol[nbr]; // EDIT: [nbr - 1]
+                                pcol[nbr] = -pcol[nbr];
                                 iccsze = iccsze + 1;
                                 ls[offset + iccsze - 1] = nbr;
                             }
@@ -595,18 +586,20 @@ namespace TriangleNet.Tools
             int[] pcol = matrix.ColumnPointers;
             int[] irow = matrix.RowIndices;
 
-            int col, i, j;
+            int col, end;
 
             int band_lo = 0;
             int band_hi = 0;
 
             int n = matrix.ColumnCount;
 
-            for (i = 0; i < n; i++)
+            for (int i = 0; i < n; i++)
             {
-                for (j = pcol[perm[i]]; j < pcol[perm[i] + 1]; j++)
+                end = pcol[perm[i] + 1];
+
+                for (int j = pcol[perm[i]]; j < end; j++)
                 {
-                    col = perm_inv[irow[j - 1]];
+                    col = perm_inv[irow[j]];
                     band_lo = Math.Max(band_lo, i - col);
                     band_hi = Math.Max(band_hi, col - i);
                 }
@@ -650,17 +643,15 @@ namespace TriangleNet.Tools
         /// </example>
         void ReverseVector(int[] a, int offset, int size)
         {
-            int i;
-            int j;
+            int j, middle = offset + size / 2,
+                end = offset + size - 1;
 
-            for (i = 0; i < size / 2; i++)
+            for (int i = offset; i < middle; i++)
             {
-                j = a[offset + i];
-                a[offset + i] = a[offset + size - 1 - i];
-                a[offset + size - 1 - i] = j;
+                j = a[i];
+                a[i] = a[end - i + offset];
+                a[end - i + offset] = j;
             }
-
-            return;
         }
 
         void Shift(int[] a, bool up)

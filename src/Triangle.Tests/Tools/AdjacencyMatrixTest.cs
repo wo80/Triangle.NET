@@ -25,6 +25,7 @@ namespace TriangleNet.Tests.Tools
             // Highest vertex id after renumbering is 4, since there
             // is no duplicate vertex.
             Assert.AreEqual(4, matrix.RowIndices.Max());
+            Assert.AreEqual(5, matrix.ColumnCount);
         }
 
         [Test]

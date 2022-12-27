@@ -45,21 +45,36 @@ namespace TriangleNet.Tools
         /// </summary>
         /// <param name="mesh">The mesh.</param>
         /// <remarks>
-        /// NOTE: as a side effect, computing the adjacency matrix will affect the
-        /// node numbering of the mesh.
+        /// As a side effect, this constructor will affect the node numbering of the
+        /// mesh to ensure that all regular vertices are numbered in a linear way (undead
+        /// vertices will be skipped and have negative ids). If you want to avoid the
+        /// renumbering, use the <see cref="AdjacencyMatrix(Mesh, bool)"/> constructor.
         /// </remarks>
         public AdjacencyMatrix(Mesh mesh)
+            : this(mesh, true)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AdjacencyMatrix" /> class.
+        /// </summary>
+        /// <param name="mesh">The mesh.</param>
+        /// <param name="renumber">Determines whether nodes should automatically be renumbered.</param>
+        public AdjacencyMatrix(Mesh mesh, bool renumber)
         {
             int n = mesh.vertices.Count;
 
             // Undead vertices should not be considered in the adjacency matrix.
             ColumnCount = n - mesh.undeads;
 
-            // Renumber nodes, excluding undeads.
-            int i = 0;
-            foreach (var vertex in mesh.vertices.Values)
+            if (renumber)
             {
-                vertex.id = vertex.type == VertexType.UndeadVertex ? -i : i++;
+                // Renumber nodes, excluding undeads.
+                int i = 0;
+                foreach (var vertex in mesh.vertices.Values)
+                {
+                    vertex.id = vertex.type == VertexType.UndeadVertex ? -i : i++;
+                }
             }
 
             // Set up the adj_row adjacency pointer array.
@@ -104,19 +119,14 @@ namespace TriangleNet.Tools
         /// <returns>Bandwidth of the adjacency matrix.</returns>
         public int Bandwidth()
         {
-            int band_hi;
-            int band_lo;
-            int col;
-            int i, j;
+            int band_lo = 0;
+            int band_hi = 0;
 
-            band_lo = 0;
-            band_hi = 0;
-
-            for (i = 0; i < ColumnCount; i++)
+            for (int i = 0; i < ColumnCount; i++)
             {
-                for (j = pcol[i]; j < pcol[i + 1]; j++)
+                for (int j = pcol[i]; j < pcol[i + 1]; j++)
                 {
-                    col = irow[j];
+                    int col = irow[j];
                     band_lo = Math.Max(band_lo, i - col);
                     band_hi = Math.Max(band_hi, col - i);
                 }

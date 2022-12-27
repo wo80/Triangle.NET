@@ -66,7 +66,7 @@ namespace TriangleNet.Meshing
         /// </summary>
         /// <remarks>
         /// If this flag is set to true, the original Triangle refinement algorithm will be
-        /// used (Ruppert's algorithm). Otherwise the aCute algorithm used.
+        /// used (Ruppert's algorithm). Otherwise the aCute algorithm is used.
         /// </remarks>
         public bool UseLegacyRefinement { get; set; }
     }
