@@ -34,7 +34,7 @@ namespace TriangleNet
 
         // TODO: Check if custom hashmap implementation could be faster.
 
-        // Using hashsets for memory management should quite fast.
+        // Using hashsets for memory management should be quite fast.
         internal TrianglePool triangles;
         internal Dictionary<int, SubSegment> subsegs;
         internal Dictionary<int, Vertex> vertices;
