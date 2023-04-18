@@ -33,6 +33,10 @@ namespace TriangleNet.Examples
                 VariableArea = true
             };
 
+            // The aCute refinement algorithm might fail when used with variable
+            // constraints, so we use Ruppert's refinement algorithm here.
+            quality.UseLegacyRefinement = true;
+
             //quality.UserTest = (t, area) => t.Label == 1 && area > 0.01;
 
             var mesh = poly.Triangulate(options, quality);
