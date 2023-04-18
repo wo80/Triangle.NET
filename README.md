@@ -23,6 +23,6 @@ Due to the unclear licensing situation, there will also be no Nuget package rele
 ## References
 
 If you want to learn about the algorithms used in Triangle.NET, I recommend taking a look at the following papers:
-* Jonathan Richard Shewchuk, *Triangle: Engineering a 2D Quality Mesh Generator and Delaunay Triangulator* ([free PDF](https://duckduckgo.com/?t=ffsb&q=Triangle+Engineering+a+2D+Quality+Mesh+Generator+and+Delaunay+Triangulator&ia=web))
-* Jonathan Richard Shewchuk, *Delaunay Refinement Algorithms for Triangular Mesh Generation* ([free PDF](https://duckduckgo.com/?q=Delaunay+Refinement+Algorithms+for+Triangular+Mesh+Generation&t=ffsb&ia=web))
-* Hale Erten & Alper Üngör, *Triangulations with Locally Optimal Steiner Points* ([free PDF](https://duckduckgo.com/?t=ffsb&q=Triangulations+with+Locally+Optimal+Steiner+Points&ia=web))
+* Jonathan Richard Shewchuk, *Triangle: Engineering a 2D Quality Mesh Generator and Delaunay Triangulator* ([free PDF](https://duckduckgo.com/?q=Triangle+Engineering+a+2D+Quality+Mesh+Generator+and+Delaunay+Triangulator+filetype%3Apdf&ia=web))
+* Jonathan Richard Shewchuk, *Delaunay Refinement Algorithms for Triangular Mesh Generation* ([free PDF](https://duckduckgo.com/?q=Delaunay+Refinement+Algorithms+for+Triangular+Mesh+Generation+filetype%3Apdf&ia=web))
+* Hale Erten & Alper Üngör, *Triangulations with Locally Optimal Steiner Points* ([free PDF](https://duckduckgo.com/?q=Triangulations+with+Locally+Optimal+Steiner+Points+filetype%3Apdf&ia=web))
