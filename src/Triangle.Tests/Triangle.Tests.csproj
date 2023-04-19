@@ -5,6 +5,8 @@
 	<RootNamespace>TriangleNet.Tests</RootNamespace>
     <AssemblyName>Triangle.Tests</AssemblyName>
     <IsPackable>false</IsPackable>
+    <LangVersion>default</LangVersion>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
 

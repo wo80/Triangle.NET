@@ -8,7 +8,7 @@
 namespace TriangleNet.Topology
 {
     using System;
-    using TriangleNet.Geometry;
+    using Geometry;
 
     /// <summary>
     /// The triangle data structure.
@@ -52,8 +52,8 @@ namespace TriangleNet.Topology
         /// </summary>
         public int ID
         {
-            get { return this.id; }
-            set { this.id = value; }
+            get => id;
+            set => id = value;
         }
 
         /// <summary>
@@ -61,8 +61,8 @@ namespace TriangleNet.Topology
         /// </summary>
         public int Label
         {
-            get { return this.label; }
-            set { this.label = value; }
+            get => label;
+            set => label = value;
         }
 
         /// <summary>
@@ -70,8 +70,8 @@ namespace TriangleNet.Topology
         /// </summary>
         public double Area
         {
-            get { return this.area; }
-            set { this.area = value; }
+            get => area;
+            set => area = value;
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace TriangleNet.Topology
         /// <returns></returns>
         public Vertex GetVertex(int index)
         {
-            return this.vertices[index]; // TODO: Check range?
+            return vertices[index]; // TODO: Check range?
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace TriangleNet.Topology
         /// <returns></returns>
         public int GetVertexID(int index)
         {
-            return this.vertices[index].id;
+            return vertices[index].id;
         }
 
         /// <summary>
@@ -125,7 +125,7 @@ namespace TriangleNet.Topology
         /// <inheritdoc />
         public override int GetHashCode()
         {
-            return this.hash;
+            return hash;
         }
 
         /// <inheritdoc />

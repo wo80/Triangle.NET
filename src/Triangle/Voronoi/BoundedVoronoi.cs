@@ -6,18 +6,18 @@
 
 namespace TriangleNet.Voronoi
 {
-    using TriangleNet.Geometry;
-    using TriangleNet.Tools;
-    using TriangleNet.Topology.DCEL;
+    using Geometry;
+    using Tools;
+    using Topology.DCEL;
 
-    using TVertex = TriangleNet.Geometry.Vertex;
+    using TVertex = Geometry.Vertex;
 
     /// <summary>
     /// Computing the bounded Voronoi diagram of a constrained and conforming Delaunay triangulation.
     /// </summary>
     public class BoundedVoronoi : VoronoiBase
     {
-        int offset;
+        private int offset;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="StandardVoronoi" /> class.
@@ -39,10 +39,10 @@ namespace TriangleNet.Voronoi
         {
             // We explicitly told the base constructor to call the Generate method, so
             // at this point the basic Voronoi diagram is already created.
-            offset = base.vertices.Count;
+            offset = Vertices.Count;
 
             // Each vertex of the hull will be part of a Voronoi cell.
-            base.vertices.Capacity = offset + mesh.hullsize;
+            Vertices.Capacity = offset + mesh.hullsize;
 
             // Create bounded Voronoi diagram.
             PostProcess();
@@ -62,7 +62,7 @@ namespace TriangleNet.Voronoi
                 var v1 = (TVertex)edge.face.generator;
                 var v2 = (TVertex)twin.face.generator;
 
-                double dir = predicates.CounterClockwise(v1, v2, edge.origin);
+                var dir = predicates.CounterClockwise(v1, v2, edge.origin);
 
                 if (dir <= 0)
                 {
@@ -100,21 +100,21 @@ namespace TriangleNet.Voronoi
             h1.next = h2;
             h2.next = edge.face.edge;
 
-            gen.leaving = h2;
+            gen.Leaving = h2;
 
             // Let the face edge point to the edge leaving at generator.
             edge.face.edge = h2;
 
-            base.edges.Add(h1);
-            base.edges.Add(h2);
+            edges.Add(h1);
+            edges.Add(h2);
 
-            int count = base.edges.Count;
+            var count = edges.Count;
 
             h1.id = count;
             h2.id = count + 1;
 
             gen.id = offset++;
-            base.vertices.Add(gen);
+            Vertices.Add(gen);
         }
 
         /// <summary>
@@ -160,7 +160,7 @@ namespace TriangleNet.Voronoi
             var gen = factory.CreateVertex(v1.x, v1.y);
             var he = factory.CreateHalfEdge(gen, edge.face);
 
-            gen.leaving = he;
+            gen.Leaving = he;
 
             edge.next = he;
             he.next = edge.face.edge;
@@ -169,40 +169,12 @@ namespace TriangleNet.Voronoi
             // Let the face edge point to the edge leaving at generator.
             edge.face.edge = he;
 
-            base.edges.Add(he);
+            edges.Add(he);
 
-            he.id = base.edges.Count;
+            he.id = edges.Count;
 
             gen.id = offset++;
-            base.vertices.Add(gen);
+            Vertices.Add(gen);
         }
-
-        /*
-        private int GetBoundaryMark(Vertex v)
-        {
-            Otri tri = default(Otri);
-            Otri next = default(Otri);
-            Osub seg = default(Osub);
-
-            // Get triangle connected to generator.
-            v.tri.Copy(ref tri);
-            v.tri.Copy(ref next);
-
-            // Find boundary triangle.
-            while (next.triangle.id != -1)
-            {
-                next.Copy(ref tri);
-                next.OnextSelf();
-            }
-
-            // Find edge dual to current half-edge.
-            tri.LnextSelf();
-            tri.LnextSelf();
-
-            tri.SegPivot(ref seg);
-
-            return seg.seg.boundary;
-        }
-        //*/
     }
 }

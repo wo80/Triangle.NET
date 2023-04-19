@@ -7,8 +7,8 @@
 namespace TriangleNet.Meshing.Iterators
 {
     using System.Collections.Generic;
-    using TriangleNet.Topology;
-    using TriangleNet.Geometry;
+    using Topology;
+    using Geometry;
 
     /// <summary>
     /// Enumerates the edges of a triangulation.
@@ -33,11 +33,11 @@ namespace TriangleNet.Meshing.Iterators
                 tri.tri = t;
                 tri.orient = 0;
 
-                for (int i = 0; i < 3; i++)
+                for (var i = 0; i < 3; i++)
                 {
                     tri.Sym(ref neighbor);
 
-                    int nid = neighbor.tri.id;
+                    var nid = neighbor.tri.id;
 
                     if ((tri.tri.id < nid) || (nid == Mesh.DUMMY))
                     {
@@ -73,18 +73,18 @@ namespace TriangleNet.Meshing.Iterators
 
             Vertex p1, p2;
 
-            bool segments = !skipSegments;
+            var segments = !skipSegments;
 
             foreach (var t in mesh.Triangles)
             {
                 tri.tri = t;
                 tri.orient = 0;
 
-                for (int i = 0; i < 3; i++)
+                for (var i = 0; i < 3; i++)
                 {
                     tri.Sym(ref neighbor);
 
-                    int nid = neighbor.tri.id;
+                    var nid = neighbor.tri.id;
 
                     if ((tri.tri.id < nid) || (nid == Mesh.DUMMY))
                     {

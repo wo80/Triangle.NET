@@ -32,17 +32,7 @@ namespace TriangleNet.Geometry
         /// Initializes a new instance of the <see cref="Point" /> class.
         /// </summary>
         public Point()
-            : this(0.0, 0.0, 0)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Point" /> class.
-        /// </summary>
-        /// <param name="x">The x coordinate.</param>
-        /// <param name="y">The y coordinate.</param>
-        public Point(double x, double y)
-            : this(x, y, 0)
+            : this(0.0d, 0.0d)
         {
         }
 
@@ -52,7 +42,7 @@ namespace TriangleNet.Geometry
         /// <param name="x">The x coordinate.</param>
         /// <param name="y">The y coordinate.</param>
         /// <param name="label">The point label.</param>
-        public Point(double x, double y, int label)
+        public Point(double x, double y, int label = 0)
         {
             this.x = x;
             this.y = y;
@@ -66,8 +56,8 @@ namespace TriangleNet.Geometry
         /// </summary>
         public int ID
         {
-            get { return id; }
-            set { id = value; }
+            get => id;
+            set => id = value;
         }
 
         /// <summary>
@@ -75,8 +65,8 @@ namespace TriangleNet.Geometry
         /// </summary>
         public double X
         {
-            get { return x; }
-            set { x = value; }
+            get => x;
+            set => x = value;
         }
 
         /// <summary>
@@ -84,8 +74,8 @@ namespace TriangleNet.Geometry
         /// </summary>
         public double Y
         {
-            get { return y; }
-            set { y = value; }
+            get => y;
+            set => y = value;
         }
 
 #if USE_Z
@@ -107,16 +97,21 @@ namespace TriangleNet.Geometry
         /// </remarks>
         public int Label
         {
-            get { return label; }
-            set { label = value; }
+            get => label;
+            set => label = value;
         }
 
         #endregion
 
         #region Overriding Equals() and == Operator
 
-        /// <inheritdoc />
-        public static bool operator ==(Point a, Point b)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static bool operator ==(Point? a, Point? b)
         {
             if (a is null)
             {
@@ -133,7 +128,12 @@ namespace TriangleNet.Geometry
             return a.Equals(b);
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
         public static bool operator !=(Point a, Point b)
         {
             return !(a == b);
@@ -143,7 +143,7 @@ namespace TriangleNet.Geometry
         public override bool Equals(object obj) => Equals(obj as Point);
 
         /// <inheritdoc />
-        public bool Equals(Point p)
+        public bool Equals(Point? p)
         {
             // If object is null return false.
             if (p is null)
@@ -158,23 +158,24 @@ namespace TriangleNet.Geometry
         #endregion
 
         /// <inheritdoc />
-        public int CompareTo(Point other)
+        public int CompareTo(Point? other)
         {
+            if (other is null) return -1;
+            
             if (x == other.x && y == other.y)
             {
                 return 0;
             }
 
-            return (x < other.x || (x == other.x && y < other.y)) ? -1 : 1;
+            return x < other.x || (x == other.x && y < other.y) ? -1 : 1;
         }
 
         /// <inheritdoc />
         public override int GetHashCode()
         {
-            int hash = 19;
+            var hash = 19;
             hash = hash * 31 + x.GetHashCode();
             hash = hash * 31 + y.GetHashCode();
-
             return hash;
         }
     }

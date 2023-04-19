@@ -7,7 +7,7 @@
 namespace TriangleNet.IO
 {
     using System.IO;
-    using TriangleNet.Meshing;
+    using Meshing;
 
     /// <summary>
     /// Interface for mesh I/O.

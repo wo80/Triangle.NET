@@ -1,8 +1,8 @@
 ﻿namespace TriangleNet.Examples
 {
-    using TriangleNet.Geometry;
-    using TriangleNet.Meshing;
-    using TriangleNet.Rendering.Text;
+    using Geometry;
+    using Meshing;
+    using Rendering.Text;
 
     /// <summary>
     /// Triangulate a polygon with hole and set minimum angle constraint.

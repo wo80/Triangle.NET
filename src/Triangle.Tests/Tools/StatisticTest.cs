@@ -48,10 +48,10 @@ namespace TriangleNet.Tests.Tools
 
             Statistic.ComputeAngles(triangle, data);
 
-            bool acute = data[2] > 0;
+            var acute = data[2] > 0;
 
-            double min = Math.Acos(Math.Sqrt(data[0]));
-            double max = Math.Acos(Math.Sqrt(data[1]));
+            var min = Math.Acos(Math.Sqrt(data[0]));
+            var max = Math.Acos(Math.Sqrt(data[1]));
 
             const double deg = 180.0 / Math.PI;
 

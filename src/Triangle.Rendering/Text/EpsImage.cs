@@ -10,8 +10,8 @@ namespace TriangleNet.Rendering.Text
     using System;
     using System.IO;
     using TriangleNet;
-    using TriangleNet.Geometry;
-    using TriangleNet.Meshing.Iterators;
+    using Geometry;
+    using Meshing.Iterators;
     using Color = System.Drawing.Color;
     using IntPoint = System.Drawing.Point;
     using IntRectangle = System.Drawing.Rectangle;
@@ -22,12 +22,12 @@ namespace TriangleNet.Rendering.Text
     public class EpsImage
     {
         // EPS page metrics
-        PageSize ps = new PageSize(36, 126, 576, 666);
-        PageSize clip = new PageSize(18, 108, 594, 684);
+        private PageSize ps = new PageSize(36, 126, 576, 666);
+        private PageSize clip = new PageSize(18, 108, 594, 684);
 
         // Mesh metrics
-        double x_max, x_min;
-        double y_max, y_min;
+        private double x_max, x_min;
+        private double y_max, y_min;
 
         // TODO: use color manager
         private static Color ColorPoints = Color.FromArgb(0, 100, 0);
@@ -56,48 +56,46 @@ namespace TriangleNet.Rendering.Text
 
             UpdateMetrics(mesh.Bounds);
 
-            using (var eps = new EpsDocument(filename, ps))
+            using var eps = new EpsDocument(filename, ps);
+            var n = mesh.Vertices.Count;
+
+            // Size of the points.
+            eps.DefaultPointSize = (n < 100) ? 3 : ((n < 500) ? 2 : 1);
+
+            eps.WriteHeader();
+
+            // Draw a gray border around the page.
+            eps.SetColor(ColorBorder);
+            eps.DrawRectangle(GetRectangle(ps));
+
+            // Define a clipping polygon.
+            eps.SetClip(GetRectangle(clip));
+
+            // Draw edges.
+            eps.AddComment("Draw edges.");
+            eps.SetStroke(0.4f, ColorLines);
+
+            foreach (var e in EdgeIterator.EnumerateEdges(mesh))
             {
-                int n = mesh.Vertices.Count;
+                eps.DrawLine(Transform(e.GetVertex(0)), Transform(e.GetVertex(1)));
+            }
 
-                // Size of the points.
-                eps.DefaultPointSize = (n < 100) ? 3 : ((n < 500) ? 2 : 1);
+            // Draw Segments.
+            eps.AddComment("Draw Segments.");
+            eps.SetStroke(0.8f, ColorSegments);
 
-                eps.WriteHeader();
+            foreach (var s in mesh.Segments)
+            {
+                eps.DrawLine(Transform(s.GetVertex(0)), Transform(s.GetVertex(1)));
+            }
 
-                // Draw a gray border around the page.
-                eps.SetColor(ColorBorder);
-                eps.DrawRectangle(GetRectangle(ps));
+            // Draw points.
+            eps.AddComment("Draw points.");
+            eps.SetColor(ColorPoints);
 
-                // Define a clipping polygon.
-                eps.SetClip(GetRectangle(clip));
-
-                // Draw edges.
-                eps.AddComment("Draw edges.");
-                eps.SetStroke(0.4f, ColorLines);
-
-                foreach (var e in EdgeIterator.EnumerateEdges(mesh))
-                {
-                    eps.DrawLine(Transform(e.GetVertex(0)), Transform(e.GetVertex(1)));
-                }
-
-                // Draw Segments.
-                eps.AddComment("Draw Segments.");
-                eps.SetStroke(0.8f, ColorSegments);
-
-                foreach (var s in mesh.Segments)
-                {
-                    eps.DrawLine(Transform(s.GetVertex(0)), Transform(s.GetVertex(1)));
-                }
-
-                // Draw points.
-                eps.AddComment("Draw points.");
-                eps.SetColor(ColorPoints);
-
-                foreach (var node in mesh.Vertices)
-                {
-                    eps.DrawPoint(Transform(node));
-                }
+            foreach (var node in mesh.Vertices)
+            {
+                eps.DrawPoint(Transform(node));
             }
         }
 
@@ -127,27 +125,27 @@ namespace TriangleNet.Rendering.Text
             y_min = bounds.Bottom;
 
             // Enlarge width 5% on each side
-            double x_scale = x_max - x_min;
+            var x_scale = x_max - x_min;
             x_max = x_max + 0.05 * x_scale;
             x_min = x_min - 0.05 * x_scale;
             x_scale = x_max - x_min;
 
             // Enlarge height 5% on each side
-            double y_scale = y_max - y_min;
+            var y_scale = y_max - y_min;
             y_max = y_max + 0.05 * y_scale;
             y_min = y_min - 0.05 * y_scale;
             y_scale = y_max - y_min;
 
             if (x_scale < y_scale)
             {
-                int delta = (int)Math.Round((ps.Right - ps.X) * (y_scale - x_scale) / (2.0 * y_scale));
+                var delta = (int)Math.Round((ps.Right - ps.X) * (y_scale - x_scale) / (2.0 * y_scale));
 
                 ps.Expand(-delta, 0);
                 clip.Expand(-delta, 0);
             }
             else
             {
-                int delta = (int)Math.Round((ps.Bottom - ps.Y) * (x_scale - y_scale) / (2.0 * x_scale));
+                var delta = (int)Math.Round((ps.Bottom - ps.Y) * (x_scale - y_scale) / (2.0 * x_scale));
 
                 ps.Expand(0, -delta);
                 clip.Expand(0, -delta);

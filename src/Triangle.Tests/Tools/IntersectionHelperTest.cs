@@ -9,8 +9,8 @@ namespace TriangleNet.Tests.Tools
     {
         private const double EPS = 1e-8;
 
-        Rectangle box;
-        Point p;
+        private Rectangle box;
+        private Point p;
 
         [SetUp]
         public void Initialize()
@@ -162,7 +162,7 @@ namespace TriangleNet.Tests.Tools
             // Test point not on segment.
             Assert.IsFalse(IntersectionHelper.IsPointOnSegment(a, b, new Vertex(1.5, 0.5)));
 
-            double eps = 1e-12;
+            var eps = 1e-12;
 
             // Test point collinear near endpoint, but not on segment.
             Assert.IsFalse(IntersectionHelper.IsPointOnSegment(a, b, new Vertex(2.0 + eps, 2.0 + eps)));

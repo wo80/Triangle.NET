@@ -9,31 +9,31 @@ namespace TriangleNet.Meshing
 {
     using System;
     using System.Collections.Generic;
-    using TriangleNet.Geometry;
-    using TriangleNet.Meshing.Iterators;
-    using TriangleNet.Topology;
+    using Geometry;
+    using Iterators;
+    using Topology;
 
     internal class ConstraintMesher
     {
-        IPredicates predicates;
+        private IPredicates predicates;
 
-        Mesh mesh;
-        Behavior behavior;
-        TriangleLocator locator;
+        private Mesh mesh;
+        private Behavior behavior;
+        private TriangleLocator locator;
 
-        List<Triangle> viri;
+        private List<Triangle> viri;
 
-        Log logger = Log.Instance;
+        private Log logger = Log.Instance;
 
         public ConstraintMesher(Mesh mesh, Configuration config)
         {
             this.mesh = mesh;
-            this.predicates = config.Predicates();
+            predicates = config.Predicates();
 
-            this.behavior = mesh.behavior;
-            this.locator = mesh.locator;
+            behavior = mesh.behavior;
+            locator = mesh.locator;
 
-            this.viri = new List<Triangle>();
+            viri = new List<Triangle>();
         }
 
 
@@ -42,12 +42,12 @@ namespace TriangleNet.Meshing
         /// </summary>
         /// <param name="input">The polygon.</param>
         /// <param name="options">Constraint options.</param>
-        public void Apply(IPolygon input, ConstraintOptions options)
+        public void Apply(IPolygon input, ConstraintOptions? options)
         {
             behavior.Poly = input.Segments.Count > 0;
 
             // Copy constraint options
-            if (options != null)
+            if (options is not null)
             {
                 behavior.ConformingDelaunay = options.ConformingDelaunay;
                 behavior.Convex = options.Convex;
@@ -99,11 +99,11 @@ namespace TriangleNet.Meshing
         /// </summary>
         private void CarveHoles()
         {
-            Otri searchtri = default(Otri);
-            Vertex searchorg, searchdest;
+            var searchtri = default(Otri);
+            Vertex? searchorg, searchdest;
             LocateResult intersect;
 
-            Triangle[] regionTris = null;
+            Triangle[] regionTris = {};
 
             var dummytri = mesh.dummytri;
 
@@ -153,7 +153,7 @@ namespace TriangleNet.Meshing
             // which might not be convex; they can only be used with a freshly triangulated PSLG.)
             if (mesh.regions.Count > 0)
             {
-                int i = 0;
+                var i = 0;
 
                 regionTris = new Triangle[mesh.regions.Count];
 
@@ -202,7 +202,7 @@ namespace TriangleNet.Meshing
             {
                 var iterator = new RegionIterator(mesh);
 
-                for (int i = 0; i < regionTris.Length; i++)
+                for (var i = 0; i < regionTris.Length; i++)
                 {
                     if (regionTris[i].id != Mesh.DUMMY)
                     {
@@ -287,10 +287,10 @@ namespace TriangleNet.Meshing
         /// </summary>
         private void InfectHull()
         {
-            Otri hulltri = default(Otri);
-            Otri nexttri = default(Otri);
-            Otri starttri = default(Otri);
-            Osub hullsubseg = default(Osub);
+            var hulltri = default(Otri);
+            var nexttri = default(Otri);
+            var starttri = default(Otri);
+            var hullsubseg = default(Osub);
             Vertex horg, hdest;
 
             var dummytri = mesh.dummytri;
@@ -365,11 +365,11 @@ namespace TriangleNet.Meshing
         /// The second phase actually eliminates the infected triangles. It also
         /// eliminates orphaned vertices.
         /// </remarks>
-        void Plague()
+        private void Plague()
         {
-            Otri testtri = default(Otri);
-            Otri neighbor = default(Otri);
-            Osub neighborsubseg = default(Osub);
+            var testtri = default(Otri);
+            var neighbor = default(Otri);
+            var neighborsubseg = default(Osub);
             Vertex testvertex;
             Vertex norg, ndest;
 
@@ -380,7 +380,7 @@ namespace TriangleNet.Meshing
 
             // Loop through all the infected triangles, spreading the virus to
             // their neighbors, then to their neighbors' neighbors.
-            for (int i = 0; i < viri.Count; i++)
+            for (var i = 0; i < viri.Count; i++)
             {
                 // WARNING: Don't use foreach, mesh.viri list may get modified.
 
@@ -573,7 +573,7 @@ namespace TriangleNet.Meshing
         /// </remarks>
         private FindDirectionResult FindDirection(ref Otri searchtri, Vertex searchpoint)
         {
-            Otri checktri = default(Otri);
+            var checktri = default(Otri);
             Vertex startvertex;
             Vertex leftvertex, rightvertex;
             double leftccw, rightccw;
@@ -662,7 +662,7 @@ namespace TriangleNet.Meshing
         /// </remarks>
         private void SegmentIntersection(ref Otri splittri, ref Osub splitsubseg, Vertex endpoint2)
         {
-            Osub opposubseg = default(Osub);
+            var opposubseg = default(Osub);
             Vertex endpoint1;
             Vertex torg, tdest;
             Vertex leftvertex, rightvertex;
@@ -795,8 +795,8 @@ namespace TriangleNet.Meshing
         /// </remarks>
         private bool ScoutSegment(ref Otri searchtri, Vertex endpoint2, int newmark)
         {
-            Otri crosstri = default(Otri);
-            Osub crosssubseg = default(Osub);
+            var crosstri = default(Otri);
+            var crosssubseg = default(Osub);
             Vertex leftvertex, rightvertex;
             FindDirectionResult collinear;
 
@@ -891,9 +891,9 @@ namespace TriangleNet.Meshing
         /// </remarks>
         private void DelaunayFixup(ref Otri fixuptri, bool leftside)
         {
-            Otri neartri = default(Otri);
-            Otri fartri = default(Otri);
-            Osub faredge = default(Osub);
+            var neartri = default(Otri);
+            var fartri = default(Otri);
+            var faredge = default(Osub);
             Vertex nearvertex, leftvertex, rightvertex, farvertex;
 
             fixuptri.Lnext(ref neartri);
@@ -1008,8 +1008,8 @@ namespace TriangleNet.Meshing
         /// </remarks>
         private void ConstrainedEdge(ref Otri starttri, Vertex endpoint2, int newmark)
         {
-            Otri fixuptri = default(Otri), fixuptri2 = default(Otri);
-            Osub crosssubseg = default(Osub);
+            Otri fixuptri = default, fixuptri2 = default;
+            var crosssubseg = default(Osub);
             Vertex endpoint1;
             Vertex farvertex;
             double area;
@@ -1113,7 +1113,7 @@ namespace TriangleNet.Meshing
         /// <param name="newmark"></param>
         private void InsertSegment(Vertex endpoint1, Vertex endpoint2, int newmark)
         {
-            Otri searchtri1 = default(Otri), searchtri2 = default(Otri);
+            Otri searchtri1 = default, searchtri2 = default;
             Vertex checkvertex = null;
 
             var dummytri = mesh.dummytri;
@@ -1194,9 +1194,9 @@ namespace TriangleNet.Meshing
         /// </summary>
         private void MarkHull()
         {
-            Otri hulltri = default(Otri);
-            Otri nexttri = default(Otri);
-            Otri starttri = default(Otri);
+            var hulltri = default(Otri);
+            var nexttri = default(Otri);
+            var starttri = default(Otri);
 
             // Find a triangle handle on the hull.
             hulltri.tri = mesh.dummytri;

@@ -8,9 +8,9 @@ namespace TriangleNet.Meshing
 {
     using System;
     using System.Collections.Generic;
-    using TriangleNet.Geometry;
-    using TriangleNet.IO;
-    using TriangleNet.Meshing.Algorithm;
+    using Geometry;
+    using IO;
+    using Algorithm;
 
     /// <summary>
     /// Create meshes of point sets or polygons.
@@ -20,8 +20,8 @@ namespace TriangleNet.Meshing
     /// </remarks>
     public class GenericMesher
     {
-        Configuration config;
-        ITriangulator triangulator;
+        private Configuration config;
+        private ITriangulator triangulator;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GenericMesher" /> class.
@@ -60,32 +60,56 @@ namespace TriangleNet.Meshing
             this.triangulator = triangulator;
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="points"></param>
+        /// <returns></returns>
         public IMesh Triangulate(IList<Vertex> points)
         {
             return triangulator.Triangulate(points, config);
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="polygon"></param>
+        /// <returns></returns>
         public IMesh Triangulate(IPolygon polygon)
         {
             return Triangulate(polygon, null, null);
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="polygon"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
         public IMesh Triangulate(IPolygon polygon, ConstraintOptions options)
         {
             return Triangulate(polygon, options, null);
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="polygon"></param>
+        /// <param name="quality"></param>
+        /// <returns></returns>
         public IMesh Triangulate(IPolygon polygon, QualityOptions quality)
         {
             return Triangulate(polygon, null, quality);
         }
 
-        /// <inheritdoc />
-        public IMesh Triangulate(IPolygon polygon, ConstraintOptions options, QualityOptions quality)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="polygon"></param>
+        /// <param name="options"></param>
+        /// <param name="quality"></param>
+        /// <returns></returns>
+        public IMesh Triangulate(IPolygon polygon, ConstraintOptions? options, QualityOptions? quality)
         {
             var mesh = (Mesh)triangulator.Triangulate(polygon.Points, config);
 

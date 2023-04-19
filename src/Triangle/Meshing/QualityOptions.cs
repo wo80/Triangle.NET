@@ -2,7 +2,7 @@
 namespace TriangleNet.Meshing
 {
     using System;
-    using TriangleNet.Geometry;
+    using Geometry;
 
     /// <summary>
     /// Mesh constraint options for quality triangulation.
@@ -32,7 +32,7 @@ namespace TriangleNet.Meshing
         /// second argument is the area of the triangle tested. If the function
         /// returns true, the triangle is considered bad and will be refined.
         /// </remarks>
-        public Func<ITriangle, double, bool> UserTest { get; set; }
+        public Func<ITriangle, double, bool>? UserTest { get; set; }
 
         /// <summary>
         /// Gets or sets a test function for excluding triangles from refinement.
@@ -41,7 +41,7 @@ namespace TriangleNet.Meshing
         /// The exclude test takes higher priority than all other test, i.e. if a
         /// triangle passes the exclude test, no other test will be executed.
         /// </remarks>
-        public Func<ITriangle, bool> Exclude { get; set; }
+        public Func<ITriangle, bool>? Exclude { get; set; }
 
         /// <summary>
         /// Gets or sets an area constraint per triangle.

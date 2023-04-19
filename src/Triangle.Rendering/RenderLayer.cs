@@ -2,17 +2,15 @@
 namespace TriangleNet.Rendering
 {
     using System.Collections.Generic;
-    using TriangleNet.Geometry;
-    using TriangleNet.Meshing;
-    using TriangleNet.Rendering.Buffer;
-    using TriangleNet.Rendering.Util;
+    using Geometry;
+    using Meshing;
+    using Buffer;
+    using Util;
 
     using Color = System.Drawing.Color;
 
     public class RenderLayer : IRenderLayer
     {
-        int count;
-
         protected IBuffer<float> points;
         protected IBuffer<int> indices;
 
@@ -21,11 +19,11 @@ namespace TriangleNet.Rendering
 
         public RenderLayer()
         {
-            this.IsEnabled = false;
+            IsEnabled = false;
         }
 
         /// <inheritdoc />
-        public int Count => count;
+        public int Count { get; private set; }
 
         /// <inheritdoc />
         public IBuffer<float> Points => points;
@@ -53,7 +51,7 @@ namespace TriangleNet.Rendering
         {
             if (clear)
             {
-                count = 0;
+                Count = 0;
                 points = null;
             }
 
@@ -69,11 +67,11 @@ namespace TriangleNet.Rendering
             {
                 // NOTE: we keep the old size to be able to render new Steiner
                 //       points in a different color than existing points.
-                count = points.Count / points.Size;
+                Count = points.Count / points.Size;
             }
             else
             {
-                count = buffer.Count / buffer.Size;
+                Count = buffer.Count / buffer.Size;
             }
 
             points = buffer;
@@ -88,13 +86,13 @@ namespace TriangleNet.Rendering
         /// <inheritdoc />
         public void AttachLayerData(float[] values, ColorMap colormap)
         {
-            int length = values.Length;
+            var length = values.Length;
 
-            double min = double.MaxValue;
-            double max = double.MinValue;
+            var min = double.MaxValue;
+            var max = double.MinValue;
 
             // Find min and max of given values.
-            for (int i = 0; i < length; i++)
+            for (var i = 0; i < length; i++)
             {
                 if (values[i] < min)
                 {
@@ -109,7 +107,7 @@ namespace TriangleNet.Rendering
 
             var colorData = new Color[length];
 
-            for (int i = 0; i < length; i++)
+            for (var i = 0; i < length; i++)
             {
                 colorData[i] = colormap.GetColor(values[i], min, max);
             }

@@ -2,17 +2,17 @@
 namespace TriangleNet.Examples
 {
     using System;
-    using TriangleNet.Geometry;
-    using TriangleNet.Meshing;
-    using TriangleNet.Meshing.Iterators;
-    using TriangleNet.Rendering.Text;
+    using Geometry;
+    using Meshing;
+    using Meshing.Iterators;
+    using Rendering.Text;
 
     /// <summary>
     /// Using a user test function to define a maximum edge length constraint.
     /// </summary>
     public static class Example8
     {
-        const double MAX_EDGE_LENGTH = 0.2;
+        private const double MAX_EDGE_LENGTH = 0.2;
 
         public static bool Run(bool print = false)
         {
@@ -33,7 +33,7 @@ namespace TriangleNet.Examples
             // Validate.
             foreach (var e in EdgeIterator.EnumerateEdges(mesh))
             {
-                double length = Math.Sqrt(DistSqr(e.GetVertex(0), e.GetVertex(1)));
+                var length = Math.Sqrt(DistSqr(e.GetVertex(0), e.GetVertex(1)));
 
                 if (length > MAX_EDGE_LENGTH)
                 {
@@ -46,7 +46,7 @@ namespace TriangleNet.Examples
             return true;
         }
 
-        static bool MaxEdgeLength(ITriangle tri, double area)
+        private static bool MaxEdgeLength(ITriangle tri, double area)
         {
             var p0 = tri.GetVertex(0);
             var p1 = tri.GetVertex(1);
@@ -62,7 +62,7 @@ namespace TriangleNet.Examples
             return s1 > maxlen || s2 > maxlen || s3 > maxlen;
         }
 
-        static double DistSqr(Vertex a, Vertex b)
+        private static double DistSqr(Vertex a, Vertex b)
         {
             var dx = a.X - b.X;
             var dy = a.Y - b.Y;

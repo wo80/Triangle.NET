@@ -8,7 +8,7 @@
 namespace TriangleNet.Tools
 {
     using System;
-    using TriangleNet.Geometry;
+    using Geometry;
 
     /// <summary>
     /// Sort an array of points using quicksort.
@@ -17,14 +17,14 @@ namespace TriangleNet.Tools
     {
         private const int RANDOM_SEED = 57113;
 
-        Random rand;
+        private Random rand;
 
-        Vertex[] points;
+        private Vertex[] points;
 
-        VertexSorter(Vertex[] points, int seed)
+        private VertexSorter(Vertex[] points, int seed)
         {
             this.points = points;
-            this.rand = new Random(seed);
+            rand = new Random(seed);
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace TriangleNet.Tools
         {
             var qs = new VertexSorter(array, seed);
 
-            int divider = length >> 1;
+            var divider = length >> 1;
 
             // Re-sort the array of vertices to accommodate alternating cuts.
             if (length - divider >= 2)
@@ -76,22 +76,22 @@ namespace TriangleNet.Tools
         /// </remarks>
         private void QuickSort(int left, int right)
         {
-            int oleft = left;
-            int oright = right;
-            int arraysize = right - left + 1;
+            var oleft = left;
+            var oright = right;
+            var arraysize = right - left + 1;
             int pivot;
             double pivotx, pivoty;
             Vertex temp;
 
-            var array = this.points;
+            var array = points;
 
             if (arraysize < 32)
             {
                 // Insertion sort
-                for (int i = left + 1; i <= right; i++)
+                for (var i = left + 1; i <= right; i++)
                 {
                     var a = array[i];
-                    int j = i - 1;
+                    var j = i - 1;
                     while (j >= left && (array[j].x > a.x || (array[j].x == a.x && array[j].y > a.y)))
                     {
                         array[j + 1] = array[j];
@@ -168,8 +168,8 @@ namespace TriangleNet.Tools
         /// </remarks>
         private void AlternateAxes(int left, int right, int axis)
         {
-            int size = right - left + 1;
-            int divider = size >> 1;
+            var size = right - left + 1;
+            var divider = size >> 1;
 
             if (size <= 3)
             {
@@ -213,13 +213,13 @@ namespace TriangleNet.Tools
         /// </remarks>
         private void VertexMedianX(int left, int right, int median)
         {
-            int arraysize = right - left + 1;
+            var arraysize = right - left + 1;
             int oleft = left, oright = right;
             int pivot;
             double px, py; // pivot x and y coordinatex
             Vertex temp;
 
-            var array = this.points;
+            var array = points;
 
             if (arraysize == 2)
             {
@@ -296,13 +296,13 @@ namespace TriangleNet.Tools
         /// </remarks>
         private void VertexMedianY(int left, int right, int median)
         {
-            int arraysize = right - left + 1;
+            var arraysize = right - left + 1;
             int oleft = left, oright = right;
             int pivot;
             double px, py; // pivot x and y coordinatex
             Vertex temp;
 
-            var array = this.points;
+            var array = points;
 
             if (arraysize == 2)
             {

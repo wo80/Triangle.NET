@@ -8,8 +8,8 @@
 namespace TriangleNet.Tools
 {
     using System;
-    using TriangleNet.Topology;
-    using TriangleNet.Geometry;
+    using Topology;
+    using Geometry;
 
     /// <summary>
     /// Gather mesh statistics.
@@ -67,72 +67,61 @@ namespace TriangleNet.Tools
 
         #region Properties
 
-        double minEdge = 0;
         /// <summary>
         /// Gets the shortest edge.
         /// </summary>
-        public double ShortestEdge => minEdge;
+        public double ShortestEdge { get; private set; }
 
-        double maxEdge = 0;
         /// <summary>
         /// Gets the longest edge.
         /// </summary>
-        public double LongestEdge => maxEdge;
+        public double LongestEdge { get; private set; }
 
         //
-        double minAspect = 0;
         /// <summary>
         /// Gets the shortest altitude.
         /// </summary>
-        public double ShortestAltitude => minAspect;
+        public double ShortestAltitude { get; private set; }
 
-        double maxAspect = 0;
         /// <summary>
         /// Gets the largest aspect ratio.
         /// </summary>
-        public double LargestAspectRatio => maxAspect;
+        public double LargestAspectRatio { get; private set; }
 
-        double minArea = 0;
         /// <summary>
         /// Gets the smallest area.
         /// </summary>
-        public double SmallestArea => minArea;
+        public double SmallestArea { get; private set; }
 
-        double maxArea = 0;
         /// <summary>
         /// Gets the largest area.
         /// </summary>
-        public double LargestArea => maxArea;
+        public double LargestArea { get; private set; }
 
-        double minAngle = 0;
         /// <summary>
         /// Gets the smallest angle.
         /// </summary>
-        public double SmallestAngle => minAngle;
+        public double SmallestAngle { get; private set; }
 
-        double maxAngle = 0;
         /// <summary>
         /// Gets the largest angle.
         /// </summary>
-        public double LargestAngle => maxAngle;
+        public double LargestAngle { get; private set; }
 
-        int[] angleTable;
         /// <summary>
         /// Gets the angle histogram.
         /// </summary>
-        public int[] AngleHistogram => angleTable;
+        public int[] AngleHistogram { get; private set; }
 
-        int[] minAngles;
         /// <summary>
         /// Gets the min angles histogram.
         /// </summary>
-        public int[] MinAngleHistogram => minAngles;
+        public int[] MinAngleHistogram { get; private set; }
 
-        int[] maxAngles;
         /// <summary>
         /// Gets the max angles histogram.
         /// </summary>
-        public int[] MaxAngleHistogram => maxAngles;
+        public int[] MaxAngleHistogram { get; private set; }
 
         #endregion
 
@@ -149,10 +138,10 @@ namespace TriangleNet.Tools
                 100.0, 300.0, 1000.0, 10000.0, 100000.0, 0.0 };
 
 
-            Otri tri = default(Otri);
+            var tri = default(Otri);
             Vertex[] p = new Vertex[3];
             double[] dx = new double[3], dy = new double[3];
-            double[] edgelength = new double[3];
+            var edgelength = new double[3];
             double triarea;
             double trilongest2;
             double triminaltitude2;
@@ -202,8 +191,8 @@ namespace TriangleNet.Tools
 
         #endregion
 
-        static readonly int[] plus1Mod3 = { 1, 2, 0 };
-        static readonly int[] minus1Mod3 = { 2, 0, 1 };
+        private static readonly int[] plus1Mod3 = { 1, 2, 0 };
+        private static readonly int[] minus1Mod3 = { 2, 0, 1 };
 
         /// <summary>
         /// Update statistics about the quality of the mesh.
@@ -222,10 +211,10 @@ namespace TriangleNet.Tools
             //sampleDegrees = 45; // sample every 4 degrees
             sampleDegrees = 60; // sample every 3 degrees
 
-            double[] cosSquareTable = new double[sampleDegrees / 2 - 1];
-            double[] dx = new double[3];
-            double[] dy = new double[3];
-            double[] edgeLength = new double[3];
+            var cosSquareTable = new double[sampleDegrees / 2 - 1];
+            var dx = new double[3];
+            var dy = new double[3];
+            var edgeLength = new double[3];
             double dotProduct;
             double cosSquare;
             double triArea;
@@ -233,36 +222,36 @@ namespace TriangleNet.Tools
             double triMinAltitude2;
             double triAspect2;
 
-            double radconst = Math.PI / sampleDegrees;
-            double degconst = 180.0 / Math.PI;
+            var radconst = Math.PI / sampleDegrees;
+            var degconst = 180.0 / Math.PI;
 
             // New angle table
-            angleTable = new int[sampleDegrees];
-            minAngles = new int[sampleDegrees];
-            maxAngles = new int[sampleDegrees];
+            AngleHistogram = new int[sampleDegrees];
+            MinAngleHistogram = new int[sampleDegrees];
+            MaxAngleHistogram = new int[sampleDegrees];
 
-            for (int i = 0; i < sampleDegrees / 2 - 1; i++)
+            for (var i = 0; i < sampleDegrees / 2 - 1; i++)
             {
                 cosSquareTable[i] = Math.Cos(radconst * (i + 1));
                 cosSquareTable[i] = cosSquareTable[i] * cosSquareTable[i];
             }
-            for (int i = 0; i < sampleDegrees; i++)
+            for (var i = 0; i < sampleDegrees; i++)
             {
-                angleTable[i] = 0;
+                AngleHistogram[i] = 0;
             }
 
-            minAspect = mesh.bounds.Width + mesh.bounds.Height;
-            minAspect = minAspect * minAspect;
-            maxAspect = 0.0;
-            minEdge = minAspect;
-            maxEdge = 0.0;
-            minArea = minAspect;
-            maxArea = 0.0;
-            minAngle = 0.0;
-            maxAngle = 2.0;
+            ShortestAltitude = mesh.bounds.Width + mesh.bounds.Height;
+            ShortestAltitude = ShortestAltitude * ShortestAltitude;
+            LargestAspectRatio = 0.0;
+            ShortestEdge = ShortestAltitude;
+            LongestEdge = 0.0;
+            SmallestArea = ShortestAltitude;
+            LargestArea = 0.0;
+            SmallestAngle = 0.0;
+            LargestAngle = 2.0;
 
-            bool acuteBiggest = true;
-            bool acuteBiggestTri = true;
+            var acuteBiggest = true;
+            var acuteBiggestTri = true;
 
             double triMinAngle, triMaxAngle = 1;
 
@@ -277,7 +266,7 @@ namespace TriangleNet.Tools
 
                 triLongest2 = 0.0;
 
-                for (int i = 0; i < 3; i++)
+                for (var i = 0; i < 3; i++)
                 {
                     k1 = plus1Mod3[i];
                     k2 = minus1Mod3[i];
@@ -292,14 +281,14 @@ namespace TriangleNet.Tools
                         triLongest2 = edgeLength[i];
                     }
 
-                    if (edgeLength[i] > maxEdge)
+                    if (edgeLength[i] > LongestEdge)
                     {
-                        maxEdge = edgeLength[i];
+                        LongestEdge = edgeLength[i];
                     }
 
-                    if (edgeLength[i] < minEdge)
+                    if (edgeLength[i] < ShortestEdge)
                     {
-                        minEdge = edgeLength[i];
+                        ShortestEdge = edgeLength[i];
                     }
                 }
 
@@ -307,29 +296,29 @@ namespace TriangleNet.Tools
                 triArea = Math.Abs((p[2].x - p[0].x) * (p[1].y - p[0].y) -
                     (p[1].x - p[0].x) * (p[2].y - p[0].y));
 
-                if (triArea < minArea)
+                if (triArea < SmallestArea)
                 {
-                    minArea = triArea;
+                    SmallestArea = triArea;
                 }
 
-                if (triArea > maxArea)
+                if (triArea > LargestArea)
                 {
-                    maxArea = triArea;
+                    LargestArea = triArea;
                 }
 
                 triMinAltitude2 = triArea * triArea / triLongest2;
-                if (triMinAltitude2 < minAspect)
+                if (triMinAltitude2 < ShortestAltitude)
                 {
-                    minAspect = triMinAltitude2;
+                    ShortestAltitude = triMinAltitude2;
                 }
 
                 triAspect2 = triLongest2 / triMinAltitude2;
-                if (triAspect2 > maxAspect)
+                if (triAspect2 > LargestAspectRatio)
                 {
-                    maxAspect = triAspect2;
+                    LargestAspectRatio = triAspect2;
                 }
 
-                for (int i = 0; i < 3; i++)
+                for (var i = 0; i < 3; i++)
                 {
                     k1 = plus1Mod3[i];
                     k2 = minus1Mod3[i];
@@ -338,7 +327,7 @@ namespace TriangleNet.Tools
                     cosSquare = dotProduct * dotProduct / (edgeLength[k1] * edgeLength[k2]);
                     degreeStep = sampleDegrees / 2 - 1;
 
-                    for (int j = degreeStep - 1; j >= 0; j--)
+                    for (var j = degreeStep - 1; j >= 0; j--)
                     {
                         if (cosSquare > cosSquareTable[j])
                         {
@@ -348,14 +337,14 @@ namespace TriangleNet.Tools
 
                     if (dotProduct <= 0.0)
                     {
-                        angleTable[degreeStep]++;
-                        if (cosSquare > minAngle)
+                        AngleHistogram[degreeStep]++;
+                        if (cosSquare > SmallestAngle)
                         {
-                            minAngle = cosSquare;
+                            SmallestAngle = cosSquare;
                         }
-                        if (acuteBiggest && (cosSquare < maxAngle))
+                        if (acuteBiggest && (cosSquare < LargestAngle))
                         {
-                            maxAngle = cosSquare;
+                            LargestAngle = cosSquare;
                         }
 
                         // Update min/max angle per triangle
@@ -370,10 +359,10 @@ namespace TriangleNet.Tools
                     }
                     else
                     {
-                        angleTable[sampleDegrees - degreeStep - 1]++;
-                        if (acuteBiggest || (cosSquare > maxAngle))
+                        AngleHistogram[sampleDegrees - degreeStep - 1]++;
+                        if (acuteBiggest || (cosSquare > LargestAngle))
                         {
-                            maxAngle = cosSquare;
+                            LargestAngle = cosSquare;
                             acuteBiggest = false;
                         }
 
@@ -389,19 +378,19 @@ namespace TriangleNet.Tools
                 // Update min angle histogram
                 degreeStep = sampleDegrees / 2 - 1;
 
-                for (int j = degreeStep - 1; j >= 0; j--)
+                for (var j = degreeStep - 1; j >= 0; j--)
                 {
                     if (triMinAngle > cosSquareTable[j])
                     {
                         degreeStep = j;
                     }
                 }
-                minAngles[degreeStep]++;
+                MinAngleHistogram[degreeStep]++;
 
                 // Update max angle histogram
                 degreeStep = sampleDegrees / 2 - 1;
 
-                for (int j = degreeStep - 1; j >= 0; j--)
+                for (var j = degreeStep - 1; j >= 0; j--)
                 {
                     if (triMaxAngle > cosSquareTable[j])
                     {
@@ -411,44 +400,44 @@ namespace TriangleNet.Tools
 
                 if (acuteBiggestTri)
                 {
-                    maxAngles[degreeStep]++;
+                    MaxAngleHistogram[degreeStep]++;
                 }
                 else
                 {
-                    maxAngles[sampleDegrees - degreeStep - 1]++;
+                    MaxAngleHistogram[sampleDegrees - degreeStep - 1]++;
                 }
 
                 acuteBiggestTri = true;
             }
 
-            minEdge = Math.Sqrt(minEdge);
-            maxEdge = Math.Sqrt(maxEdge);
-            minAspect = Math.Sqrt(minAspect);
-            maxAspect = Math.Sqrt(maxAspect);
-            minArea *= 0.5;
-            maxArea *= 0.5;
-            if (minAngle >= 1.0)
+            ShortestEdge = Math.Sqrt(ShortestEdge);
+            LongestEdge = Math.Sqrt(LongestEdge);
+            ShortestAltitude = Math.Sqrt(ShortestAltitude);
+            LargestAspectRatio = Math.Sqrt(LargestAspectRatio);
+            SmallestArea *= 0.5;
+            LargestArea *= 0.5;
+            if (SmallestAngle >= 1.0)
             {
-                minAngle = 0.0;
+                SmallestAngle = 0.0;
             }
             else
             {
-                minAngle = degconst * Math.Acos(Math.Sqrt(minAngle));
+                SmallestAngle = degconst * Math.Acos(Math.Sqrt(SmallestAngle));
             }
 
-            if (maxAngle >= 1.0)
+            if (LargestAngle >= 1.0)
             {
-                maxAngle = 180.0;
+                LargestAngle = 180.0;
             }
             else
             {
                 if (acuteBiggest)
                 {
-                    maxAngle = degconst * Math.Acos(Math.Sqrt(maxAngle));
+                    LargestAngle = degconst * Math.Acos(Math.Sqrt(LargestAngle));
                 }
                 else
                 {
-                    maxAngle = 180.0 - degconst * Math.Acos(Math.Sqrt(maxAngle));
+                    LargestAngle = 180.0 - degconst * Math.Acos(Math.Sqrt(LargestAngle));
                 }
             }
         }
@@ -466,29 +455,29 @@ namespace TriangleNet.Tools
         /// </remarks>
         public static void ComputeAngles(ITriangle triangle, double[] data)
         {
-            double min = 0.0;
-            double max = 1.0;
+            var min = 0.0;
+            var max = 1.0;
 
             var va = triangle.GetVertex(0);
             var vb = triangle.GetVertex(1);
             var vc = triangle.GetVertex(2);
 
-            double dxa = vb.x - vc.x;
-            double dya = vb.y - vc.y;
-            double lena = dxa * dxa + dya * dya;
+            var dxa = vb.x - vc.x;
+            var dya = vb.y - vc.y;
+            var lena = dxa * dxa + dya * dya;
 
-            double dxb = vc.x - va.x;
-            double dyb = vc.y - va.y;
-            double lenb = dxb * dxb + dyb * dyb;
+            var dxb = vc.x - va.x;
+            var dyb = vc.y - va.y;
+            var lenb = dxb * dxb + dyb * dyb;
 
-            double dxc = va.x - vb.x;
-            double dyc = va.y - vb.y;
-            double lenc = dxc * dxc + dyc * dyc;
+            var dxc = va.x - vb.x;
+            var dyc = va.y - vb.y;
+            var lenc = dxc * dxc + dyc * dyc;
 
             // Dot products.
-            double dota = data[0] = dxb * dxc + dyb * dyc;
-            double dotb = data[1] = dxc * dxa + dyc * dya;
-            double dotc = data[2] = dxa * dxb + dya * dyb;
+            var dota = data[0] = dxb * dxc + dyb * dyc;
+            var dotb = data[1] = dxc * dxa + dyc * dya;
+            var dotc = data[2] = dxa * dxb + dya * dyb;
 
             // Squared cosines.
             data[3] = (dota * dota) / (lenb * lenc);
@@ -498,11 +487,11 @@ namespace TriangleNet.Tools
             // The sign of the dot product will tell us, if the angle is
             // acute (value < 0) or obtuse (value > 0).
 
-            bool acute = true;
+            var acute = true;
 
             double cos, dot;
 
-            for (int i = 0; i < 3; i++)
+            for (var i = 0; i < 3; i++)
             {
                 dot = data[i];
                 cos = data[3 + i];

@@ -7,7 +7,7 @@
 namespace TriangleNet.Topology.DCEL
 {
     using System.Collections.Generic;
-    using TriangleNet.Geometry;
+    using Geometry;
 
     /// <summary>
     /// A face of the DCEL datastructure.
@@ -33,9 +33,9 @@ namespace TriangleNet.Topology.DCEL
         internal int mark;
 
         // If the face is a Voronoi cell, this is the point that generates the cell.
-        internal Point generator;
+        internal Point? generator;
 
-        internal HalfEdge edge;
+        internal HalfEdge? edge;
         internal bool bounded;
 
         /// <summary>
@@ -49,17 +49,17 @@ namespace TriangleNet.Topology.DCEL
         /// </summary>
         public int ID
         {
-            get { return id; }
-            set { id = value; }
+            get => id;
+            set => id = value;
         }
 
         /// <summary>
         /// Gets or sets a half-edge connected to the face.
         /// </summary>
-        public HalfEdge Edge
+        public HalfEdge? Edge
         {
-            get { return edge; }
-            set { edge = value; }
+            get => edge;
+            set => edge = value;
         }
 
         /// <summary>
@@ -67,8 +67,8 @@ namespace TriangleNet.Topology.DCEL
         /// </summary>
         public bool Bounded
         {
-            get { return bounded; }
-            set { bounded = value; }
+            get => bounded;
+            set => bounded = value;
         }
 
         /// <summary>
@@ -85,14 +85,14 @@ namespace TriangleNet.Topology.DCEL
         /// </summary>
         /// <param name="generator">The generator of this face (for Voronoi diagram)</param>
         /// <param name="edge">The half-edge connected to this face.</param>
-        public Face(Point generator, HalfEdge edge)
+        public Face(Point? generator, HalfEdge? edge)
         {
             this.generator = generator;
             this.edge = edge;
 
             bounded = true;
 
-            if (generator != null)
+            if (generator is not null)
             {
                 id = generator.ID;
             }
@@ -105,7 +105,7 @@ namespace TriangleNet.Topology.DCEL
         public IEnumerable<HalfEdge> EnumerateEdges()
         {
             var edge = Edge;
-            int first = edge.ID;
+            var first = edge.ID;
 
             do
             {

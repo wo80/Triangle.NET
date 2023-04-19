@@ -3,13 +3,13 @@ namespace TriangleNet
 {
     using System;
     using System.Linq;
-    using TriangleNet.Examples;
+    using Examples;
 
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            bool print = args.Contains("--print");
+            var print = args.Contains("--print");
 
             Check("Example  1", Example1.Run(print));
             Check("Example  2", Example2.Run(print));
@@ -24,7 +24,7 @@ namespace TriangleNet
             Check("Example 11", Example11.Run(print));
         }
 
-        static void Check(string item, bool success)
+        private static void Check(string item, bool success)
         {
             var color = Console.ForegroundColor;
 

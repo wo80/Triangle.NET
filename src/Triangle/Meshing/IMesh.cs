@@ -2,8 +2,8 @@
 namespace TriangleNet.Meshing
 {
     using System.Collections.Generic;
-    using TriangleNet.Topology;
-    using TriangleNet.Geometry;
+    using Topology;
+    using Geometry;
 
     /// <summary>
     /// Mesh interface.
@@ -38,7 +38,7 @@ namespace TriangleNet.Meshing
         /// <summary>
         /// Gets the bounds of the mesh.
         /// </summary>
-        Rectangle Bounds { get; }
+        Rectangle? Bounds { get; }
 
         /// <summary>
         /// Renumber mesh vertices and triangles.

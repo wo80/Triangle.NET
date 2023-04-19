@@ -8,12 +8,12 @@ namespace TriangleNet.IO
 {
     using System;
     using System.Collections.Generic;
-    using TriangleNet.Geometry;
-    using TriangleNet.Meshing;
+    using Geometry;
+    using Meshing;
 
     public static class FileProcessor
     {
-        static List<IFileFormat> formats;
+        private static List<IFileFormat> formats;
 
         static FileProcessor()
         {

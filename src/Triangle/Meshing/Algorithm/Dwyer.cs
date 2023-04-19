@@ -9,9 +9,9 @@ namespace TriangleNet.Meshing.Algorithm
 {
     using System;
     using System.Collections.Generic;
-    using TriangleNet.Geometry;
-    using TriangleNet.Tools;
-    using TriangleNet.Topology;
+    using Geometry;
+    using Tools;
+    using Topology;
 
     /// <summary>
     /// Builds a delaunay triangulation using the divide-and-conquer algorithm.
@@ -46,15 +46,15 @@ namespace TriangleNet.Meshing.Algorithm
     /// </remarks>
     public class Dwyer : ITriangulator
     {
-        IPredicates predicates;
+        private IPredicates predicates;
 
         /// <summary>
         /// Gets or sets a value indicating whether to use alternating cuts (default = true).
         /// </summary>
         public bool UseDwyer = true;
 
-        Vertex[] sortarray;
-        Mesh mesh;
+        private Vertex[] sortarray;
+        private Mesh mesh;
 
         /// <summary>
         /// Compute a Delaunay triangulation by the divide-and-conquer method.
@@ -70,7 +70,7 @@ namespace TriangleNet.Meshing.Algorithm
 
             mesh = new Mesh(config, points);
 
-            Otri hullleft = default(Otri), hullright = default(Otri);
+            Otri hullleft = default, hullright = default;
             int i, j, n = points.Count;
 
             // Allocate an array of pointers to vertices for sorting.
@@ -157,14 +157,14 @@ namespace TriangleNet.Meshing.Algorithm
         /// merged triangulation, and the destination of 'farright' is the rightmost
         /// vertex.
         /// </remarks>
-        void MergeHulls(ref Otri farleft, ref Otri innerleft, ref Otri innerright,
+        private void MergeHulls(ref Otri farleft, ref Otri innerleft, ref Otri innerright,
                         ref Otri farright, int axis)
         {
-            Otri leftcand = default(Otri), rightcand = default(Otri);
-            Otri nextedge = default(Otri);
-            Otri sidecasing = default(Otri), topcasing = default(Otri), outercasing = default(Otri);
-            Otri checkedge = default(Otri);
-            Otri baseedge = default(Otri);
+            Otri leftcand = default, rightcand = default;
+            var nextedge = default(Otri);
+            Otri sidecasing = default, topcasing = default, outercasing = default;
+            var checkedge = default(Otri);
+            var baseedge = default(Otri);
             Vertex innerleftdest;
             Vertex innerrightorg;
             Vertex innerleftapex, innerrightapex;
@@ -484,16 +484,16 @@ namespace TriangleNet.Meshing.Algorithm
         /// 'farright' is the rightmost vertex (breaking ties by choosing the
         /// lowest rightmost vertex).
         /// </remarks>
-        void DivconqRecurse(int left, int right, int axis,
+        private void DivconqRecurse(int left, int right, int axis,
                             ref Otri farleft, ref Otri farright)
         {
-            Otri midtri = default(Otri);
-            Otri tri1 = default(Otri);
-            Otri tri2 = default(Otri);
-            Otri tri3 = default(Otri);
-            Otri innerleft = default(Otri), innerright = default(Otri);
+            var midtri = default(Otri);
+            var tri1 = default(Otri);
+            var tri2 = default(Otri);
+            var tri3 = default(Otri);
+            Otri innerleft = default, innerright = default;
             double area;
-            int vertices = right - left + 1;
+            var vertices = right - left + 1;
             int divider;
 
             if (vertices == 2)
@@ -638,16 +638,16 @@ namespace TriangleNet.Meshing.Algorithm
         /// </summary>
         /// <param name="startghost"></param>
         /// <returns>Number of vertices on the hull.</returns>
-        int RemoveGhosts(ref Otri startghost)
+        private int RemoveGhosts(ref Otri startghost)
         {
-            Otri searchedge = default(Otri);
-            Otri dissolveedge = default(Otri);
-            Otri deadtriangle = default(Otri);
+            var searchedge = default(Otri);
+            var dissolveedge = default(Otri);
+            var deadtriangle = default(Otri);
             Vertex markorg;
 
             int hullsize;
 
-            bool noPoly = !mesh.behavior.Poly;
+            var noPoly = !mesh.behavior.Poly;
 
             // Find an edge on the convex hull to start point location from.
             startghost.Lprev(ref searchedge);

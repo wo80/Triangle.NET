@@ -7,7 +7,7 @@
 
 namespace TriangleNet.Tools
 {
-    using TriangleNet.Geometry;
+    using Geometry;
 
     /// <summary>
     /// Interpolation helper.
@@ -30,24 +30,24 @@ namespace TriangleNet.Tools
             var dest = tri.GetVertex(1);
             var apex = tri.GetVertex(2);
 
-            double xdo = dest.x - org.x;
-            double ydo = dest.y - org.y;
-            double xao = apex.x - org.x;
-            double yao = apex.y - org.y;
+            var xdo = dest.x - org.x;
+            var ydo = dest.y - org.y;
+            var xao = apex.x - org.x;
+            var yao = apex.y - org.y;
 
-            double denominator = 0.5 / (xdo * yao - xao * ydo);
+            var denominator = 0.5 / (xdo * yao - xao * ydo);
 
-            double dx = p.x - org.x;
-            double dy = p.y - org.y;
+            var dx = p.x - org.x;
+            var dy = p.y - org.y;
 
             // To interpolate z value for the given point inserted, define a
             // coordinate system with a xi-axis, directed from the triangle's
             // origin to its destination, and an eta-axis, directed from its
             // origin to its apex.
-            double xi = (yao * dx - xao * dy) * (2.0 * denominator);
-            double eta = (xdo * dy - ydo * dx) * (2.0 * denominator);
+            var xi = (yao * dx - xao * dy) * (2.0 * denominator);
+            var eta = (xdo * dy - ydo * dx) * (2.0 * denominator);
 
-            double orgz = data[org.id];
+            var orgz = data[org.id];
 
             return orgz + xi * (data[dest.id] - orgz) + eta * (data[apex.id] - orgz);
         }

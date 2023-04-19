@@ -8,7 +8,7 @@
 namespace TriangleNet.Topology
 {
     using System;
-    using TriangleNet.Geometry;
+    using Geometry;
 
     /// <summary>
     /// An oriented subsegment.

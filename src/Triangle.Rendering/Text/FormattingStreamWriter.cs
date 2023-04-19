@@ -13,8 +13,6 @@ namespace TriangleNet.Rendering.Text
     /// </remarks>
     public class FormattingStreamWriter : StreamWriter
     {
-        private readonly IFormatProvider formatProvider;
-
         /// <summary>
         /// Initializes a new instance of the StreamWriter class for the specified file
         /// by using the default encoding and buffer size.
@@ -44,7 +42,7 @@ namespace TriangleNet.Rendering.Text
         public FormattingStreamWriter(string path, IFormatProvider formatProvider)
             : base(path)
         {
-            this.formatProvider = formatProvider;
+            this.FormatProvider = formatProvider;
         }
 
         /// <summary>
@@ -56,12 +54,12 @@ namespace TriangleNet.Rendering.Text
         public FormattingStreamWriter(Stream stream, IFormatProvider formatProvider)
             : base(stream)
         {
-            this.formatProvider = formatProvider;
+            this.FormatProvider = formatProvider;
         }
 
         /// <summary>
         /// Gets an object that controls formatting.
         /// </summary>
-        public override IFormatProvider FormatProvider => formatProvider;
+        public override IFormatProvider FormatProvider { get; }
     }
 }

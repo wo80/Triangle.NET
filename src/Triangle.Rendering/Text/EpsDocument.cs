@@ -41,19 +41,19 @@ namespace TriangleNet.Rendering.Text
 
         public void AddComment(string comment, int line = 1)
         {
-            for (int i = 0; i < line; i++)
+            for (var i = 0; i < line; i++)
             {
                 _w.WriteLine("%");
             }
 
             var t = comment.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries );
 
-            for (int i = 0; i < t.Length; i++)
+            for (var i = 0; i < t.Length; i++)
             {
                 _w.WriteLine("% " + t[i]);
             }
 
-            for (int i = 0; i < line; i++)
+            for (var i = 0; i < line; i++)
             {
                 _w.WriteLine("%");
             }
@@ -170,7 +170,7 @@ namespace TriangleNet.Rendering.Text
         #region IDisposable implementation
 
         // Has Dispose already been called?
-        bool disposed = false;
+        private bool disposed;
 
         // Public implementation of Dispose pattern callable by consumers.
         public void Dispose()

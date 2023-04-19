@@ -1,8 +1,8 @@
 ﻿
 namespace TriangleNet.Rendering
 {
-    using TriangleNet.Rendering.Buffer;
-    using TriangleNet.Rendering.Util;
+    using Buffer;
+    using Util;
 
     using Color = System.Drawing.Color;
 

@@ -2,10 +2,10 @@
 namespace TriangleNet.Examples
 {
     using TriangleNet;
-    using TriangleNet.Geometry;
-    using TriangleNet.Meshing;
-    using TriangleNet.Rendering.Text;
-    using TriangleNet.Smoothing;
+    using Geometry;
+    using Meshing;
+    using Rendering.Text;
+    using Smoothing;
 
     /// <summary>
     /// Refine only a part of a polygon mesh by using region pointers and an area constraint.

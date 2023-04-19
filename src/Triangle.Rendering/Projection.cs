@@ -30,16 +30,16 @@ namespace TriangleNet.Rendering
     public class Projection
     {
         // The original mesh bounds (needed for screen-to-world projection).
-        TRectangle world_;
+        private TRectangle world_;
 
         // Precomputed scaling factor for normalized coordinates.
-        double scale_;
+        private double scale_;
 
         // The screen dimensions.
-        Rectangle screen;
+        private Rectangle screen;
 
         // The original mesh and the viewport in normalized coordinates.
-        RectangleF world, viewport;
+        private RectangleF world, viewport;
 
         /// <summary>
         /// Gets or sets the current viewport (normalized coordinates).
@@ -84,23 +84,23 @@ namespace TriangleNet.Rendering
             scale_ = Math.Max(world.Width, world.Height);
 
             // Dimensions in normalized coordinates.
-            float ww = (float)(world.Width / scale_);
-            float wh = (float)(world.Height / scale_);
+            var ww = (float)(world.Width / scale_);
+            var wh = (float)(world.Height / scale_);
 
             // Add a margin so there's some space around the screen borders.
-            float margin = (ww < wh) ? wh * 0.05f : ww * 0.05f;
+            var margin = (ww < wh) ? wh * 0.05f : ww * 0.05f;
 
-            int sw = screen.Width;
-            int sh = screen.Height;
+            var sw = screen.Width;
+            var sh = screen.Height;
 
-            float wRatio = ww / wh;
-            float sRatio = sw / (float)sh;
+            var wRatio = ww / wh;
+            var sRatio = sw / (float)sh;
 
-            float scale = (sRatio < wRatio) ? (ww + margin) / sw : (wh + margin) / sh;
+            var scale = (sRatio < wRatio) ? (ww + margin) / sw : (wh + margin) / sh;
 
             // Center in normalized coordinates (left = bottom = 0)
-            float centerX = ww / 2;
-            float centerY = wh / 2;
+            var centerX = ww / 2;
+            var centerY = wh / 2;
 
             // Get the initial viewport (complete mesh centered on the screen)
             this.world = viewport = new RectangleF(
@@ -120,20 +120,20 @@ namespace TriangleNet.Rendering
             // the scaling and the center.
 
             // Get the screen scaling.
-            float scaleX = newScreen.Width / (float)screen.Width;
-            float scaleY = newScreen.Height / (float)screen.Height;
+            var scaleX = newScreen.Width / (float)screen.Width;
+            var scaleY = newScreen.Height / (float)screen.Height;
 
             screen = newScreen;
 
             var view = viewport;
 
             // Center of the viewport
-            float centerX = (view.Left + view.Right) / 2;
-            float centerY = (view.Bottom + view.Top) / 2;
+            var centerX = (view.Left + view.Right) / 2;
+            var centerY = (view.Bottom + view.Top) / 2;
 
             // The new viewport dimensions.
-            float width = view.Width * scaleX;
-            float height = view.Height * scaleY;
+            var width = view.Width * scaleX;
+            var height = view.Height * scaleY;
 
             viewport = new RectangleF(
                 centerX - width / 2,
@@ -162,8 +162,8 @@ namespace TriangleNet.Rendering
 
             var view = viewport;
 
-            float x = view.X + dx * view.Width / 4;
-            float y = view.Y + dy * view.Height / 4;
+            var x = view.X + dx * view.Width / 4;
+            var y = view.Y + dy * view.Height / 4;
 
             viewport = new RectangleF(x, y, view.Width, view.Height);
 
@@ -211,8 +211,8 @@ namespace TriangleNet.Rendering
             }
 
             // Current focus on viewport
-            float x = viewport.X + viewport.Width * focusX;
-            float y = viewport.Y + viewport.Height * focusY;
+            var x = viewport.X + viewport.Width * focusX;
+            var y = viewport.Y + viewport.Height * focusY;
 
             // New left and top positions
             x = x - width * focusX;

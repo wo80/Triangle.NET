@@ -2,11 +2,11 @@
 {
     using System.Linq;
     using TriangleNet;
-    using TriangleNet.Geometry;
-    using TriangleNet.Meshing.Iterators;
-    using TriangleNet.Rendering.Text;
-    using TriangleNet.Tools;
-    using TriangleNet.Topology;
+    using Geometry;
+    using Meshing.Iterators;
+    using Rendering.Text;
+    using Tools;
+    using Topology;
 
     /// <summary>
     /// Boolean operations on mesh regions (intersection, difference, xor).
@@ -32,7 +32,7 @@
 
             // Find a seeding triangle (in this case, the point (2, 2) lies in
             // both rectangles).
-            var seed = (new TriangleQuadTree(mesh)).Query(2.0, 2.0) as Triangle;
+            var seed = (Triangle)new TriangleQuadTree(mesh).Query(2.0, 2.0);
 
             var iterator = new RegionIterator(mesh);
 

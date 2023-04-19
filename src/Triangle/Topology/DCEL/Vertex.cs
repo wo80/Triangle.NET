@@ -11,18 +11,12 @@ namespace TriangleNet.Topology.DCEL
     /// <summary>
     /// A vertex of the DCEL datastructure.
     /// </summary>
-    public class Vertex : TriangleNet.Geometry.Point
+    public class Vertex : Geometry.Point
     {
-        internal HalfEdge leaving;
-
         /// <summary>
         /// Gets or sets a half-edge leaving the vertex.
         /// </summary>
-        public HalfEdge Leaving
-        {
-            get { return leaving; }
-            set { leaving = value; }
-        }
+        public HalfEdge? Leaving { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Vertex" /> class.
@@ -43,7 +37,7 @@ namespace TriangleNet.Topology.DCEL
         public Vertex(double x, double y, HalfEdge leaving)
             : base(x, y)
         {
-            this.leaving = leaving;
+            Leaving = leaving;
         }
 
         /// <summary>
@@ -52,8 +46,9 @@ namespace TriangleNet.Topology.DCEL
         /// <returns></returns>
         public IEnumerable<HalfEdge> EnumerateEdges()
         {
-            var edge = this.Leaving;
-            int first = edge.ID;
+            var edge = Leaving;
+            if (edge is null) yield break;
+            var first = edge.ID;
 
             do
             {
@@ -64,9 +59,6 @@ namespace TriangleNet.Topology.DCEL
         }
 
         /// <inheritdoc />
-        public override string ToString()
-        {
-            return string.Format("V-ID {0}", base.id);
-        }
+        public override string ToString() => $"V-ID {id}";
     }
 }

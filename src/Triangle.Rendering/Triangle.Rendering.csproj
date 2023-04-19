@@ -6,6 +6,8 @@
     <RootNamespace>TriangleNet.Rendering</RootNamespace>
     <AssemblyName>Triangle.Rendering</AssemblyName>
     <Platforms>AnyCPU;x64</Platforms>
+    <LangVersion>default</LangVersion>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

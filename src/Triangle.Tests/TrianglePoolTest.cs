@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace TriangleNet.Tests
 {
-    class TrianglePoolTest
+    internal class TrianglePoolTest
     {
         [Test]
         public void TestGetRelease()
@@ -112,9 +112,9 @@ namespace TriangleNet.Tests
             Assert.AreEqual(0, pool.Count);
             Assert.AreEqual(0, pool.Capacity);
 
-            int n = 10;
+            var n = 10;
 
-            for (int i = 0; i < n; i++)
+            for (var i = 0; i < n; i++)
             {
                 Assert.AreEqual(i, pool.Get().ID);
             }

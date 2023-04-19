@@ -8,21 +8,21 @@ namespace TriangleNet.Geometry
 {
     using System;
     using System.Collections.Generic;
-    using TriangleNet.Tools;
+    using Tools;
 
     /// <summary>
     /// Represents a contour of a polygon (outer boundary or internal holes).
     /// </summary>
     public class Contour
     {
-        int marker;
+        private int marker;
 
-        bool convex;
+        private bool convex;
 
         /// <summary>
         /// Gets or sets the list of points making up the contour.
         /// </summary>
-        public List<Vertex> Points { get; set; }
+        public List<Vertex> Points { get; } = new();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Contour" /> class.
@@ -67,9 +67,9 @@ namespace TriangleNet.Geometry
 
             var p = Points;
 
-            int count = p.Count - 1;
+            var count = p.Count - 1;
 
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
                 // Add segments to polygon.
                 segments.Add(new Segment(p[i], p[i + 1], marker));
@@ -102,11 +102,11 @@ namespace TriangleNet.Geometry
             {
                 var p = Points;
 
-                int count = p.Count;
+                var count = p.Count;
 
                 var point = new Point(0.0, 0.0);
 
-                for (int i = 0; i < count; i++)
+                for (var i = 0; i < count; i++)
                 {
                     point.x += p[i].x;
                     point.y += p[i].y;
@@ -119,14 +119,14 @@ namespace TriangleNet.Geometry
                 return point;
             }
 
-            return FindPointInPolygon(this.Points, limit, eps);
+            return FindPointInPolygon(Points, limit, eps);
         }
 
         private void AddPoints(IEnumerable<Vertex> points)
         {
-            Points = new List<Vertex>(points);
+            Points.AddRange(points);
 
-            int count = Points.Count - 1;
+            var count = Points.Count - 1;
 
             // Check if first vertex equals last vertex.
             if (Points[0] == Points[count])
@@ -142,7 +142,7 @@ namespace TriangleNet.Geometry
             var bounds = new Rectangle();
             bounds.Expand(contour);
 
-            int length = contour.Count;
+            var length = contour.Count;
 
             var test = new Point();
 
@@ -157,7 +157,7 @@ namespace TriangleNet.Geometry
             a = contour[0];
             b = contour[1];
 
-            for (int i = 0; i < length; i++)
+            for (var i = 0; i < length; i++)
             {
                 c = contour[(i + 2) % length];
 
@@ -189,7 +189,7 @@ namespace TriangleNet.Geometry
 
                 h = 1.0;
 
-                for (int j = 0; j < limit; j++)
+                for (var j = 0; j < limit; j++)
                 {
                     // Search in direction.
                     test.x = bx + dx * h;
@@ -230,12 +230,12 @@ namespace TriangleNet.Geometry
         /// </remarks>
         private static bool IsPointInPolygon(Point point, List<Vertex> poly)
         {
-            bool inside = false;
+            var inside = false;
 
-            double x = point.x;
-            double y = point.y;
+            var x = point.x;
+            var y = point.y;
 
-            int count = poly.Count;
+            var count = poly.Count;
 
             for (int i = 0, j = count - 1; i < count; i++)
             {
@@ -257,11 +257,11 @@ namespace TriangleNet.Geometry
         /// </summary>
         private static bool IsPointOnSegment(Point test, List<Vertex> contour, double eps = 1e-12)
         {
-            int count = contour.Count;
+            var count = contour.Count;
 
-            int i = count - 1;
+            var i = count - 1;
 
-            for (int j = 0; j < count; j++)
+            for (var j = 0; j < count; j++)
             {
                 if (IntersectionHelper.IsPointOnSegment(contour[i], contour[j], test, eps))
                 {

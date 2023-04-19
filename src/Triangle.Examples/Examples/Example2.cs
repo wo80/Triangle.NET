@@ -2,14 +2,14 @@
 namespace TriangleNet.Examples
 {
     using System.Collections.Generic;
-    using TriangleNet.Geometry;
-    using TriangleNet.Meshing;
-    using TriangleNet.Rendering.Text;
+    using Geometry;
+    using Meshing;
+    using Rendering.Text;
 
     /// <summary>
     /// Simple point set triangulation with convex hull.
     /// </summary>
-    public class Example2
+    public sealed class Example2
     {
         public static bool Run(bool print = false)
         {
@@ -38,7 +38,7 @@ namespace TriangleNet.Examples
         {
             int first = -1, prev = -1;
 
-            Point a = null, b, c;
+            Point a = new();
 
             var p = RobustPredicates.Default;
 
@@ -63,8 +63,8 @@ namespace TriangleNet.Examples
                     return false;
                 }
 
-                b = s.GetVertex(1);
-                c = s.GetVertex(0);
+                Point b = s.GetVertex(1);
+                Point c = s.GetVertex(0);
 
                 // Check whether the convex hull is traversed in counterclockwise.
                 if (p.CounterClockwise(a, b, c) < 0)

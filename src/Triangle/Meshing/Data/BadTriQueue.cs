@@ -7,8 +7,8 @@
 
 namespace TriangleNet.Meshing.Data
 {
-    using TriangleNet.Geometry;
-    using TriangleNet.Topology;
+    using Geometry;
+    using Topology;
 
     /// <summary>
     /// A (priority) queue for bad triangles.
@@ -18,20 +18,18 @@ namespace TriangleNet.Meshing.Data
     /// give priority to smaller angles. I originally implemented a heap, but
     /// the queues are faster by a larger margin than I'd suspected.
     /// </remarks>
-    class BadTriQueue
+    internal class BadTriQueue
     {
-        const double SQRT2 = 1.4142135623730950488016887242096980785696718753769480732;
+        private const double SQRT2 = 1.4142135623730950488016887242096980785696718753769480732;
 
-        public int Count { get { return this.count; } }
+        public int Count { get; private set; }
 
         // Variables that maintain the bad triangle queues.  The queues are
         // ordered from 4095 (highest priority) to 0 (lowest priority).
-        BadTriangle[] queuefront;
-        BadTriangle[] queuetail;
-        int[] nextnonemptyq;
-        int firstnonemptyq;
-
-        int count;
+        private BadTriangle[] queuefront;
+        private BadTriangle[] queuetail;
+        private int[] nextnonemptyq;
+        private int firstnonemptyq;
 
         public BadTriQueue()
         {
@@ -41,7 +39,7 @@ namespace TriangleNet.Meshing.Data
 
             firstnonemptyq = -1;
 
-            count = 0;
+            Count = 0;
         }
 
         /// <summary>
@@ -56,7 +54,7 @@ namespace TriangleNet.Meshing.Data
             int posexponent;
             int i;
 
-            this.count++;
+            Count++;
 
             // Determine the appropriate queue to put the bad triangle into.
             // Recall that the key is the square of its shortest edge length.
@@ -152,7 +150,7 @@ namespace TriangleNet.Meshing.Data
         public void Enqueue(ref Otri enqtri, double minedge, Vertex apex, Vertex org, Vertex dest)
         {
             // Allocate space for the bad triangle.
-            BadTriangle newbad = new BadTriangle();
+            var newbad = new BadTriangle();
 
             newbad.poortri = enqtri;
             newbad.key = minedge;
@@ -175,10 +173,10 @@ namespace TriangleNet.Meshing.Data
                 return null;
             }
 
-            this.count--;
+            Count--;
 
             // Find the first triangle of the highest-priority queue.
-            BadTriangle result = queuefront[firstnonemptyq];
+            var result = queuefront[firstnonemptyq];
             // Remove the triangle from the queue.
             queuefront[firstnonemptyq] = result.next;
             // If this queue is now empty, note the new highest-priority

@@ -8,7 +8,7 @@ namespace TriangleNet.Tools
 {
     using System;
     using System.Collections.Generic;
-    using TriangleNet.Geometry;
+    using Geometry;
 
     /// <summary>
     /// Polygon validation helper.
@@ -24,10 +24,10 @@ namespace TriangleNet.Tools
 
             var points = poly.Points;
 
-            int horrors = 0;
+            var horrors = 0;
 
-            int i = 0;
-            int count = points.Count;
+            var i = 0;
+            var count = points.Count;
 
             if (count < 3)
             {
@@ -101,13 +101,13 @@ namespace TriangleNet.Tools
         {
             var logger = Log.Instance;
 
-            int horrors = 0;
+            var horrors = 0;
 
             var points = poly.Points.ToArray();
 
             VertexSorter.Sort(points);
 
-            for (int i = 1; i < points.Length; i++)
+            for (var i = 1; i < points.Length; i++)
             {
                 if (points[i - 1] == points[i])
                 {
@@ -133,8 +133,8 @@ namespace TriangleNet.Tools
         {
             var logger = Log.Instance;
 
-            double min = double.MaxValue;
-            double max = 0.0;
+            var min = double.MaxValue;
+            var max = 0.0;
 
             foreach (var seg in poly.Segments)
             {
@@ -157,7 +157,7 @@ namespace TriangleNet.Tools
                 max = Math.Max(max, length);
             }
 
-            double ratio = min / max;
+            var ratio = min / max;
 
             if (ratio < threshold)
             {
@@ -182,8 +182,8 @@ namespace TriangleNet.Tools
         {
             var logger = Log.Instance;
 
-            int horrors = 0;
-            int i = 0;
+            var horrors = 0;
+            var i = 0;
 
             Point p0 = null, p1 = null;
             Point q0, q1;
@@ -224,8 +224,8 @@ namespace TriangleNet.Tools
 
         private static bool IsBadAngle(Point a, Point b, Point c, double threshold = 0.0)
         {
-            double x = DotProduct(a, b, c);
-            double y = CrossProductLength(a, b, c);
+            var x = DotProduct(a, b, c);
+            var y = CrossProductLength(a, b, c);
 
             return Math.Abs(Math.Atan2(y, x)) <= threshold;
         }
@@ -248,9 +248,9 @@ namespace TriangleNet.Tools
         {
             var logger = Log.Instance;
 
-            int horrors = 0;
+            var horrors = 0;
 
-            int i = 0;
+            var i = 0;
 
             Vertex p, q;
 

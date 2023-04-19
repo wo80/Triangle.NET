@@ -9,7 +9,7 @@ namespace TriangleNet.Meshing.Iterators
 {
     using System;
     using System.Collections.Generic;
-    using TriangleNet.Topology;
+    using Topology;
 
     /// <summary>
     /// Iterates the region a given triangle belongs to and applies an action
@@ -20,14 +20,14 @@ namespace TriangleNet.Meshing.Iterators
     /// </remarks>
     public class RegionIterator
     {
-        List<Triangle> region;
+        private List<Triangle> region;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RegionIterator" /> class.
         /// </summary>
         public RegionIterator(Mesh mesh)
         {
-            this.region = new List<Triangle>();
+            region = new List<Triangle>();
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace TriangleNet.Meshing.Iterators
         /// region that is enclosed by segments with given boundary label.</param>
         public void Process(Triangle triangle, int boundary = 0)
         {
-            this.Process(triangle, (tri) =>
+            Process(triangle, (tri) =>
             {
                 // Set the region id and area constraint.
                 tri.label = triangle.label;
@@ -87,16 +87,16 @@ namespace TriangleNet.Meshing.Iterators
         /// </summary>
         /// <param name="action"></param>
         /// <param name="protector"></param>
-        void ProcessRegion(Action<Triangle> action, Func<SubSegment, bool> protector)
+        private void ProcessRegion(Action<Triangle> action, Func<SubSegment, bool> protector)
         {
-            Otri testtri = default(Otri);
-            Otri neighbor = default(Otri);
-            Osub neighborsubseg = default(Osub);
+            var testtri = default(Otri);
+            var neighbor = default(Otri);
+            var neighborsubseg = default(Osub);
 
             // Loop through all the infected triangles, spreading the attribute
             // and/or area constraint to their neighbors, then to their neighbors'
             // neighbors.
-            for (int i = 0; i < region.Count; i++)
+            for (var i = 0; i < region.Count; i++)
             {
                 // WARNING: Don't use foreach, viri list gets modified.
 

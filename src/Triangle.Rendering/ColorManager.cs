@@ -3,7 +3,7 @@ namespace TriangleNet.Rendering
 {
     using System.Collections.Generic;
     using System.Drawing;
-    using TriangleNet.Rendering.Util;
+    using Util;
 
     public class ColorManager
     {
@@ -72,7 +72,7 @@ namespace TriangleNet.Rendering
         {
             var keys = new int[length];
 
-            for (int i = 0; i < length; i++)
+            for (var i = 0; i < length; i++)
             {
                 keys[i] = i;
             }

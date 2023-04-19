@@ -7,10 +7,10 @@ namespace TriangleNet.Examples
     using System.Linq;
     using System.Threading.Tasks;
     using TriangleNet;
-    using TriangleNet.Geometry;
-    using TriangleNet.IO;
-    using TriangleNet.Meshing;
-    using TriangleNet.Meshing.Algorithm;
+    using Geometry;
+    using IO;
+    using Meshing;
+    using Meshing.Algorithm;
 
     /// <summary>
     /// Processing meshes in parallel.
@@ -32,11 +32,11 @@ namespace TriangleNet.Examples
 
             var queue = new ConcurrentQueue<int>(sizes);
 
-            int concurrencyLevel = Environment.ProcessorCount / 2;
+            var concurrencyLevel = Environment.ProcessorCount / 2;
 
             var tasks = new Task<MeshResult>[concurrencyLevel];
 
-            for (int i = 0; i < concurrencyLevel; i++)
+            for (var i = 0; i < concurrencyLevel; i++)
             {
                 tasks[i] = Task.Run(() =>
                 {
@@ -59,7 +59,7 @@ namespace TriangleNet.Examples
 
                     while (queue.Count > 0)
                     {
-                        if (queue.TryDequeue(out int size))
+                        if (queue.TryDequeue(out var size))
                         {
                             var points = Generate.RandomPoints(size, bounds);
 
@@ -77,8 +77,8 @@ namespace TriangleNet.Examples
 
             Task.WaitAll(tasks);
 
-            int numberOfTriangles = tasks.Sum(t => t.Result.NumberOfTriangles);
-            int invalid = tasks.Sum(t => t.Result.Invalid);
+            var numberOfTriangles = tasks.Sum(t => t.Result.NumberOfTriangles);
+            var invalid = tasks.Sum(t => t.Result.Invalid);
 
             Console.WriteLine("Total number of triangles processed: {0}", numberOfTriangles);
 
@@ -103,11 +103,11 @@ namespace TriangleNet.Examples
 
             var queue = new ConcurrentQueue<string>(files);
 
-            int concurrencyLevel = Environment.ProcessorCount / 2;
+            var concurrencyLevel = Environment.ProcessorCount / 2;
 
             var tasks = new Task<MeshResult>[concurrencyLevel];
 
-            for (int i = 0; i < concurrencyLevel; i++)
+            for (var i = 0; i < concurrencyLevel; i++)
             {
                 tasks[i] = Task.Run(() =>
                 {
@@ -146,8 +146,8 @@ namespace TriangleNet.Examples
 
             Task.WaitAll(tasks);
 
-            int numberOfTriangles = tasks.Sum(t => t.Result.NumberOfTriangles);
-            int invalid = tasks.Sum(t => t.Result.Invalid);
+            var numberOfTriangles = tasks.Sum(t => t.Result.NumberOfTriangles);
+            var invalid = tasks.Sum(t => t.Result.Invalid);
 
             Console.WriteLine("Total number of triangles processed: {0}", numberOfTriangles);
 
@@ -169,7 +169,7 @@ namespace TriangleNet.Examples
             }
         }
 
-        class MeshResult
+        private class MeshResult
         {
             public int NumberOfTriangles;
             public int Invalid;

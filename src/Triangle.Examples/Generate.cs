@@ -3,9 +3,9 @@ namespace TriangleNet
 {
     using System;
     using System.Collections.Generic;
-    using TriangleNet.Geometry;
+    using Geometry;
 
-    static class Generate
+    internal static class Generate
     {
         public static List<Vertex> RandomPoints(int n, Rectangle bounds)
         {
@@ -19,10 +19,10 @@ namespace TriangleNet
 
             var random = Random.Shared;
 
-            for (int i = 0; i < n; i++)
+            for (var i = 0; i < n; i++)
             {
-                double x = random.NextDouble();
-                double y = random.NextDouble();
+                var x = random.NextDouble();
+                var y = random.NextDouble();
                 points.Add(new Vertex(xmin + x * width, ymin + y * height));
             }
 
@@ -51,11 +51,11 @@ namespace TriangleNet
             double size = 0d, int label = 0)
         {
             // Horizontal and vertical step sizes.
-            double stepH = 0d;
-            double stepV = 0d;
+            var stepH = 0d;
+            var stepV = 0d;
 
-            int nH = 1;
-            int nV = 1;
+            var nH = 1;
+            var nV = 1;
 
             if (size > 0d)
             {
@@ -70,29 +70,29 @@ namespace TriangleNet
 
             var points = new List<Vertex>(2 * nH + 2 * nV);
 
-            double right = x + width;
-            double top = y + height;
+            var right = x + width;
+            var top = y + height;
 
             // Left box boundary points
-            for (int i = 0; i < nV; i++)
+            for (var i = 0; i < nV; i++)
             {
                 points.Add(new Vertex(x, y + i * stepV, label));
             }
 
             // Top box boundary points
-            for (int i = 0; i < nH; i++)
+            for (var i = 0; i < nH; i++)
             {
                 points.Add(new Vertex(x + i * stepH, top, label));
             }
 
             // Right box boundary points
-            for (int i = 0; i < nV; i++)
+            for (var i = 0; i < nV; i++)
             {
                 points.Add(new Vertex(right, top - i * stepV, label));
             }
 
             // Bottom box boundary points
-            for (int i = 0; i < nH; i++)
+            for (var i = 0; i < nH; i++)
             {
                 points.Add(new Vertex(right - i * stepH, y, label));
             }
@@ -110,13 +110,13 @@ namespace TriangleNet
         /// <returns>A circular contour.</returns>
         public static Contour Circle(double r, Point center, double h, int label = 0)
         {
-            int n = (int)(2 * Math.PI * r / h);
+            var n = (int)(2 * Math.PI * r / h);
 
             var points = new List<Vertex>(n);
 
             double x, y, dphi = 2 * Math.PI / n;
 
-            for (int i = 0; i < n; i++)
+            for (var i = 0; i < n; i++)
             {
                 x = center.X + r * Math.Cos(i * dphi);
                 y = center.Y + r * Math.Sin(i * dphi);
