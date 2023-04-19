@@ -8,8 +8,8 @@
 namespace TriangleNet
 {
     using System;
-    using TriangleNet.Geometry;
-    using TriangleNet.Tools;
+    using Geometry;
+    using Tools;
 
     /// <summary>
     /// Adaptive exact arithmetic geometric predicates.
@@ -1247,14 +1247,14 @@ namespace TriangleNet
         #region Workspace
 
         // InCircleAdapt workspace:
-        double[] fin1, fin2, abdet;
+        private double[] fin1, fin2, abdet;
 
-        double[] axbc, axxbc, aybc, ayybc, adet;
-        double[] bxca, bxxca, byca, byyca, bdet;
-        double[] cxab, cxxab, cyab, cyyab, cdet;
+        private double[] axbc, axxbc, aybc, ayybc, adet;
+        private double[] bxca, bxxca, byca, byyca, bdet;
+        private double[] cxab, cxxab, cyab, cyyab, cdet;
 
-        double[] temp8, temp16a, temp16b, temp16c;
-        double[] temp32a, temp32b, temp48, temp64;
+        private double[] temp8, temp16a, temp16b, temp16c;
+        private double[] temp32a, temp32b, temp48, temp64;
 
         private void AllocateWorkspace()
         {

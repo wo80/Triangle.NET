@@ -10,12 +10,12 @@ namespace TriangleNet.Meshing
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using TriangleNet.Geometry;
-    using TriangleNet.Topology;
-    using TriangleNet.Topology.DCEL;
+    using Geometry;
+    using Topology;
+    using Topology.DCEL;
 
-    using HVertex = TriangleNet.Topology.DCEL.Vertex;
-    using TVertex = TriangleNet.Geometry.Vertex;
+    using HVertex = Topology.DCEL.Vertex;
+    using TVertex = Geometry.Vertex;
 
     /// <summary>
     /// The Converter class provides methods for mesh reconstruction and conversion.
@@ -27,7 +27,7 @@ namespace TriangleNet.Meshing
         /// <summary>
         /// Gets the <see cref="Converter"/> instance.
         /// </summary>
-        public static Converter Instance { get { return lazy.Value; } }
+        public static Converter Instance => lazy.Value;
 
         private Converter()
         {
@@ -46,13 +46,15 @@ namespace TriangleNet.Meshing
         /// <summary>
         /// Reconstruct a triangulation from its raw data representation.
         /// </summary>
-        public Mesh ToMesh(Polygon polygon, ITriangle[] triangles, Configuration config = null)
+        public Mesh ToMesh(Polygon polygon, ITriangle[] triangles, Configuration? config = null)
         {
-            Otri tri = default(Otri);
-            Osub subseg = default(Osub);
+            if (triangles is null) throw new ArgumentNullException(nameof(triangles));
 
-            int elements = triangles == null ? 0 : triangles.Length;
-            int segments = polygon.Segments.Count;
+            var tri = default(Otri);
+            var subseg = default(Osub);
+
+            var elements = triangles.Length;
+            var segments = polygon.Segments.Count;
 
             var mesh = new Mesh(config ?? new Configuration(), polygon.Points);
 
@@ -66,7 +68,7 @@ namespace TriangleNet.Meshing
             }
 
             // Create the triangles.
-            for (int i = 0; i < elements; i++)
+            for (var i = 0; i < elements; i++)
             {
                 mesh.MakeTriangle(ref tri);
             }
@@ -76,7 +78,7 @@ namespace TriangleNet.Meshing
                 mesh.insegments = segments;
 
                 // Create the subsegments.
-                for (int i = 0; i < segments; i++)
+                for (var i = 0; i < segments; i++)
                 {
                     mesh.MakeSegment(ref subseg);
                 }
@@ -95,14 +97,14 @@ namespace TriangleNet.Meshing
         /// </summary>
         private List<Otri>[] SetNeighbors(Mesh mesh, ITriangle[] triangles)
         {
-            Otri tri = default(Otri);
-            Otri triangleleft = default(Otri);
-            Otri checktri = default(Otri);
-            Otri checkleft = default(Otri);
+            var tri = default(Otri);
+            var triangleleft = default(Otri);
+            var checktri = default(Otri);
+            var checkleft = default(Otri);
             Otri nexttri;
             TVertex tdest, tapex;
             TVertex checkdest, checkapex;
-            int[] corner = new int[3];
+            var corner = new int[3];
             int aroundvertex;
             int i;
 
@@ -112,7 +114,7 @@ namespace TriangleNet.Meshing
             // Each vertex is initially unrepresented.
             for (i = 0; i < mesh.vertices.Count; i++)
             {
-                Otri tmp = default(Otri);
+                var tmp = default(Otri);
                 tmp.tri = mesh.dummytri;
                 vertexarray[i] = new List<Otri>(3);
                 vertexarray[i].Add(tmp);
@@ -127,7 +129,7 @@ namespace TriangleNet.Meshing
                 tri.tri = item;
 
                 // Copy the triangle's three corners.
-                for (int j = 0; j < 3; j++)
+                for (var j = 0; j < 3; j++)
                 {
                     corner[j] = triangles[i].GetVertexID(j);
 
@@ -159,7 +161,7 @@ namespace TriangleNet.Meshing
                     // Take the number for the origin of triangleloop.
                     aroundvertex = corner[tri.orient];
 
-                    int index = vertexarray[aroundvertex].Count - 1;
+                    var index = vertexarray[aroundvertex].Count - 1;
 
                     // Look for other triangles having this vertex.
                     nexttri = vertexarray[aroundvertex][index];
@@ -212,11 +214,11 @@ namespace TriangleNet.Meshing
         /// </summary>
         private void SetSegments(Mesh mesh, Polygon polygon, List<Otri>[] vertexarray)
         {
-            Otri checktri = default(Otri);
+            var checktri = default(Otri);
             Otri nexttri; // Triangle
             TVertex checkdest;
-            Otri checkneighbor = default(Otri);
-            Osub subseg = default(Osub);
+            var checkneighbor = default(Otri);
+            var subseg = default(Osub);
             Otri prevlink; // Triangle
 
             TVertex tmp;
@@ -229,7 +231,7 @@ namespace TriangleNet.Meshing
             int aroundvertex;
             int i;
 
-            int hullsize = 0;
+            var hullsize = 0;
 
             // Prepare to count the boundary edges.
             if (mesh.behavior.Poly)
@@ -264,7 +266,7 @@ namespace TriangleNet.Meshing
                         // Take the number for the destination of subsegloop.
                         aroundvertex = subseg.orient == 1 ? sorg.id : sdest.id;
 
-                        int index = vertexarray[aroundvertex].Count - 1;
+                        var index = vertexarray[aroundvertex].Count - 1;
 
                         // Look for triangles having this vertex.
                         prevlink = vertexarray[aroundvertex][index];
@@ -321,7 +323,7 @@ namespace TriangleNet.Meshing
             for (i = 0; i < mesh.vertices.Count; i++)
             {
                 // Search the stack of triangles adjacent to a vertex.
-                int index = vertexarray[i].Count - 1;
+                var index = vertexarray[i].Count - 1;
                 nexttri = vertexarray[i][index];
                 checktri = nexttri;
 
@@ -393,7 +395,7 @@ namespace TriangleNet.Meshing
                 map[t.id] = new List<HalfEdge>(3);
             }
 
-            Otri tri = default(Otri), neighbor = default(Otri);
+            Otri tri = default, neighbor = default;
             TVertex org, dest;
 
             int id, nid, count = mesh.triangles.Count;
@@ -403,7 +405,7 @@ namespace TriangleNet.Meshing
             var edges = dcel.HalfEdges;
 
             // Count half-edges (edge ids).
-            int k = 0;
+            var k = 0;
 
             // Maps a vertex to its leaving boundary edge.
             var boundary = new Dictionary<int, HalfEdge>();
@@ -414,7 +416,7 @@ namespace TriangleNet.Meshing
 
                 tri.tri = t;
 
-                for (int i = 0; i < 3; i++)
+                for (var i = 0; i < 3; i++)
                 {
                     tri.orient = i;
                     tri.Sym(ref neighbor);
@@ -445,8 +447,8 @@ namespace TriangleNet.Meshing
                         }
 
                         // Set leaving edges.
-                        edge.origin.leaving = edge;
-                        twin.origin.leaving = twin;
+                        edge.origin.Leaving = edge;
+                        twin.origin.Leaving = twin;
 
                         // Set twin edges.
                         edge.twin = twin;

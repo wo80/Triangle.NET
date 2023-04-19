@@ -2,7 +2,7 @@
 namespace TriangleNet.Geometry
 {
     using System;
-    using TriangleNet.Meshing;
+    using Meshing;
 
     /// <summary>
     /// Extension methods.
@@ -96,15 +96,15 @@ namespace TriangleNet.Geometry
             var t2 = triangle.GetVertex(2);
 
             // TODO: no need to create new Point instances here
-            Point d0 = new Point(t1.X - t0.X, t1.Y - t0.Y);
-            Point d1 = new Point(t2.X - t0.X, t2.Y - t0.Y);
-            Point d2 = new Point(x - t0.X, y - t0.Y);
+            var d0 = new Point(t1.X - t0.X, t1.Y - t0.Y);
+            var d1 = new Point(t2.X - t0.X, t2.Y - t0.Y);
+            var d2 = new Point(x - t0.X, y - t0.Y);
 
             // crossproduct of (0, 0, 1) and d0
-            Point c0 = new Point(-d0.Y, d0.X);
+            var c0 = new Point(-d0.Y, d0.X);
 
             // crossproduct of (0, 0, 1) and d1
-            Point c1 = new Point(-d1.Y, d1.X);
+            var c1 = new Point(-d1.Y, d1.X);
 
             // Linear combination d2 = s * d0 + v * d1.
             //
@@ -114,8 +114,8 @@ namespace TriangleNet.Geometry
             // s = d2 * c1 / d0 * c1
             // v = d2 * c0 / d1 * c0
 
-            double s = DotProduct(d2, c1) / DotProduct(d0, c1);
-            double v = DotProduct(d2, c0) / DotProduct(d1, c0);
+            var s = DotProduct(d2, c1) / DotProduct(d0, c1);
+            var v = DotProduct(d2, c0) / DotProduct(d1, c0);
 
             if (s >= 0 && v >= 0 && ((s + v) <= 1))
             {
@@ -135,7 +135,7 @@ namespace TriangleNet.Geometry
         {
             var bounds = new Rectangle();
 
-            for (int i = 0; i < 3; i++)
+            for (var i = 0; i < 3; i++)
             {
                 bounds.Expand(triangle.GetVertex(i));
             }

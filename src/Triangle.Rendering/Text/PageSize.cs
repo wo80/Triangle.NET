@@ -16,47 +16,24 @@ namespace TriangleNet.Rendering.Text
         public static readonly PageSize LETTER = new PageSize(8.5f * MM_PER_INCH, 11.0f * MM_PER_INCH);
         public static readonly PageSize LEGAL = new PageSize(8.5f * MM_PER_INCH, 14.0f * MM_PER_INCH);
 
-        private float left;
-        private float top;
-        private float right;
-        private float bottom;
+        public float X { get; private set; }
 
-        public float X
-        {
-            get { return left; }
-        }
+        public float Y { get; private set; }
 
-        public float Y
-        {
-            get { return top; }
-        }
+        public float Width => Right - X;
 
-        public float Width
-        {
-            get { return right - left; }
-        }
+        public float Height => Bottom - Y;
 
-        public float Height
-        {
-            get { return bottom - top; }
-        }
+        public float Right { get; private set; }
 
-        public float Right
-        {
-            get { return right; }
-        }
-
-        public float Bottom
-        {
-            get { return bottom; }
-        }
+        public float Bottom { get; private set; }
 
         public PageSize(float left, float top, float right, float bottom)
         {
-            this.left = left;
-            this.top = top;
-            this.right = right;
-            this.bottom = bottom;
+            this.X = left;
+            this.Y = top;
+            this.Right = right;
+            this.Bottom = bottom;
         }
 
         public PageSize(float width, float height)
@@ -71,11 +48,11 @@ namespace TriangleNet.Rendering.Text
 
         public void Expand(float dx, float dy)
         {
-            left -= dx;
-            top -= dy;
+            X -= dx;
+            Y -= dy;
 
-            right += dx;
-            bottom += dy;
+            Right += dx;
+            Bottom += dy;
         }
     }
 }

@@ -8,10 +8,10 @@ using System;
 
 namespace TriangleNet.Smoothing
 {
-    using TriangleNet.Geometry;
-    using TriangleNet.Meshing;
-    using TriangleNet.Topology.DCEL;
-    using TriangleNet.Voronoi;
+    using Geometry;
+    using Meshing;
+    using Topology.DCEL;
+    using Voronoi;
 
     /// <summary>
     /// Simple mesh smoother implementation (Lloyd's relaxation algorithm).
@@ -22,13 +22,12 @@ namespace TriangleNet.Smoothing
     /// </remarks>
     public class SimpleSmoother
     {
+        private TrianglePool pool;
+        private Configuration config;
 
-        TrianglePool pool;
-        Configuration config;
+        private IVoronoiFactory factory;
 
-        IVoronoiFactory factory;
-
-        ConstraintOptions options;
+        private ConstraintOptions options;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SimpleSmoother" /> class.
@@ -44,13 +43,13 @@ namespace TriangleNet.Smoothing
         public SimpleSmoother(IVoronoiFactory factory)
         {
             this.factory = factory;
-            this.pool = new TrianglePool();
+            pool = new TrianglePool();
 
-            this.config = new Configuration(
+            config = new Configuration(
                 () => RobustPredicates.Default,
                 () => pool.Restart());
 
-            this.options = new ConstraintOptions() { ConformingDelaunay = true };
+            options = new ConstraintOptions() { ConformingDelaunay = true };
         }
 
         /// <summary>
@@ -63,7 +62,7 @@ namespace TriangleNet.Smoothing
             this.factory = factory;
             this.config = config;
 
-            this.options = new ConstraintOptions() { ConformingDelaunay = true };
+            options = new ConstraintOptions() { ConformingDelaunay = true };
         }
 
         /// <summary>
@@ -93,7 +92,7 @@ namespace TriangleNet.Smoothing
             var predicates = config.Predicates();
 
             // The smoother should respect the mesh segment splitting behavior.
-            this.options.SegmentSplitting = smoothedMesh.behavior.NoBisect;
+            options.SegmentSplitting = smoothedMesh.behavior.NoBisect;
 
             // The maximum distances moved from any site at the previous and
             // current iterations.
@@ -103,7 +102,7 @@ namespace TriangleNet.Smoothing
             // Take a few smoothing rounds (Lloyd's algorithm). The stop
             // criteria are the maximum number of iterations and the convergence
             // criterion.
-            int i = 1;
+            var i = 1;
             while (i < limit && Math.Abs(currMax - prevMax) > tol * currMax)
             {
                 prevMax = currMax;

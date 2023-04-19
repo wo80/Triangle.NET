@@ -8,8 +8,8 @@
 namespace TriangleNet.Meshing.Data
 {
     using System;
-    using TriangleNet.Geometry;
-    using TriangleNet.Topology;
+    using Geometry;
+    using Topology;
 
     /// <summary>
     /// A queue used to store bad triangles.
@@ -19,7 +19,7 @@ namespace TriangleNet.Meshing.Data
     /// Each triangle's vertices are stored so that one can check whether a
     /// triangle is still the same.
     /// </remarks>
-    class BadTriangle
+    internal class BadTriangle
     {
         public Otri poortri; // A skinny or too-large triangle.
         public double key; // cos^2 of smallest (apical) angle.

@@ -23,7 +23,7 @@ namespace TriangleNet.Geometry
         /// </summary>
         public double Area
         {
-            get { return area; }
+            get => area;
             set
             {
                 if (value < 0.0)
@@ -54,7 +54,7 @@ namespace TriangleNet.Geometry
         /// <param name="area">Area constraint.</param>
         public RegionPointer(double x, double y, int id, double area)
         {
-            this.point = new Point(x, y);
+            point = new Point(x, y);
             this.id = id;
             this.area = area;
         }

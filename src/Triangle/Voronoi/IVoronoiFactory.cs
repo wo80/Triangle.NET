@@ -1,7 +1,7 @@
 ﻿
 namespace TriangleNet.Voronoi
 {
-    using TriangleNet.Topology.DCEL;
+    using Topology.DCEL;
 
     /// <summary>
     /// Factory for Voronoi DCEL datastructure.

@@ -51,12 +51,12 @@ namespace TriangleNet.Tests.Geometry
             var h = poly.Holes[0];
             var p = RobustPredicates.Default;
 
-            int count = points.Count;
-            int i = count - 1;
+            var count = points.Count;
+            var i = count - 1;
 
-            for (int j = 0; j < count; j++)
+            for (var j = 0; j < count; j++)
             {
-                double ccw = p.CounterClockwise(points[i], h, points[j]);
+                var ccw = p.CounterClockwise(points[i], h, points[j]);
 
                 Assert.Greater(Math.Abs(ccw), 1e-12);
 

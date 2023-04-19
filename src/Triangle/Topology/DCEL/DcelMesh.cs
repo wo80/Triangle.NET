@@ -7,22 +7,13 @@
 namespace TriangleNet.Topology.DCEL
 {
     using System.Collections.Generic;
-    using TriangleNet.Geometry;
+    using Geometry;
 
     /// <summary>
     /// DCEL mesh.
     /// </summary>
     public class DcelMesh
     {
-        /// <summary>List of vertices.</summary>
-        protected List<Vertex> vertices;
-        
-        /// <summary>List of half-edges.</summary>
-        protected List<HalfEdge> edges;
-
-        /// <summary>List of faces.</summary>
-        protected List<Face> faces;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="DcelMesh" /> class.
         /// </summary>
@@ -39,43 +30,33 @@ namespace TriangleNet.Topology.DCEL
         {
             if (initialize)
             {
-                vertices = new List<Vertex>();
-                edges = new List<HalfEdge>();
-                faces = new List<Face>();
+                Vertices.Clear();
+                edges.Clear();
+                Faces.Clear();
             }
         }
 
         /// <summary>
         /// Gets the vertices of the Voronoi diagram.
         /// </summary>
-        public List<Vertex> Vertices
-        {
-            get { return vertices; }
-        }
+        public List<Vertex> Vertices { get; set; } = new();
 
         /// <summary>
         /// Gets the list of half-edges specify the Voronoi diagram topology.
         /// </summary>
-        public List<HalfEdge> HalfEdges
-        {
-            get { return edges; }
-        }
+        public List<HalfEdge> HalfEdges { get; set; } = new();
 
+        protected List<HalfEdge> edges = new();
+        
         /// <summary>
         /// Gets the faces of the Voronoi diagram.
         /// </summary>
-        public List<Face> Faces
-        {
-            get { return faces; }
-        }
+        public List<Face> Faces { get; set; } = new();
 
         /// <summary>
         /// Gets the collection of edges of the Voronoi diagram.
         /// </summary>
-        public IEnumerable<IEdge> Edges
-        {
-            get { return EnumerateEdges(); }
-        }
+        public IEnumerable<IEdge> Edges => EnumerateEdges();
 
         /// <summary>
         /// Check if the DCEL is consistent.
@@ -93,14 +74,14 @@ namespace TriangleNet.Topology.DCEL
         public virtual bool IsConsistent(bool closed = true, int depth = 0)
         {
             // Check vertices for null pointers.
-            foreach (var vertex in vertices)
+            foreach (var vertex in Vertices)
             {
                 if (vertex.id < 0)
                 {
                     continue;
                 }
 
-                if (vertex.leaving == null)
+                if (vertex.Leaving == null)
                 {
                     return false;
                 }
@@ -112,7 +93,7 @@ namespace TriangleNet.Topology.DCEL
             }
 
             // Check faces for null pointers.
-            foreach (var face in faces)
+            foreach (var face in Faces)
             {
                 if (face.ID < 0)
                 {
@@ -133,6 +114,8 @@ namespace TriangleNet.Topology.DCEL
             // Check half-edges for null pointers.
             foreach (var edge in edges)
             {
+                if (edge is null) continue;
+                
                 if (edge.id < 0)
                 {
                     continue;
@@ -192,7 +175,7 @@ namespace TriangleNet.Topology.DCEL
             if (closed && depth > 0)
             {
                 // Check if faces are closed.
-                foreach (var face in faces)
+                foreach (var face in Faces)
                 {
                     if (face.id < 0)
                     {
@@ -200,10 +183,12 @@ namespace TriangleNet.Topology.DCEL
                     }
 
                     var edge = face.edge;
+                    if (edge is null) continue;
+
                     var next = edge.next;
 
-                    int id = edge.id;
-                    int k = 0;
+                    var id = edge.id;
+                    var k = 0;
 
                     while (next.id != id && k < depth)
                     {
@@ -234,9 +219,9 @@ namespace TriangleNet.Topology.DCEL
             var map = new Dictionary<int, HalfEdge>();
 
             // TODO: parallel?
-            foreach (var edge in this.edges)
+            foreach (var edge in edges)
             {
-                if (edge.twin == null)
+                if (edge.twin is null)
                 {
                     var twin = edge.twin = new HalfEdge(edge.next.origin, Face.Empty);
                     twin.twin = edge;
@@ -245,14 +230,14 @@ namespace TriangleNet.Topology.DCEL
                 }
             }
 
-            int j = edges.Count;
+            var j = edges.Count;
 
             foreach (var edge in map.Values)
             {
                 edge.id = j++;
                 edge.next = map[edge.twin.origin.id];
 
-                this.edges.Add(edge);
+                edges.Add(edge);
             }
         }
 

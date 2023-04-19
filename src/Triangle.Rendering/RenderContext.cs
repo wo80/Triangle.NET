@@ -3,19 +3,16 @@ namespace TriangleNet.Rendering
 {
     using System.Collections.Generic;
     using System.Linq;
-    using TriangleNet.Geometry;
-    using TriangleNet.Meshing;
-    using TriangleNet.Rendering.Buffer;
+    using Geometry;
+    using Meshing;
+    using Buffer;
 
     /// <summary>
     /// The RenderContext class brings all the rendering parts together.
     /// </summary>
     public class RenderContext : IRenderContext
     {
-        private ColorManager colorManager;
-        private Projection zoom;
         private Rectangle bounds;
-        private IMesh mesh;
 
         private List<IRenderLayer> renderLayers;
 
@@ -35,21 +32,21 @@ namespace TriangleNet.Rendering
             RenderLayers[2].IsEnabled = true;
             RenderLayers[3].IsEnabled = true;
 
-            this.zoom = zoom;
-            this.colorManager = colorManager;
+            this.Zoom = zoom;
+            this.ColorManager = colorManager;
         }
 
         /// <inheritdoc />
-        public ColorManager ColorManager => colorManager;
+        public ColorManager ColorManager { get; }
 
         /// <inheritdoc />
         public IList<IRenderLayer> RenderLayers => renderLayers;
 
         /// <inheritdoc />
-        public Projection Zoom => zoom;
+        public Projection Zoom { get; }
 
         /// <inheritdoc />
-        public IMesh Mesh => mesh;
+        public IMesh Mesh { get; private set; }
 
         /// <inheritdoc />
         public bool HasData => renderLayers.Any(layer => !layer.IsEmpty());
@@ -65,7 +62,7 @@ namespace TriangleNet.Rendering
             // Always clear Voronoi layer.
             RenderLayers[4].Reset(true);
 
-            int i = 0;
+            var i = 0;
 
             // Ensure linear numbering of polygon vertices.
             foreach (var p in data.Points)
@@ -75,7 +72,7 @@ namespace TriangleNet.Rendering
 
             bounds = data.Bounds();
 
-            zoom.Initialize(bounds);
+            Zoom.Initialize(bounds);
 
             RenderLayers[2].SetPoints(VertexBuffer.Create(data.Points, bounds));
             RenderLayers[2].SetIndices(IndexBuffer.Create(data.Segments, 2));
@@ -95,13 +92,13 @@ namespace TriangleNet.Rendering
             RenderLayers[4].Reset(true);
 
             // Save reference to mesh.
-            mesh = data;
+            Mesh = data;
             bounds = data.Bounds;
 
             // Ensure linear numbering of vertices.
-            mesh.Renumber();
+            Mesh.Renumber();
 
-            zoom.Initialize(bounds);
+            Zoom.Initialize(bounds);
 
             RenderLayers[1].SetPoints(VertexBuffer.Create(data.Vertices, bounds));
             RenderLayers[1].SetIndices(IndexBuffer.Create(data.Edges, 2));
@@ -125,8 +122,8 @@ namespace TriangleNet.Rendering
         {
             // Add function values for filled mesh.
             RenderLayers[0].SetPoints(RenderLayers[1].Points);
-            RenderLayers[0].SetIndices(IndexBuffer.Create(mesh.Triangles, 3));
-            RenderLayers[0].AttachLayerData(data, colorManager.ColorMap);
+            RenderLayers[0].SetIndices(IndexBuffer.Create(Mesh.Triangles, 3));
+            RenderLayers[0].AttachLayerData(data, ColorManager.ColorMap);
 
             RenderLayers[0].IsEnabled = true;
         }
@@ -136,7 +133,7 @@ namespace TriangleNet.Rendering
         {
             // Add partition data for filled mesh.
             RenderLayers[0].SetPoints(RenderLayers[1].Points);
-            RenderLayers[0].SetIndices(IndexBuffer.Create(mesh.Triangles, 3));
+            RenderLayers[0].SetIndices(IndexBuffer.Create(Mesh.Triangles, 3));
             RenderLayers[0].AttachLayerData(data);
 
             RenderLayers[0].IsEnabled = true;

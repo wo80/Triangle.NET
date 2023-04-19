@@ -7,7 +7,7 @@
 namespace TriangleNet.IO
 {
     using System.IO;
-    using TriangleNet.Geometry;
+    using Geometry;
 
     /// <summary>
     /// Interface for geometry input.

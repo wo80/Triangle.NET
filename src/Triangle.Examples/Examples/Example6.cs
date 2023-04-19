@@ -3,10 +3,10 @@ namespace TriangleNet.Examples
 {
     using System.Collections.Generic;
     using TriangleNet;
-    using TriangleNet.Geometry;
-    using TriangleNet.Meshing;
-    using TriangleNet.Meshing.Iterators;
-    using TriangleNet.Rendering.Text;
+    using Geometry;
+    using Meshing;
+    using Meshing.Iterators;
+    using Rendering.Text;
 
     /// <summary>
     /// Two ways finding boundary triangles.
@@ -41,9 +41,9 @@ namespace TriangleNet.Examples
 
             foreach (var s in mesh.Segments)
             {
-                int label = s.Label;
+                var label = s.Label;
 
-                for (int i = 0; i < 2; i++)
+                for (var i = 0; i < 2; i++)
                 {
                     var vertex = s.GetVertex(i);
 
@@ -81,7 +81,7 @@ namespace TriangleNet.Examples
 
             foreach (var vertex in mesh.Vertices)
             {
-                int label = vertex.Label;
+                var label = vertex.Label;
 
                 if (label > 0)
                 {

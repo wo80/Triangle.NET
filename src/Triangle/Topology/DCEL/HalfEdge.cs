@@ -14,18 +14,18 @@ namespace TriangleNet.Topology.DCEL
         internal int id;
         internal int mark;
 
-        internal Vertex origin;
-        internal Face face;
-        internal HalfEdge twin;
-        internal HalfEdge next;
+        internal Vertex? origin;
+        internal Face? face;
+        internal HalfEdge? twin;
+        internal HalfEdge? next;
 
         /// <summary>
         /// Gets or sets the half-edge id.
         /// </summary>
         public int ID
         {
-            get { return id; }
-            set { id = value; }
+            get => id;
+            set => id = value;
         }
 
         /// <summary>
@@ -33,44 +33,44 @@ namespace TriangleNet.Topology.DCEL
         /// </summary>
         public int Boundary
         {
-            get { return mark; }
-            set { mark = value; }
+            get => mark;
+            set => mark = value;
         }
 
         /// <summary>
         /// Gets or sets the origin of the half-edge.
         /// </summary>
-        public Vertex Origin
+        public Vertex? Origin
         {
-            get { return origin; }
-            set { origin = value; }
+            get => origin;
+            set => origin = value;
         }
 
         /// <summary>
         /// Gets or sets the face connected to the half-edge.
         /// </summary>
-        public Face Face
+        public Face? Face
         {
-            get { return face; }
-            set { face = value; }
+            get => face;
+            set => face = value;
         }
 
         /// <summary>
         /// Gets or sets the twin of the half-edge.
         /// </summary>
-        public HalfEdge Twin
+        public HalfEdge? Twin
         {
-            get { return twin; }
-            set { twin = value; }
+            get => twin;
+            set => twin = value;
         }
 
         /// <summary>
         /// Gets or sets the next pointer of the half-edge.
         /// </summary>
-        public HalfEdge Next
+        public HalfEdge? Next
         {
-            get { return next; }
-            set { next = value; }
+            get => next;
+            set => next = value;
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace TriangleNet.Topology.DCEL
         /// </summary>
         /// <param name="origin">The origin of this half-edge.</param>
         /// <param name="face">The face connected to this half-edge.</param>
-        public HalfEdge(Vertex origin, Face face)
+        public HalfEdge(Vertex origin, Face? face)
         {
             this.origin = origin;
             this.face = face;
@@ -100,9 +100,6 @@ namespace TriangleNet.Topology.DCEL
         }
 
         /// <inheritdoc />
-        public override string ToString()
-        {
-            return string.Format("HE-ID {0} (Origin = VID-{1})", id, origin.id);
-        }
+        public override string ToString() => $"HE-ID {id} (Origin = VID-{origin?.id})";
     }
 }

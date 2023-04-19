@@ -1,9 +1,9 @@
 ﻿
 namespace TriangleNet.Examples
 {
-    using TriangleNet.Geometry;
-    using TriangleNet.Meshing.Algorithm;
-    using TriangleNet.Rendering.Text;
+    using Geometry;
+    using Meshing.Algorithm;
+    using Rendering.Text;
 
     /// <summary>
     /// Simple point set triangulation.

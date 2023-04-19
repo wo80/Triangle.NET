@@ -10,9 +10,9 @@ namespace TriangleNet.Rendering.Text
     using System.Collections.Generic;
     using System.IO;
     using System.Text;
-    using TriangleNet.Geometry;
-    using TriangleNet.Meshing;
-    using TriangleNet.Meshing.Iterators;
+    using Geometry;
+    using Meshing;
+    using Meshing.Iterators;
 
     /// <summary>
     /// Writes a mesh to an SVG file.
@@ -22,7 +22,7 @@ namespace TriangleNet.Rendering.Text
         // Iterations to insert a line break in SVG path.
         private const int LINEBREAK_COUNT = 10;
 
-        float scale = 1f;
+        private float scale = 1f;
 
         /// <summary>
         /// Exports a mesh to SVG format.
@@ -67,37 +67,35 @@ namespace TriangleNet.Rendering.Text
 
             var bounds = mesh.Bounds;
 
-            float margin = 0.05f * (float)bounds.Width;
+            var margin = 0.05f * (float)bounds.Width;
 
             scale = width / ((float)bounds.Width + 2 * margin);
 
-            int x_offset = -(int)((bounds.Left - margin) * scale - 0.5);
-            int y_offset = (int)((bounds.Top + margin) * scale + 0.5);
+            var x_offset = -(int)((bounds.Left - margin) * scale - 0.5);
+            var y_offset = (int)((bounds.Top + margin) * scale + 0.5);
 
-            int height = (int)((bounds.Height + 2 * margin) * scale + 0.5);
+            var height = (int)((bounds.Height + 2 * margin) * scale + 0.5);
 
-            using (var svg = new FormattingStreamWriter(filename))
+            using var svg = new FormattingStreamWriter(filename);
+            svg.WriteLine("<svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\"");
+            svg.WriteLine("\twidth=\"{0}px\" height=\"{1}px\"", width, height);
+            svg.WriteLine("\tviewBox=\"0 0 {0} {1}\">", width, height);
+
+            svg.WriteLine("<g transform=\"translate({0}, {1}) scale(1,-1)\">", x_offset, y_offset);
+
+            DrawTriangles(svg, mesh, regions, false);
+            //DrawEdges(svg, mesh);
+
+            DrawSegments(svg, mesh);
+
+            if (points)
             {
-                svg.WriteLine("<svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\"");
-                svg.WriteLine("\twidth=\"{0}px\" height=\"{1}px\"", width, height);
-                svg.WriteLine("\tviewBox=\"0 0 {0} {1}\">", width, height);
-
-                svg.WriteLine("<g transform=\"translate({0}, {1}) scale(1,-1)\">", x_offset, y_offset);
-
-                DrawTriangles(svg, mesh, regions, false);
-                //DrawEdges(svg, mesh);
-
-                DrawSegments(svg, mesh);
-
-                if (points)
-                {
-                    DrawPoints(svg, mesh, false);
-                }
-
-                svg.WriteLine("</g>");
-
-                svg.WriteLine("</svg>");
+                DrawPoints(svg, mesh, false);
             }
+
+            svg.WriteLine("</g>");
+
+            svg.WriteLine("</svg>");
         }
 
         private void DrawTriangles(StreamWriter svg, IMesh mesh, bool regions, bool label)
@@ -110,7 +108,7 @@ namespace TriangleNet.Rendering.Text
             Vertex v1, v2, v3;
             double x1, y1, x2, y2, x3, y3, xa, ya;
 
-            int i = 1;
+            var i = 1;
 
             edges.Append("\t<path d=\"");
 
@@ -195,7 +193,7 @@ namespace TriangleNet.Rendering.Text
             Vertex v1, v2;
             double x1, y1, x2, y2;
 
-            int i = 1;
+            var i = 1;
 
             foreach (var e in EdgeIterator.EnumerateEdges(mesh))
             {
@@ -228,7 +226,7 @@ namespace TriangleNet.Rendering.Text
 
             double x1, y1, x2, y2;
 
-            int i = 1;
+            var i = 1;
 
             foreach (var seg in mesh.Segments)
             {
@@ -254,9 +252,9 @@ namespace TriangleNet.Rendering.Text
 
         private void DrawPoints(StreamWriter svg, IMesh mesh, bool label)
         {
-            int n = mesh.Vertices.Count;
+            var n = mesh.Vertices.Count;
 
-            float circle_size = 1.5f;
+            var circle_size = 1.5f;
 
             if (n < 100)
             {

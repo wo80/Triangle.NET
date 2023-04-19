@@ -8,8 +8,8 @@
 namespace TriangleNet.Meshing.Data
 {
     using System;
-    using TriangleNet.Geometry;
-    using TriangleNet.Topology;
+    using Geometry;
+    using Topology;
 
     /// <summary>
     /// A queue used to store encroached subsegments.
@@ -18,7 +18,7 @@ namespace TriangleNet.Meshing.Data
     /// Each subsegment's vertices are stored so that we can check whether a 
     /// subsegment is still the same.
     /// </remarks>
-    class BadSubseg
+    internal class BadSubseg
     {
         public Osub subseg; // An encroached subsegment.
         public Vertex org, dest; // Its two vertices.

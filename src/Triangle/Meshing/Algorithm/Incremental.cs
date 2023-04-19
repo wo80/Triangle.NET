@@ -8,15 +8,15 @@
 namespace TriangleNet.Meshing.Algorithm
 {
     using System.Collections.Generic;
-    using TriangleNet.Topology;
-    using TriangleNet.Geometry;
+    using Topology;
+    using Geometry;
 
     /// <summary>
     /// Builds a delaunay triangulation using the incremental algorithm.
     /// </summary>
     public class Incremental : ITriangulator
     {
-        Mesh mesh;
+        private Mesh mesh;
 
         /// <summary>
         /// Compute a Delaunay triangulation by incrementally inserting vertices.
@@ -26,7 +26,7 @@ namespace TriangleNet.Meshing.Algorithm
         {
             mesh = new Mesh(config, points);
 
-            Otri starttri = new Otri();
+            var starttri = new Otri();
 
             // Create a triangular bounding box.
             GetBoundingBox();
@@ -34,7 +34,7 @@ namespace TriangleNet.Meshing.Algorithm
             foreach (var v in mesh.vertices.Values)
             {
                 starttri.tri = mesh.dummytri;
-                Osub tmp = default(Osub);
+                var tmp = default(Osub);
                 if (mesh.InsertVertex(v, ref starttri, ref tmp, false, false) == InsertVertexResult.Duplicate)
                 {
                     if (Log.Verbose)
@@ -61,13 +61,13 @@ namespace TriangleNet.Meshing.Algorithm
         /// used by the point location routines, but (mostly) ignored by the
         /// Delaunay edge flip routines.
         /// </remarks>
-        void GetBoundingBox()
+        private void GetBoundingBox()
         {
-            Otri inftri = default(Otri); // Handle for the triangular bounding box.
-            Rectangle box = mesh.bounds;
+            var inftri = default(Otri); // Handle for the triangular bounding box.
+            var box = mesh.bounds;
 
             // Find the width (or height, whichever is larger) of the triangulation.
-            double width = box.Width;
+            var width = box.Width;
             if (box.Height > width)
             {
                 width = box.Height;
@@ -103,16 +103,16 @@ namespace TriangleNet.Meshing.Algorithm
         /// the three bounding box vertices (one triangle for each edge of the
         /// convex hull of the inner mesh).  This routine removes these triangles.
         /// </remarks>
-        int RemoveBox()
+        private int RemoveBox()
         {
-            Otri deadtriangle = default(Otri);
-            Otri searchedge = default(Otri);
-            Otri checkedge = default(Otri);
-            Otri nextedge = default(Otri), finaledge = default(Otri), dissolveedge = default(Otri);
+            var deadtriangle = default(Otri);
+            var searchedge = default(Otri);
+            var checkedge = default(Otri);
+            Otri nextedge = default, finaledge = default, dissolveedge = default;
             Vertex markorg;
             int hullsize;
 
-            bool noPoly = !mesh.behavior.Poly;
+            var noPoly = !mesh.behavior.Poly;
 
             // Find a boundary triangle.
             nextedge.tri = mesh.dummytri;

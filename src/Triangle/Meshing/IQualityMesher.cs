@@ -1,7 +1,7 @@
 ﻿
 namespace TriangleNet.Meshing
 {
-    using TriangleNet.Geometry;
+    using Geometry;
 
     /// <summary>
     /// Interface for polygon triangulation with quality constraints.

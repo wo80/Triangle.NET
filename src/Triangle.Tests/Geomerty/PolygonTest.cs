@@ -6,7 +6,7 @@ namespace TriangleNet.Tests.Geometry
     public class PolygonTest
     {
         // The vertices  that define the polygon contour (triangle shape).
-        Vertex[] vertices = new Vertex[]
+        private Vertex[] vertices = new Vertex[]
         {
                 new Vertex(0d, 0d),
                 new Vertex(2d ,0d),

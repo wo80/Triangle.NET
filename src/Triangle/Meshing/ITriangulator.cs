@@ -2,7 +2,7 @@
 namespace TriangleNet.Meshing
 {
     using System.Collections.Generic;
-    using TriangleNet.Geometry;
+    using Geometry;
 
     /// <summary>
     /// Interface for point set triangulation.

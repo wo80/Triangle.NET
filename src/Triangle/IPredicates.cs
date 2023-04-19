@@ -1,7 +1,7 @@
 ﻿
 namespace TriangleNet
 {
-    using TriangleNet.Geometry;
+    using Geometry;
 
     /// <summary>
     /// Geometric predicates interface.
@@ -65,7 +65,6 @@ namespace TriangleNet
         /// <param name="eta">Relative coordinate of new location.</param>
         /// <param name="offconstant">Off-center constant.</param>
         /// <returns>Coordinates of the circumcenter (or off-center)</returns>
-        Point FindCircumcenter(Point org, Point dest, Point apex, ref double xi, ref double eta,
-            double offconstant);
+        Point FindCircumcenter(Point org, Point dest, Point apex, ref double xi, ref double eta, double offconstant);
     }
 }

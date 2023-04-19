@@ -7,7 +7,7 @@
 namespace TriangleNet.IO
 {
     using System;
-    using TriangleNet.Geometry;
+    using Geometry;
 
     /// <summary>
     /// Simple triangle class for input.
@@ -31,22 +31,22 @@ namespace TriangleNet.IO
         /// <inheritdoc/>
         public int ID
         {
-            get { return 0; }
+            get => 0;
             set { }
         }
 
         /// <inheritdoc/>
         public int Label
         {
-            get { return label; }
-            set { label = value; }
+            get => label;
+            set => label = value;
         }
 
         /// <inheritdoc/>
         public double Area
         {
-            get { return area; }
-            set { area = value; }
+            get => area;
+            set => area = value;
         }
 
         /// <summary>

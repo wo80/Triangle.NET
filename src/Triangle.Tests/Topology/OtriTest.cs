@@ -3,7 +3,7 @@ namespace TriangleNet.Tests
 {
     using NUnit.Framework;
     using TriangleNet.Geometry;
-    using TriangleNet.Topology;
+    using Topology;
 
     // The Otri (orientent triangle) struct is the heart of Triangle's mesh
     // datastructure. It basically represents one of the three edges of the
@@ -27,7 +27,7 @@ namespace TriangleNet.Tests
     public class OtriTest
     {
         // The vertices of the mesh.
-        Vertex[] vertices;
+        private Vertex[] vertices;
 
         private Triangle[] CreateExampleMesh()
         {

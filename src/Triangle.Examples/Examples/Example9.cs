@@ -4,8 +4,8 @@ namespace TriangleNet.Examples
     using System;
     using System.Collections.Generic;
     using TriangleNet;
-    using TriangleNet.Meshing.Iterators;
-    using TriangleNet.Tools;
+    using Meshing.Iterators;
+    using Tools;
 
     /// <summary>
     /// Compute the adjacency matrix of the mesh vertices.
@@ -28,7 +28,7 @@ namespace TriangleNet.Examples
 
             var circulator = new VertexCirculator(mesh);
 
-            int k = 0;
+            var k = 0;
 
             foreach (var vertex in mesh.Vertices)
             {
@@ -63,14 +63,14 @@ namespace TriangleNet.Examples
 
         private static bool CompareArray(int[] a, int[] b)
         {
-            int length = a.Length;
+            var length = a.Length;
 
             if (b.Length != length)
             {
                 return false;
             }
 
-            for (int i = 0; i < length; i++)
+            for (var i = 0; i < length; i++)
             {
                 if (a[i] != b[i])
                 {

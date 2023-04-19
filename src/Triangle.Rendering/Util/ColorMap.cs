@@ -10,11 +10,11 @@ namespace TriangleNet.Rendering.Util
 
         public static ColorMap Jet(int size)
         {
-            ColorMap map = new ColorMap(size);
+            var map = new ColorMap(size);
             float v, step = 1.0f / (size - 1);
-            float[] rgb = new float[3];
+            var rgb = new float[3];
 
-            for (int i = 0; i < size; i += 1)
+            for (var i = 0; i < size; i += 1)
             {
                 v = 4 * i * step;
 
@@ -32,11 +32,11 @@ namespace TriangleNet.Rendering.Util
 
         public static ColorMap Hot(int size)
         {
-            ColorMap map = new ColorMap(size);
+            var map = new ColorMap(size);
             float v, step = 1.0f / (size - 1);
-            float[] rgb = new float[3];
+            var rgb = new float[3];
 
-            for (int i = 0; i < size; i += 1)
+            for (var i = 0; i < size; i += 1)
             {
                 v = 2.5f * i * step;
 
@@ -58,16 +58,16 @@ namespace TriangleNet.Rendering.Util
 
         private static Color ColorFromRgb(float r, float g, float b)
         {
-            byte max = byte.MaxValue;
+            var max = byte.MaxValue;
 
             return Color.FromArgb((byte)(r * max), (byte)(g * max), (byte)(b * max));
         }
 
         private static void Clamp(float[] values, float min, float max)
         {
-            int n = values.Length;
+            var n = values.Length;
 
-            for (int i = 0; i < n; i += 1)
+            for (var i = 0; i < n; i += 1)
             {
                 values[i] = Math.Min(max, Math.Max(min, values[i]));
             }
@@ -93,7 +93,7 @@ namespace TriangleNet.Rendering.Util
 
         private ColorMap(int size)
         {
-            this.colors = new Color[size];
+            colors = new Color[size];
         }
 
         public ColorMap(Color[] colors)
@@ -103,10 +103,10 @@ namespace TriangleNet.Rendering.Util
 
         public Color GetColor(double value, double min, double max)
         {
-            int n = this.colors.Length;
-			int i = (int)Math.Floor(n * (max - value) / (max - min));
+            var n = colors.Length;
+			var i = (int)Math.Floor(n * (max - value) / (max - min));
 
-            return this.colors[Clamp(i, n - 1)];
+            return colors[Clamp(i, n - 1)];
 		}
     }
 }

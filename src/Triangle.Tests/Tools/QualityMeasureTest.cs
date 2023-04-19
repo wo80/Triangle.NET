@@ -12,7 +12,7 @@ namespace TriangleNet.Tests.Tools
         [Test, DefaultFloatingPointTolerance(1e-12)]
         public void TestEquilateralTriangles()
         {
-            double sqrt3 = Math.Sqrt(3);
+            var sqrt3 = Math.Sqrt(3);
 
             var vertices = new List<Vertex>()
             {

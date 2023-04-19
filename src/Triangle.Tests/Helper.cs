@@ -3,9 +3,9 @@ namespace TriangleNet.Tests
 {
     using System.Collections.Generic;
     using TriangleNet.Geometry;
-    using TriangleNet.Topology;
+    using Topology;
 
-    static class Helper
+    internal static class Helper
     {
         public static Contour Rectangle(double left, double top,
             double right, double bottom, int mark = 0)

@@ -31,12 +31,12 @@ namespace TriangleNet.Rendering.Buffer
 
             var data = buffer.Data;
 
-            double dx = bounds.X;
-            double dy = bounds.Y;
+            var dx = bounds.X;
+            var dy = bounds.Y;
 
-            double scale = 1.0 / Math.Max(bounds.Width, bounds.Height);
+            var scale = 1.0 / Math.Max(bounds.Width, bounds.Height);
 
-            int i = 0;
+            var i = 0;
 
             double x, y;
 
@@ -76,12 +76,12 @@ namespace TriangleNet.Rendering.Buffer
 
             var data = buffer.Data;
 
-            double dx = bounds.X;
-            double dy = bounds.Y;
+            var dx = bounds.X;
+            var dy = bounds.Y;
 
-            double scale = 1.0 / Math.Max(bounds.Width, bounds.Height);
+            var scale = 1.0 / Math.Max(bounds.Width, bounds.Height);
 
-            int i = 0;
+            var i = 0;
 
             double x, y;
 

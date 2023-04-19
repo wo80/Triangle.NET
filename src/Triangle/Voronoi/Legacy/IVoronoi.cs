@@ -7,7 +7,7 @@
 namespace TriangleNet.Voronoi.Legacy
 {
     using System.Collections.Generic;
-    using TriangleNet.Geometry;
+    using Geometry;
 
     /// <summary>
     /// Voronoi diagram interface.

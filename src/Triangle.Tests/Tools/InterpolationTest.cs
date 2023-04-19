@@ -30,7 +30,7 @@ namespace TriangleNet.Tests.Tools
 
             double actual, expected;
 
-            for (int i = 0; i < 3; i++)
+            for (var i = 0; i < 3; i++)
             {
                 actual = Interpolation.InterpolatePoint(tri, vertices[i], values);
                 expected = values[i];
@@ -42,7 +42,7 @@ namespace TriangleNet.Tests.Tools
 
             double x, y;
 
-            for (int i = 0; i < 3; i++)
+            for (var i = 0; i < 3; i++)
             {
                 x = (vertices[i].X + vertices[(i + 1) % 3].X) / 2;
                 y = (vertices[i].Y + vertices[(i + 1) % 3].Y) / 2;

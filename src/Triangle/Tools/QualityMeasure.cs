@@ -8,8 +8,8 @@ namespace TriangleNet.Tools
 {
     using System;
     using System.Collections.Generic;
-    using TriangleNet.Geometry;
-    using TriangleNet.Meshing;
+    using Geometry;
+    using Meshing;
 
     /// <summary>
     /// Base class for quality measures.
@@ -114,10 +114,10 @@ namespace TriangleNet.Tools
     /// </remarks>
     public class QualityMeasure
     {
-        MeasureArea _area;
-        MeasureAlpha _alpha;
-        MeasureEta _eta;
-        MeasureQ _q;
+        private MeasureArea _area;
+        private MeasureAlpha _alpha;
+        private MeasureEta _eta;
+        private MeasureQ _q;
 
         #region Public properties
 
@@ -161,7 +161,7 @@ namespace TriangleNet.Tools
 
         #endregion
 
-        List<Measure> measures;
+        private List<Measure> measures;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="QualityMeasure" /> class.
@@ -208,7 +208,7 @@ namespace TriangleNet.Tools
             double lx, ly;
             double area;
 
-            int n = 0;
+            var n = 0;
 
             foreach (var m in measures)
             {
@@ -290,11 +290,11 @@ namespace TriangleNet.Tools
 
             foreach (var tri in mesh.Triangles)
             {
-                for (int j = 0; j < 3; j++)
+                for (var j = 0; j < 3; j++)
                 {
                     gi = tri.GetVertexID(j);
 
-                    for (int k = 0; k < 3; k++)
+                    for (var k = 0; k < 3; k++)
                     {
                         gj = tri.GetVertexID(k);
 
@@ -307,7 +307,7 @@ namespace TriangleNet.Tools
             return ml + 1 + mu;
         }
 
-        class MeasureArea : Measure
+        private class MeasureArea : Measure
         {
             private readonly double EPS = 0.0;
 
@@ -357,16 +357,16 @@ namespace TriangleNet.Tools
         /// is 60). The best possible value is 1, and the worst 0. A good
         /// triangulation should have an alpha score close to 1.
         /// </remarks>
-        class MeasureAlpha : Measure
+        private class MeasureAlpha : Measure
         {
             /// <inheritdoc />
             public override double Update(double ab, double bc, double ca, double area)
             {
-                double alpha = double.MaxValue;
+                var alpha = double.MaxValue;
 
-                double ab2 = ab * ab;
-                double bc2 = bc * bc;
-                double ca2 = ca * ca;
+                var ab2 = ab * ab;
+                var bc2 = bc * bc;
+                var ca2 = ca * ca;
 
                 double a_angle;
                 double b_angle;
@@ -439,7 +439,7 @@ namespace TriangleNet.Tools
         /// possible value is 1, and the worst 0. A good triangulation should have an
         /// eta score close to 1.
         /// </remarks>
-        class MeasureEta : Measure
+        private class MeasureEta : Measure
         {
             // Normalization factor to ensure that a perfect triangle
             // (equal edges) has a quality of 1.
@@ -448,11 +448,11 @@ namespace TriangleNet.Tools
             /// <inheritdoc />
             public override double Update(double ab, double bc, double ca, double area)
             {
-                double ab2 = ab * ab;
-                double bc2 = bc * bc;
-                double ca2 = ca * ca;
+                var ab2 = ab * ab;
+                var bc2 = bc * bc;
+                var ca2 = ca * ca;
 
-                double eta = Factor * area / (ab2 + bc2 + ca2);
+                var eta = Factor * area / (ab2 + bc2 + ca2);
 
                 avg += eta;
                 are += area * eta;
@@ -477,12 +477,12 @@ namespace TriangleNet.Tools
         /// equilateral shape, for which Q = 1. A good mesh would have
         /// 0.5 &lt; Q.
         /// </remarks>
-        class MeasureQ : Measure
+        private class MeasureQ : Measure
         {
             /// <inheritdoc />
             public override double Update(double ab, double bc, double ca, double area)
             {
-                double q = (bc + ca - ab) * (ca + ab - bc) * (ab + bc - ca) / (ab * bc * ca);
+                var q = (bc + ca - ab) * (ca + ab - bc) * (ab + bc - ca) / (ab * bc * ca);
 
                 min = Math.Min(min, q);
                 max = Math.Max(max, q);

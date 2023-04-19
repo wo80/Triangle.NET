@@ -8,7 +8,7 @@ namespace TriangleNet
 {
     using System;
     using System.Collections.Generic;
-    using TriangleNet.Topology;
+    using Topology;
 
     /// <summary>
     /// Pool datastructure storing triangles of a <see cref="Mesh" />.
@@ -19,31 +19,30 @@ namespace TriangleNet
         private const int BLOCKSIZE = 1024;
 
         // The total number of currently allocated triangles.
-        int size;
 
         // The number of triangles currently used.
-        int count;
+        private int count;
 
         // The pool.
-        Triangle[][] pool;
+        private Triangle[][] pool;
 
         // A stack of free triangles.
-        Stack<Triangle> stack;
+        private Stack<Triangle> stack;
 
         /// <summary>
         /// Gets the total number of currently allocated triangles.
         /// </summary>
-        public int Capacity => size;
+        public int Capacity { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TrianglePool" /> class.
         /// </summary>
         public TrianglePool()
         {
-            size = 0;
+            Capacity = 0;
 
             // On startup, the pool should be able to hold 2^16 triangles.
-            int n = Math.Max(1, 65536 / BLOCKSIZE);
+            var n = Math.Max(1, 65536 / BLOCKSIZE);
 
             pool = new Triangle[n][];
             pool[0] = new Triangle[BLOCKSIZE];
@@ -66,7 +65,7 @@ namespace TriangleNet
 
                 Cleanup(triangle);
             }
-            else if (count < size)
+            else if (count < Capacity)
             {
                 triangle = pool[count / BLOCKSIZE][count % BLOCKSIZE];
                 triangle.id = triangle.hash;
@@ -78,10 +77,10 @@ namespace TriangleNet
             else
             {
                 triangle = new Triangle();
-                triangle.hash = size;
+                triangle.hash = Capacity;
                 triangle.id = triangle.hash;
 
-                int block = size / BLOCKSIZE;
+                var block = Capacity / BLOCKSIZE;
 
                 if (pool[block] == null)
                 {
@@ -95,9 +94,9 @@ namespace TriangleNet
                 }
 
                 // Add triangle to pool.
-                pool[block][size % BLOCKSIZE] = triangle;
+                pool[block][Capacity % BLOCKSIZE] = triangle;
 
-                count = ++size;
+                count = ++Capacity;
             }
 
             return triangle;
@@ -140,7 +139,7 @@ namespace TriangleNet
         /// <returns></returns>
         internal IEnumerable<Triangle> Sample(int k, Random random)
         {
-            int i, count = this.Count;
+            int i, count = Count;
 
             if (k > count)
             {
@@ -172,12 +171,12 @@ namespace TriangleNet
             triangle.area = 0.0;
             triangle.infected = false;
 
-            for (int i = 0; i < 3; i++)
+            for (var i = 0; i < 3; i++)
             {
                 triangle.vertices[i] = null;
 
-                triangle.subsegs[i] = default(Osub);
-                triangle.neighbors[i] = default(Otri);
+                triangle.subsegs[i] = default;
+                triangle.neighbors[i] = default;
             }
         }
 
@@ -196,30 +195,30 @@ namespace TriangleNet
         {
             stack.Clear();
 
-            int blocks = (size / BLOCKSIZE) + 1;
+            var blocks = (Capacity / BLOCKSIZE) + 1;
 
-            for (int i = 0; i < blocks; i++)
+            for (var i = 0; i < blocks; i++)
             {
                 var block = pool[i];
 
                 // Number of triangles in current block:
-                int length = (size - i * BLOCKSIZE) % BLOCKSIZE;
+                var length = (Capacity - i * BLOCKSIZE) % BLOCKSIZE;
 
-                for (int j = 0; j < length; j++)
+                for (var j = 0; j < length; j++)
                 {
                     block[j] = null;
                 }
             }
 
-            size = count = 0;
+            Capacity = count = 0;
         }
 
         /// <inheritdoc />
         public bool Contains(Triangle item)
         {
-            int i = item.hash;
+            var i = item.hash;
 
-            if (i < 0 || i > size)
+            if (i < 0 || i > Capacity)
             {
                 return false;
             }
@@ -230,7 +229,7 @@ namespace TriangleNet
         /// <inheritdoc />
         public void CopyTo(Triangle[] array, int index)
         {
-            var enumerator = GetEnumerator();
+            using var enumerator = GetEnumerator();
 
             while (enumerator.MoveNext())
             {
@@ -262,50 +261,42 @@ namespace TriangleNet
             return GetEnumerator();
         }
 
-        class Enumerator : IEnumerator<Triangle>
+        private class Enumerator : IEnumerator<Triangle>
         {
             // TODO: enumerator should be able to tell if collection changed.
 
-            int count;
+            private int count;
 
-            Triangle[][] pool;
+            private Triangle[][] pool;
 
-            Triangle current;
-
-            int index, offset;
+            private int index, offset;
 
             public Enumerator(TrianglePool pool)
             {
-                this.count = pool.Count;
+                count = pool.Count;
                 this.pool = pool.pool;
 
                 index = 0;
                 offset = 0;
             }
 
-            public Triangle Current
-            {
-                get { return current; }
-            }
+            public Triangle Current { get; private set; }
 
             public void Dispose()
             {
             }
 
-            object System.Collections.IEnumerator.Current
-            {
-                get { return current; }
-            }
+            object System.Collections.IEnumerator.Current => Current;
 
             public bool MoveNext()
             {
                 while (index < count)
                 {
-                    current = pool[offset / BLOCKSIZE][offset % BLOCKSIZE];
+                    Current = pool[offset / BLOCKSIZE][offset % BLOCKSIZE];
 
                     offset++;
 
-                    if (current.hash >= 0)
+                    if (Current.hash >= 0)
                     {
                         index++;
                         return true;

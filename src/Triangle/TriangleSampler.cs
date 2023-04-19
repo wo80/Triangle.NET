@@ -9,12 +9,12 @@ namespace TriangleNet
 {
     using System;
     using System.Collections.Generic;
-    using TriangleNet.Topology;
+    using Topology;
 
     /// <summary>
     /// Used for triangle sampling in the <see cref="TriangleLocator"/> class.
     /// </summary>
-    class TriangleSampler : IEnumerable<Triangle>
+    internal class TriangleSampler : IEnumerable<Triangle>
     {
         // Empirically chosen factor.
         private const int samplefactor = 11;
@@ -26,7 +26,7 @@ namespace TriangleNet
         private int samples = 1;
 
         // Number of triangles in mesh.
-        private int triangleCount = 0;
+        private int triangleCount;
 
         public TriangleSampler(Mesh mesh, Random random)
         {
@@ -48,7 +48,7 @@ namespace TriangleNet
         /// </summary>
         public void Update()
         {
-            int count = mesh.triangles.Count;
+            var count = mesh.triangles.Count;
 
             if (triangleCount != count)
             {

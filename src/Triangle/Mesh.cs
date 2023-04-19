@@ -9,12 +9,12 @@ namespace TriangleNet
 {
     using System;
     using System.Collections.Generic;
-    using TriangleNet.Geometry;
-    using TriangleNet.Meshing;
-    using TriangleNet.Meshing.Data;
-    using TriangleNet.Meshing.Iterators;
-    using TriangleNet.Tools;
-    using TriangleNet.Topology;
+    using Geometry;
+    using Meshing;
+    using Meshing.Data;
+    using Meshing.Iterators;
+    using Tools;
+    using Topology;
 
     /// <summary>
     /// Mesh data structure.
@@ -23,14 +23,14 @@ namespace TriangleNet
     {
         #region Variables
 
-        IPredicates predicates;
+        private readonly IPredicates predicates;
 
-        Log logger = Log.Instance;
+        private static Log logger => Log.Instance;
 
-        QualityMesher qualityMesher;
+        private QualityMesher? qualityMesher;
 
         // Stack that maintains a list of recently flipped triangles.
-        Stack<Otri> flipstack;
+        private Stack<Otri> flipstack;
 
         // TODO: Check if custom hashmap implementation could be faster.
 
@@ -40,9 +40,9 @@ namespace TriangleNet
         internal Dictionary<int, Vertex> vertices;
 
         // Hash seeds (should belong to mesh instance)
-        internal int hash_vtx = 0;
-        internal int hash_seg = 0;
-        internal int hash_tri = 0;
+        internal int hash_vtx;
+        internal int hash_seg;
+        internal int hash_tri;
 
         internal List<Point> holes;
         internal List<RegionPointer> regions;
@@ -50,7 +50,7 @@ namespace TriangleNet
         // TODO: remove mesh_dim, invertices and insegments
 
         // Other variables.
-        internal Rectangle bounds; // x and y bounds.
+        internal Rectangle? bounds; // x and y bounds.
         internal int invertices;     // Number of input vertices.
         internal int insegments;     // Number of input segments.
         internal int undeads;        // Number of input vertices that don't appear in the mesh.
@@ -63,7 +63,7 @@ namespace TriangleNet
         internal bool checkquality;  // Has quality triangulation begun yet?
 
         // Triangular bounding box vertices.
-        internal Vertex infvertex1, infvertex2, infvertex3;
+        internal Vertex? infvertex1, infvertex2, infvertex3;
 
         internal TriangleLocator locator;
 
@@ -80,7 +80,7 @@ namespace TriangleNet
         /// <summary>
         /// Gets the mesh bounding box.
         /// </summary>
-        public Rectangle Bounds => bounds;
+        public Rectangle? Bounds => bounds;
 
         /// <summary>
         /// Gets the mesh vertices.
@@ -249,7 +249,7 @@ namespace TriangleNet
         /// </summary>
         public void Renumber()
         {
-            this.Renumber(NodeNumbering.Linear);
+            Renumber(NodeNumbering.Linear);
         }
 
         /// <summary>
@@ -258,7 +258,7 @@ namespace TriangleNet
         public void Renumber(NodeNumbering num)
         {
             // Don't need to do anything if the nodes are already numbered.
-            if (num == this.numbering)
+            if (num == numbering)
             {
                 return;
             }
@@ -268,7 +268,7 @@ namespace TriangleNet
             if (num == NodeNumbering.Linear)
             {
                 id = 0;
-                foreach (var node in this.vertices.Values)
+                foreach (var node in vertices.Values)
                 {
                     node.id = id++;
                 }
@@ -279,7 +279,7 @@ namespace TriangleNet
                 var iperm = rcm.Renumber(this);
 
                 // Permute the node indices.
-                foreach (var node in this.vertices.Values)
+                foreach (var node in vertices.Values)
                 {
                     node.id = iperm[node.id];
                 }
@@ -290,7 +290,7 @@ namespace TriangleNet
 
             // Triangles will always be numbered from 0 to n-1
             id = 0;
-            foreach (var item in this.triangles)
+            foreach (var item in triangles)
             {
                 item.id = id++;
             }
@@ -309,19 +309,19 @@ namespace TriangleNet
 
         internal void CopyTo(Mesh target)
         {
-            target.vertices = this.vertices;
-            target.triangles = this.triangles;
-            target.subsegs = this.subsegs;
+            target.vertices = vertices;
+            target.triangles = triangles;
+            target.subsegs = subsegs;
 
-            target.holes = this.holes;
-            target.regions = this.regions;
+            target.holes = holes;
+            target.regions = regions;
 
-            target.hash_vtx = this.hash_vtx;
-            target.hash_seg = this.hash_seg;
-            target.hash_tri = this.hash_tri;
+            target.hash_vtx = hash_vtx;
+            target.hash_seg = hash_seg;
+            target.hash_tri = hash_tri;
 
-            target.numbering = this.numbering;
-            target.hullsize = this.hullsize;
+            target.numbering = numbering;
+            target.hullsize = hullsize;
         }
 
 
@@ -335,9 +335,9 @@ namespace TriangleNet
             holes.Clear();
             regions.Clear();
 
-            this.hash_vtx = 0;
-            this.hash_seg = 0;
-            this.hash_tri = 0;
+            hash_vtx = 0;
+            hash_seg = 0;
+            hash_tri = 0;
 
             flipstack.Clear();
 
@@ -395,7 +395,7 @@ namespace TriangleNet
             // Simple heuristic to check if ids are already set.  We assume that if the
             // first two vertex ids are distinct, then all input vertices have pairwise
             // distinct ids.
-            bool userId = (v.id != points[1].id);
+            var userId = (v.id != points[1].id);
 
             foreach (var p in points)
             {
@@ -429,10 +429,10 @@ namespace TriangleNet
         /// </remarks>
         internal void MakeVertexMap()
         {
-            Otri tri = default(Otri);
+            var tri = default(Otri);
             Vertex triorg;
 
-            foreach (var t in this.triangles)
+            foreach (var t in triangles)
             {
                 tri.tri = t;
                 // Check all three vertices of the triangle.
@@ -454,7 +454,7 @@ namespace TriangleNet
         /// <param name="newotri">Reference to the new triangle.</param>
         internal void MakeTriangle(ref Otri newotri)
         {
-            Triangle tri = triangles.Get();
+            var tri = triangles.Get();
 
             //tri.id = tri.hash;
 
@@ -478,7 +478,7 @@ namespace TriangleNet
         {
             var seg = new SubSegment();
 
-            seg.hash = this.hash_seg++;
+            seg.hash = hash_seg++;
 
             seg.subsegs[0].seg = dummysub;
             seg.subsegs[1].seg = dummysub;
@@ -548,21 +548,21 @@ namespace TriangleNet
         internal InsertVertexResult InsertVertex(Vertex newvertex, ref Otri searchtri,
             ref Osub splitseg, bool segmentflaws, bool triflaws)
         {
-            Otri horiz = default(Otri);
-            Otri top = default(Otri);
-            Otri botleft = default(Otri), botright = default(Otri);
-            Otri topleft = default(Otri), topright = default(Otri);
-            Otri newbotleft = default(Otri), newbotright = default(Otri);
-            Otri newtopright = default(Otri);
-            Otri botlcasing = default(Otri), botrcasing = default(Otri);
-            Otri toplcasing = default(Otri), toprcasing = default(Otri);
-            Otri testtri = default(Otri);
-            Osub botlsubseg = default(Osub), botrsubseg = default(Osub);
-            Osub toplsubseg = default(Osub), toprsubseg = default(Osub);
-            Osub brokensubseg = default(Osub);
-            Osub checksubseg = default(Osub);
-            Osub rightsubseg = default(Osub);
-            Osub newsubseg = default(Osub);
+            var horiz = default(Otri);
+            var top = default(Otri);
+            Otri botleft = default, botright = default;
+            Otri topleft = default, topright = default;
+            Otri newbotleft = default, newbotright = default;
+            var newtopright = default(Otri);
+            Otri botlcasing = default, botrcasing = default;
+            Otri toplcasing = default, toprcasing = default;
+            var testtri = default(Otri);
+            Osub botlsubseg = default, botrsubseg = default;
+            Osub toplsubseg = default, toprsubseg = default;
+            var brokensubseg = default(Osub);
+            var checksubseg = default(Osub);
+            var rightsubseg = default(Osub);
+            var newsubseg = default(Osub);
             BadSubseg encroached;
             //FlipStacker newflip;
             Vertex first;
@@ -774,7 +774,7 @@ namespace TriangleNet
                 {
                     flipstack.Clear();
 
-                    flipstack.Push(default(Otri)); // Dummy flip (see UndoVertex)
+                    flipstack.Push(default); // Dummy flip (see UndoVertex)
                     flipstack.Push(horiz);
                 }
 
@@ -1068,7 +1068,7 @@ namespace TriangleNet
                         // We're done. Return a triangle whose origin is the new vertex.
                         horiz.Lnext(ref searchtri);
 
-                        Otri recenttri = default(Otri);
+                        var recenttri = default(Otri);
                         horiz.Lnext(ref recenttri);
                         locator.Update(ref recenttri);
 
@@ -1092,8 +1092,8 @@ namespace TriangleNet
         /// subsegment and, if appropriate, its vertices.</param>
         internal void InsertSubseg(ref Otri tri, int subsegmark)
         {
-            Otri oppotri = default(Otri);
-            Osub newsubseg = default(Osub);
+            var oppotri = default(Otri);
+            var newsubseg = default(Osub);
             Vertex triorg, tridest;
 
             triorg = tri.Org();
@@ -1176,13 +1176,13 @@ namespace TriangleNet
         /// </remarks>
         internal void Flip(ref Otri flipedge)
         {
-            Otri botleft = default(Otri), botright = default(Otri);
-            Otri topleft = default(Otri), topright = default(Otri);
-            Otri top = default(Otri);
-            Otri botlcasing = default(Otri), botrcasing = default(Otri);
-            Otri toplcasing = default(Otri), toprcasing = default(Otri);
-            Osub botlsubseg = default(Osub), botrsubseg = default(Osub);
-            Osub toplsubseg = default(Osub), toprsubseg = default(Osub);
+            Otri botleft = default, botright = default;
+            Otri topleft = default, topright = default;
+            var top = default(Otri);
+            Otri botlcasing = default, botrcasing = default;
+            Otri toplcasing = default, toprcasing = default;
+            Osub botlsubseg = default, botrsubseg = default;
+            Osub toplsubseg = default, toprsubseg = default;
             Vertex leftvertex, rightvertex, botvertex;
             Vertex farvertex;
 
@@ -1191,26 +1191,6 @@ namespace TriangleNet
             leftvertex = flipedge.Dest();
             botvertex = flipedge.Apex();
             flipedge.Sym(ref top);
-
-            // SELF CHECK
-
-            //if (top.triangle.id == DUMMY)
-            //{
-            //    logger.Error("Attempt to flip on boundary.", "Mesh.Flip()");
-            //    flipedge.LnextSelf();
-            //    return;
-            //}
-
-            //if (checksegments)
-            //{
-            //    flipedge.SegPivot(ref toplsubseg);
-            //    if (toplsubseg.ss != Segment.Empty)
-            //    {
-            //        logger.Error("Attempt to flip a segment.", "Mesh.Flip()");
-            //        flipedge.LnextSelf();
-            //        return;
-            //    }
-            //}
 
             farvertex = top.Apex();
 
@@ -1299,13 +1279,13 @@ namespace TriangleNet
         /// </remarks>
         internal void Unflip(ref Otri flipedge)
         {
-            Otri botleft = default(Otri), botright = default(Otri);
-            Otri topleft = default(Otri), topright = default(Otri);
-            Otri top = default(Otri);
-            Otri botlcasing = default(Otri), botrcasing = default(Otri);
-            Otri toplcasing = default(Otri), toprcasing = default(Otri);
-            Osub botlsubseg = default(Osub), botrsubseg = default(Osub);
-            Osub toplsubseg = default(Osub), toprsubseg = default(Osub);
+            Otri botleft = default, botright = default;
+            Otri topleft = default, topright = default;
+            var top = default(Otri);
+            Otri botlcasing = default, botrcasing = default;
+            Otri toplcasing = default, toprcasing = default;
+            Osub botlsubseg = default, botrsubseg = default;
+            Osub toplsubseg = default, toprsubseg = default;
             Vertex leftvertex, rightvertex, botvertex;
             Vertex farvertex;
 
@@ -1445,17 +1425,21 @@ namespace TriangleNet
         /// there's a lot of long segments that each cut many triangles. I ought to
         /// code a faster algorithm some day.
         /// </remarks>
-        private void TriangulatePolygon(Otri firstedge, Otri lastedge,
-                                int edgecount, bool doflip, bool triflaws)
+        private void TriangulatePolygon(
+            Otri firstedge,
+            Otri lastedge,
+            int edgecount,
+            bool doflip,
+            bool triflaws)
         {
-            Otri testtri = default(Otri);
-            Otri besttri = default(Otri);
-            Otri tempedge = default(Otri);
+            var testtri = default(Otri);
+            var besttri = default(Otri);
+            var tempedge = default(Otri);
             Vertex leftbasevertex, rightbasevertex;
             Vertex testvertex;
             Vertex bestvertex;
 
-            int bestnumber = 1;
+            var bestnumber = 1;
 
             // Identify the base vertices.
             leftbasevertex = lastedge.Apex();
@@ -1466,7 +1450,7 @@ namespace TriangleNet
             bestvertex = besttri.Dest();
             besttri.Copy(ref testtri);
 
-            for (int i = 2; i <= edgecount - 2; i++)
+            for (var i = 2; i <= edgecount - 2; i++)
             {
                 testtri.Onext();
                 testvertex = testtri.Dest();
@@ -1524,12 +1508,12 @@ namespace TriangleNet
         /// </remarks>
         internal void DeleteVertex(ref Otri deltri)
         {
-            Otri countingtri = default(Otri);
-            Otri firstedge = default(Otri), lastedge = default(Otri);
-            Otri deltriright = default(Otri);
-            Otri lefttri = default(Otri), righttri = default(Otri);
-            Otri leftcasing = default(Otri), rightcasing = default(Otri);
-            Osub leftsubseg = default(Osub), rightsubseg = default(Osub);
+            var countingtri = default(Otri);
+            Otri firstedge = default, lastedge = default;
+            var deltriright = default(Otri);
+            Otri lefttri = default, righttri = default;
+            Otri leftcasing = default, rightcasing = default;
+            Osub leftsubseg = default, rightsubseg = default;
             Vertex delvertex;
             Vertex neworg;
             int edgecount;
@@ -1601,10 +1585,10 @@ namespace TriangleNet
         {
             Otri fliptri;
 
-            Otri botleft = default(Otri), botright = default(Otri), topright = default(Otri);
-            Otri botlcasing = default(Otri), botrcasing = default(Otri), toprcasing = default(Otri);
-            Otri gluetri = default(Otri);
-            Osub botlsubseg = default(Osub), botrsubseg = default(Osub), toprsubseg = default(Osub);
+            Otri botleft = default, botright = default, topright = default;
+            Otri botlcasing = default, botrcasing = default, toprcasing = default;
+            var gluetri = default(Otri);
+            Osub botlsubseg = default, botrsubseg = default, toprsubseg = default;
             Vertex botvertex, rightvertex;
 
             // Walk through the list of transformations (flips and a vertex insertion)

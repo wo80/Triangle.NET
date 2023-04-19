@@ -33,7 +33,7 @@ namespace TriangleNet.Tools
     public class CuthillMcKee
     {
         // The adjacency matrix of the mesh.
-        AdjacencyMatrix matrix;
+        private AdjacencyMatrix matrix;
 
         /// <summary>
         /// Gets the permutation vector for the Reverse Cuthill-McKee numbering.
@@ -62,17 +62,17 @@ namespace TriangleNet.Tools
             // TODO: Make RCM work with 0-based matrix.
 
             // Compute the RCM permutation.
-            int[] perm = GenerateRcm();
+            var perm = GenerateRcm();
 
-            int[] perm_inv = PermInverse(perm);
+            var perm_inv = PermInverse(perm);
 
             // Adjust column pointers (0-based indexing).
             Shift(pcol, false);
 
             if (Log.Verbose)
             {
-                int bandwidth1 = matrix.Bandwidth();
-                int bandwidth2 = PermBandwidth(perm, perm_inv);
+                var bandwidth1 = matrix.Bandwidth();
+                var bandwidth2 = PermBandwidth(perm, perm_inv);
 
                 Log.Instance.Info(string.Format("Reverse Cuthill-McKee (Bandwidth: {0} > {1})",
                     bandwidth1, bandwidth2));
@@ -91,23 +91,23 @@ namespace TriangleNet.Tools
         /// For each connected component in the graph, the routine obtains
         /// an ordering by calling RCM.
         /// </remarks>
-        int[] GenerateRcm()
+        private int[] GenerateRcm()
         {
             // Number of nodes in the mesh.
-            int n = matrix.ColumnCount;
+            var n = matrix.ColumnCount;
 
-            int[] perm = new int[n];
+            var perm = new int[n];
 
             int i, num, root;
-            int iccsze = 0;
-            int level_num = 0;
+            var iccsze = 0;
+            var level_num = 0;
 
             // Index vector for a level structure. The level structure is stored in the
             // currently unused  spaces in the permutation vector PERM.
-            int[] level_row = new int[n + 1];
+            var level_row = new int[n + 1];
 
             // Marks variables that have been numbered.
-            int[] mask = new int[n];
+            var mask = new int[n];
 
             for (i = 0; i < n; i++)
             {
@@ -168,10 +168,10 @@ namespace TriangleNet.Tools
         ///
         /// When done, reverse the ordering.
         /// </remarks>
-        void Rcm(int root, int[] mask, int[] perm, int offset, ref int iccsze)
+        private void Rcm(int root, int[] mask, int[] perm, int offset, ref int iccsze)
         {
-            int[] pcol = matrix.ColumnPointers;
-            int[] irow = matrix.RowIndices;
+            var pcol = matrix.ColumnPointers;
+            var irow = matrix.RowIndices;
 
             int fnbr;
             int i, j, k, l;
@@ -180,11 +180,11 @@ namespace TriangleNet.Tools
             int nbr, node;
 
             // Number of nodes in the mesh.
-            int n = matrix.ColumnCount;
+            var n = matrix.ColumnCount;
 
             // Workspace, int DEG[NODE_NUM], a temporary vector used to hold 
             // the degree of the nodes in the section graph specified by mask and root.
-            int[] deg = new int[n];
+            var deg = new int[n];
 
             // Find the degrees of the nodes in the component specified by MASK and ROOT.
             Degree(root, mask, deg, ref iccsze, perm, offset);
@@ -309,11 +309,11 @@ namespace TriangleNet.Tools
         /// of the list of nodes that are at a distance of 0, 1, 2, ...,
         /// NODE_NUM-1 from the pseudo-peripheral node.
         /// </remarks>
-        void FindRoot(ref int root, int[] mask, ref int level_num, int[] level_row,
+        private void FindRoot(ref int root, int[] mask, ref int level_num, int[] level_row,
             int[] level, int offset)
         {
-            int[] pcol = matrix.ColumnPointers;
-            int[] irow = matrix.RowIndices;
+            var pcol = matrix.ColumnPointers;
+            var irow = matrix.RowIndices;
 
             int iccsze;
             int j, jstrt;
@@ -321,7 +321,7 @@ namespace TriangleNet.Tools
             int mindeg;
             int nghbor, ndeg;
             int node;
-            int level_num2 = 0;
+            var level_num2 = 0;
 
             // Determine the level structure rooted at ROOT.
             GetLevelSet(ref root, mask, ref level_num, level_row, level, offset);
@@ -417,11 +417,11 @@ namespace TriangleNet.Tools
         /// are no unmasked nodes adjacent to any node in the current level.
         /// The number of levels may vary between 2 and NODE_NUM.
         /// </remarks>
-        void GetLevelSet(ref int root, int[] mask, ref int level_num, int[] level_row,
+        private void GetLevelSet(ref int root, int[] mask, ref int level_num, int[] level_row,
             int[] level, int offset)
         {
-            int[] pcol = matrix.ColumnPointers;
-            int[] irow = matrix.RowIndices;
+            var pcol = matrix.ColumnPointers;
+            var irow = matrix.RowIndices;
 
             int i, iccsze;
             int j, jstop, jstrt;
@@ -500,15 +500,15 @@ namespace TriangleNet.Tools
         /// The connected component is specified by MASK and ROOT.
         /// Nodes for which MASK is zero are ignored.
         /// </remarks>
-        void Degree(int root, int[] mask, int[] deg, ref int iccsze, int[] ls, int offset)
+        private void Degree(int root, int[] mask, int[] deg, ref int iccsze, int[] ls, int offset)
         {
-            int[] pcol = matrix.ColumnPointers;
-            int[] irow = matrix.RowIndices;
+            var pcol = matrix.ColumnPointers;
+            var irow = matrix.RowIndices;
 
             int i, ideg;
             int j, jstop, jstrt;
             int lbegin, lvlend;
-            int lvsize = 1;
+            var lvsize = 1;
             int nbr, node;
 
             // The sign of ADJ_ROW(I) is used to indicate if node I has been considered.
@@ -581,23 +581,23 @@ namespace TriangleNet.Tools
         /// The matrix is defined by the adjacency information and a permutation.  
         /// The routine also computes the bandwidth and the size of the envelope.
         /// </remarks>
-        int PermBandwidth(int[] perm, int[] perm_inv)
+        private int PermBandwidth(int[] perm, int[] perm_inv)
         {
-            int[] pcol = matrix.ColumnPointers;
-            int[] irow = matrix.RowIndices;
+            var pcol = matrix.ColumnPointers;
+            var irow = matrix.RowIndices;
 
             int col, end;
 
-            int band_lo = 0;
-            int band_hi = 0;
+            var band_lo = 0;
+            var band_hi = 0;
 
-            int n = matrix.ColumnCount;
+            var n = matrix.ColumnCount;
 
-            for (int i = 0; i < n; i++)
+            for (var i = 0; i < n; i++)
             {
                 end = pcol[perm[i] + 1];
 
-                for (int j = pcol[perm[i]]; j < end; j++)
+                for (var j = pcol[perm[i]]; j < end; j++)
                 {
                     col = perm_inv[irow[j]];
                     band_lo = Math.Max(band_lo, i - col);
@@ -613,13 +613,13 @@ namespace TriangleNet.Tools
         /// </summary>
         /// <param name="perm">PERM[N], a permutation.</param>
         /// <returns>The inverse permutation.</returns>
-        int[] PermInverse(int[] perm)
+        private int[] PermInverse(int[] perm)
         {
-            int n = matrix.ColumnCount;
+            var n = matrix.ColumnCount;
 
-            int[] perm_inv = new int[n];
+            var perm_inv = new int[n];
 
-            for (int i = 0; i < n; i++)
+            for (var i = 0; i < n; i++)
             {
                 perm_inv[perm[i]] = i;
             }
@@ -641,12 +641,12 @@ namespace TriangleNet.Tools
         ///   Output:
         ///     A = ( 15, 14, 13, 12, 11 ).
         /// </example>
-        void ReverseVector(int[] a, int offset, int size)
+        private void ReverseVector(int[] a, int offset, int size)
         {
             int j, middle = offset + size / 2,
                 end = offset + size - 1;
 
-            for (int i = offset; i < middle; i++)
+            for (var i = offset; i < middle; i++)
             {
                 j = a[i];
                 a[i] = a[end - i + offset];
@@ -654,17 +654,17 @@ namespace TriangleNet.Tools
             }
         }
 
-        void Shift(int[] a, bool up)
+        private void Shift(int[] a, bool up)
         {
-            int length = a.Length;
+            var length = a.Length;
 
             if (up)
             {
-                for (int i = 0; i < length; a[i]++, i++) ;
+                for (var i = 0; i < length; a[i]++, i++) ;
             }
             else
             {
-                for (int i = 0; i < length; a[i]--, i++) ;
+                for (var i = 0; i < length; a[i]--, i++) ;
             }
         }
 

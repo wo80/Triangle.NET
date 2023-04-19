@@ -8,9 +8,9 @@
 namespace TriangleNet
 {
     using System;
-    using TriangleNet.Topology;
-    using TriangleNet.Geometry;
-    using TriangleNet.Tools;
+    using Topology;
+    using Geometry;
+    using Tools;
 
     /// <summary>
     /// Find new Steiner point locations.
@@ -18,38 +18,38 @@ namespace TriangleNet
     /// <remarks>
     /// See https://www.cise.ufl.edu/~ungor/aCute/index.html
     /// </remarks>
-    class NewLocation
+    internal class NewLocation
     {
-        const double EPS = 1e-50;
+        private const double EPS = 1e-50;
 
-        IPredicates predicates;
+        private IPredicates predicates;
 
-        Mesh mesh;
-        Behavior behavior;
+        private Mesh mesh;
+        private Behavior behavior;
 
         // Work arrays for wegde intersection
-        double[] petalx = new double[20];
-        double[] petaly = new double[20];
-        double[] petalr = new double[20];
-        double[] wedges = new double[500];
-        double[] initialConvexPoly = new double[500];
+        private double[] petalx = new double[20];
+        private double[] petaly = new double[20];
+        private double[] petalr = new double[20];
+        private double[] wedges = new double[500];
+        private double[] initialConvexPoly = new double[500];
 
         // Work arrays for smoothing
-        double[] points_p = new double[500];
-        double[] points_q = new double[500];
-        double[] points_r = new double[500];
+        private double[] points_p = new double[500];
+        private double[] points_q = new double[500];
+        private double[] points_r = new double[500];
 
         // Work arrays for convex polygon split
-        double[] poly1 = new double[100];
-        double[] poly2 = new double[100];
-        double[][] polys = new double[3][];
+        private double[] poly1 = new double[100];
+        private double[] poly2 = new double[100];
+        private double[][] polys = new double[3][];
 
         public NewLocation(Mesh mesh, IPredicates predicates)
         {
             this.mesh = mesh;
             this.predicates = predicates;
 
-            this.behavior = mesh.behavior;
+            behavior = mesh.behavior;
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace TriangleNet
         private Point FindNewLocationWithoutMaxAngle(Vertex torg, Vertex tdest, Vertex tapex,
             ref double xi, ref double eta, bool offcenter, Otri badotri)
         {
-            double offconstant = behavior.offconstant;
+            var offconstant = behavior.offconstant;
 
             // for calculating the distances of the edges
             double xdo, ydo, xao, yao, xda, yda;
@@ -110,12 +110,12 @@ namespace TriangleNet
             Point smallestAngleCorner, middleAngleCorner, largestAngleCorner;
 
             // keeps the type of orientation if the triangle
-            int orientation = 0;
+            var orientation = 0;
             // keeps the coordinates of circumcenter of itself and neighbor triangle circumcenter
             Point myCircumcenter, neighborCircumcenter;
 
             // keeps if bad triangle is almost good or not
-            int almostGood = 0;
+            var almostGood = 0;
             // keeps the cosine of the largest angle
             double cosMaxAngle;
             bool isObtuse; // 1: obtuse 0: nonobtuse
@@ -125,8 +125,8 @@ namespace TriangleNet
             double xPetalCtr_1, yPetalCtr_1, xPetalCtr_2, yPetalCtr_2, xPetalCtr, yPetalCtr, xMidOfShortestEdge, yMidOfShortestEdge;
             double dxcenter1, dycenter1, dxcenter2, dycenter2;
             // for finding neighbor
-            Otri neighborotri = default(Otri);
-            double[] thirdPoint = new double[2];
+            var neighborotri = default(Otri);
+            var thirdPoint = new double[2];
             //int neighborNotFound = -1;
             bool neighborNotFound;
             // for keeping the vertices of the neighbor triangle
@@ -143,13 +143,13 @@ namespace TriangleNet
 
             // for vector calculations in perturbation
             double ax, ay, d;
-            double pertConst = 0.06; // perturbation constant
+            var pertConst = 0.06; // perturbation constant
 
             double lengthConst = 1; // used at comparing circumcenter's distance to proposed point's distance
             double justAcute = 1; // used for making the program working for one direction only
             // for smoothing
-            int relocated = 0;// used to differentiate between calling the deletevertex and just proposing a steiner point
-            double[] newloc = new double[2];   // new location suggested by smoothing
+            var relocated = 0;// used to differentiate between calling the deletevertex and just proposing a steiner point
+            var newloc = new double[2];   // new location suggested by smoothing
             double origin_x = 0, origin_y = 0; // for keeping torg safe
             Otri delotri; // keeping the original orientation for relocation process
             // keeps the first and second direction suggested points
@@ -745,7 +745,7 @@ namespace TriangleNet
                 }// end of relocation
             }// end of almostGood
 
-            Point circumcenter = new Point();
+            var circumcenter = new Point();
 
             if (relocated <= 0)
             {

@@ -9,10 +9,10 @@ namespace TriangleNet
 {
     using System;
     using System.Collections.Generic;
-    using TriangleNet.Geometry;
-    using TriangleNet.Meshing;
-    using TriangleNet.Tools;
-    using TriangleNet.Topology;
+    using Geometry;
+    using Meshing;
+    using Tools;
+    using Topology;
 
     /// <summary>
     /// Mesh validation helper.
@@ -28,18 +28,18 @@ namespace TriangleNet
         /// <returns>True, if mesh is topologically consistent.</returns>
         public static bool IsConsistent(Mesh mesh)
         {
-            Otri tri = default(Otri);
-            Otri oppotri = default(Otri), oppooppotri = default(Otri);
+            var tri = default(Otri);
+            Otri oppotri = default, oppooppotri = default;
             Vertex org, dest, apex;
             Vertex oppoorg, oppodest;
 
             var logger = Log.Instance;
 
             // Temporarily turn on exact arithmetic if it's off.
-            bool saveexact = Behavior.NoExact;
+            var saveexact = Behavior.NoExact;
             Behavior.NoExact = false;
 
-            int horrors = 0;
+            var horrors = 0;
 
             // Run through the list of triangles, checking each one.
             foreach (var t in mesh.triangles)
@@ -144,9 +144,9 @@ namespace TriangleNet
         /// </summary>
         private static bool IsDelaunay(Mesh mesh, bool constrained)
         {
-            Otri loop = default(Otri);
-            Otri oppotri = default(Otri);
-            Osub opposubseg = default(Osub);
+            var loop = default(Otri);
+            var oppotri = default(Otri);
+            var opposubseg = default(Osub);
             Vertex org, dest, apex;
             Vertex oppoapex;
 
@@ -155,10 +155,10 @@ namespace TriangleNet
             var logger = Log.Instance;
 
             // Temporarily turn on exact arithmetic if it's off.
-            bool saveexact = Behavior.NoExact;
+            var saveexact = Behavior.NoExact;
             Behavior.NoExact = false;
 
-            int horrors = 0;
+            var horrors = 0;
 
             var inf1 = mesh.infvertex1;
             var inf2 = mesh.infvertex2;
@@ -239,7 +239,7 @@ namespace TriangleNet
 
             foreach (var triangle in mesh.Triangles)
             {
-                for (int i = 0; i < 3; i++)
+                for (var i = 0; i < 3; i++)
                 {
                     var neighbor = triangle.GetNeighbor(i);
 

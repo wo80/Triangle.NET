@@ -9,31 +9,31 @@ namespace TriangleNet.Meshing
 {
     using System;
     using System.Collections.Generic;
-    using TriangleNet.Geometry;
-    using TriangleNet.Meshing.Data;
-    using TriangleNet.Topology;
+    using Geometry;
+    using Data;
+    using Topology;
 
     /// <summary>
     /// Provides methods for mesh quality enforcement and testing.
     /// </summary>
-    class QualityMesher
+    internal class QualityMesher
     {
-        IPredicates predicates;
+        private IPredicates predicates;
 
-        Queue<BadSubseg> badsubsegs;
-        BadTriQueue queue;
-        Mesh mesh;
-        Behavior behavior;
+        private Queue<BadSubseg> badsubsegs;
+        private BadTriQueue queue;
+        private Mesh mesh;
+        private Behavior behavior;
 
-        NewLocation newLocation;
+        private NewLocation newLocation;
 
-        Log logger = Log.Instance;
+        private Log logger = Log.Instance;
 
         // Stores the vertices of the triangle that contains newvertex
         // in SplitTriangle method.
-        Triangle newvertex_tri;
+        private Triangle newvertex_tri;
 
-        bool enableAcute = true;
+        private bool enableAcute = true;
 
         public QualityMesher(Mesh mesh, Configuration config)
         {
@@ -41,9 +41,9 @@ namespace TriangleNet.Meshing
             queue = new BadTriQueue();
 
             this.mesh = mesh;
-            this.predicates = config.Predicates();
+            predicates = config.Predicates();
 
-            this.behavior = mesh.behavior;
+            behavior = mesh.behavior;
 
             newLocation = new NewLocation(mesh, predicates);
 
@@ -55,7 +55,7 @@ namespace TriangleNet.Meshing
         /// </summary>
         /// <param name="quality">The quality constraints.</param>
         /// <param name="delaunay">A value indicating, whether the refined mesh should be Conforming Delaunay.</param>
-        public void Apply(QualityOptions quality, bool delaunay = false)
+        public void Apply(QualityOptions? quality, bool delaunay = false)
         {
             // Copy quality options
             if (quality != null)
@@ -135,8 +135,8 @@ namespace TriangleNet.Meshing
         /// </remarks>
         public int CheckSeg4Encroach(ref Osub testsubseg)
         {
-            Otri neighbortri = default(Otri);
-            Osub testsym = default(Osub);
+            var neighbortri = default(Otri);
+            var testsym = default(Osub);
             BadSubseg encroachedseg;
             double dotproduct;
             int encroached;
@@ -240,12 +240,12 @@ namespace TriangleNet.Meshing
         /// </remarks>
         public void TestTriangle(ref Otri testtri)
         {
-            Otri tri1 = default(Otri), tri2 = default(Otri);
-            Osub testsub = default(Osub);
+            Otri tri1 = default, tri2 = default;
+            var testsub = default(Osub);
             Vertex torg, tdest, tapex;
             Vertex base1, base2;
             Vertex org1, dest1, org2, dest2;
-            Vertex joinvertex;
+            Vertex? joinvertex;
             double dxod, dyod, dxda, dyda, dxao, dyao;
             double dxod2, dyod2, dxda2, dyda2, dxao2, dyao2;
             double apexlen, orglen, destlen, minedge;
@@ -446,7 +446,7 @@ namespace TriangleNet.Meshing
         /// </summary>
         private void TallyEncs()
         {
-            Osub subsegloop = default(Osub);
+            var subsegloop = default(Osub);
             subsegloop.orient = 0;
 
             foreach (var seg in mesh.subsegs.Values)
@@ -470,10 +470,10 @@ namespace TriangleNet.Meshing
         /// </remarks>
         private void SplitEncSegs(bool triflaws)
         {
-            Otri enctri = default(Otri);
-            Otri testtri = default(Otri);
-            Osub testsh = default(Osub);
-            Osub currentenc = default(Osub);
+            var enctri = default(Otri);
+            var testtri = default(Otri);
+            var testsh = default(Osub);
+            var currentenc = default(Osub);
             BadSubseg seg;
             Vertex eorg, edest, eapex;
             Vertex newvertex;
@@ -694,7 +694,7 @@ namespace TriangleNet.Meshing
         /// </summary>
         private void TallyFaces()
         {
-            Otri triangleloop = default(Otri);
+            var triangleloop = default(Otri);
             triangleloop.orient = 0;
 
             foreach (var tri in mesh.triangles)
@@ -713,7 +713,7 @@ namespace TriangleNet.Meshing
         /// <param name="badtri"></param>
         private void SplitTriangle(BadTriangle badtri)
         {
-            Otri badotri = default(Otri);
+            var badotri = default(Otri);
             Vertex borg, bdest, bapex;
             Point newloc; // Location of the new vertex
             double xi = 0, eta = 0;
@@ -757,7 +757,7 @@ namespace TriangleNet.Meshing
                 {
                     // The new vertex must be in the interior, and therefore is a
                     // free vertex with a marker of zero.
-                    Vertex newvertex = new Vertex(newloc.x, newloc.y, 0
+                    var newvertex = new Vertex(newloc.x, newloc.y, 0
 #if USE_ATTRIBS
                         , mesh.nextras
 #endif
@@ -782,7 +782,7 @@ namespace TriangleNet.Meshing
 
                     // Insert the circumcenter, searching from the edge of the triangle,
                     // and maintain the Delaunay property of the triangulation.
-                    Osub tmp = default(Osub);
+                    var tmp = default(Osub);
                     success = mesh.InsertVertex(newvertex, ref badotri, ref tmp, true, true);
 
                     if (success == InsertVertexResult.Successful)

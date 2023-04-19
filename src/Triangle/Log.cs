@@ -19,30 +19,25 @@ namespace TriangleNet
     /// </summary>
     public class LogItem
     {
-        private readonly DateTime time;
-        private readonly LogLevel level;
-        private readonly string message;
-        private readonly string details;
-
         /// <summary>
         /// Gets the <see cref="DateTime"/> the item was logged.
         /// </summary>
-        public DateTime Time => time;
+        public DateTime Time { get; }
 
         /// <summary>
         /// Gets the <see cref="LogLevel"/>.
         /// </summary>
-        public LogLevel Level => level;
+        public LogLevel Level { get; }
 
         /// <summary>
         /// Gets the log message.
         /// </summary>
-        public string Message => message;
+        public string Message { get; }
 
         /// <summary>
         /// Gets further details of the log message.
         /// </summary>
-        public string Details => details;
+        public string Details { get; }
 
         /// <summary>
         /// Creates a new instance of the <see cref="LogItem"/> class.
@@ -61,11 +56,11 @@ namespace TriangleNet
         /// <param name="details">The message details.</param>
         public LogItem(LogLevel level, string message, string details)
         {
-            time = DateTime.Now;
+            Time = DateTime.Now;
 
-            this.level = level;
-            this.message = message;
-            this.details = details;
+            this.Level = level;
+            this.Message = message;
+            this.Details = details;
         }
     }
 
@@ -91,8 +86,6 @@ namespace TriangleNet
         // Singleton pattern as proposed by Jon Skeet:
         // https://csharpindepth.com/Articles/Singleton
 
-        private static readonly Log instance = new Log();
-
         // Explicit static constructor to tell C# compiler
         // not to mark type as beforefieldinit
         static Log() { }
@@ -102,7 +95,7 @@ namespace TriangleNet
         /// <summary>
         /// Gets the <see cref="Log"/> instance.
         /// </summary>
-        public static Log Instance => instance;
+        public static Log Instance { get; } = new Log();
 
         #endregion
 

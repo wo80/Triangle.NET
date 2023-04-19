@@ -15,15 +15,13 @@ namespace TriangleNet.Tools
     public class AdjacencyMatrix
     {
         // Number of adjacency entries.
-        int nnz;
+        private int nnz;
 
         // Pointers into the actual adjacency structure adj. Information about row k is
         // stored in entries pcol(k) through pcol(k+1)-1 of adj. Size: N + 1
-        int[] pcol;
 
         // The adjacency structure. For each row, it contains the column indices 
         // of the nonzero entries. Size: nnz
-        int[] irow;
 
         /// <summary>
         /// Gets the number of columns (nodes of the mesh).
@@ -33,12 +31,12 @@ namespace TriangleNet.Tools
         /// <summary>
         /// Gets the column pointers.
         /// </summary>
-        public int[] ColumnPointers => pcol;
+        public int[] ColumnPointers { get; }
 
         /// <summary>
         /// Gets the row indices.
         /// </summary>
-        public int[] RowIndices => irow;
+        public int[] RowIndices { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdjacencyMatrix" /> class.
@@ -62,7 +60,7 @@ namespace TriangleNet.Tools
         /// <param name="renumber">Determines whether nodes should automatically be renumbered.</param>
         public AdjacencyMatrix(Mesh mesh, bool renumber)
         {
-            int n = mesh.vertices.Count;
+            var n = mesh.vertices.Count;
 
             // Undead vertices should not be considered in the adjacency matrix.
             ColumnCount = n - mesh.undeads;
@@ -70,7 +68,7 @@ namespace TriangleNet.Tools
             if (renumber)
             {
                 // Renumber nodes, excluding undeads.
-                int i = 0;
+                var i = 0;
                 foreach (var vertex in mesh.vertices.Values)
                 {
                     vertex.id = vertex.type == VertexType.UndeadVertex ? -i : i++;
@@ -78,11 +76,11 @@ namespace TriangleNet.Tools
             }
 
             // Set up the adj_row adjacency pointer array.
-            pcol = AdjacencyCount(mesh);
-            nnz = pcol[ColumnCount];
+            ColumnPointers = AdjacencyCount(mesh);
+            nnz = ColumnPointers[ColumnCount];
 
             // Set up the adj adjacency array.
-            irow = AdjacencySet(mesh, pcol);
+            RowIndices = AdjacencySet(mesh, ColumnPointers);
 
             SortIndices();
         }
@@ -99,8 +97,8 @@ namespace TriangleNet.Tools
 
             nnz = pcol[ColumnCount];
 
-            this.pcol = pcol;
-            this.irow = irow;
+            this.ColumnPointers = pcol;
+            this.RowIndices = irow;
 
             if (pcol[0] != 0)
             {
@@ -119,14 +117,14 @@ namespace TriangleNet.Tools
         /// <returns>Bandwidth of the adjacency matrix.</returns>
         public int Bandwidth()
         {
-            int band_lo = 0;
-            int band_hi = 0;
+            var band_lo = 0;
+            var band_hi = 0;
 
-            for (int i = 0; i < ColumnCount; i++)
+            for (var i = 0; i < ColumnCount; i++)
             {
-                for (int j = pcol[i]; j < pcol[i + 1]; j++)
+                for (var j = ColumnPointers[i]; j < ColumnPointers[i + 1]; j++)
                 {
-                    int col = irow[j];
+                    var col = RowIndices[j];
                     band_lo = Math.Max(band_lo, i - col);
                     band_hi = Math.Max(band_hi, col - i);
                 }
@@ -150,16 +148,16 @@ namespace TriangleNet.Tools
         /// Two nodes are "adjacent" if they are both nodes in some triangle.
         /// Also, a node is considered to be adjacent to itself.
         /// </remarks>
-        int[] AdjacencyCount(Mesh mesh)
+        private int[] AdjacencyCount(Mesh mesh)
         {
-            int n = ColumnCount;
+            var n = ColumnCount;
             int n1, n2, n3;
             int tid, nid;
 
-            int[] pcol = new int[n + 1];
+            var pcol = new int[n + 1];
 
             // Set every node to be adjacent to itself.
-            for (int i = 0; i < n; i++)
+            for (var i = 0; i < n; i++)
             {
                 pcol[i] = 1;
             }
@@ -205,13 +203,13 @@ namespace TriangleNet.Tools
 
             // We used PCOL to count the number of entries in each column.
             // Convert it to pointers into the ADJ array.
-            for (int i = n; i > 0; i--)
+            for (var i = n; i > 0; i--)
             {
                 pcol[i] = pcol[i - 1];
             }
 
             pcol[0] = 0;
-            for (int i = 1; i <= n; i++)
+            for (var i = 1; i <= n; i++)
             {
                 pcol[i] = pcol[i - 1] + pcol[i];
             }
@@ -227,11 +225,11 @@ namespace TriangleNet.Tools
         /// for a linear triangle finite element discretization of Poisson's
         /// equation in two dimensions.
         /// </remarks>
-        int[] AdjacencySet(Mesh mesh, int[] pcol)
+        private int[] AdjacencySet(Mesh mesh, int[] pcol)
         {
-            int n = ColumnCount;
+            var n = ColumnCount;
 
-            int[] col = new int[n];
+            var col = new int[n];
 
             // Copy of the adjacency rows input.
             Array.Copy(pcol, col, n);
@@ -239,7 +237,7 @@ namespace TriangleNet.Tools
             int i, nnz = pcol[n];
 
             // Output list, stores the actual adjacency information.
-            int[] list = new int[nnz];
+            var list = new int[nnz];
 
             // Set every node to be adjacent to itself.
             for (i = 0; i < n; i++)
@@ -300,13 +298,13 @@ namespace TriangleNet.Tools
         {
             int k1, k2, n = ColumnCount;
 
-            var list = irow;
+            var list = RowIndices;
 
             // Ascending sort the entries for each column.
-            for (int i = 0; i < n; i++)
+            for (var i = 0; i < n; i++)
             {
-                k1 = pcol[i];
-                k2 = pcol[i + 1];
+                k1 = ColumnPointers[i];
+                k2 = ColumnPointers[i + 1];
                 Array.Sort(list, k1, k2 - k1);
             }
         }

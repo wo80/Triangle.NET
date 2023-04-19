@@ -2,23 +2,21 @@
 namespace TriangleNet.Rendering
 {
     using System.Collections.Generic;
-    using TriangleNet.Geometry;
-    using TriangleNet.Meshing;
-    using TriangleNet.Rendering.Util;
+    using Geometry;
+    using Meshing;
+    using Util;
 
     public class RenderManager
     {
         // TODO: delete
         public static bool VORONOI_DEBUG = false;
 
-        IRenderControl control;
-        IRenderContext context;
-        IRenderer renderer;
-        Projection zoom;
+        private IRenderer renderer;
+        private Projection zoom;
 
-        public IRenderControl Control => control; 
+        public IRenderControl Control { get; private set; }
 
-        public IRenderContext Context => context;
+        public IRenderContext Context { get; private set; }
 
         public RenderManager()
         {
@@ -31,16 +29,16 @@ namespace TriangleNet.Rendering
 
         public void Initialize(IRenderControl control, IRenderer renderer)
         {
-            this.zoom = new Projection(control.ClientRectangle);
+            zoom = new Projection(control.ClientRectangle);
 
-            this.context = new RenderContext(zoom, ColorManager.Default());
+            Context = new RenderContext(zoom, ColorManager.Default());
 
             this.renderer = renderer;
-            this.renderer.Context = context;
+            this.renderer.Context = Context;
 
-            this.control = control;
-            this.control.Initialize();
-            this.control.Renderer = renderer;
+            this.Control = control;
+            this.Control.Initialize();
+            this.Control.Renderer = renderer;
         }
 
         public bool TryCreateControl(string assemblyName, IEnumerable<string> dependencies,
@@ -51,39 +49,39 @@ namespace TriangleNet.Rendering
 
         public void Resize()
         {
-            control.HandleResize();
+            Control.HandleResize();
         }
 
         public void Clear()
         {
-            context.Clear();
-            control.Refresh();
+            Context.Clear();
+            Control.Refresh();
         }
 
         public void Enable(int layer, bool enabled)
         {
-            context.Enable(layer, enabled);
+            Context.Enable(layer, enabled);
 
-            control.Refresh();
+            Control.Refresh();
         }
 
         public void Set(IPolygon data, bool refresh = true)
         {
-            context.Add(data);
+            Context.Add(data);
 
             if (refresh)
             {
-                control.Refresh();
+                Control.Refresh();
             }
         }
 
         public void Set(IMesh data, bool reset, bool refresh = true)
         {
-            context.Add(data, reset);
+            Context.Add(data, reset);
 
             if (refresh)
             {
-                control.Refresh();
+                Control.Refresh();
             }
         }
 
@@ -92,24 +90,24 @@ namespace TriangleNet.Rendering
         /// </summary>
         public void Set(ICollection<Point> points, IEnumerable<IEdge> edges, bool reset, bool refresh = true)
         {
-            context.Add(points, edges, reset);
+            Context.Add(points, edges, reset);
 
             if (refresh)
             {
-                control.Refresh();
+                Control.Refresh();
             }
         }
 
         public void Update(float[] values)
         {
-            context.Add(values);
-            control.Refresh();
+            Context.Add(values);
+            Control.Refresh();
         }
 
         public void Update(int[] partition)
         {
-            context.Add(partition);
-            control.Refresh();
+            Context.Add(partition);
+            Control.Refresh();
         }
     }
 }

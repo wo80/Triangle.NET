@@ -29,7 +29,7 @@ namespace TriangleNet.Examples
             //var mesh = GetStructuredDataMesh(r);
 
             // Generate function values for mesh points.
-            double[] data = GetFunctionValues(mesh.Vertices);
+            var data = GetFunctionValues(mesh.Vertices);
 
             if (print) SvgImage.Save(mesh, "example-11.svg", 500);
 
@@ -38,13 +38,13 @@ namespace TriangleNet.Examples
 
             var xyData = InterpolateData((Mesh)mesh, data, xy);
 
-            double error = xy.Max(p => Math.Abs(xyData[p.ID] - F(p)));
+            var error = xy.Max(p => Math.Abs(xyData[p.ID] - F(p)));
 
             // L2 error
             //double error = Math.Sqrt(xy.Sum(p => Math.Pow(xyData[p.ID] - F(p), 2)));
 
             // Define tolerance dependent on mesh dimensions and size.
-            double tolerance = 0.5 * Math.Max(r.Width, r.Height) / SIZE;
+            var tolerance = 0.5 * Math.Max(r.Width, r.Height) / SIZE;
 
             return error < tolerance;
         }
@@ -62,7 +62,7 @@ namespace TriangleNet.Examples
         {
             var r = new Rectangle(domain);
 
-            double h = domain.Width / SIZE;
+            var h = domain.Width / SIZE;
 
             // Generate a rectangle boundary point set (SIZE points on each side).
             var input = Generate.Rectangle(r, h);
@@ -71,7 +71,7 @@ namespace TriangleNet.Examples
             h = -h / 2;
             r.Resize(h, h);
 
-            int n = Math.Max(1, SIZE * SIZE - input.Points.Count);
+            var n = Math.Max(1, SIZE * SIZE - input.Points.Count);
 
             // Add more input points (more sampling points, better interpolation).
             input.Points.AddRange(Generate.RandomPoints(n, r));
@@ -105,7 +105,7 @@ namespace TriangleNet.Examples
 
             var qtree = new TriangleQuadTree(mesh);
 
-            int i = 0;
+            var i = 0;
 
             foreach (var p in xy)
             {

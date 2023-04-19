@@ -2,11 +2,11 @@
 namespace TriangleNet.Examples
 {
     using System;
-    using TriangleNet.Geometry;
-    using TriangleNet.Meshing;
-    using TriangleNet.Rendering.Text;
-    using TriangleNet.Smoothing;
-    using TriangleNet.Tools;
+    using Geometry;
+    using Meshing;
+    using Rendering.Text;
+    using Smoothing;
+    using Tools;
 
     /// <summary>
     /// Triangulate a polygon with hole with maximum area constraint, followed by mesh smoothing.
@@ -39,10 +39,10 @@ namespace TriangleNet.Examples
         }
 
         // The boundary segment size of the input geometry.
-        const double h = 0.2;
+        private const double h = 0.2;
 
         // Parameter to relax the maximum area constraint.
-        const double relax = 1.45;
+        private const double relax = 1.45;
 
         public static IMesh CreateMesh()
         {

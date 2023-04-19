@@ -9,8 +9,8 @@ namespace TriangleNet.IO
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using TriangleNet.Geometry;
-    using TriangleNet.Meshing;
+    using Geometry;
+    using Meshing;
 
     /// <summary>
     /// Implements geometry and mesh file formats of the original Triangle project.
@@ -20,7 +20,7 @@ namespace TriangleNet.IO
         /// <inheritdoc />
         public bool IsSupported(string file)
         {
-            string ext = Path.GetExtension(file).ToLower();
+            var ext = Path.GetExtension(file).ToLower();
 
             if (ext == ".node" || ext == ".poly" || ext == ".ele")
             {
@@ -33,7 +33,7 @@ namespace TriangleNet.IO
         /// <inheritdoc />
         public IMesh Import(string filename)
         {
-            string ext = Path.GetExtension(filename);
+            var ext = Path.GetExtension(filename);
 
             if (ext == ".node" || ext == ".poly" || ext == ".ele")
             {
@@ -69,7 +69,7 @@ namespace TriangleNet.IO
         /// <inheritdoc />
         public IPolygon Read(string filename)
         {
-            string ext = Path.GetExtension(filename);
+            var ext = Path.GetExtension(filename);
 
             if (ext == ".node")
             {

@@ -7,15 +7,15 @@
 namespace TriangleNet.Meshing.Iterators
 {
     using System.Collections.Generic;
-    using TriangleNet.Geometry;
-    using TriangleNet.Topology;
+    using Geometry;
+    using Topology;
 
     /// <summary>
     /// Vertex circulator to enumerate the vertices connected to a mesh vertex.
     /// </summary>
     public class VertexCirculator
     {
-        List<Otri> cache = new List<Otri>();
+        private List<Otri> cache = new List<Otri>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VertexCirculator" /> class.
@@ -59,9 +59,9 @@ namespace TriangleNet.Meshing.Iterators
         {
             cache.Clear();
 
-            Otri init = vertex.tri;
-            Otri next = default(Otri);
-            Otri prev = default(Otri);
+            var init = vertex.tri;
+            var next = default(Otri);
+            var prev = default(Otri);
 
             init.Copy(ref next);
 

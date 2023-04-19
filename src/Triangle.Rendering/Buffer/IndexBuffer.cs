@@ -16,7 +16,7 @@ namespace TriangleNet.Rendering.Buffer
 
             var data = buffer.Data;
 
-            int i = 0;
+            var i = 0;
 
             foreach (var e in edges)
             {
@@ -35,7 +35,7 @@ namespace TriangleNet.Rendering.Buffer
 
             var data = buffer.Data;
 
-            int i = 0;
+            var i = 0;
 
             foreach (var e in elements)
             {

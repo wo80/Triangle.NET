@@ -13,22 +13,17 @@ namespace TriangleNet.Geometry
     /// </summary>
     public class Polygon : IPolygon
     {
-        private readonly List<Vertex> points;
-        private readonly List<ISegment> segments;
-        private readonly List<Point> holes;
-        private readonly List<RegionPointer> regions;
+        /// <inheritdoc />
+        public List<Vertex> Points { get; }
 
         /// <inheritdoc />
-        public List<Vertex> Points => points;
+        public List<Point> Holes { get; }
 
         /// <inheritdoc />
-        public List<Point> Holes => holes;
+        public List<RegionPointer> Regions { get; }
 
         /// <inheritdoc />
-        public List<RegionPointer> Regions => regions;
-
-        /// <inheritdoc />
-        public List<ISegment> Segments => segments;
+        public List<ISegment> Segments { get; }
 
         /// <inheritdoc />
         public bool HasPointMarkers { get; set; }
@@ -37,10 +32,7 @@ namespace TriangleNet.Geometry
         public bool HasSegmentMarkers { get; set; }
 
         /// <inheritdoc />
-        public int Count
-        {
-            get { return points.Count; }
-        }
+        public int Count => Points.Count;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Polygon" /> class.
@@ -66,11 +58,11 @@ namespace TriangleNet.Geometry
         /// <param name="markers">Use point and segment markers.</param>
         public Polygon(int capacity, bool markers)
         {
-            points = new List<Vertex>(capacity);
-            holes = new List<Point>();
-            regions = new List<RegionPointer>();
+            Points = new List<Vertex>(capacity);
+            Holes = new List<Point>();
+            Regions = new List<RegionPointer>();
 
-            segments = new List<ISegment>();
+            Segments = new List<ISegment>();
 
             HasPointMarkers = markers;
             HasSegmentMarkers = markers;
@@ -80,7 +72,7 @@ namespace TriangleNet.Geometry
         public Rectangle Bounds()
         {
             var bounds = new Rectangle();
-            bounds.Expand(points);
+            bounds.Expand(Points);
 
             return bounds;
         }
@@ -88,33 +80,33 @@ namespace TriangleNet.Geometry
         /// <inheritdoc />
         public void Add(Vertex vertex)
         {
-            points.Add(vertex);
+            Points.Add(vertex);
         }
 
         /// <inheritdoc />
         public void Add(ISegment segment, bool insert = false)
         {
-            segments.Add(segment);
+            Segments.Add(segment);
 
             if (insert)
             {
-                points.Add(segment.GetVertex(0));
-                points.Add(segment.GetVertex(1));
+                Points.Add(segment.GetVertex(0));
+                Points.Add(segment.GetVertex(1));
             }
         }
 
         /// <inheritdoc />
         public void Add(ISegment segment, int index)
         {
-            segments.Add(segment);
+            Segments.Add(segment);
 
-            points.Add(segment.GetVertex(index));
+            Points.Add(segment.GetVertex(index));
         }
 
         private void AddContourPointsAndSegments(Contour contour)
         {
-            points.AddRange(contour.Points);
-            segments.AddRange(contour.GetSegments());
+            Points.AddRange(contour.Points);
+            Segments.AddRange(contour.GetSegments());
         }
 
         /// <inheritdoc />
@@ -145,7 +137,7 @@ namespace TriangleNet.Geometry
         public void Add(Contour contour, Point hole)
         {
             AddContourPointsAndSegments(contour);
-            holes.Add(hole);
+            Holes.Add(hole);
         }
     }
 }

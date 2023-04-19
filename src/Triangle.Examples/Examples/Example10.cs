@@ -4,7 +4,7 @@ namespace TriangleNet.Examples
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using TriangleNet.Geometry;
+    using Geometry;
 
     /// <summary>
     /// Troubleshooting: finding degenerate boundary triangles.
@@ -33,7 +33,7 @@ namespace TriangleNet.Examples
             // The original rectangle.
             var poly = Rotate(pts, 0);
 
-            for (int i = 0; i < 10; i++)
+            for (var i = 0; i < 10; i++)
             {
                 var mesh = poly.Triangulate();
 
@@ -67,18 +67,18 @@ namespace TriangleNet.Examples
         {
             var poly = new Polygon(points.Count);
 
-            int id = 0;
+            var id = 0;
 
             foreach (var p in points)
             {
-                double x = p.X;
-                double y = p.Y;
+                var x = p.X;
+                var y = p.Y;
 
-                double s = Math.Sin(radians);
-                double c = Math.Cos(radians);
+                var s = Math.Sin(radians);
+                var c = Math.Cos(radians);
 
-                double xr = c * x - s * y;
-                double yr = s * x + c * y;
+                var xr = c * x - s * y;
+                var yr = s * x + c * y;
 
                 poly.Points.Add(new Vertex(xr, yr) { ID = id++ });
             }
