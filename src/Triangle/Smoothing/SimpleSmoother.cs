@@ -23,12 +23,11 @@ namespace TriangleNet.Smoothing
     public class SimpleSmoother
     {
 
-        TrianglePool pool;
-        Configuration config;
+        private readonly TrianglePool pool;
+        private readonly Configuration config;
+        private readonly IVoronoiFactory factory;
 
-        IVoronoiFactory factory;
-
-        ConstraintOptions options;
+        private readonly ConstraintOptions options;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SimpleSmoother" /> class.
@@ -44,13 +43,13 @@ namespace TriangleNet.Smoothing
         public SimpleSmoother(IVoronoiFactory factory)
         {
             this.factory = factory;
-            this.pool = new TrianglePool();
+            pool = new TrianglePool();
 
-            this.config = new Configuration(
+            config = new Configuration(
                 () => RobustPredicates.Default,
                 () => pool.Restart());
 
-            this.options = new ConstraintOptions() { ConformingDelaunay = true };
+            options = new ConstraintOptions() { ConformingDelaunay = true };
         }
 
         /// <summary>
@@ -63,7 +62,7 @@ namespace TriangleNet.Smoothing
             this.factory = factory;
             this.config = config;
 
-            this.options = new ConstraintOptions() { ConformingDelaunay = true };
+            options = new ConstraintOptions() { ConformingDelaunay = true };
         }
 
         /// <summary>
@@ -93,17 +92,18 @@ namespace TriangleNet.Smoothing
             var predicates = config.Predicates();
 
             // The smoother should respect the mesh segment splitting behavior.
-            this.options.SegmentSplitting = smoothedMesh.behavior.NoBisect;
+            options.SegmentSplitting = smoothedMesh.behavior.NoBisect;
 
             // The maximum distances moved from any site at the previous and
             // current iterations.
             double
-                prevMax = Double.PositiveInfinity,
-                currMax = Step(smoothedMesh, factory, predicates);
+                prevMax = double.PositiveInfinity,
+                currMax = 1d;
+
             // Take a few smoothing rounds (Lloyd's algorithm). The stop
             // criteria are the maximum number of iterations and the convergence
             // criterion.
-            int i = 1;
+            int i = 0;
             while (i < limit && Math.Abs(currMax - prevMax) > tol * currMax)
             {
                 prevMax = currMax;
@@ -134,7 +134,11 @@ namespace TriangleNet.Smoothing
             {
                 if (face.generator.label == 0)
                 {
+#if SMOOTHER_DENSITY
+                    WeightedCentroid(face, out x, out y);
+#else
                     Centroid(face, out x, out y);
+#endif
 
                     double
                         xShift = face.generator.x - x,
@@ -183,6 +187,57 @@ namespace TriangleNet.Smoothing
 
             //area = atmp / 2;
         }
+
+#if SMOOTHER_DENSITY
+        /// <summary>
+        /// A density function for the given mesh geometry influencing the distribution
+        /// of vertices during smoothing (default = constant 1).
+        /// </summary>
+        public Func<double, double, double> Density { get; set; } = (x, y) => 1d;
+
+        /// <summary>
+        /// Calculate the weighted centroid of a polygon.
+        /// </summary>
+        private void WeightedCentroid(Face face, out double x, out double y)
+        {
+            var edge = face.Edge;
+            var first = edge.Next.ID;
+
+            Point p, q, generator = face.generator;
+
+            double den, weight, area, total = 0, xtmp = 0, ytmp = 0;
+
+            double cx, cy,
+                mx = generator.x,
+                my = generator.y;
+
+            do
+            {
+                p = edge.Origin;
+                q = edge.Twin.Origin;
+
+                // Center of triangle for mid-point quadrature rule.
+                cx = (p.x + q.x + mx) / 3.0;
+                cy = (p.y + q.y + my) / 3.0;
+
+                area = 0.5 * ((p.x - mx) * (q.y - my) - (p.y - my) * (q.x - mx));
+
+                den = Density(cx, cy);
+                weight = den * area;
+
+                total += weight;
+
+                xtmp += weight * cx;
+                ytmp += weight * cy;
+
+                edge = edge.Next;
+
+            } while (edge.Next.ID != first);
+
+            x = xtmp / total;
+            y = ytmp / total;
+        }
+#endif
 
         /// <summary>
         /// Rebuild the input geometry.
