@@ -10,9 +10,9 @@ namespace TriangleNet.Examples
     /// <summary>
     /// Refine only a part of a polygon mesh by using region pointers and an area constraint.
     /// </summary>
-    public class Example5
+    public class Example5 : IExample
     {
-        public static bool Run(bool print = false)
+        public bool Run(bool print = false)
         {
             // Generate the input geometry.
             var poly = CreatePolygon();

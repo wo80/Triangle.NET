@@ -1,18 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using TriangleNet.Geometry;
-using TriangleNet.Meshing;
-using TriangleNet.Meshing.Algorithm;
-using TriangleNet.Rendering.Text;
-using TriangleNet.Tools;
-
+﻿
 namespace TriangleNet.Examples
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using TriangleNet.Geometry;
+    using TriangleNet.Meshing;
+    using TriangleNet.Meshing.Algorithm;
+    using TriangleNet.Rendering.Text;
+    using TriangleNet.Tools;
+
     /// <summary>
     /// Scattered data interpolation without USE_Z or USE_ATTRIBS.
     /// </summary>
-    internal class Example11
+    public class Example11 : IExample
     {
         // The function we are sampling.
         private static readonly Func<Point, double> F = p => Math.Sin(p.X) * Math.Cos(p.Y);
@@ -20,7 +21,7 @@ namespace TriangleNet.Examples
         // The mesh size, for a structured grid (SIZE x SIZE) points.
         private const int SIZE = 20;
 
-        public static bool Run(bool print = false)
+        public bool Run(bool print = false)
         {
             // The input domain.
             var r = new Rectangle(0d, 0d, 10d, 10d);

@@ -1,4 +1,5 @@
-﻿namespace TriangleNet.Examples
+﻿
+namespace TriangleNet.Examples
 {
     using TriangleNet.Geometry;
     using TriangleNet.Meshing;
@@ -7,9 +8,9 @@
     /// <summary>
     /// Triangulate a polygon with hole and set minimum angle constraint.
     /// </summary>
-    public static class Example3
+    public class Example3 : IExample
     {
-        public static bool Run(bool print = false)
+        public bool Run(bool print = false)
         {
             // Generate the input geometry.
             var poly = CreatePolygon();

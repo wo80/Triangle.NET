@@ -1,4 +1,5 @@
-﻿namespace TriangleNet.Examples
+﻿
+namespace TriangleNet.Examples
 {
     using System.Linq;
     using TriangleNet;
@@ -11,9 +12,9 @@
     /// <summary>
     /// Boolean operations on mesh regions (intersection, difference, xor).
     /// </summary>
-    public static class Example7
+    public class Example7 : IExample
     {
-        public static bool Run(bool print = false)
+        public bool Run(bool print = false)
         {
             // Generate the input geometry.
             var polygon = new Polygon(8, true);

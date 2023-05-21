@@ -11,9 +11,9 @@ namespace TriangleNet.Examples
     /// <summary>
     /// Two ways finding boundary triangles.
     /// </summary>
-    public static class Example6
+    public class Example6 : IExample
     {
-        public static bool Run(bool print = false)
+        public bool Run(bool print = false)
         {
             var mesh = Example4.CreateMesh();
 

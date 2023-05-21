@@ -11,9 +11,9 @@ namespace TriangleNet.Examples
     /// <summary>
     /// Triangulate a polygon with hole with maximum area constraint, followed by mesh smoothing.
     /// </summary>
-    public class Example4
+    public class Example4 : IExample
     {
-        public static bool Run(bool print = false)
+        public bool Run(bool print = false)
         {
             // Generate mesh.
             var mesh = CreateMesh();

@@ -10,11 +10,11 @@ namespace TriangleNet.Examples
     /// <summary>
     /// Using a user test function to define a maximum edge length constraint.
     /// </summary>
-    public static class Example8
+    public class Example8 : IExample
     {
         const double MAX_EDGE_LENGTH = 0.2;
 
-        public static bool Run(bool print = false)
+        public bool Run(bool print = false)
         {
             var poly = new Polygon();
 

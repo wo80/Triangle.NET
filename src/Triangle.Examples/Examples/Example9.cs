@@ -1,7 +1,6 @@
 ﻿
 namespace TriangleNet.Examples
 {
-    using System;
     using System.Collections.Generic;
     using TriangleNet;
     using TriangleNet.Meshing.Iterators;
@@ -10,9 +9,9 @@ namespace TriangleNet.Examples
     /// <summary>
     /// Compute the adjacency matrix of the mesh vertices.
     /// </summary>
-    public class Example9
+    public class Example9 : IExample
     {
-        public static bool Run()
+        public bool Run(bool print)
         {
             var mesh = (Mesh)Example4.CreateMesh();
 

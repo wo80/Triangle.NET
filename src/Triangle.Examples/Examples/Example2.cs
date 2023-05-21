@@ -9,9 +9,9 @@ namespace TriangleNet.Examples
     /// <summary>
     /// Simple point set triangulation with convex hull.
     /// </summary>
-    public class Example2
+    public class Example2 : IExample
     {
-        public static bool Run(bool print = false)
+        public bool Run(bool print = false)
         {
             const int N = 50;
 

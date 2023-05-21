@@ -9,19 +9,42 @@ namespace TriangleNet
     {
         static void Main(string[] args)
         {
+            var examples = new IExample[]
+            {
+                new Example1(),
+                new Example2(),
+                new Example3(),
+                new Example4(),
+                new Example5(),
+                new Example6(),
+                new Example7(),
+                new Example8(),
+                new Example9(),
+                new Example10(),
+                new Example11()
+            };
+
+            int count = examples.Length;
+
+            if (args.Contains("--help") || args.Contains("-h") || args.Contains("-?"))
+            {
+                Console.WriteLine("Usage: Triangle.Examples [i [--print]] [--help]");
+                return;
+            }
+
             bool print = args.Contains("--print");
 
-            Check("Example  1", Example1.Run(print));
-            Check("Example  2", Example2.Run(print));
-            Check("Example  3", Example3.Run(print));
-            Check("Example  4", Example4.Run(print));
-            Check("Example  5", Example5.Run(print));
-            Check("Example  6", Example6.Run(print));
-            Check("Example  7", Example7.Run(print));
-            Check("Example  8", Example8.Run(print));
-            Check("Example  9", Example9.Run());
-            Check("Example 10", Example10.Run(print));
-            Check("Example 11", Example11.Run(print));
+            if (args.Length > 0 && int.TryParse(args[0], out int i))
+            {
+                Check($"Example {i,2}", examples[i - 1].Run(print));
+            }
+            else
+            {
+                for (i = 1; i <= count; i++)
+                {
+                    Check($"Example {i,2}", examples[i - 1].Run(print));
+                }
+            }
         }
 
         static void Check(string item, bool success)

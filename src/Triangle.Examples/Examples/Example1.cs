@@ -8,9 +8,9 @@ namespace TriangleNet.Examples
     /// <summary>
     /// Simple point set triangulation.
     /// </summary>
-    public class Example1
+    public class Example1 : IExample
     {
-        public static bool Run(bool print = false)
+        public bool Run(bool print = false)
         {
             // Generate points.
             var points = Generate.RandomPoints(50, new Rectangle(0, 0, 100, 100));

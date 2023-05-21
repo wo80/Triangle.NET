@@ -9,9 +9,9 @@ namespace TriangleNet.Examples
     /// <summary>
     /// Troubleshooting: finding degenerate boundary triangles.
     /// </summary>
-    public class Example10
+    public class Example10 : IExample
     {
-        public static bool Run(bool print = false)
+        public bool Run(bool print = false)
         {
             var pts = new List<Vertex>
             {
