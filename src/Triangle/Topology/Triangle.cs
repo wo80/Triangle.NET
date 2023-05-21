@@ -52,8 +52,8 @@ namespace TriangleNet.Topology
         /// </summary>
         public int ID
         {
-            get { return this.id; }
-            set { this.id = value; }
+            get { return id; }
+            set { id = value; }
         }
 
         /// <summary>
@@ -61,8 +61,8 @@ namespace TriangleNet.Topology
         /// </summary>
         public int Label
         {
-            get { return this.label; }
-            set { this.label = value; }
+            get { return label; }
+            set { label = value; }
         }
 
         /// <summary>
@@ -70,8 +70,8 @@ namespace TriangleNet.Topology
         /// </summary>
         public double Area
         {
-            get { return this.area; }
-            set { this.area = value; }
+            get { return area; }
+            set { area = value; }
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace TriangleNet.Topology
         /// <returns></returns>
         public Vertex GetVertex(int index)
         {
-            return this.vertices[index]; // TODO: Check range?
+            return vertices[index]; // TODO: Check range?
         }
 
         /// <summary>
@@ -91,14 +91,14 @@ namespace TriangleNet.Topology
         /// <returns></returns>
         public int GetVertexID(int index)
         {
-            return this.vertices[index].id;
+            return vertices[index].id;
         }
 
         /// <summary>
         /// Gets a triangles' neighbor.
         /// </summary>
         /// <param name="index">The neighbor index (0, 1 or 2).</param>
-        /// <returns>The neigbbor opposite of vertex with given index.</returns>
+        /// <returns>The neighbor opposite of vertex with given index.</returns>
         public ITriangle GetNeighbor(int index)
         {
             return neighbors[index].tri.hash == Mesh.DUMMY ? null : neighbors[index].tri;
@@ -125,13 +125,13 @@ namespace TriangleNet.Topology
         /// <inheritdoc />
         public override int GetHashCode()
         {
-            return this.hash;
+            return hash;
         }
 
         /// <inheritdoc />
         public override string ToString()
         {
-            return String.Format("TID {0}", hash);
+            return string.Format("TID {0}", hash);
         }
     }
 }

@@ -200,7 +200,7 @@ namespace TriangleNet.Meshing
 
             if (regionTris != null)
             {
-                var iterator = new RegionIterator(mesh);
+                var iterator = new RegionIterator();
 
                 for (int i = 0; i < regionTris.Length; i++)
                 {

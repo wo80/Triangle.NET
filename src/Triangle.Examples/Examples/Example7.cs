@@ -35,7 +35,7 @@ namespace TriangleNet.Examples
             // both rectangles).
             var seed = (new TriangleQuadTree(mesh)).Query(2.0, 2.0) as Triangle;
 
-            var iterator = new RegionIterator(mesh);
+            var iterator = new RegionIterator();
 
             iterator.Process(seed, t => t.Label ^= 1, 1);
             iterator.Process(seed, t => t.Label ^= 2, 2);

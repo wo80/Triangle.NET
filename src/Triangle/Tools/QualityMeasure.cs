@@ -145,7 +145,7 @@ namespace TriangleNet.Tools
         public Measure Eta => _eta;
 
         /// <summary>
-        /// Gets the Q measure, also knows as normalized shape ratio (NSR).
+        /// Gets the Q measure, also known as normalized shape ratio (NSR).
         /// </summary>
         /// <remarks>
         /// The Q measure relates the incircle to the circumcircle radius.

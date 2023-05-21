@@ -136,31 +136,31 @@ namespace TriangleNet.Smoothing
 
             public int Capacity
             {
-                get { return this.pool.Length; }
+                get { return pool.Length; }
                 set { Resize(value); }
             }
 
             public ObjectPool(int capacity = 3)
             {
-                this.index = 0;
-                this.count = 0;
+                index = 0;
+                count = 0;
 
-                this.pool = new T[capacity];
+                pool = new T[capacity];
             }
 
             public ObjectPool(T[] pool)
             {
-                this.index = 0;
-                this.count = 0;
+                index = 0;
+                count = 0;
 
                 this.pool = pool;
             }
 
             public bool TryGet(out T obj)
             {
-                if (this.index < this.count)
+                if (index < count)
                 {
-                    obj = this.pool[this.index++];
+                    obj = pool[index++];
 
                     return true;
                 }
@@ -172,28 +172,28 @@ namespace TriangleNet.Smoothing
 
             public void Put(T obj)
             {
-                var capacity = this.pool.Length;
+                var capacity = pool.Length;
 
-                if (capacity <= this.count)
+                if (capacity <= count)
                 {
                     Resize(2 * capacity);
                 }
 
-                this.pool[this.count++] = obj;
+                pool[count++] = obj;
 
-                this.index++;
+                index++;
             }
 
             public void Release()
             {
-                this.index = 0;
+                index = 0;
             }
 
             private void Resize(int size)
             {
-                if (size > this.count)
+                if (size > count)
                 {
-                    Array.Resize(ref this.pool, size);
+                    Array.Resize(ref pool, size);
                 }
             }
         }

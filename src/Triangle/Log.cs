@@ -19,30 +19,25 @@ namespace TriangleNet
     /// </summary>
     public class LogItem
     {
-        private readonly DateTime time;
-        private readonly LogLevel level;
-        private readonly string message;
-        private readonly string details;
-
         /// <summary>
         /// Gets the <see cref="DateTime"/> the item was logged.
         /// </summary>
-        public DateTime Time => time;
+        public DateTime Time { get; }
 
         /// <summary>
         /// Gets the <see cref="LogLevel"/>.
         /// </summary>
-        public LogLevel Level => level;
+        public LogLevel Level { get; }
 
         /// <summary>
         /// Gets the log message.
         /// </summary>
-        public string Message => message;
+        public string Message { get; }
 
         /// <summary>
         /// Gets further details of the log message.
         /// </summary>
-        public string Details => details;
+        public string Details { get; }
 
         /// <summary>
         /// Creates a new instance of the <see cref="LogItem"/> class.
@@ -61,11 +56,10 @@ namespace TriangleNet
         /// <param name="details">The message details.</param>
         public LogItem(LogLevel level, string message, string details)
         {
-            time = DateTime.Now;
-
-            this.level = level;
-            this.message = message;
-            this.details = details;
+            Time = DateTime.Now;
+            Level = level;
+            Message = message;
+            Details = details;
         }
     }
 
@@ -82,16 +76,12 @@ namespace TriangleNet
         /// <summary>
         /// Gets all log messages.
         /// </summary>
-        public IList<LogItem> Data => data;
-
-        private readonly List<LogItem> data = new List<LogItem>();
+        public IList<LogItem> Data { get; } = new List<LogItem>();
 
         #region Singleton pattern
 
         // Singleton pattern as proposed by Jon Skeet:
         // https://csharpindepth.com/Articles/Singleton
-
-        private static readonly Log instance = new Log();
 
         // Explicit static constructor to tell C# compiler
         // not to mark type as beforefieldinit
@@ -102,7 +92,7 @@ namespace TriangleNet
         /// <summary>
         /// Gets the <see cref="Log"/> instance.
         /// </summary>
-        public static Log Instance => instance;
+        public static Log Instance { get; } = new Log();
 
         #endregion
 
@@ -112,7 +102,7 @@ namespace TriangleNet
         /// <param name="item"></param>
         public void Add(LogItem item)
         {
-            data.Add(item);
+            Data.Add(item);
         }
 
         /// <summary>
@@ -120,7 +110,7 @@ namespace TriangleNet
         /// </summary>
         public void Clear()
         {
-            data.Clear();
+            Data.Clear();
         }
 
         /// <summary>
@@ -129,7 +119,7 @@ namespace TriangleNet
         /// <param name="message">The message.</param>
         public void Info(string message)
         {
-            data.Add(new LogItem(LogLevel.Info, message));
+            Data.Add(new LogItem(LogLevel.Info, message));
         }
 
         /// <summary>
@@ -139,7 +129,7 @@ namespace TriangleNet
         /// <param name="details">Message details, for example the code location where the error occurred (class, method).</param>
         public void Warning(string message, string details)
         {
-            data.Add(new LogItem(LogLevel.Warning, message, details));
+            Data.Add(new LogItem(LogLevel.Warning, message, details));
         }
 
         /// <summary>
@@ -149,7 +139,7 @@ namespace TriangleNet
         /// <param name="details">Message details, for example the code location where the error occurred (class, method).</param>
         public void Error(string message, string details)
         {
-            data.Add(new LogItem(LogLevel.Error, message, details));
+            Data.Add(new LogItem(LogLevel.Error, message, details));
         }
     }
 }

@@ -41,7 +41,7 @@ namespace TriangleNet.Topology
             {
                 return "O-TID [null]";
             }
-            return String.Format("O-TID {0}", tri.hash);
+            return string.Format("O-TID {0}", tri.hash);
         }
 
         #region Otri primitives (public)

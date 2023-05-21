@@ -6,6 +6,7 @@
 
 namespace TriangleNet.Voronoi
 {
+    using System;
     using System.Collections.Generic;
 
     using TriangleNet.Topology;
@@ -42,8 +43,11 @@ namespace TriangleNet.Voronoi
         protected VoronoiBase(Mesh mesh, IVoronoiFactory factory, IPredicates predicates,
             bool generate) : base(false)
         {
-            this.factory = factory;
+            this.factory = factory ?? new DefaultVoronoiFactory();
             this.predicates = predicates;
+
+            edges = new List<HalfEdge>();
+            rays = new List<HalfEdge>();
 
             if (generate)
             {
@@ -52,13 +56,13 @@ namespace TriangleNet.Voronoi
         }
 
         /// <summary>
-        /// Generate the Voronoi diagram from given triangle mesh..
+        /// Generate the Voronoi diagram from given triangle mesh.
         /// </summary>
         /// <param name="mesh"></param>
         protected void Generate(Mesh mesh)
         {
-            base.edges = new List<HalfEdge>();
-            this.rays = new List<HalfEdge>();
+            edges.Clear();
+            rays.Clear();
 
             // Undead vertices cannot be Voronoi cell generators.
             int count = mesh.vertices.Count - mesh.undeads;
@@ -66,11 +70,6 @@ namespace TriangleNet.Voronoi
             // Allocate space for Voronoi diagram.
             var vertices = new Vertex[mesh.triangles.Count + mesh.hullsize];
             var faces = new Face[count];
-
-            if (factory == null)
-            {
-                factory = new DefaultVoronoiFactory();
-            }
 
             factory.Initialize(vertices.Length, 2 * mesh.NumberOfEdges, faces.Length);
 
@@ -112,7 +111,7 @@ namespace TriangleNet.Voronoi
         /// </remarks>
         protected List<HalfEdge>[] ComputeVertices(Mesh mesh, Vertex[] vertices)
         {
-            Otri tri = default(Otri);
+            Otri tri = default;
             double xi = 0, eta = 0;
             Vertex vertex;
             Point pt;
@@ -148,7 +147,7 @@ namespace TriangleNet.Voronoi
         /// <param name="map">Empty vertex map.</param>
         protected void ComputeEdges(Mesh mesh, Vertex[] vertices, Face[] faces, List<HalfEdge>[] map)
         {
-            Otri tri, neighbor = default(Otri);
+            Otri tri, neighbor = default;
             TriangleNet.Geometry.Vertex org, dest;
 
             double px, py;
@@ -241,8 +240,8 @@ namespace TriangleNet.Voronoi
                         edge.id = k++;
                         twin.id = k++;
 
-                        this.edges.Add(edge);
-                        this.edges.Add(twin);
+                        edges.Add(edge);
+                        edges.Add(twin);
                     }
                 }
             }
@@ -257,7 +256,7 @@ namespace TriangleNet.Voronoi
             int length = map.Length;
 
             // For each half-edge, find its successor in the connected face.
-            foreach (var edge in this.edges)
+            foreach (var edge in edges)
             {
                 var face = edge.face.generator.id;
 

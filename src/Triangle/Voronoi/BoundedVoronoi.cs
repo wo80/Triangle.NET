@@ -39,10 +39,10 @@ namespace TriangleNet.Voronoi
         {
             // We explicitly told the base constructor to call the Generate method, so
             // at this point the basic Voronoi diagram is already created.
-            offset = base.vertices.Count;
+            offset = vertices.Count;
 
             // Each vertex of the hull will be part of a Voronoi cell.
-            base.vertices.Capacity = offset + mesh.hullsize;
+            vertices.Capacity = offset + mesh.hullsize;
 
             // Create bounded Voronoi diagram.
             PostProcess();
@@ -105,16 +105,16 @@ namespace TriangleNet.Voronoi
             // Let the face edge point to the edge leaving at generator.
             edge.face.edge = h2;
 
-            base.edges.Add(h1);
-            base.edges.Add(h2);
+            edges.Add(h1);
+            edges.Add(h2);
 
-            int count = base.edges.Count;
+            int count = edges.Count;
 
             h1.id = count;
             h2.id = count + 1;
 
             gen.id = offset++;
-            base.vertices.Add(gen);
+            vertices.Add(gen);
         }
 
         /// <summary>
@@ -169,12 +169,12 @@ namespace TriangleNet.Voronoi
             // Let the face edge point to the edge leaving at generator.
             edge.face.edge = he;
 
-            base.edges.Add(he);
+            edges.Add(he);
 
-            he.id = base.edges.Count;
+            he.id = edges.Count;
 
             gen.id = offset++;
-            base.vertices.Add(gen);
+            vertices.Add(gen);
         }
 
         /*

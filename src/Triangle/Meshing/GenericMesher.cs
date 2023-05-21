@@ -60,31 +60,55 @@ namespace TriangleNet.Meshing
             this.triangulator = triangulator;
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Triangulate the given point set.
+        /// </summary>
+        /// <param name="points">The input point set</param>
+        /// <returns>The mesh.</returns>
         public IMesh Triangulate(IList<Vertex> points)
         {
             return triangulator.Triangulate(points, config);
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Triangulate the given polygon.
+        /// </summary>
+        /// <param name="polygon">The input polygon.</param>
+        /// <returns>The mesh.</returns>
         public IMesh Triangulate(IPolygon polygon)
         {
             return Triangulate(polygon, null, null);
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Triangulate the given polygon.
+        /// </summary>
+        /// <param name="polygon">The input polygon.</param>
+        /// <param name="options">The <see cref="ConstraintOptions"/>.</param>
+        /// <returns>The mesh.</returns>
         public IMesh Triangulate(IPolygon polygon, ConstraintOptions options)
         {
             return Triangulate(polygon, options, null);
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Triangulate the given polygon.
+        /// </summary>
+        /// <param name="polygon">The input polygon.</param>
+        /// <param name="quality">The <see cref="QualityOptions"/>.</param>
+        /// <returns>The mesh.</returns>
         public IMesh Triangulate(IPolygon polygon, QualityOptions quality)
         {
             return Triangulate(polygon, null, quality);
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Triangulate the given polygon.
+        /// </summary>
+        /// <param name="polygon">The input polygon.</param>
+        /// <param name="options">The <see cref="ConstraintOptions"/>.</param>
+        /// <param name="quality">The <see cref="QualityOptions"/>.</param>
+        /// <returns>The mesh.</returns>
         public IMesh Triangulate(IPolygon polygon, ConstraintOptions options, QualityOptions quality)
         {
             var mesh = (Mesh)triangulator.Triangulate(polygon.Points, config);

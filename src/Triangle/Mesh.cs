@@ -23,14 +23,14 @@ namespace TriangleNet
     {
         #region Variables
 
-        IPredicates predicates;
+        private readonly IPredicates predicates;
 
-        Log logger = Log.Instance;
+        private readonly Log logger = Log.Instance;
 
-        QualityMesher qualityMesher;
+        private QualityMesher qualityMesher;
 
         // Stack that maintains a list of recently flipped triangles.
-        Stack<Otri> flipstack;
+        private Stack<Otri> flipstack;
 
         // TODO: Check if custom hashmap implementation could be faster.
 
@@ -249,7 +249,7 @@ namespace TriangleNet
         /// </summary>
         public void Renumber()
         {
-            this.Renumber(NodeNumbering.Linear);
+            Renumber(NodeNumbering.Linear);
         }
 
         /// <summary>
@@ -258,7 +258,7 @@ namespace TriangleNet
         public void Renumber(NodeNumbering num)
         {
             // Don't need to do anything if the nodes are already numbered.
-            if (num == this.numbering)
+            if (num == numbering)
             {
                 return;
             }
@@ -268,7 +268,7 @@ namespace TriangleNet
             if (num == NodeNumbering.Linear)
             {
                 id = 0;
-                foreach (var node in this.vertices.Values)
+                foreach (var node in vertices.Values)
                 {
                     node.id = id++;
                 }
@@ -279,7 +279,7 @@ namespace TriangleNet
                 var iperm = rcm.Renumber(this);
 
                 // Permute the node indices.
-                foreach (var node in this.vertices.Values)
+                foreach (var node in vertices.Values)
                 {
                     node.id = iperm[node.id];
                 }
@@ -290,7 +290,7 @@ namespace TriangleNet
 
             // Triangles will always be numbered from 0 to n-1
             id = 0;
-            foreach (var item in this.triangles)
+            foreach (var item in triangles)
             {
                 item.id = id++;
             }
@@ -309,19 +309,19 @@ namespace TriangleNet
 
         internal void CopyTo(Mesh target)
         {
-            target.vertices = this.vertices;
-            target.triangles = this.triangles;
-            target.subsegs = this.subsegs;
+            target.vertices = vertices;
+            target.triangles = triangles;
+            target.subsegs = subsegs;
 
-            target.holes = this.holes;
-            target.regions = this.regions;
+            target.holes = holes;
+            target.regions = regions;
 
-            target.hash_vtx = this.hash_vtx;
-            target.hash_seg = this.hash_seg;
-            target.hash_tri = this.hash_tri;
+            target.hash_vtx = hash_vtx;
+            target.hash_seg = hash_seg;
+            target.hash_tri = hash_tri;
 
-            target.numbering = this.numbering;
-            target.hullsize = this.hullsize;
+            target.numbering = numbering;
+            target.hullsize = hullsize;
         }
 
 
@@ -335,9 +335,9 @@ namespace TriangleNet
             holes.Clear();
             regions.Clear();
 
-            this.hash_vtx = 0;
-            this.hash_seg = 0;
-            this.hash_tri = 0;
+            hash_vtx = 0;
+            hash_seg = 0;
+            hash_tri = 0;
 
             flipstack.Clear();
 
@@ -432,7 +432,7 @@ namespace TriangleNet
             Otri tri = default(Otri);
             Vertex triorg;
 
-            foreach (var t in this.triangles)
+            foreach (var t in triangles)
             {
                 tri.tri = t;
                 // Check all three vertices of the triangle.
@@ -478,7 +478,7 @@ namespace TriangleNet
         {
             var seg = new SubSegment();
 
-            seg.hash = this.hash_seg++;
+            seg.hash = hash_seg++;
 
             seg.subsegs[0].seg = dummysub;
             seg.subsegs[1].seg = dummysub;
@@ -774,7 +774,7 @@ namespace TriangleNet
                 {
                     flipstack.Clear();
 
-                    flipstack.Push(default(Otri)); // Dummy flip (see UndoVertex)
+                    flipstack.Push(default); // Dummy flip (see UndoVertex)
                     flipstack.Push(horiz);
                 }
 

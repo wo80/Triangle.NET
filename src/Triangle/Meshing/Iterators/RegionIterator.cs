@@ -13,32 +13,32 @@ namespace TriangleNet.Meshing.Iterators
 
     /// <summary>
     /// Iterates the region a given triangle belongs to and applies an action
-    /// to each connected trianlge in that region. 
+    /// to each connected triangle in that region. 
     /// </summary>
     /// <remarks>
     /// The default action is to set the region id and area constraint.
     /// </remarks>
     public class RegionIterator
     {
-        List<Triangle> region;
+        private readonly List<Triangle> region;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RegionIterator" /> class.
         /// </summary>
-        public RegionIterator(Mesh mesh)
+        public RegionIterator()
         {
-            this.region = new List<Triangle>();
+            region = new List<Triangle>();
         }
 
         /// <summary>
-        /// Set the region attribute of all trianlges connected to given triangle.
+        /// Set the region attribute of all triangles connected to given triangle.
         /// </summary>
         /// <param name="triangle">The triangle seed.</param>
         /// <param name="boundary">If non-zero, process all triangles of the
         /// region that is enclosed by segments with given boundary label.</param>
         public void Process(Triangle triangle, int boundary = 0)
         {
-            this.Process(triangle, (tri) =>
+            Process(triangle, (tri) =>
             {
                 // Set the region id and area constraint.
                 tri.label = triangle.label;
@@ -47,7 +47,7 @@ namespace TriangleNet.Meshing.Iterators
         }
 
         /// <summary>
-        /// Process all trianlges connected to given triangle and apply given action.
+        /// Process all triangles connected to given triangle and apply given action.
         /// </summary>
         /// <param name="triangle">The seeding triangle.</param>
         /// <param name="action">The action to apply to each triangle.</param>
@@ -89,9 +89,9 @@ namespace TriangleNet.Meshing.Iterators
         /// <param name="protector"></param>
         void ProcessRegion(Action<Triangle> action, Func<SubSegment, bool> protector)
         {
-            Otri testtri = default(Otri);
-            Otri neighbor = default(Otri);
-            Osub neighborsubseg = default(Osub);
+            Otri testtri = default;
+            Otri neighbor = default;
+            Osub neighborsubseg = default;
 
             // Loop through all the infected triangles, spreading the attribute
             // and/or area constraint to their neighbors, then to their neighbors'

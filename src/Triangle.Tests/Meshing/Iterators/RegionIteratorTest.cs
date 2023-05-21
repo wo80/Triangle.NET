@@ -22,7 +22,7 @@ namespace TriangleNet.Tests.Meshing.Iterators
 
             var mesh = (Mesh)poly.Triangulate();
 
-            var iterator = new RegionIterator(mesh);
+            var iterator = new RegionIterator();
 
             var qtree = new TriangleQuadTree(mesh);
 

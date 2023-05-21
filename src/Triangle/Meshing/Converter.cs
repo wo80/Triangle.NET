@@ -27,7 +27,7 @@ namespace TriangleNet.Meshing
         /// <summary>
         /// Gets the <see cref="Converter"/> instance.
         /// </summary>
-        public static Converter Instance { get { return lazy.Value; } }
+        public static Converter Instance => lazy.Value;
 
         private Converter()
         {

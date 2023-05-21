@@ -13,19 +13,14 @@ namespace TriangleNet.Geometry
     /// </summary>
     public class Segment : ISegment
     {
-        Vertex v0;
-        Vertex v1;
-
-        int label;
+        private readonly Vertex v0;
+        private readonly Vertex v1;
 
         /// <summary>
         /// Gets or sets the segments boundary mark.
         /// </summary>
-        public int Label
-        {
-            get { return label; }
-            set { label = value; }
-        }
+        public int Label { get; set; }
+
         /// <summary>
         /// Gets the first endpoints index.
         /// </summary>
@@ -52,7 +47,7 @@ namespace TriangleNet.Geometry
             this.v0 = v0;
             this.v1 = v1;
 
-            this.label = label;
+            Label = label;
         }
 
         /// <summary>
