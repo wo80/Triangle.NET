@@ -7,6 +7,7 @@
     <RootNamespace>TriangleNet.Rendering.GDI</RootNamespace>
     <AssemblyName>Triangle.Rendering.GDI</AssemblyName>
     <Platforms>AnyCPU;x64</Platforms>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

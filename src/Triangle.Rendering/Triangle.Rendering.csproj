@@ -6,6 +6,7 @@
     <RootNamespace>TriangleNet.Rendering</RootNamespace>
     <AssemblyName>Triangle.Rendering</AssemblyName>
     <Platforms>AnyCPU;x64</Platforms>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
