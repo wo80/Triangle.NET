@@ -6,6 +6,7 @@ using MeshExplorer.Controls;
 using MeshExplorer.IO;
 using TriangleNet;
 using TriangleNet.Geometry;
+using TriangleNet.IO;
 using TriangleNet.Meshing;
 using TriangleNet.Meshing.Algorithm;
 using TriangleNet.Rendering;
@@ -177,7 +178,7 @@ namespace MeshExplorer
                 string file = args[0].ToLower();
 
                 // Check if file extension is known
-                if (FileProcessor.CanHandleFile(file))
+                if (FileProcessor.IsSupported(file))
                 {
                     e.Effect = DragDropEffects.Copy;
                 }
@@ -347,15 +348,30 @@ namespace MeshExplorer
             }
         }
 
+        private bool MeshDataExists(string filename)
+        {
+            string ext = Path.GetExtension(filename);
+
+            if (ext == ".node" || ext == ".poly")
+            {
+                if (File.Exists(Path.ChangeExtension(filename, ".ele")))
+                {
+                    return true;
+                }
+            }
+
+            return ext == ".ele";
+        }
+
         private bool Open(string filename)
         {
-            if (!FileProcessor.CanHandleFile(filename))
+            if (!FileProcessor.IsSupported(filename))
             {
                 // TODO: show message.
             }
             else
             {
-                if (FileProcessor.ContainsMeshData(filename))
+                if (MeshDataExists(filename))
                 {
                     if (filename.EndsWith(".ele") || DarkMessageBox.Show("Import mesh", Settings.ImportString,
                         "Do you want to import the mesh?", MessageBoxButtons.YesNo) == DialogResult.OK)
@@ -364,7 +380,7 @@ namespace MeshExplorer
 
                         try
                         {
-                            mesh = FileProcessor.Import(filename);
+                            mesh = (Mesh)FileProcessor.Import(filename);
                         }
                         catch (Exception e)
                         {
@@ -414,7 +430,7 @@ namespace MeshExplorer
 
             if (sfd.ShowDialog() == DialogResult.OK)
             {
-                FileProcessor.Save(sfd.FileName, mesh);
+                FileProcessor.Write(mesh, sfd.FileName);
             }
         }
 
