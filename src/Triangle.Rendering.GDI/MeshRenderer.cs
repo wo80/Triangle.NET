@@ -13,13 +13,6 @@ namespace TriangleNet.Rendering.GDI
     /// </summary>
     public class MeshRenderer
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MeshRenderer" /> class.
-        /// </summary>
-        public MeshRenderer()
-        {
-        }
-
         public Graphics RenderTarget { get; set; }
 
         public IRenderContext Context { get; set; }
@@ -44,11 +37,11 @@ namespace TriangleNet.Rendering.GDI
 
         public void RenderPoints(float[] points, int size, int start, int end, Brush brush)
         {
-            var g = this.RenderTarget;
-            var zoom = this.Context.Zoom;
+            var g = RenderTarget;
+            var zoom = Context.Zoom;
 
-            int i, k, n = points.Length / size;
-            PointF p = new PointF();
+            int i, k;
+            var p = new PointF();
 
             // Render points
             for (i = start; i < end; i++)
@@ -66,23 +59,23 @@ namespace TriangleNet.Rendering.GDI
             }
         }
 
-        public void RenderSegments(float[] points, int[] indices, Pen pen)
+        public void RenderSegments(float[] points, uint[] indices, Pen pen)
         {
             RenderLines(points, indices, pen);
         }
 
-        public void RenderEdges(float[] points, int[] indices, Pen pen)
+        public void RenderEdges(float[] points, uint[] indices, Pen pen)
         {
             RenderLines(points, indices, pen);
         }
 
-        public void RenderElements(float[] points, int[] indices, int size, int[] partition)
+        public void RenderElements(float[] points, uint[] indices, int size, uint[] partition)
         {
-            var g = this.RenderTarget;
-            var zoom = this.Context.Zoom;
+            var g = RenderTarget;
+            var zoom = Context.Zoom;
 
             int n = indices.Length / size;
-            int k0, k1, k2;
+            uint k0, k1, k2;
 
             var tri = new PointF[size];
 
@@ -139,16 +132,16 @@ namespace TriangleNet.Rendering.GDI
             }
         }
 
-        public void RenderLines(float[] points, int[] indices, Pen pen)
+        public void RenderLines(float[] points, uint[] indices, Pen pen)
         {
-            var g = this.RenderTarget;
-            var zoom = this.Context.Zoom;
+            var g = RenderTarget;
+            var zoom = Context.Zoom;
 
             int n = indices.Length / 2;
-            int k0, k1;
+            uint k0, k1;
 
-            PointF p0 = new PointF();
-            PointF p1 = new PointF();
+            var p0 = new PointF();
+            var p1 = new PointF();
 
             // Draw edges
             for (int i = 0; i < n; i++)

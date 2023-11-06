@@ -44,7 +44,7 @@ namespace TriangleNet.Rendering
         /// <summary>
         /// Gets or sets a dictionary which maps region ids (or partition indices) to a color.
         /// </summary>
-        public Dictionary<int, Color> ColorDictionary { get; set; }
+        public Dictionary<uint, Color> ColorDictionary { get; set; }
 
         /// <summary>
         /// Gets or sets a color map used for function plotting.
@@ -68,11 +68,11 @@ namespace TriangleNet.Rendering
             return colors;
         }
 
-        public Dictionary<int, Color> CreateColorDictionary(int length)
+        public Dictionary<uint, Color> CreateColorDictionary(int length)
         {
-            var keys = new int[length];
+            var keys = new uint[length];
 
-            for (int i = 0; i < length; i++)
+            for (uint i = 0; i < length; i++)
             {
                 keys[i] = i;
             }
@@ -80,9 +80,9 @@ namespace TriangleNet.Rendering
             return CreateColorDictionary(keys);
         }
 
-        public Dictionary<int, Color> CreateColorDictionary(IEnumerable<int> keys)
+        public Dictionary<uint, Color> CreateColorDictionary(IEnumerable<uint> keys)
         {
-            ColorDictionary = new Dictionary<int, Color>();
+            ColorDictionary = new Dictionary<uint, Color>();
 
             int i = 0, n = regionColors.Length;
 

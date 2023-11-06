@@ -12,24 +12,30 @@ namespace TriangleNet.Rendering
     /// </summary>
     public class RenderContext : IRenderContext
     {
-        private ColorManager colorManager;
-        private Projection zoom;
+        private readonly List<IRenderLayer> renderLayers;
+        private readonly ColorManager colorManager;
+        private readonly Projection zoom;
+
         private Rectangle bounds;
         private IMesh mesh;
 
-        private List<IRenderLayer> renderLayers;
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RenderContext"/> class.
+        /// </summary>
+        /// <param name="zoom">The <see cref="Projection"/> used for panning and zooming.</param>
+        /// <param name="colorManager">The <see cref="ColorManager"/>.</param>
         public RenderContext(Projection zoom, ColorManager colorManager)
         {
-            renderLayers = new List<IRenderLayer>(6);
-
-            renderLayers.Add(new RenderLayer()); // 0 = mesh (filled)
-            renderLayers.Add(new RenderLayer()); // 1 = mesh (wireframe)
-            renderLayers.Add(new RenderLayer()); // 2 = polygon
-            renderLayers.Add(new RenderLayer()); // 3 = points
-            renderLayers.Add(new RenderLayer()); // 4 = voronoi overlay
-            renderLayers.Add(new RenderLayer()); // 5 = vector field
-            renderLayers.Add(new RenderLayer()); // 6 = contour lines
+            renderLayers = new List<IRenderLayer>(7)
+            {
+                new RenderLayer(), // 0 = mesh (filled)
+                new RenderLayer(), // 1 = mesh (wireframe)
+                new RenderLayer(), // 2 = polygon
+                new RenderLayer(), // 3 = points
+                new RenderLayer(), // 4 = voronoi overlay
+                new RenderLayer(), // 5 = vector field
+                new RenderLayer()  // 6 = contour lines
+            };
 
             RenderLayers[1].IsEnabled = true;
             RenderLayers[2].IsEnabled = true;
@@ -132,7 +138,7 @@ namespace TriangleNet.Rendering
         }
 
         /// <inheritdoc />
-        public void Add(int[] data)
+        public void Add(uint[] data)
         {
             // Add partition data for filled mesh.
             RenderLayers[0].SetPoints(RenderLayers[1].Points);

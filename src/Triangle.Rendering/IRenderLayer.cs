@@ -24,7 +24,7 @@ namespace TriangleNet.Rendering
         /// <summary>
         /// Gets the indices buffer.
         /// </summary>
-        IBuffer<int> Indices { get; }
+        IBuffer<uint> Indices { get; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the layer is enabled.
@@ -40,12 +40,12 @@ namespace TriangleNet.Rendering
         /// <summary>
         /// Resets this layer to an empty state.
         /// </summary>
-        /// <param name="clear">If true, all buffers will be set to <c>null</c>.</param>
+        /// <param name="clear">If true, point buffer will be cleared.</param>
         void Reset(bool clear);
 
         void SetPoints(IBuffer<float> buffer, bool reset = true);
 
-        void SetIndices(IBuffer<int> buffer);
+        void SetIndices(IBuffer<uint> buffer);
 
         #region Attached data (mesh partitioning and heat map rendering)
 
@@ -58,7 +58,7 @@ namespace TriangleNet.Rendering
         /// Triangle <c>i</c> given by indices <c>[3 * i, 3 * i + 1, 3 * i + 2]</c>
         /// belongs to <c>Partition[i]</c>.
         /// </remarks>
-        IBuffer<int> Partition { get; }
+        IBuffer<uint> Partition { get; }
 
         /// <summary>
         /// Gets the color attached to a point in the points buffer.
@@ -76,7 +76,7 @@ namespace TriangleNet.Rendering
         /// Attach partitioning data to each triangle in the index buffer.
         /// </summary>
         /// <param name="partition">The mesh partition.</param>
-        void AttachLayerData(int[] partition);
+        void AttachLayerData(uint[] partition);
 
         #endregion
     }

@@ -1,9 +1,6 @@
 ﻿
 namespace TriangleNet.Rendering
 {
-    using System.Collections.Generic;
-    using TriangleNet.Geometry;
-    using TriangleNet.Meshing;
     using TriangleNet.Rendering.Buffer;
     using TriangleNet.Rendering.Util;
 
@@ -14,14 +11,17 @@ namespace TriangleNet.Rendering
         int count;
 
         protected IBuffer<float> points;
-        protected IBuffer<int> indices;
+        protected IBuffer<uint> indices;
 
-        protected IBuffer<int> partition;
+        protected IBuffer<uint> partition;
         protected IBuffer<Color> colors;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RenderLayer"/> class.
+        /// </summary>
         public RenderLayer()
         {
-            this.IsEnabled = false;
+            IsEnabled = false;
         }
 
         /// <inheritdoc />
@@ -31,10 +31,10 @@ namespace TriangleNet.Rendering
         public IBuffer<float> Points => points;
 
         /// <inheritdoc />
-        public IBuffer<int> Indices => indices;
+        public IBuffer<uint> Indices => indices;
 
         /// <inheritdoc />
-        public IBuffer<int> Partition => partition;
+        public IBuffer<uint> Partition => partition;
 
         /// <inheritdoc />
         public IBuffer<Color> Colors => colors;
@@ -80,7 +80,7 @@ namespace TriangleNet.Rendering
         }
 
         /// <inheritdoc />
-        public void SetIndices(IBuffer<int> buffer)
+        public void SetIndices(IBuffer<uint> buffer)
         {
             indices = buffer;
         }
@@ -88,37 +88,15 @@ namespace TriangleNet.Rendering
         /// <inheritdoc />
         public void AttachLayerData(float[] values, ColorMap colormap)
         {
-            int length = values.Length;
+            var colorData = new Color[values.Length];
 
-            double min = double.MaxValue;
-            double max = double.MinValue;
-
-            // Find min and max of given values.
-            for (int i = 0; i < length; i++)
-            {
-                if (values[i] < min)
-                {
-                    min = values[i];
-                }
-
-                if (values[i] > max)
-                {
-                    max = values[i];
-                }
-            }
-
-            var colorData = new Color[length];
-
-            for (int i = 0; i < length; i++)
-            {
-                colorData[i] = colormap.GetColor(values[i], min, max);
-            }
+            colormap.GetColors(values, colorData);
 
             colors = new ColorBuffer(colorData, 1);
         }
 
         /// <inheritdoc />
-        public void AttachLayerData(int[] partition)
+        public void AttachLayerData(uint[] partition)
         {
             this.partition = new IndexBuffer(partition, 1);
         }

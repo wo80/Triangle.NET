@@ -5,7 +5,7 @@ namespace TriangleNet.Rendering.GDI
 {
     internal class Helper
     {
-        public static void Dispose(Dictionary<int, SolidBrush> brushes)
+        public static void Dispose(Dictionary<uint, SolidBrush> brushes)
         {
             foreach (var brush in brushes.Values)
             {
@@ -13,9 +13,9 @@ namespace TriangleNet.Rendering.GDI
             }
         }
 
-        public static Dictionary<int, SolidBrush> GetBrushDictionary(Dictionary<int, Color> ColorDictionary)
+        public static Dictionary<uint, SolidBrush> GetBrushDictionary(Dictionary<uint, Color> ColorDictionary)
         {
-            var brushes = new Dictionary<int, SolidBrush>();
+            var brushes = new Dictionary<uint, SolidBrush>();
 
             foreach (var item in ColorDictionary)
             {

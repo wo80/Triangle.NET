@@ -35,35 +35,36 @@ namespace TriangleNet.Rendering
         /// <summary>
         /// Add polygon data.
         /// </summary>
-        /// <param name="data"></param>
+        /// <param name="data">The polygon data to render.</param>
         void Add(IPolygon data);
 
         /// <summary>
         /// Add mesh data.
         /// </summary>
-        /// <param name="data"></param>
-        /// <param name="reset"></param>
+        /// <param name="data">The mesh data to render.</param>
+        /// <param name="reset">If true, point buffer will be cleared. Otherwise, the information
+        /// may be used to render new Steiner points in a different color.</param>
         void Add(IMesh data, bool reset);
 
         /// <summary>
         /// Add edge data (used for Voronoi).
         /// </summary>
-        /// <param name="points"></param>
-        /// <param name="edges"></param>
-        /// <param name="reset"></param>
+        /// <param name="points">The points to render.</param>
+        /// <param name="edges">The edges to render.</param>
+        /// <param name="reset">(unused)</param>
         void Add(ICollection<Point> points, IEnumerable<IEdge> edges, bool reset);
 
         /// <summary>
         /// Add mesh function values <c>z=f(x,y)</c>.
         /// </summary>
-        /// <param name="values"></param>
+        /// <param name="values">Functions values corresponding to each vertex.</param>
         void Add(float[] values);
 
         /// <summary>
         /// Add mesh partitioning data.
         /// </summary>
-        /// <param name="partition"></param>
-        void Add(int[] partition);
+        /// <param name="partition">Partition index corresponding to each triangle.</param>
+        void Add(uint[] partition);
 
         /// <summary>
         /// Enable or disable a layer for rendering.

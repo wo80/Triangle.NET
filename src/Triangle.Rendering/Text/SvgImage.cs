@@ -105,7 +105,7 @@ namespace TriangleNet.Rendering.Text
             var labels = new StringBuilder();
             var edges = new StringBuilder();
 
-            var filled = new Dictionary<int, StringBuilder>();
+            var filled = new Dictionary<uint, StringBuilder>();
 
             Vertex v1, v2, v3;
             double x1, y1, x2, y2, x3, y3, xa, ya;
@@ -143,10 +143,10 @@ namespace TriangleNet.Rendering.Text
 
                 if (regions && tri.Label != 0)
                 {
-                    if (!filled.TryGetValue(tri.Label, out var sb))
+                    if (!filled.TryGetValue((uint)tri.Label, out var sb))
                     {
                         sb = new StringBuilder();
-                        filled.Add(tri.Label, sb);
+                        filled.Add((uint)tri.Label, sb);
                     }
                     sb.Append(s);
                 }
@@ -254,6 +254,8 @@ namespace TriangleNet.Rendering.Text
 
         private void DrawPoints(StreamWriter svg, IMesh mesh, bool label)
         {
+            var format = svg.FormatProvider;
+
             int n = mesh.Vertices.Count;
 
             float circle_size = 1.5f;
@@ -283,7 +285,7 @@ namespace TriangleNet.Rendering.Text
 
                 if (label)
                 {
-                    labels.AppendFormat("<text x=\"{0:0.#}\" y=\"{1:0.#}\">{2}</text>",
+                    labels.AppendFormat(format, "<text x=\"{0:0.#}\" y=\"{1:0.#}\">{2}</text>",
                         x, y, node.ID);
                     labels.AppendLine();
                 }
@@ -296,7 +298,7 @@ namespace TriangleNet.Rendering.Text
             {
                 svg.WriteLine("\t<g font-family=\"Verdana\" font-size=\"11\" fill=\"black\">");
                 svg.Write(labels.ToString());
-                svg.WriteLine("\t<g/>");
+                svg.WriteLine("\t</g>");
             }
         }
     }

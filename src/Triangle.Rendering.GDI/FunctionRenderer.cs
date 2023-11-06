@@ -42,11 +42,11 @@ namespace TriangleNet.Rendering.GDI
                 throw new Exception();
             }
 
-            this.points = new TriVertex[length];
+            points = new TriVertex[length];
 
             TriVertex vertex;
             Color color;
-            PointF p = new PointF((float)data[0], (float)data[1]);
+            PointF p = new PointF(data[0], data[1]);
 
             zoom.NdcToScreen(ref p);
 
@@ -57,8 +57,8 @@ namespace TriangleNet.Rendering.GDI
             // Create vertices.
             for (int i = 0; i < length; i++)
             {
-                p.X = (float)data[size * i];
-                p.Y = (float)data[size * i + 1];
+                p.X = data[size * i];
+                p.Y = data[size * i + 1];
 
                 zoom.NdcToScreen(ref p);
 
@@ -74,14 +74,14 @@ namespace TriangleNet.Rendering.GDI
                 vertex.Blue = (ushort)(color.B << 8);
                 vertex.Alpha = (ushort)(color.A << 8);
 
-                this.points[i] = vertex;
+                points[i] = vertex;
             }
 
             var triangles = layer.Indices.Data;
 
             length = triangles.Length / 3;
 
-            this.elements = new GradientTriangle[length];
+            elements = new GradientTriangle[length];
 
             GradientTriangle e;
 
@@ -94,7 +94,7 @@ namespace TriangleNet.Rendering.GDI
                 e.Vertex2 = (uint)triangles[3 * i + 1];
                 e.Vertex3 = (uint)triangles[3 * i + 2];
 
-                this.elements[i] = e;
+                elements[i] = e;
             }
         }
     }

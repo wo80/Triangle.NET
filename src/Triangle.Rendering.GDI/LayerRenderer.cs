@@ -36,7 +36,7 @@ namespace TriangleNet.Rendering.GDI
 
             int i = 0;
 
-            foreach (var layer in this.Context.RenderLayers)
+            foreach (var layer in Context.RenderLayers)
             {
                 if (!layer.IsEmpty() && layer.IsEnabled)
                 {

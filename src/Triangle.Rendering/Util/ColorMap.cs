@@ -2,12 +2,22 @@
 namespace TriangleNet.Rendering.Util
 {
     using System;
+    using System.Collections.Generic;
     using System.Drawing;
+    using System.Linq;
 
+    /// <summary>
+    /// A simple color map implementation.
+    /// </summary>
     public class ColorMap
     {
         #region Colormap definitions
 
+        /// <summary>
+        /// Create a jet (or rainbow) color map.
+        /// </summary>
+        /// <param name="size">The size of the color map.</param>
+        /// <returns>The jet color map.</returns>
         public static ColorMap Jet(int size)
         {
             ColorMap map = new ColorMap(size);
@@ -18,18 +28,23 @@ namespace TriangleNet.Rendering.Util
             {
                 v = 4 * i * step;
 
-				rgb[0] = Math.Min(v - 1.5f, 4.5f - v);
-				rgb[1] = Math.Min(v - 0.5f, 3.5f - v);
-				rgb[2] = Math.Min(v + 0.5f, 2.5f - v);
+                rgb[0] = Math.Min(v - 1.5f, 4.5f - v);
+                rgb[1] = Math.Min(v - 0.5f, 3.5f - v);
+                rgb[2] = Math.Min(v + 0.5f, 2.5f - v);
 
                 Clamp(rgb, 0.0f, 1.0f);
 
-                map.colors[size - i - 1] = ColorFromRgb(rgb[0], rgb[1], rgb[2]);
+                map.map[size - i - 1] = ColorFromRgb(rgb[0], rgb[1], rgb[2]);
             }
 
             return map;
         }
 
+        /// <summary>
+        /// Create a hot color map.
+        /// </summary>
+        /// <param name="size">The size of the color map.</param>
+        /// <returns>The jet color map.</returns>
         public static ColorMap Hot(int size)
         {
             ColorMap map = new ColorMap(size);
@@ -40,13 +55,13 @@ namespace TriangleNet.Rendering.Util
             {
                 v = 2.5f * i * step;
 
-				rgb[0] = v;
-				rgb[1] = v - 1;
-				rgb[2] = 2 * v - 4;
+                rgb[0] = v;
+                rgb[1] = v - 1;
+                rgb[2] = 2 * v - 4;
 
                 Clamp(rgb, 0.0f, 1.0f);
 
-                map.colors[i] = ColorFromRgb(rgb[0], rgb[1], rgb[2]);
+                map.map[i] = ColorFromRgb(rgb[0], rgb[1], rgb[2]);
             }
 
             return map;
@@ -73,40 +88,166 @@ namespace TriangleNet.Rendering.Util
             }
         }
 
-        private static int Clamp(int index, int max)
+        private static (double, double) GetMinMax(IEnumerable<double> values)
         {
-            if (index < 0)
+            double min = double.MaxValue;
+            double max = double.MinValue;
+
+            foreach (var a in values)
             {
-                index = 0;
-            }
-            else if (index > max)
-            {
-                index = max;
+                if (a < min) min = a;
+                if (a > max) max = a;
             }
 
-            return index;
+            return (min, max);
+        }
+
+        private static (double, double) GetMinMax(double[] values)
+        {
+            double min = double.MaxValue;
+            double max = double.MinValue;
+
+            for (int i = 0; i < values.Length; i++)
+            {
+                double a = values[i];
+
+                if (a < min) min = a;
+                if (a > max) max = a;
+            }
+
+            return (min, max);
         }
 
         #endregion
 
-        private Color[] colors;
+        private readonly Color[] map;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ColorMap"/> class.
+        /// </summary>
+        /// <param name="size">The size of the color map.</param>
         private ColorMap(int size)
+            : this(new Color[size])
         {
-            this.colors = new Color[size];
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ColorMap"/> class.
+        /// </summary>
+        /// <param name="colors">The colors of the color map.</param>
         public ColorMap(Color[] colors)
         {
-            this.colors = colors;
+            map = colors;
         }
 
-        public Color GetColor(double value, double min, double max)
+        /// <summary>
+        /// For each input value assign the corresponding color.
+        /// </summary>
+        /// <param name="values">The input values (associated to vertex).</param>
+        /// <param name="colors">The color array target containing the <see cref="Color"/>s on output.</param>
+        public void GetColors(float[] values, Color[] colors)
         {
-            int n = this.colors.Length;
-			int i = (int)Math.Floor(n * (max - value) / (max - min));
+            (double min, double max) = GetMinMax(values.Cast<double>());
 
-            return this.colors[Clamp(i, n - 1)];
-		}
+            GetColors(values, (float)min, (float)max, colors);
+        }
+
+        /// <summary>
+        /// For each input value assign the corresponding color.
+        /// </summary>
+        /// <param name="values">The input values (associated to vertex).</param>
+        /// <param name="min">The minimum of the input values.</param>
+        /// <param name="max">The maximum of the input values.</param>
+        /// <param name="colors">The color array target containing the <see cref="Color"/>s on output.</param>
+        public void GetColors(float[] values, float min, float max, Color[] colors)
+        {
+            if (max <= min) return;
+
+            int length = Math.Min(values.Length, colors.Length);
+
+            for (int i = 0; i < length; i++)
+            {
+                int n = map.Length;
+                int k = (int)Math.Floor(n * (max - values[i]) / (max - min));
+
+                k = Math.Max(Math.Min(k, n), 0);
+
+                colors[i] = map[k];
+            }
+        }
+
+        /// <summary>
+        /// For each input value assign the corresponding color.
+        /// </summary>
+        /// <param name="values">The input values (associated to vertex).</param>
+        /// <param name="rgba">The color array target containing RGBA float values on output.</param>
+        public void GetColors(float[] values, float[] rgba)
+        {
+            (double min, double max) = GetMinMax(values.Cast<double>());
+
+            GetColorsFromDouble(values.Cast<double>(), min, max, rgba);
+        }
+
+        /// <summary>
+        /// For each input value assign the corresponding color.
+        /// </summary>
+        /// <param name="values">The input values (associated to vertex).</param>
+        /// <param name="min">The minimum of the input values.</param>
+        /// <param name="max">The maximum of the input values.</param>
+        /// <param name="rgba">The color array target containing RGBA float values on output.</param>
+        public void GetColors(float[] values, float min, float max, float[] rgba)
+        {
+            GetColorsFromDouble(values.Cast<double>(), min, max, rgba);
+        }
+
+        /// <summary>
+        /// For each input value assign the corresponding color.
+        /// </summary>
+        /// <param name="values">The input values (associated to vertex).</param>
+        /// <param name="rgba">The color array target containing RGBA float values on output.</param>
+        public void GetColors(double[] values, float[] rgba)
+        {
+            (double min, double max) = GetMinMax(values);
+
+            GetColorsFromDouble(values, min, max, rgba);
+        }
+
+        /// <summary>
+        /// For each input value assign the corresponding color.
+        /// </summary>
+        /// <param name="values">The input values (associated to vertex).</param>
+        /// <param name="min">The minimum of the input values.</param>
+        /// <param name="max">The maximum of the input values.</param>
+        /// <param name="rgba">The color array target containing RGBA float values on output.</param>
+        public void GetColors(double[] values, double min, double max, float[] rgba)
+        {
+            GetColorsFromDouble(values, min, max, rgba);
+        }
+
+        private void GetColorsFromDouble(IEnumerable<double> values, double min, double max, float[] rgba)
+        {
+            if (max <= min) return;
+
+            int i = 0;
+
+            foreach (var value in values)
+            {
+                int n = map.Length;
+                int k = (int)Math.Floor(n * (max - value) / (max - min));
+
+                k = Math.Max(Math.Min(k, n), 0);
+
+                var color = map[k];
+
+                k = 4 * i;
+
+                rgba[k] = color.R / 255f;
+                rgba[k + 1] = color.G / 255f;
+                rgba[k + 2] = color.B / 255f;
+                rgba[k + 3] = color.A / 255f;
+
+                i++;
+            }
+        }
     }
 }

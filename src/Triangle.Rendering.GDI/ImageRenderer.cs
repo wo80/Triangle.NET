@@ -7,6 +7,7 @@ namespace TriangleNet.Rendering.GDI
     using System.Drawing.Drawing2D;
     using System.Drawing.Imaging;
     using System.IO;
+    using System.Linq;
     using TriangleNet.Meshing;
 
     /// <summary>
@@ -14,13 +15,7 @@ namespace TriangleNet.Rendering.GDI
     /// </summary>
     public class ImageRenderer
     {
-        ColorManager colors = LightScheme();
-
-        public ColorManager ColorScheme
-        {
-            get { return colors; }
-            set { colors = value; }
-        }
+        public ColorManager ColorScheme { get; set; } = LightScheme();
 
         public bool EnableRegions { get; set; }
 
@@ -124,10 +119,10 @@ namespace TriangleNet.Rendering.GDI
 
             using (var g = Graphics.FromImage(bitmap))
             {
-                g.Clear(colors.Background);
+                g.Clear(ColorScheme.Background);
                 g.SmoothingMode = SmoothingMode.HighQuality;
 
-                var context = new RenderContext(new Projection(target), colors);
+                var context = new RenderContext(new Projection(target), ColorScheme);
                 context.Add(poly);
                 
                 if (!EnablePoints)
@@ -176,10 +171,10 @@ namespace TriangleNet.Rendering.GDI
 
             using (var g = Graphics.FromImage(bitmap))
             {
-                g.Clear(colors.Background);
+                g.Clear(ColorScheme.Background);
                 g.SmoothingMode = SmoothingMode.HighQuality;
 
-                var context = new RenderContext(new Projection(target), colors);
+                var context = new RenderContext(new Projection(target), ColorScheme);
                 context.Add(mesh, true);
 
                 if (EnableRegions)
@@ -223,10 +218,10 @@ namespace TriangleNet.Rendering.GDI
 
             using (var g = Graphics.FromImage(bitmap))
             {
-                g.Clear(colors.Background);
+                g.Clear(ColorScheme.Background);
                 g.SmoothingMode = SmoothingMode.HighQuality;
 
-                var context = new RenderContext(new Projection(target), colors);
+                var context = new RenderContext(new Projection(target), ColorScheme);
                 context.Add(mesh, true);
                 context.Add(dcel.Vertices.ToArray(), dcel.Edges, false);
 
@@ -249,22 +244,22 @@ namespace TriangleNet.Rendering.GDI
             return bitmap;
         }
 
-        private int[] GetRegions(IMesh mesh)
+        private uint[] GetRegions(IMesh mesh)
         {
             mesh.Renumber();
 
-            var labels = new int[mesh.Triangles.Count];
-            var regions = new SortedSet<int>();
+            var labels = new uint[mesh.Triangles.Count()];
+            var regions = new SortedSet<uint>();
 
             foreach (var t in mesh.Triangles)
             {
-                labels[t.ID] = t.Label;
-                regions.Add(t.Label);
+                labels[t.ID] = (uint)t.Label;
+                regions.Add((uint)t.Label);
             }
 
-            if (colors.ColorDictionary == null)
+            if (ColorScheme.ColorDictionary == null)
             {
-                colors.CreateColorDictionary(regions);
+                ColorScheme.CreateColorDictionary(regions);
             }
 
             return labels;

@@ -52,7 +52,7 @@ namespace TriangleNet.Rendering.Util
             }
 
             // Return true if render control was successfully created.
-            return (control != null);
+            return control != null;
         }
 
         private static bool FilesExist(string assemblyName, IEnumerable<string> dependencies)
