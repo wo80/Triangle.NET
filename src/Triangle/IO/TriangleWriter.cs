@@ -237,8 +237,8 @@ namespace TriangleNet.IO
                 writer.WriteLine("{0}", polygon.Regions.Count);
                 foreach (var region in polygon.Regions)
                 {
-                    writer.WriteLine("{0} {1} {2} {3}", j, region.point.X.ToString(nfi),
-                        region.point.Y.ToString(nfi), region.id);
+                    writer.WriteLine("{0} {1} {2} {3}", j, region.Point.X.ToString(nfi),
+                        region.Point.Y.ToString(nfi), region.Label);
 
                     j++;
                 }
@@ -328,8 +328,8 @@ namespace TriangleNet.IO
                 writer.WriteLine("{0}", mesh.regions.Count);
                 foreach (var region in mesh.regions)
                 {
-                    writer.WriteLine("{0} {1} {2} {3}", j, region.point.X.ToString(nfi),
-                        region.point.Y.ToString(nfi), region.id);
+                    writer.WriteLine("{0} {1} {2} {3}", j, region.Point.X.ToString(nfi),
+                        region.Point.Y.ToString(nfi), region.Label);
 
                     j++;
                 }

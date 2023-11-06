@@ -6,42 +6,35 @@
 
 namespace TriangleNet.Geometry
 {
-    using System;
-
     /// <summary>
     /// Pointer to a region in the mesh geometry. A region is a well-defined
     /// subset of the geometry (enclosed by subsegments).
     /// </summary>
     public class RegionPointer
     {
-        internal Point point;
-        internal int id;
-        internal double area;
+        /// <summary>
+        /// Gets the x and y coordinates of the region pointer.
+        /// </summary>
+        public Point Point { get; private set; }
 
         /// <summary>
-        /// Gets or sets a region area constraint.
+        /// Gets the label of the region.
         /// </summary>
-        public double Area
-        {
-            get { return area; }
-            set
-            {
-                if (value < 0.0)
-                {
-                    throw new ArgumentException("Area constraints must not be negative.");
-                }
-                area = value;
-            }
-        }
+        public int Label { get; private set; }
+
+        /// <summary>
+        /// Gets the area constraint of the region.
+        /// </summary>
+        public double Area { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RegionPointer" /> class.
         /// </summary>
         /// <param name="x">X coordinate of the region.</param>
         /// <param name="y">Y coordinate of the region.</param>
-        /// <param name="id">Region id.</param>
-        public RegionPointer(double x, double y, int id)
-            : this(x, y, id, 0.0)
+        /// <param name="label">Region label.</param>
+        public RegionPointer(double x, double y, int label)
+            : this(x, y, label, 0.0)
         {
         }
 
@@ -50,13 +43,13 @@ namespace TriangleNet.Geometry
         /// </summary>
         /// <param name="x">X coordinate of the region.</param>
         /// <param name="y">Y coordinate of the region.</param>
-        /// <param name="id">Region id.</param>
+        /// <param name="label">Region label.</param>
         /// <param name="area">Area constraint.</param>
-        public RegionPointer(double x, double y, int id, double area)
+        public RegionPointer(double x, double y, int label, double area)
         {
-            this.point = new Point(x, y);
-            this.id = id;
-            this.area = area;
+            Point = new Point(x, y);
+            Label = label;
+            Area = area;
         }
     }
 }

@@ -162,7 +162,7 @@ namespace TriangleNet.Meshing
                 {
                     regionTris[i] = dummytri;
                     // Ignore region points that aren't within the bounds of the mesh.
-                    if (mesh.bounds.Contains(region.point))
+                    if (mesh.bounds.Contains(region.Point))
                     {
                         // Start searching from some triangle on the outer boundary.
                         searchtri.tri = dummytri;
@@ -173,17 +173,17 @@ namespace TriangleNet.Meshing
                         // region point falls within the starting triangle.
                         searchorg = searchtri.Org();
                         searchdest = searchtri.Dest();
-                        if (predicates.CounterClockwise(searchorg, searchdest, region.point) > 0.0)
+                        if (predicates.CounterClockwise(searchorg, searchdest, region.Point) > 0.0)
                         {
                             // Find a triangle that contains the region point.
-                            intersect = mesh.locator.Locate(region.point, ref searchtri);
+                            intersect = mesh.locator.Locate(region.Point, ref searchtri);
                             if ((intersect != LocateResult.Outside) && (!searchtri.IsInfected()))
                             {
                                 // Record the triangle for processing after the
                                 // holes have been carved.
                                 regionTris[i] = searchtri.tri;
-                                regionTris[i].label = region.id;
-                                regionTris[i].area = region.area;
+                                regionTris[i].label = region.Label;
+                                regionTris[i].area = region.Area;
                             }
                         }
                     }
