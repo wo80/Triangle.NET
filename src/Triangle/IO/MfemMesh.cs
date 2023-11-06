@@ -49,8 +49,6 @@ namespace TriangleNet.IO
 
                 Write(mesh, sw);
             }
-
-            client.Close();
         }
 
         /// <summary>
