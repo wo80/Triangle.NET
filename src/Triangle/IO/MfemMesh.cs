@@ -13,10 +13,13 @@ namespace TriangleNet.IO
     /// <summary>
     /// A simple helper class to write a mesh using MFEM mesh format and send it to GLVis.
     /// </summary>
+    /// <remarks>
+    /// See https://mfem.org/mesh-format-v1.0/ and https://glvis.org/
+    /// </remarks>
     public static class MfemMesh
     {
         /// <summary>
-        /// Send the to default GLVis socket (127.0.0.1:19916).
+        /// Send the mesh to default GLVis socket (127.0.0.1:19916).
         /// </summary>
         /// <param name="mesh">The mesh to send.</param>
         /// <param name="port">The port number (default = 19916).</param>
@@ -26,35 +29,28 @@ namespace TriangleNet.IO
         }
 
         /// <summary>
-        /// Number the vertices and write them to a .node file.
+        /// Send the mesh to the given GLVis socket.
         /// </summary>
         /// <param name="mesh">The mesh to send.</param>
         /// <param name="ip">The IP address.</param>
         /// <param name="port">The port number.</param>
         public static async Task Send(IMesh mesh, IPAddress ip, int port)
         {
-            var client = new TcpClient();
+            using var client = new TcpClient();
 
-            try
+            await client.ConnectAsync(ip, port);
+
+            var stream = client.GetStream();
+
+            using (var sw = new StreamWriter(stream) { NewLine = "\n" })
             {
-                await client.ConnectAsync(ip, port);
+                sw.WriteLine("mesh");
+                sw.WriteLine();
 
-                var stream = client.GetStream();
-
-                using (var sw = new StreamWriter(stream) { NewLine = "\n" })
-                {
-                    sw.WriteLine("mesh"); // fem2d_gf_data
-                    sw.WriteLine();
-
-                    Write(mesh, sw);
-                }
-
-                client.Close();
+                Write(mesh, sw);
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
+
+            client.Close();
         }
 
         /// <summary>
@@ -65,7 +61,10 @@ namespace TriangleNet.IO
         public static void Write(IMesh mesh, string filename)
         {
             using var file = File.Open(filename, FileMode.Create);
-            using var sw = new StreamWriter(file);
+            using var sw = new StreamWriter(file)
+            {
+                NewLine = "\n"
+            };
 
             Write(mesh, sw);
         }
@@ -77,15 +76,16 @@ namespace TriangleNet.IO
         /// <param name="stream">The target stream.</param>
         public static void Write(IMesh mesh, Stream stream)
         {
-            using var sw = new StreamWriter(stream);
+            using var sw = new StreamWriter(stream)
+            {
+                NewLine = "\n"
+            };
 
             Write(mesh, sw);
         }
 
         private static void Write(IMesh mesh, StreamWriter sw)
         {
-            sw.NewLine = "\n";
-
             mesh.Renumber();
 
             // Header
