@@ -36,19 +36,24 @@ namespace TriangleNet.IO
         /// <param name="port">The port number.</param>
         public static async Task Send(IMesh mesh, IPAddress ip, int port)
         {
+            using var stream = new MemoryStream();
+            using var writer = new StreamWriter(stream) { NewLine = "\n" };
+
+            writer.WriteLine("mesh");
+            writer.WriteLine();
+
+            Write(mesh, writer);
+
+            writer.Flush();
+
+            stream.Flush();
+            stream.Position = 0;
+
             using var client = new TcpClient();
 
             await client.ConnectAsync(ip, port);
 
-            var stream = client.GetStream();
-
-            using (var sw = new StreamWriter(stream) { NewLine = "\n" })
-            {
-                sw.WriteLine("mesh");
-                sw.WriteLine();
-
-                Write(mesh, sw);
-            }
+            await stream.CopyToAsync(client.GetStream());
         }
 
         /// <summary>
@@ -157,8 +162,6 @@ namespace TriangleNet.IO
                     v.x.ToString(NumberFormatInfo.InvariantInfo),
                     v.y.ToString(NumberFormatInfo.InvariantInfo));
             }
-
-            sw.WriteLine();
         }
     }
 }
