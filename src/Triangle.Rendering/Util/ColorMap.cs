@@ -2,9 +2,7 @@
 namespace TriangleNet.Rendering.Util
 {
     using System;
-    using System.Collections.Generic;
     using System.Drawing;
-    using System.Linq;
 
     /// <summary>
     /// A simple color map implementation.
@@ -88,10 +86,10 @@ namespace TriangleNet.Rendering.Util
             }
         }
 
-        private static (double, double) GetMinMax(IEnumerable<double> values)
+        private static (float, float) GetMinMax(float[] values)
         {
-            double min = double.MaxValue;
-            double max = double.MinValue;
+            float min = float.MaxValue;
+            float max = float.MinValue;
 
             foreach (var a in values)
             {
@@ -147,9 +145,9 @@ namespace TriangleNet.Rendering.Util
         /// <param name="colors">The color array target containing the <see cref="Color"/>s on output.</param>
         public void GetColors(float[] values, Color[] colors)
         {
-            (double min, double max) = GetMinMax(values.Cast<double>());
+            (float min, float max) = GetMinMax(values);
 
-            GetColors(values, (float)min, (float)max, colors);
+            GetColors(values, min, max, colors);
         }
 
         /// <summary>
@@ -165,12 +163,13 @@ namespace TriangleNet.Rendering.Util
 
             int length = Math.Min(values.Length, colors.Length);
 
+            int n = map.Length;
+
             for (int i = 0; i < length; i++)
             {
-                int n = map.Length;
                 int k = (int)Math.Floor(n * (max - values[i]) / (max - min));
 
-                k = Math.Max(Math.Min(k, n), 0);
+                k = Math.Max(Math.Min(k, n - 1), 0);
 
                 colors[i] = map[k];
             }
@@ -183,9 +182,9 @@ namespace TriangleNet.Rendering.Util
         /// <param name="rgba">The color array target containing RGBA float values on output.</param>
         public void GetColors(float[] values, float[] rgba)
         {
-            (double min, double max) = GetMinMax(values.Cast<double>());
+            (float min, float max) = GetMinMax(values);
 
-            GetColorsFromDouble(values.Cast<double>(), min, max, rgba);
+            GetColors(values, min, max, rgba);
         }
 
         /// <summary>
@@ -197,7 +196,27 @@ namespace TriangleNet.Rendering.Util
         /// <param name="rgba">The color array target containing RGBA float values on output.</param>
         public void GetColors(float[] values, float min, float max, float[] rgba)
         {
-            GetColorsFromDouble(values.Cast<double>(), min, max, rgba);
+            if (max <= min) return;
+
+            int n = map.Length;
+
+            for (int i = 0; i < values.Length; i++)
+            {
+                int k = (int)Math.Floor(n * (max - values[i]) / (max - min));
+
+                k = Math.Max(Math.Min(k, n - 1), 0);
+
+                var color = map[k];
+
+                k = 4 * i;
+
+                rgba[k] = color.R / 255f;
+                rgba[k + 1] = color.G / 255f;
+                rgba[k + 2] = color.B / 255f;
+                rgba[k + 3] = color.A / 255f;
+
+                i++;
+            }
         }
 
         /// <summary>
@@ -209,7 +228,7 @@ namespace TriangleNet.Rendering.Util
         {
             (double min, double max) = GetMinMax(values);
 
-            GetColorsFromDouble(values, min, max, rgba);
+            GetColors(values, min, max, rgba);
         }
 
         /// <summary>
@@ -221,21 +240,15 @@ namespace TriangleNet.Rendering.Util
         /// <param name="rgba">The color array target containing RGBA float values on output.</param>
         public void GetColors(double[] values, double min, double max, float[] rgba)
         {
-            GetColorsFromDouble(values, min, max, rgba);
-        }
-
-        private void GetColorsFromDouble(IEnumerable<double> values, double min, double max, float[] rgba)
-        {
             if (max <= min) return;
 
-            int i = 0;
+            int n = map.Length;
 
-            foreach (var value in values)
+            for (int i = 0; i < values.Length; i++)
             {
-                int n = map.Length;
-                int k = (int)Math.Floor(n * (max - value) / (max - min));
+                int k = (int)Math.Floor(n * (max - values[i]) / (max - min));
 
-                k = Math.Max(Math.Min(k, n), 0);
+                k = Math.Max(Math.Min(k, n - 1), 0);
 
                 var color = map[k];
 
