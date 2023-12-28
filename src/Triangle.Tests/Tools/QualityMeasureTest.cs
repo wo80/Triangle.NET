@@ -28,13 +28,13 @@ namespace TriangleNet.Tests.Tools
 
             quality.Update(mesh);
 
-            Assert.AreEqual(quality.Area.Minimum, quality.Area.Maximum);
-            Assert.AreEqual(1.0, quality.Alpha.Minimum);
-            Assert.AreEqual(1.0, quality.Alpha.Maximum);
-            Assert.AreEqual(1.0, quality.Eta.Minimum);
-            Assert.AreEqual(1.0, quality.Eta.Maximum);
-            Assert.AreEqual(1.0, quality.Q.Minimum);
-            Assert.AreEqual(1.0, quality.Q.Maximum);
+            Assert.That(quality.Area.Maximum, Is.EqualTo(quality.Area.Minimum));
+            Assert.That(quality.Alpha.Minimum, Is.EqualTo(1.0));
+            Assert.That(quality.Alpha.Maximum, Is.EqualTo(1.0));
+            Assert.That(quality.Eta.Minimum, Is.EqualTo(1.0));
+            Assert.That(quality.Eta.Maximum, Is.EqualTo(1.0));
+            Assert.That(quality.Q.Minimum, Is.EqualTo(1.0));
+            Assert.That(quality.Q.Maximum, Is.EqualTo(1.0));
         }
     }
 }

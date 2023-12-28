@@ -13,16 +13,16 @@ namespace TriangleNet.Tests.Tools
 
             var matrix = new AdjacencyMatrix(mesh);
 
-            CollectionAssert.AreEqual(matrix.ColumnPointers, new int[] { 0, 4, 7, 11, 17, 21, 24 });
-            CollectionAssert.AreEqual(matrix.RowIndices, new int[] {
+            Assert.That(new int[] { 0, 4, 7, 11, 17, 21, 24 }, Is.EqualTo(matrix.ColumnPointers).AsCollection);
+            Assert.That(new int[] {
                 0, 1, 2, 3,
                 0, 1, 3,
                 0, 2, 3, 4,
                 0, 1, 2, 3, 4, 5,
                 2, 3, 4, 5,
-                3, 4, 5 });
+                3, 4, 5 }, Is.EqualTo(matrix.RowIndices).AsCollection);
 
-            Assert.AreEqual(7, matrix.Bandwidth());
+            Assert.That(matrix.Bandwidth(), Is.EqualTo(7));
 
             var p = new CuthillMcKee().Renumber(matrix);
 
@@ -33,17 +33,17 @@ namespace TriangleNet.Tests.Tools
 
             var pmatrix = new AdjacencyMatrix(mesh, false);
 
-            CollectionAssert.AreEqual(pmatrix.ColumnPointers, new int[] { 0, 3, 7, 11, 15, 21, 24 });
-            CollectionAssert.AreEqual(pmatrix.RowIndices, new int[] {
+            Assert.That(new int[] { 0, 3, 7, 11, 15, 21, 24 }, Is.EqualTo(pmatrix.ColumnPointers).AsCollection);
+            Assert.That(new int[] {
                 0, 2, 4,
                 1, 2, 3, 4,
                 0, 1, 2, 4,
                 1, 3, 4, 5,
                 0, 1, 2, 3, 4, 5,
-                3, 4, 5 });
+                3, 4, 5 }, Is.EqualTo(pmatrix.RowIndices).AsCollection);
 
             // For structured meshes we cannot expect an improved bandwidth.
-            Assert.AreEqual(9, pmatrix.Bandwidth());
+            Assert.That(pmatrix.Bandwidth(), Is.EqualTo(9));
         }
     }
 }

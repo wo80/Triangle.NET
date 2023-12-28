@@ -14,36 +14,36 @@ namespace TriangleNet.Tests
             var t1 = pool.Get();
             var t2 = pool.Get();
 
-            Assert.AreEqual(0, t0.ID);
-            Assert.AreEqual(1, t1.ID);
-            Assert.AreEqual(2, t2.ID);
+            Assert.That(t0.ID, Is.EqualTo(0));
+            Assert.That(t1.ID, Is.EqualTo(1));
+            Assert.That(t2.ID, Is.EqualTo(2));
 
-            Assert.AreEqual(3, pool.Count);
+            Assert.That(pool.Count, Is.EqualTo(3));
 
             pool.Release(t0);
 
-            Assert.AreEqual(2, pool.Count);
-            Assert.Less(t0.GetHashCode(), 0);
+            Assert.That(pool.Count, Is.EqualTo(2));
+            Assert.That(t0.GetHashCode(), Is.LessThan(0));
 
             pool.Release(t1);
 
-            Assert.AreEqual(1, pool.Count);
-            Assert.Less(t1.GetHashCode(), 0);
+            Assert.That(pool.Count, Is.EqualTo(1));
+            Assert.That(t1.GetHashCode(), Is.LessThan(0));
 
             var t4 = pool.Get();
 
-            Assert.AreEqual(2, pool.Count);
-            Assert.AreEqual(t1.ID, t4.ID);
+            Assert.That(pool.Count, Is.EqualTo(2));
+            Assert.That(t4.ID, Is.EqualTo(t1.ID));
 
             var t5 = pool.Get();
 
-            Assert.AreEqual(3, pool.Count);
-            Assert.AreEqual(t0.ID, t5.ID);
+            Assert.That(pool.Count, Is.EqualTo(3));
+            Assert.That(t5.ID, Is.EqualTo(t0.ID));
 
             var t6 = pool.Get();
 
-            Assert.AreEqual(4, pool.Count);
-            Assert.AreEqual(3, t6.ID);
+            Assert.That(pool.Count, Is.EqualTo(4));
+            Assert.That(t6.ID, Is.EqualTo(3));
         }
 
         [Test]
@@ -59,49 +59,49 @@ namespace TriangleNet.Tests
 
             var a = pool.ToArray();
 
-            Assert.AreEqual(4, a.Length);
-            Assert.AreEqual(0, a[0].ID);
-            Assert.AreEqual(1, a[1].ID);
-            Assert.AreEqual(2, a[2].ID);
-            Assert.AreEqual(3, a[3].ID);
+            Assert.That(a.Length, Is.EqualTo(4));
+            Assert.That(a[0].ID, Is.EqualTo(0));
+            Assert.That(a[1].ID, Is.EqualTo(1));
+            Assert.That(a[2].ID, Is.EqualTo(2));
+            Assert.That(a[3].ID, Is.EqualTo(3));
 
             pool.Release(a[1]);
 
             a = pool.ToArray();
 
-            Assert.AreEqual(3, a.Length);
-            Assert.AreEqual(0, a[0].ID);
-            Assert.AreEqual(2, a[1].ID);
-            Assert.AreEqual(3, a[2].ID);
+            Assert.That(a.Length, Is.EqualTo(3));
+            Assert.That(a[0].ID, Is.EqualTo(0));
+            Assert.That(a[1].ID, Is.EqualTo(2));
+            Assert.That(a[2].ID, Is.EqualTo(3));
 
             pool.Release(a[1]);
 
             a = pool.ToArray();
 
-            Assert.AreEqual(2, a.Length);
-            Assert.AreEqual(0, a[0].ID);
-            Assert.AreEqual(3, a[1].ID);
+            Assert.That(a.Length, Is.EqualTo(2));
+            Assert.That(a[0].ID, Is.EqualTo(0));
+            Assert.That(a[1].ID, Is.EqualTo(3));
 
             var t2 = pool.Get();
 
             a = pool.ToArray();
 
-            Assert.AreEqual(3, a.Length);
-            Assert.AreEqual(0, a[0].ID);
-            Assert.AreEqual(2, a[1].ID);
-            Assert.AreEqual(2, t2.ID);
-            Assert.AreEqual(3, a[2].ID);
+            Assert.That(a.Length, Is.EqualTo(3));
+            Assert.That(a[0].ID, Is.EqualTo(0));
+            Assert.That(a[1].ID, Is.EqualTo(2));
+            Assert.That(t2.ID, Is.EqualTo(2));
+            Assert.That(a[2].ID, Is.EqualTo(3));
 
             var t1 = pool.Get();
 
             a = pool.ToArray();
 
-            Assert.AreEqual(4, a.Length);
-            Assert.AreEqual(0, a[0].ID);
-            Assert.AreEqual(1, a[1].ID);
-            Assert.AreEqual(1, t1.ID);
-            Assert.AreEqual(2, a[2].ID);
-            Assert.AreEqual(3, a[3].ID);
+            Assert.That(a.Length, Is.EqualTo(4));
+            Assert.That(a[0].ID, Is.EqualTo(0));
+            Assert.That(a[1].ID, Is.EqualTo(1));
+            Assert.That(t1.ID, Is.EqualTo(1));
+            Assert.That(a[2].ID, Is.EqualTo(2));
+            Assert.That(a[3].ID, Is.EqualTo(3));
         }
 
         [Test]
@@ -109,22 +109,22 @@ namespace TriangleNet.Tests
         {
             var pool = new TrianglePool();
 
-            Assert.AreEqual(0, pool.Count);
-            Assert.AreEqual(0, pool.Capacity);
+            Assert.That(pool.Count, Is.EqualTo(0));
+            Assert.That(pool.Capacity, Is.EqualTo(0));
 
             int n = 10;
 
             for (int i = 0; i < n; i++)
             {
-                Assert.AreEqual(i, pool.Get().ID);
+                Assert.That(pool.Get().ID, Is.EqualTo(i));
             }
 
-            Assert.AreEqual(n, pool.Count);
+            Assert.That(pool.Count, Is.EqualTo(n));
 
             pool.Restart();
 
-            Assert.AreEqual(0, pool.Count);
-            Assert.AreEqual(10, pool.Capacity);
+            Assert.That(pool.Count, Is.EqualTo(0));
+            Assert.That(pool.Capacity, Is.EqualTo(10));
         }
     }
 }

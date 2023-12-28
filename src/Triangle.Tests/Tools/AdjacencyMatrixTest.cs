@@ -16,7 +16,7 @@ namespace TriangleNet.Tests.Tools
             var mesher = new GenericMesher();
             var mesh = (Mesh)mesher.Triangulate(p);
 
-            Assert.AreEqual(5, mesh.Vertices.Max(v => v.ID));
+            Assert.That(mesh.Vertices.Max(v => v.ID), Is.EqualTo(5));
 
             mesh.Renumber();
 
@@ -24,8 +24,8 @@ namespace TriangleNet.Tests.Tools
 
             // Highest vertex id after renumbering is 4, since there
             // is no duplicate vertex.
-            Assert.AreEqual(4, matrix.RowIndices.Max());
-            Assert.AreEqual(5, matrix.ColumnCount);
+            Assert.That(matrix.RowIndices.Max(), Is.EqualTo(4));
+            Assert.That(matrix.ColumnCount, Is.EqualTo(5));
         }
 
         [Test]
@@ -43,7 +43,7 @@ namespace TriangleNet.Tests.Tools
 
             // Highest vertex id after renumbering is 4, duplicates
             // are ignored.
-            Assert.AreEqual(4, ai.Max());
+            Assert.That(ai.Max(), Is.EqualTo(4));
 
             // Get the single, duplicate vertex.
             var dup = mesh.Vertices
@@ -52,8 +52,8 @@ namespace TriangleNet.Tests.Tools
 
             // Side effect: undead vertices will have negative indices
             // after computing the adjacency matrix.
-            Assert.IsTrue(dup.id < 0);
-            Assert.IsTrue(!ai.Contains(dup.id));
+            Assert.That(dup.id, Is.LessThan(0));
+            Assert.That(!ai.Contains(dup.id), Is.True);
         }
 
         private List<Vertex> GetVertices(bool includeDuplicate)

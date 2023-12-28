@@ -23,22 +23,22 @@ namespace TriangleNet.Tests.Smoothing
 
             var mesh = poly.Triangulate(options, quality);
 
-            Assert.AreEqual(1, mesh.Vertices
+            Assert.That(mesh.Vertices
                 .Where(v => v.Type == VertexType.UndeadVertex)
-                .Count());
+                .Count(), Is.EqualTo(1));
 
             quality.MaximumArea = 0.2;
 
             mesh.Refine(quality, true);
 
-            Assert.AreEqual(1, mesh.Vertices
+            Assert.That(mesh.Vertices
                 .Where(v => v.Type == VertexType.UndeadVertex)
-                .Count());
+                .Count(), Is.EqualTo(1));
 
             var smoother = new SimpleSmoother();
 
             // Smooth mesh.
-            Assert.IsTrue(smoother.Smooth(mesh, 25) > 0);
+            Assert.That(smoother.Smooth(mesh, 25), Is.GreaterThan(0));
         }
 
         private Polygon GetPolygon()

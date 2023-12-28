@@ -23,7 +23,7 @@ namespace TriangleNet.Tests.Geometry
 
             var p = contour.FindInteriorPoint();
 
-            Assert.IsTrue(p.X > 0d && p.X < 1d && p.Y > 0d && p.Y < 1d);
+            Assert.That(p.X > 0d && p.X < 1d && p.Y > 0d && p.Y < 1d, Is.True);
         }
 
         [Test]
@@ -58,7 +58,7 @@ namespace TriangleNet.Tests.Geometry
             {
                 double ccw = p.CounterClockwise(points[i], h, points[j]);
 
-                Assert.Greater(Math.Abs(ccw), 1e-12);
+                Assert.That(Math.Abs(ccw), Is.GreaterThan(1e-12));
 
                 i = j;
             }

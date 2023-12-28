@@ -17,11 +17,11 @@ namespace TriangleNet.Tests.Meshing
 
             var mesh = m.Triangulate(vertices);
 
-            Assert.AreEqual(6, vertices.Count);
-            Assert.AreEqual(6, mesh.Vertices.Count);
-            Assert.AreEqual(1, mesh.Vertices
+            Assert.That(vertices.Count, Is.EqualTo(6));
+            Assert.That(mesh.Vertices.Count, Is.EqualTo(6));
+            Assert.That(mesh.Vertices
                 .Where(v => v.Type == VertexType.UndeadVertex)
-                .Count());
+                .Count(), Is.EqualTo(1));
         }
 
         private List<Vertex> GetVertices()

@@ -22,10 +22,10 @@ namespace TriangleNet.Tests.Geometry
 
             p.Add(contour);
 
-            Assert.AreEqual(3, p.Points.Count);
-            Assert.AreEqual(3, p.Segments.Count);
-            Assert.AreEqual(0, p.Holes.Count);
-            Assert.AreEqual(0, p.Regions.Count);
+            Assert.That(p.Points.Count, Is.EqualTo(3));
+            Assert.That(p.Segments.Count, Is.EqualTo(3));
+            Assert.That(p.Holes.Count, Is.EqualTo(0));
+            Assert.That(p.Regions.Count, Is.EqualTo(0));
         }
 
         [Test]
@@ -37,10 +37,10 @@ namespace TriangleNet.Tests.Geometry
 
             p.Add(contour, true);
 
-            Assert.AreEqual(3, p.Points.Count);
-            Assert.AreEqual(3, p.Segments.Count);
-            Assert.AreEqual(1, p.Holes.Count);
-            Assert.AreEqual(0, p.Regions.Count);
+            Assert.That(p.Points.Count, Is.EqualTo(3));
+            Assert.That(p.Segments.Count, Is.EqualTo(3));
+            Assert.That(p.Holes.Count, Is.EqualTo(1));
+            Assert.That(p.Regions.Count, Is.EqualTo(0));
         }
 
         [Test]
@@ -52,10 +52,10 @@ namespace TriangleNet.Tests.Geometry
 
             p.Add(contour, 1);
 
-            Assert.AreEqual(3, p.Points.Count);
-            Assert.AreEqual(3, p.Segments.Count);
-            Assert.AreEqual(0, p.Holes.Count);
-            Assert.AreEqual(1, p.Regions.Count);
+            Assert.That(p.Points.Count, Is.EqualTo(3));
+            Assert.That(p.Segments.Count, Is.EqualTo(3));
+            Assert.That(p.Holes.Count, Is.EqualTo(0));
+            Assert.That(p.Regions.Count, Is.EqualTo(1));
         }
 
         [Test]
@@ -69,8 +69,8 @@ namespace TriangleNet.Tests.Geometry
 
             var bounds = p.Bounds();
 
-            Assert.AreEqual(2d, bounds.Width);
-            Assert.AreEqual(1.5, bounds.Height);
+            Assert.That(bounds.Width, Is.EqualTo(2d));
+            Assert.That(bounds.Height, Is.EqualTo(1.5));
         }
     }
 }

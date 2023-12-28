@@ -30,8 +30,8 @@ namespace TriangleNet.Tests.Meshing.Iterators
             var p = vertices[0];
             
             var list =  circulator.EnumerateVertices(p).ToList();
-            
-            Assert.AreEqual(2, list.Count);
+
+            Assert.That(list.Count, Is.EqualTo(2));
         }
 
         [Test]
@@ -45,7 +45,7 @@ namespace TriangleNet.Tests.Meshing.Iterators
 
             var list = circulator.EnumerateTriangles(p).ToList();
 
-            Assert.AreEqual(1, list.Count);
+            Assert.That(list.Count, Is.EqualTo(1));
         }
 
         private Mesh CreateMesh(out Vertex[] vertices)

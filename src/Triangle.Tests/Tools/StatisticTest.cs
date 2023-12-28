@@ -14,29 +14,29 @@ namespace TriangleNet.Tests.Tools
             var t = Helper.CreateTriangle(1 ,new Vertex(0.0, 0.0), new Vertex(1.0, 0.0), new Vertex(0.0, 1.0));
             var a = ComputeAngles(t);
 
-            Assert.AreEqual(45.0, a.min);
-            Assert.AreEqual(90.0, a.max);
+            Assert.That(a.min, Is.EqualTo(45.0));
+            Assert.That(a.max, Is.EqualTo(90.0));
 
             // Angles: 135, 14, 31
             t = Helper.CreateTriangle(1 ,new Vertex(0.0, 0.0), new Vertex(3.0, 0.0), new Vertex(-1.0, 1.0));
             a = ComputeAngles(t);
 
-            Assert.AreEqual(14.0, a.min);
-            Assert.AreEqual(135.0, a.max);
+            Assert.That(a.min, Is.EqualTo(14.0));
+            Assert.That(a.max, Is.EqualTo(135.0));
 
             // Angles: 60, 60, 60
             t = Helper.CreateTriangle(1 ,new Vertex(0.0, 0.0), new Vertex(2.0, 0.0), new Vertex(1.0, 1.73));
             a = ComputeAngles(t);
 
-            Assert.AreEqual(60.0, a.min);
-            Assert.AreEqual(60.0, a.max);
+            Assert.That(a.min, Is.EqualTo(60.0));
+            Assert.That(a.max, Is.EqualTo(60.0));
 
             // Angles: 180
             t = Helper.CreateTriangle(1 ,new Vertex(0.0, 0.0), new Vertex(10000.0, 1.0), new Vertex(-10000.0, 1.0));
             a = ComputeAngles(t);
 
-            Assert.AreEqual(0.0, a.min);
-            Assert.AreEqual(180.0, a.max);
+            Assert.That(a.min, Is.EqualTo(0.0));
+            Assert.That(a.max, Is.EqualTo(180.0));
         }
 
         /// <summary>

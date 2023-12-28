@@ -35,7 +35,7 @@ namespace TriangleNet.Tests.Tools
                 actual = Interpolation.InterpolatePoint(tri, vertices[i], values);
                 expected = values[i];
 
-                Assert.AreEqual(expected, actual);
+                Assert.That(actual, Is.EqualTo(expected));
             }
 
             // Check the edge midpoints.
@@ -52,7 +52,7 @@ namespace TriangleNet.Tests.Tools
                 actual = Interpolation.InterpolatePoint(tri, p, values);
                 expected = (values[i] + values[(i + 1) % 3]) / 2;
 
-                Assert.AreEqual(expected, actual);
+                Assert.That(actual, Is.EqualTo(expected));
             }
 
             // Check centroid.
@@ -62,7 +62,7 @@ namespace TriangleNet.Tests.Tools
             actual = Interpolation.InterpolatePoint(tri, new Point(x, y), values);
             expected = (values[0] + values[1] + values[2]) / 3;
 
-            Assert.AreEqual(expected, actual);
+            Assert.That(actual, Is.EqualTo(expected));
         }
     }
 }

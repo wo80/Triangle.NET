@@ -102,13 +102,13 @@ namespace TriangleNet.Tests
             t.tri = Helper.CreateTriangle(0, vertices[1], vertices[4], vertices[3]);
 
             t.orient = 0;
-            Assert.AreEqual(1, t.Org().ID);
+            Assert.That(t.Org().ID, Is.EqualTo(1));
 
             t.orient = 1;
-            Assert.AreEqual(4, t.Org().ID);
+            Assert.That(t.Org().ID, Is.EqualTo(4));
 
             t.orient = 2;
-            Assert.AreEqual(3, t.Org().ID);
+            Assert.That(t.Org().ID, Is.EqualTo(3));
         }
 
         [Test]
@@ -119,13 +119,13 @@ namespace TriangleNet.Tests
             t.tri = Helper.CreateTriangle(0, vertices[1], vertices[4], vertices[3]);
 
             t.orient = 0;
-            Assert.AreEqual(4, t.Dest().ID);
+            Assert.That(t.Dest().ID, Is.EqualTo(4));
 
             t.orient = 1;
-            Assert.AreEqual(3, t.Dest().ID);
+            Assert.That(t.Dest().ID, Is.EqualTo(3));
 
             t.orient = 2;
-            Assert.AreEqual(1, t.Dest().ID);
+            Assert.That(t.Dest().ID, Is.EqualTo(1));
         }
 
         [Test]
@@ -136,13 +136,13 @@ namespace TriangleNet.Tests
             t.tri = Helper.CreateTriangle(0, vertices[1], vertices[4], vertices[3]);
 
             t.orient = 0;
-            Assert.AreEqual(3, t.Apex().ID);
+            Assert.That(t.Apex().ID, Is.EqualTo(3));
 
             t.orient = 1;
-            Assert.AreEqual(1, t.Apex().ID);
+            Assert.That(t.Apex().ID, Is.EqualTo(1));
 
             t.orient = 2;
-            Assert.AreEqual(4, t.Apex().ID);
+            Assert.That(t.Apex().ID, Is.EqualTo(4));
         }
 
         [Test]
@@ -158,15 +158,15 @@ namespace TriangleNet.Tests
 
             t.orient = 0;
             t.Sym(ref s);
-            Assert.AreEqual(2, s.tri.ID);
+            Assert.That(s.tri.ID, Is.EqualTo(2));
 
             t.orient = 1;
             t.Sym(ref s);
-            Assert.AreEqual(3, s.tri.ID);
+            Assert.That(s.tri.ID, Is.EqualTo(3));
 
             t.orient = 2;
             t.Sym(ref s);
-            Assert.AreEqual(0, s.tri.ID);
+            Assert.That(s.tri.ID, Is.EqualTo(0));
         }
 
         [Test]
@@ -181,13 +181,13 @@ namespace TriangleNet.Tests
             t.orient = 0;
 
             t.Lnext();
-            Assert.AreEqual(4, t.Org().ID);
+            Assert.That(t.Org().ID, Is.EqualTo(4));
 
             t.Lnext();
-            Assert.AreEqual(3, t.Org().ID);
+            Assert.That(t.Org().ID, Is.EqualTo(3));
 
             t.Lnext();
-            Assert.AreEqual(1, t.Org().ID);
+            Assert.That(t.Org().ID, Is.EqualTo(1));
         }
 
         [Test]
@@ -202,13 +202,13 @@ namespace TriangleNet.Tests
             t.orient = 0;
 
             t.Lprev();
-            Assert.AreEqual(3, t.Org().ID);
+            Assert.That(t.Org().ID, Is.EqualTo(3));
 
             t.Lprev();
-            Assert.AreEqual(4, t.Org().ID);
+            Assert.That(t.Org().ID, Is.EqualTo(4));
 
             t.Lprev();
-            Assert.AreEqual(1, t.Org().ID);
+            Assert.That(t.Org().ID, Is.EqualTo(1));
         }
 
         [Test]
@@ -225,22 +225,22 @@ namespace TriangleNet.Tests
             t.orient = 0;
 
             // Make sure we're on the correct edge.
-            Assert.AreEqual(1, t.Org().ID);
-            Assert.AreEqual(2, t.Dest().ID);
+            Assert.That(t.Org().ID, Is.EqualTo(1));
+            Assert.That(t.Dest().ID, Is.EqualTo(2));
 
             t.Onext();
-            Assert.AreEqual(1, t.Org().ID);
-            Assert.AreEqual(4, t.Dest().ID);
-            Assert.AreEqual(1, t.tri.ID);
+            Assert.That(t.Org().ID, Is.EqualTo(1));
+            Assert.That(t.Dest().ID, Is.EqualTo(4));
+            Assert.That(t.tri.ID, Is.EqualTo(1));
 
             t.Onext();
-            Assert.AreEqual(1, t.Org().ID);
-            Assert.AreEqual(3, t.Dest().ID);
-            Assert.AreEqual(0, t.tri.ID);
+            Assert.That(t.Org().ID, Is.EqualTo(1));
+            Assert.That(t.Dest().ID, Is.EqualTo(3));
+            Assert.That(t.tri.ID, Is.EqualTo(0));
 
             // Out of mesh.
             t.Onext();
-            Assert.AreEqual(-1, t.tri.ID);
+            Assert.That(t.tri.ID, Is.EqualTo(-1));
         }
 
         [Test]
@@ -257,22 +257,22 @@ namespace TriangleNet.Tests
             t.orient = 1;
 
             // Make sure we're on the correct edge.
-            Assert.AreEqual(1, t.Org().ID);
-            Assert.AreEqual(3, t.Dest().ID);
+            Assert.That(t.Org().ID, Is.EqualTo(1));
+            Assert.That(t.Dest().ID, Is.EqualTo(3));
 
             t.Oprev();
-            Assert.AreEqual(1, t.Org().ID);
-            Assert.AreEqual(4, t.Dest().ID);
-            Assert.AreEqual(1, t.tri.ID);
+            Assert.That(t.Org().ID, Is.EqualTo(1));
+            Assert.That(t.Dest().ID, Is.EqualTo(4));
+            Assert.That(t.tri.ID, Is.EqualTo(1));
 
             t.Oprev();
-            Assert.AreEqual(1, t.Org().ID);
-            Assert.AreEqual(2, t.Dest().ID);
-            Assert.AreEqual(2, t.tri.ID);
+            Assert.That(t.Org().ID, Is.EqualTo(1));
+            Assert.That(t.Dest().ID, Is.EqualTo(2));
+            Assert.That(t.tri.ID, Is.EqualTo(2));
 
             // Out of mesh.
             t.Oprev();
-            Assert.AreEqual(-1, t.tri.ID);
+            Assert.That(t.tri.ID, Is.EqualTo(-1));
         }
 
         [Test]
@@ -289,22 +289,22 @@ namespace TriangleNet.Tests
             t.orient = 1;
 
             // Make sure we're on the correct edge.
-            Assert.AreEqual(1, t.Org().ID);
-            Assert.AreEqual(3, t.Dest().ID);
+            Assert.That(t.Org().ID, Is.EqualTo(1));
+            Assert.That(t.Dest().ID, Is.EqualTo(3));
 
             t.Dnext();
-            Assert.AreEqual(4, t.Org().ID);
-            Assert.AreEqual(3, t.Dest().ID);
-            Assert.AreEqual(1, t.tri.ID);
+            Assert.That(t.Org().ID, Is.EqualTo(4));
+            Assert.That(t.Dest().ID, Is.EqualTo(3));
+            Assert.That(t.tri.ID, Is.EqualTo(1));
 
             t.Dnext();
-            Assert.AreEqual(5, t.Org().ID);
-            Assert.AreEqual(3, t.Dest().ID);
-            Assert.AreEqual(3, t.tri.ID);
+            Assert.That(t.Org().ID, Is.EqualTo(5));
+            Assert.That(t.Dest().ID, Is.EqualTo(3));
+            Assert.That(t.tri.ID, Is.EqualTo(3));
 
             // Out of mesh.
             t.Dnext();
-            Assert.AreEqual(-1, t.tri.ID);
+            Assert.That(t.tri.ID, Is.EqualTo(-1));
         }
 
         [Test]
@@ -321,22 +321,22 @@ namespace TriangleNet.Tests
             t.orient = 2;
 
             // Make sure we're on the correct edge.
-            Assert.AreEqual(5, t.Org().ID);
-            Assert.AreEqual(3, t.Dest().ID);
+            Assert.That(t.Org().ID, Is.EqualTo(5));
+            Assert.That(t.Dest().ID, Is.EqualTo(3));
 
             t.Dprev();
-            Assert.AreEqual(4, t.Org().ID);
-            Assert.AreEqual(3, t.Dest().ID);
-            Assert.AreEqual(1, t.tri.ID);
+            Assert.That(t.Org().ID, Is.EqualTo(4));
+            Assert.That(t.Dest().ID, Is.EqualTo(3));
+            Assert.That(t.tri.ID, Is.EqualTo(1));
 
             t.Dprev();
-            Assert.AreEqual(1, t.Org().ID);
-            Assert.AreEqual(3, t.Dest().ID);
-            Assert.AreEqual(0, t.tri.ID);
+            Assert.That(t.Org().ID, Is.EqualTo(1));
+            Assert.That(t.Dest().ID, Is.EqualTo(3));
+            Assert.That(t.tri.ID, Is.EqualTo(0));
 
             // Out of mesh.
             t.Dprev();
-            Assert.AreEqual(-1, t.tri.ID);
+            Assert.That(t.tri.ID, Is.EqualTo(-1));
         }
 
         [Test]
@@ -353,22 +353,22 @@ namespace TriangleNet.Tests
             t.orient = 1;
 
             // Make sure we're on the correct edge.
-            Assert.AreEqual(1, t.Org().ID);
-            Assert.AreEqual(3, t.Dest().ID);
+            Assert.That(t.Org().ID, Is.EqualTo(1));
+            Assert.That(t.Dest().ID, Is.EqualTo(3));
 
             t.Rnext();
-            Assert.AreEqual(4, t.Org().ID);
-            Assert.AreEqual(1, t.Dest().ID);
-            Assert.AreEqual(2, t.tri.ID);
+            Assert.That(t.Org().ID, Is.EqualTo(4));
+            Assert.That(t.Dest().ID, Is.EqualTo(1));
+            Assert.That(t.tri.ID, Is.EqualTo(2));
 
             t.Rnext();
-            Assert.AreEqual(3, t.Org().ID);
-            Assert.AreEqual(4, t.Dest().ID);
-            Assert.AreEqual(3, t.tri.ID);
+            Assert.That(t.Org().ID, Is.EqualTo(3));
+            Assert.That(t.Dest().ID, Is.EqualTo(4));
+            Assert.That(t.tri.ID, Is.EqualTo(3));
 
             // Back where we started.
             t.Rnext();
-            Assert.AreEqual(0, t.tri.ID);
+            Assert.That(t.tri.ID, Is.EqualTo(0));
         }
 
         [Test]
@@ -385,22 +385,22 @@ namespace TriangleNet.Tests
             t.orient = 0;
 
             // Make sure we're on the correct edge.
-            Assert.AreEqual(3, t.Org().ID);
-            Assert.AreEqual(4, t.Dest().ID);
+            Assert.That(t.Org().ID, Is.EqualTo(3));
+            Assert.That(t.Dest().ID, Is.EqualTo(4));
 
             t.Rprev();
-            Assert.AreEqual(4, t.Org().ID);
-            Assert.AreEqual(1, t.Dest().ID);
-            Assert.AreEqual(2, t.tri.ID);
+            Assert.That(t.Org().ID, Is.EqualTo(4));
+            Assert.That(t.Dest().ID, Is.EqualTo(1));
+            Assert.That(t.tri.ID, Is.EqualTo(2));
 
             t.Rprev();
-            Assert.AreEqual(1, t.Org().ID);
-            Assert.AreEqual(3, t.Dest().ID);
-            Assert.AreEqual(0, t.tri.ID);
+            Assert.That(t.Org().ID, Is.EqualTo(1));
+            Assert.That(t.Dest().ID, Is.EqualTo(3));
+            Assert.That(t.tri.ID, Is.EqualTo(0));
 
             // Back where we started.
             t.Rprev();
-            Assert.AreEqual(3, t.tri.ID);
+            Assert.That(t.tri.ID, Is.EqualTo(3));
         }
 
         [Test]
@@ -418,27 +418,27 @@ namespace TriangleNet.Tests
             t.orient = 2; // Edge  3 -> 1.
 
             // Make sure we're on the correct edges.
-            Assert.AreEqual(1, s.Org().ID);
-            Assert.AreEqual(3, s.Dest().ID);
-            Assert.AreEqual(3, t.Org().ID);
-            Assert.AreEqual(1, t.Dest().ID);
+            Assert.That(s.Org().ID, Is.EqualTo(1));
+            Assert.That(s.Dest().ID, Is.EqualTo(3));
+            Assert.That(t.Org().ID, Is.EqualTo(3));
+            Assert.That(t.Dest().ID, Is.EqualTo(1));
 
             // Check that the triangles don't have neighbors.
             s.Sym(ref tmp);
             //Assert.AreEqual(-1, tmp.tri.ID);
-            Assert.IsNull(tmp.tri);
+            Assert.That(tmp.tri, Is.Null);
             t.Sym(ref tmp);
             //Assert.AreEqual(-1, tmp.tri.ID);
-            Assert.IsNull(tmp.tri);
+            Assert.That(tmp.tri, Is.Null);
 
             // Bond the two triangles.
             s.Bond(ref t);
 
             // Check that neighbors are properly set.
             s.Sym(ref tmp);
-            Assert.AreEqual(1, tmp.tri.ID);
+            Assert.That(tmp.tri.ID, Is.EqualTo(1));
             t.Sym(ref tmp);
-            Assert.AreEqual(0, tmp.tri.ID);
+            Assert.That(tmp.tri.ID, Is.EqualTo(0));
         }
 
         [Test]
@@ -463,34 +463,34 @@ namespace TriangleNet.Tests
             t.orient = 2;
 
             // Make sure we're on the correct edges.
-            Assert.AreEqual(1, s.Org().ID);
-            Assert.AreEqual(3, s.Dest().ID);
-            Assert.AreEqual(3, t.Org().ID);
-            Assert.AreEqual(1, t.Dest().ID);
+            Assert.That(s.Org().ID, Is.EqualTo(1));
+            Assert.That(s.Dest().ID, Is.EqualTo(3));
+            Assert.That(t.Org().ID, Is.EqualTo(3));
+            Assert.That(t.Dest().ID, Is.EqualTo(1));
 
             // Check that neighbors are properly set.
             s.Sym(ref tmp);
-            Assert.AreEqual(1, tmp.tri.ID);
+            Assert.That(tmp.tri.ID, Is.EqualTo(1));
             t.Sym(ref tmp);
-            Assert.AreEqual(0, tmp.tri.ID);
+            Assert.That(tmp.tri.ID, Is.EqualTo(0));
 
             // Now dissolve the bond from one side.
             s.Dissolve(dummy);
 
             // Check neighbors.
             s.Sym(ref tmp);
-            Assert.AreEqual(-1, tmp.tri.ID);
+            Assert.That(tmp.tri.ID, Is.EqualTo(-1));
             t.Sym(ref tmp);
-            Assert.AreEqual(0, tmp.tri.ID);
+            Assert.That(tmp.tri.ID, Is.EqualTo(0));
 
             // And dissolve the bond from the other side.
             t.Dissolve(dummy);
 
             // Check neighbors.
             s.Sym(ref tmp);
-            Assert.AreEqual(-1, tmp.tri.ID);
+            Assert.That(tmp.tri.ID, Is.EqualTo(-1));
             t.Sym(ref tmp);
-            Assert.AreEqual(-1, tmp.tri.ID);
+            Assert.That(tmp.tri.ID, Is.EqualTo(-1));
         }
     }
 }

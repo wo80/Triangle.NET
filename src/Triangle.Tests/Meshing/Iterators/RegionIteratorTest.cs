@@ -29,7 +29,7 @@ namespace TriangleNet.Tests.Meshing.Iterators
             // Find a seeding triangle in region 1.
             var seed = (Triangle)qtree.Query(0.0, 0.0);
 
-            iterator.Process(seed, t => Assert.AreEqual(1, t.Label));
+            iterator.Process(seed, t => Assert.That(t.Label, Is.EqualTo(1)));
         }
     }
 }
