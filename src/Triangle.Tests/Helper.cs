@@ -10,14 +10,45 @@ namespace TriangleNet.Tests
         public static Contour Rectangle(double left, double top,
             double right, double bottom, int mark = 0)
         {
-            var points = new List<Vertex>(4);
-
-            points.Add(new Vertex(left, top, mark));
-            points.Add(new Vertex(right, top, mark));
-            points.Add(new Vertex(right, bottom, mark));
-            points.Add(new Vertex(left, bottom, mark));
+            var points = new List<Vertex>(4)
+            {
+                new Vertex(left, top, mark),
+                new Vertex(right, top, mark),
+                new Vertex(right, bottom, mark),
+                new Vertex(left, bottom, mark)
+            };
 
             return new Contour(points, mark, true);
+        }
+
+        public static Polygon SplitRectangle(double left, double top,
+            double right, double bottom, int mark = 0)
+        {
+            double midX = (right - left) / 2;
+            double midY = (top - bottom) / 2;
+
+            var midTop = new Vertex(left + midX, top, mark);
+            var midBottom = new Vertex(left + midX, bottom, mark);
+
+            var points = new List<Vertex>(4)
+            {
+                new Vertex(left, top, mark),
+                midTop,
+                new Vertex(right, top, mark),
+                new Vertex(right, bottom, mark),
+                midBottom,
+                new Vertex(left, bottom, mark)
+            };
+
+            var poly = new Polygon();
+
+            poly.Add(new Contour(points, mark, true));
+            poly.Add(new Segment(midTop, midBottom));
+
+            poly.Regions.Add(new RegionPointer(left + midX / 2, bottom + midY / 2, 1));
+            poly.Regions.Add(new RegionPointer(right - midX / 2, bottom + midY / 2, 2));
+
+            return poly;
         }
 
         public static Triangle CreateTriangle(int id, Vertex org, Vertex dest, Vertex apex)
