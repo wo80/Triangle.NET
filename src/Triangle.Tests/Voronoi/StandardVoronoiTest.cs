@@ -26,6 +26,12 @@ namespace TriangleNet.Tests.Voronoi
             // should have 6 infinite edges.
             Assert.That(voronoi.Vertices.Count(v => v.Label == 0), Is.EqualTo(6));
             Assert.That(voronoi.Vertices.Count(v => v.ID >= mesh.Triangles.Count), Is.EqualTo(6));
+
+            // All Voronoi cells should have a generator vertex.
+            Assert.That(voronoi.Faces.All(f => f.Generator is not null));
+
+            // Check DCEL topology (account for unbounded Voronoi cells).
+            Assert.That(voronoi.IsConsistent(false));
         }
     }
 }

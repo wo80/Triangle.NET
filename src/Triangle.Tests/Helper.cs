@@ -45,8 +45,8 @@ namespace TriangleNet.Tests
             poly.Add(new Contour(points, mark, true));
             poly.Add(new Segment(midTop, midBottom));
 
-            poly.Regions.Add(new RegionPointer(left + midX / 2, bottom + midY / 2, 1));
-            poly.Regions.Add(new RegionPointer(right - midX / 2, bottom + midY / 2, 2));
+            poly.Regions.Add(new RegionPointer(left + midX / 2, bottom + midY, 1));
+            poly.Regions.Add(new RegionPointer(right - midX / 2, bottom + midY, 2));
 
             return poly;
         }

@@ -28,6 +28,12 @@ namespace TriangleNet.Tests.Voronoi
             // the Voronoi diagram.
             Assert.That(voronoi.Vertices.Count(v => v.Label == 0), Is.EqualTo(12));
             Assert.That(voronoi.Vertices.Count(v => v.ID >= mesh.Triangles.Count), Is.EqualTo(12));
+
+            // All Voronoi cells should have a generator vertex.
+            Assert.That(voronoi.Faces.All(f => f.Generator is not null));
+
+            // Check DCEL topology (all Voronoi cells should be closed).
+            Assert.That(voronoi.IsConsistent());
         }
     }
 }
