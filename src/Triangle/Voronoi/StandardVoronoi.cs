@@ -6,10 +6,8 @@
 
 namespace TriangleNet.Voronoi
 {
-    using System.Collections.Generic;
     using TriangleNet.Geometry;
     using TriangleNet.Tools;
-    using TriangleNet.Topology.DCEL;
 
     /// <summary>
     /// Computing the standard Voronoi diagram of a Delaunay triangulation.

@@ -130,6 +130,7 @@ namespace TriangleNet.Voronoi
 
                 vertex = factory.CreateVertex(pt.x, pt.y);
                 vertex.id = id;
+                vertex.label = t.label;
 
                 vertices[id] = vertex;
                 map[id] = new List<HalfEdge>();
