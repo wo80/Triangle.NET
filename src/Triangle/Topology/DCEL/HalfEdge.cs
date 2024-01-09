@@ -7,12 +7,12 @@
 namespace TriangleNet.Topology.DCEL
 {
     /// <summary>
-    /// A half-edge of the DCEL datastructure.
+    /// A half-edge of the DCEL data structure.
     /// </summary>
     public class HalfEdge
     {
         internal int id;
-        internal int mark;
+        internal int label;
 
         internal Vertex origin;
         internal Face face;
@@ -29,12 +29,15 @@ namespace TriangleNet.Topology.DCEL
         }
 
         /// <summary>
-        /// Gets or sets a boundary marker.
+        /// Gets or sets a general-purpose label.
         /// </summary>
-        public int Boundary
+        /// <remarks>
+        /// Can be used to identify boundary segments.
+        /// </remarks>
+        public int Label
         {
-            get { return mark; }
-            set { mark = value; }
+            get { return label; }
+            set { label = value; }
         }
 
         /// <summary>

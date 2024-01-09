@@ -37,7 +37,7 @@ namespace TriangleNet.Voronoi
         /// Initializes a new instance of the <see cref="StandardVoronoi" /> class.
         /// </summary>
         /// <param name="mesh">The mesh.</param>
-        /// <param name="box">The bounding box used for clipping (not implemented.)</param>
+        /// <param name="box">The bounding box used for clipping (not implemented).</param>
         /// <param name="factory"></param>
         /// <param name="predicates"></param>
         public StandardVoronoi(Mesh mesh, Rectangle box, IVoronoiFactory factory, IPredicates predicates)

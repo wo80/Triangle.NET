@@ -10,7 +10,7 @@ namespace TriangleNet.Topology.DCEL
     using TriangleNet.Geometry;
 
     /// <summary>
-    /// A face of the DCEL datastructure.
+    /// A face of the DCEL data structure.
     /// </summary>
     public class Face
     {
@@ -30,7 +30,7 @@ namespace TriangleNet.Topology.DCEL
         #endregion
 
         internal int id;
-        internal int mark;
+        internal int label;
 
         // If the face is a Voronoi cell, this is the point that generates the cell.
         internal Point generator;
@@ -51,6 +51,18 @@ namespace TriangleNet.Topology.DCEL
         {
             get { return id; }
             set { id = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets a general-purpose label.
+        /// </summary>
+        /// <remarks>
+        /// For Voronoi diagrams, this will be the same as the <see cref="Generator"/> label.
+        /// </remarks>
+        public int Label
+        {
+            get { return label; }
+            set { label = value; }
         }
 
         /// <summary>
@@ -95,6 +107,7 @@ namespace TriangleNet.Topology.DCEL
             if (generator != null)
             {
                 id = generator.ID;
+                label = generator.Label;
             }
         }
 
