@@ -5,6 +5,7 @@
 // -----------------------------------------------------------------------
 
 using System;
+using System.Threading;
 
 namespace TriangleNet.Smoothing
 {
@@ -77,11 +78,12 @@ namespace TriangleNet.Smoothing
         /// the previous and the current solutions. If their relative difference
         /// is not greater than the tolerance, the current solution is
         /// considered good enough already.</param>
+        /// <param name="cancellationToken">A token that receives a cancellation notification when requested.</param>
         /// <returns>The number of actual iterations performed. It is 0 if a
         /// non-positive limit is passed. Otherwise, it is always a value
         /// between 1 and the limit (inclusive).
         /// </returns>
-        public int Smooth(IMesh mesh, int limit = 10, double tol = .01)
+        public int Smooth(IMesh mesh, int limit = 10, double tol = .01, CancellationToken cancellationToken = default)
         {
             if (limit <= 0)
               return 0;
@@ -106,6 +108,9 @@ namespace TriangleNet.Smoothing
             int i = 0;
             while (i < limit && Math.Abs(currMax - prevMax) > tol * currMax)
             {
+                // throw an OperationCanceledException if cancellation is requested
+                cancellationToken.ThrowIfCancellationRequested();
+
                 prevMax = currMax;
                 currMax = Step(smoothedMesh, factory, predicates);
 

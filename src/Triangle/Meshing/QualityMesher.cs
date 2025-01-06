@@ -9,6 +9,7 @@ namespace TriangleNet.Meshing
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading;
     using TriangleNet.Geometry;
     using TriangleNet.Meshing.Data;
     using TriangleNet.Topology;
@@ -55,7 +56,8 @@ namespace TriangleNet.Meshing
         /// </summary>
         /// <param name="quality">The quality constraints.</param>
         /// <param name="delaunay">A value indicating, whether the refined mesh should be Conforming Delaunay.</param>
-        public void Apply(QualityOptions quality, bool delaunay = false)
+        /// <param name="cancellationToken">A token that receives a cancellation notification when requested.</param>
+        public void Apply(QualityOptions quality, bool delaunay = false, CancellationToken cancellationToken = default)
         {
             // Copy quality options
             if (quality != null)
@@ -98,7 +100,7 @@ namespace TriangleNet.Meshing
             if (behavior.Quality && mesh.triangles.Count > 0)
             {
                 // Enforce angle and area constraints.
-                EnforceQuality();
+                EnforceQuality(cancellationToken);
             }
         }
 
@@ -841,7 +843,7 @@ namespace TriangleNet.Meshing
         /// <summary>
         /// Remove all the encroached subsegments and bad triangles from the triangulation.
         /// </summary>
-        private void EnforceQuality()
+        private void EnforceQuality(CancellationToken cancellationToken)
         {
             BadTriangle badtri;
 
@@ -864,6 +866,9 @@ namespace TriangleNet.Meshing
                 mesh.checkquality = true;
                 while ((queue.Count > 0) && (mesh.steinerleft != 0))
                 {
+                    // throw an OperationCanceledException if cancellation is requested
+                    cancellationToken.ThrowIfCancellationRequested();
+
                     // Fix one bad triangle by inserting a vertex at its circumcenter.
                     badtri = queue.Dequeue();
                     SplitTriangle(badtri);

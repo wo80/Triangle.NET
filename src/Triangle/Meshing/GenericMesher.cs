@@ -8,6 +8,7 @@ namespace TriangleNet.Meshing
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading;
     using TriangleNet.Geometry;
     using TriangleNet.IO;
     using TriangleNet.Meshing.Algorithm;
@@ -96,10 +97,11 @@ namespace TriangleNet.Meshing
         /// </summary>
         /// <param name="polygon">The input polygon.</param>
         /// <param name="quality">The <see cref="QualityOptions"/>.</param>
+        /// <param name="cancellationToken">A token that receives a cancellation notification when requested.</param>
         /// <returns>The mesh.</returns>
-        public IMesh Triangulate(IPolygon polygon, QualityOptions quality)
+        public IMesh Triangulate(IPolygon polygon, QualityOptions quality, CancellationToken cancellationToken = default)
         {
-            return Triangulate(polygon, null, quality);
+            return Triangulate(polygon, null, quality, cancellationToken);
         }
 
         /// <summary>
@@ -108,8 +110,9 @@ namespace TriangleNet.Meshing
         /// <param name="polygon">The input polygon.</param>
         /// <param name="options">The <see cref="ConstraintOptions"/>.</param>
         /// <param name="quality">The <see cref="QualityOptions"/>.</param>
+        /// <param name="cancellationToken">A token that receives a cancellation notification when requested.</param>
         /// <returns>The mesh.</returns>
-        public IMesh Triangulate(IPolygon polygon, ConstraintOptions options, QualityOptions quality)
+        public IMesh Triangulate(IPolygon polygon, ConstraintOptions options, QualityOptions quality, CancellationToken cancellationToken = default)
         {
             var mesh = (Mesh)triangulator.Triangulate(polygon.Points, config);
 
@@ -122,7 +125,7 @@ namespace TriangleNet.Meshing
             cmesher.Apply(polygon, options);
 
             // Refine mesh.
-            qmesher.Apply(quality);
+            qmesher.Apply(quality, options?.ConformingDelaunay ?? false, cancellationToken);
 
             return mesh;
         }

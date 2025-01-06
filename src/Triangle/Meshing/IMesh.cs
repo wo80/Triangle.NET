@@ -2,6 +2,7 @@
 namespace TriangleNet.Meshing
 {
     using System.Collections.Generic;
+    using System.Threading;
     using TriangleNet.Topology;
     using TriangleNet.Geometry;
 
@@ -49,9 +50,8 @@ namespace TriangleNet.Meshing
         /// Refine the mesh.
         /// </summary>
         /// <param name="quality">The quality constraints.</param>
-        /// <param name="delaunay">
-        /// A value indicating, whether the refined mesh should be Conforming Delaunay.
-        /// </param>
-        void Refine(QualityOptions quality, bool delaunay);
+        /// <param name="delaunay">A value indicating, whether the refined mesh should be Conforming Delaunay.</param>
+        /// <param name="cancellationToken">A token that receives a cancellation notification when requested.</param>
+        void Refine(QualityOptions quality, bool delaunay, CancellationToken cancellationToken = default);
     }
 }

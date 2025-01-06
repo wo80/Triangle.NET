@@ -9,6 +9,7 @@ namespace TriangleNet
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading;
     using TriangleNet.Geometry;
     using TriangleNet.Meshing;
     using TriangleNet.Meshing.Data;
@@ -224,7 +225,8 @@ namespace TriangleNet
         /// </summary>
         /// <param name="quality">The quality constraints.</param>
         /// <param name="delaunay">A value indicating, whether the refined mesh should be Conforming Delaunay.</param>
-        public void Refine(QualityOptions quality, bool delaunay = false)
+        /// <param name="cancellationToken">A token that receives a cancellation notification when requested.</param>
+        public void Refine(QualityOptions quality, bool delaunay = false, CancellationToken cancellationToken = default)
         {
             invertices = vertices.Count;
 
@@ -241,7 +243,7 @@ namespace TriangleNet
             }
 
             // Enforce angle and area constraints.
-            qualityMesher.Apply(quality, delaunay);
+            qualityMesher.Apply(quality, delaunay, cancellationToken);
         }
 
         /// <summary>

@@ -1,7 +1,7 @@
 ﻿
 namespace TriangleNet.Geometry
 {
-    using System;
+    using System.Threading;
     using TriangleNet.Meshing;
 
     /// <summary>
@@ -34,9 +34,10 @@ namespace TriangleNet.Geometry
         /// </summary>
         /// <param name="polygon">Polygon instance.</param>
         /// <param name="quality">Quality options.</param>
-        public static IMesh Triangulate(this IPolygon polygon, QualityOptions quality)
+        /// <param name="cancellationToken">A token that receives a cancellation notification when requested.</param>
+        public static IMesh Triangulate(this IPolygon polygon, QualityOptions quality, CancellationToken cancellationToken = default)
         {
-            return (new GenericMesher()).Triangulate(polygon, null, quality);
+            return (new GenericMesher()).Triangulate(polygon, null, quality, cancellationToken);
         }
 
         /// <summary>
@@ -45,9 +46,10 @@ namespace TriangleNet.Geometry
         /// <param name="polygon">Polygon instance.</param>
         /// <param name="options">Constraint options.</param>
         /// <param name="quality">Quality options.</param>
-        public static IMesh Triangulate(this IPolygon polygon, ConstraintOptions options, QualityOptions quality)
+        /// <param name="cancellationToken">A token that receives a cancellation notification when requested.</param>
+        public static IMesh Triangulate(this IPolygon polygon, ConstraintOptions options, QualityOptions quality, CancellationToken cancellationToken = default)
         {
-            return (new GenericMesher()).Triangulate(polygon, options, quality);
+            return (new GenericMesher()).Triangulate(polygon, options, quality, cancellationToken);
         }
 
         /// <summary>
