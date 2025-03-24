@@ -15,7 +15,7 @@ namespace TriangleNet.Meshing.Iterators
     /// </summary>
     public class VertexCirculator
     {
-        List<Otri> cache = new List<Otri>();
+        private readonly List<Otri> cache = new List<Otri>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VertexCirculator" /> class.
@@ -28,7 +28,7 @@ namespace TriangleNet.Meshing.Iterators
         /// <summary>
         /// Enumerate all vertices adjacent to given vertex.
         /// </summary>
-        /// <param name="vertex">The center vertex.</param>
+        /// <param name="vertex">The center vertex (has to be part of the mesh topology).</param>
         /// <returns></returns>
         public IEnumerable<Vertex> EnumerateVertices(Vertex vertex)
         {
@@ -43,7 +43,7 @@ namespace TriangleNet.Meshing.Iterators
         /// <summary>
         /// Enumerate all triangles adjacent to given vertex.
         /// </summary>
-        /// <param name="vertex">The center vertex.</param>
+        /// <param name="vertex">The center vertex (has to be part of the mesh topology).</param>
         /// <returns></returns>
         public IEnumerable<ITriangle> EnumerateTriangles(Vertex vertex)
         {
@@ -60,8 +60,8 @@ namespace TriangleNet.Meshing.Iterators
             cache.Clear();
 
             Otri init = vertex.tri;
-            Otri next = default(Otri);
-            Otri prev = default(Otri);
+            Otri next = default;
+            Otri prev = default;
 
             init.Copy(ref next);
 
