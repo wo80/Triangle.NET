@@ -29,6 +29,7 @@ namespace TriangleNet
         #region Default predicates instance (Singleton)
 
         private static readonly object creationLock = new object();
+        private readonly object InCircleAdaptLock = new object();
         private static RobustPredicates _default;
 
         /// <summary>
@@ -232,7 +233,10 @@ namespace TriangleNet
             }
 
             Statistic.InCircleAdaptCount++;
-            return InCircleAdapt(pa, pb, pc, pd, permanent);
+            lock (InCircleAdaptLock)
+            {
+                return InCircleAdapt(pa, pb, pc, pd, permanent);
+            }
         }
 
         /// <summary>
