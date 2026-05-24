@@ -10,6 +10,7 @@
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <Version>1.0.0-beta5</Version>
     <LangVersion>default</LangVersion>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
