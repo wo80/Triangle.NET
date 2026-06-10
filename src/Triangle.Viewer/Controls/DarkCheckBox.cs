@@ -7,6 +7,7 @@
 namespace MeshExplorer.Controls
 {
     using System;
+    using System.ComponentModel;
     using System.Drawing;
     using System.Drawing.Drawing2D;
     using System.Drawing.Text;
@@ -65,6 +66,7 @@ namespace MeshExplorer.Controls
         int boxSize = 13;
 
         bool isChecked = false;
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool Checked
         {
             get { return isChecked; }

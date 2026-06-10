@@ -8,6 +8,7 @@
 namespace MeshExplorer.Controls
 {
     using System;
+    using System.ComponentModel;
     using System.Drawing;
     using System.Drawing.Drawing2D;
     using System.Windows.Forms;
@@ -100,6 +101,7 @@ namespace MeshExplorer.Controls
         /// Gets or sets the value of Slider.
         /// </summary>
         /// <value>The value.</value>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public int Value
         {
             get { return trackerValue; }
@@ -121,6 +123,7 @@ namespace MeshExplorer.Controls
         /// Gets or sets the minimum value.
         /// </summary>
         /// <value>The minimum value.</value>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public int Minimum
         {
             get { return barMinimum; }
@@ -146,6 +149,7 @@ namespace MeshExplorer.Controls
         /// Gets or sets the maximum value.
         /// </summary>
         /// <value>The maximum value.</value>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public int Maximum
         {
             get { return barMaximum; }
@@ -170,6 +174,7 @@ namespace MeshExplorer.Controls
         /// Gets or sets trackbar's small change. It affects how to behave when directional keys are pressed
         /// </summary>
         /// <value>The small change value.</value>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public uint CriticalPercent
         {
             get { return criticalPercent; }

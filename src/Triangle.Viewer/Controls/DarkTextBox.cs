@@ -7,6 +7,7 @@
 namespace MeshExplorer.Controls
 {
     using System;
+    using System.ComponentModel;
     using System.Drawing;
     using System.Windows.Forms;
 
@@ -203,6 +204,7 @@ namespace MeshExplorer.Controls
 
         #region Textbox properties
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public HorizontalAlignment TextAlign
         {
             get

@@ -6,6 +6,7 @@
 
 namespace TriangleNet.Rendering.GDI
 {
+    using System.ComponentModel;
     using System.Drawing;
     using System.Drawing.Drawing2D;
     using System.Drawing.Text;
@@ -55,6 +56,7 @@ namespace TriangleNet.Rendering.GDI
             };
         }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public IRenderer Renderer { get; set; }
 
         /// <summary>

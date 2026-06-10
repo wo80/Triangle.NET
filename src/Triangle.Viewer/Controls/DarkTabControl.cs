@@ -7,6 +7,7 @@
 
 namespace MeshExplorer.Controls
 {
+    using System.ComponentModel;
     using System.Drawing;
     using System.Drawing.Text;
     using System.Windows.Forms;
@@ -76,6 +77,7 @@ namespace MeshExplorer.Controls
 
         #region Properties
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         new public TabAlignment Alignment
         {
             get { return base.Alignment; }
