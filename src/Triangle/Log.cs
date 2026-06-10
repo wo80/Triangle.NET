@@ -12,12 +12,12 @@ namespace TriangleNet
     /// <summary>
     /// The log level.
     /// </summary>
-    public enum LogLevel { Info, Warning, Error }
+    public enum LogEventLevel { Information, Warning, Error }
 
     /// <summary>
     /// Represents an item stored in the log.
     /// </summary>
-    public class LogItem
+    public class LogEvent
     {
         /// <summary>
         /// Gets the <see cref="DateTime"/> the item was logged.
@@ -25,9 +25,9 @@ namespace TriangleNet
         public DateTime Time { get; }
 
         /// <summary>
-        /// Gets the <see cref="LogLevel"/>.
+        /// Gets the <see cref="LogEventLevel"/>.
         /// </summary>
-        public LogLevel Level { get; }
+        public LogEventLevel Level { get; }
 
         /// <summary>
         /// Gets the log message.
@@ -40,21 +40,21 @@ namespace TriangleNet
         public string Details { get; }
 
         /// <summary>
-        /// Creates a new instance of the <see cref="LogItem"/> class.
+        /// Creates a new instance of the <see cref="LogEvent"/> class.
         /// </summary>
         /// <param name="level">The log level.</param>
         /// <param name="message">The log message.</param>
-        public LogItem(LogLevel level, string message)
+        public LogEvent(LogEventLevel level, string message)
             : this(level, message, "")
         { }
 
         /// <summary>
-        /// Creates a new instance of the <see cref="LogItem"/> class.
+        /// Creates a new instance of the <see cref="LogEvent"/> class.
         /// </summary>
         /// <param name="level">The log level.</param>
         /// <param name="message">The log message.</param>
         /// <param name="details">The message details.</param>
-        public LogItem(LogLevel level, string message, string details)
+        public LogEvent(LogEventLevel level, string message, string details)
         {
             Time = DateTime.Now;
             Level = level;
@@ -76,7 +76,7 @@ namespace TriangleNet
         /// <summary>
         /// Gets all log messages.
         /// </summary>
-        public IList<LogItem> Data { get; } = new List<LogItem>();
+        public IList<LogEvent> Data { get; } = new List<LogEvent>();
 
         #region Singleton pattern
 
@@ -97,10 +97,10 @@ namespace TriangleNet
         #endregion
 
         /// <summary>
-        /// Adds a <see cref="LogItem"/> to the log.
+        /// Adds a <see cref="LogEvent"/> to the log.
         /// </summary>
         /// <param name="item"></param>
-        public void Add(LogItem item)
+        public void Add(LogEvent item)
         {
             Data.Add(item);
         }
@@ -119,7 +119,7 @@ namespace TriangleNet
         /// <param name="message">The message.</param>
         public void Info(string message)
         {
-            Data.Add(new LogItem(LogLevel.Info, message));
+            Data.Add(new LogEvent(LogEventLevel.Information, message));
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace TriangleNet
         /// <param name="details">Message details, for example the code location where the error occurred (class, method).</param>
         public void Warning(string message, string details)
         {
-            Data.Add(new LogItem(LogLevel.Warning, message, details));
+            Data.Add(new LogEvent(LogEventLevel.Warning, message, details));
         }
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace TriangleNet
         /// <param name="details">Message details, for example the code location where the error occurred (class, method).</param>
         public void Error(string message, string details)
         {
-            Data.Add(new LogItem(LogLevel.Error, message, details));
+            Data.Add(new LogEvent(LogEventLevel.Error, message, details));
         }
     }
 }

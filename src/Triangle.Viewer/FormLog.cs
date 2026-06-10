@@ -39,15 +39,15 @@ namespace MeshExplorer
             }
         }
 
-        private ListViewItem CreateListViewItem(LogItem item)
+        private ListViewItem CreateListViewItem(LogEvent item)
         {
             ListViewItem lvi = new ListViewItem(new string[] { item.Message, item.Details });
 
-            if (item.Level == LogLevel.Error)
+            if (item.Level == LogEventLevel.Error)
             {
                 lvi.ForeColor = Color.DarkRed;
             }
-            else if (item.Level == LogLevel.Warning)
+            else if (item.Level == LogEventLevel.Warning)
             {
                 lvi.ForeColor = Color.Peru;
             }
