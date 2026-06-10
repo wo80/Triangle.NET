@@ -22,10 +22,6 @@ namespace TriangleNet
     {
         const double EPS = 1e-50;
 
-        // A safeguard to prevent an infinite loop in GetStarPoints method, see
-        // https://github.com/wo80/Triangle.NET/issues/58
-        const int GETSTARPOINTS_SAFEGUARD = 2000;
-
         IPredicates predicates;
 
         Mesh mesh;
@@ -2295,7 +2291,11 @@ namespace TriangleNet
 
                     if (numvertices == points.Length)
                     {
-                        Array.Resize(ref points, numvertices * 2);
+                        // See https://github.com/wo80/Triangle.NET/issues/58
+                        Log.Instance.Warning("aCute smoothing ran out of precision", "NewLocation.GetStarPoints()");
+
+                        numvertices = 0;
+                        break;
                     }
 
                     // add a new point to the list of surrounding points
@@ -2305,12 +2305,6 @@ namespace TriangleNet
                     numvertices++;
                 }
                 else
-                {
-                    numvertices = 0;
-                    break;
-                }
-
-                if (numvertices > GETSTARPOINTS_SAFEGUARD)
                 {
                     numvertices = 0;
                     break;
