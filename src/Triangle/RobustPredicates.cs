@@ -28,38 +28,18 @@ namespace TriangleNet
     {
         #region Default predicates instance (Singleton)
 
-        private static readonly object creationLock = new object();
-        private static RobustPredicates _default;
-
         /// <summary>
         /// Gets the default configuration instance.
         /// </summary>
-        public static RobustPredicates Default
-        {
-            get
-            {
-                if (_default == null)
-                {
-                    lock (creationLock)
-                    {
-                        if (_default == null)
-                        {
-                            _default = new RobustPredicates();
-                        }
-                    }
-                }
-
-                return _default;
-            }
-        }
+        public static RobustPredicates Default { get; } = new RobustPredicates();
 
         #endregion
 
         #region Static initialization
 
-        private static double epsilon, splitter, resulterrbound;
-        private static double ccwerrboundA, ccwerrboundB, ccwerrboundC;
-        private static double iccerrboundA, iccerrboundB, iccerrboundC;
+        private static readonly double epsilon, splitter, resulterrbound;
+        private static readonly double ccwerrboundA, ccwerrboundB, ccwerrboundC;
+        private static readonly double iccerrboundA, iccerrboundB, iccerrboundC;
         //private static double o3derrboundA, o3derrboundB, o3derrboundC;
 
         /// <summary>
@@ -126,7 +106,6 @@ namespace TriangleNet
         /// </summary>
         public RobustPredicates()
         {
-            AllocateWorkspace();
         }
 
         /// <inheritdoc/>
@@ -422,7 +401,7 @@ namespace TriangleNet
         /// property.  (That is, if e is strongly nonoverlapping, h will be also.) Does NOT
         /// maintain the nonoverlapping or nonadjacent properties. 
         /// </remarks>
-        private int FastExpansionSumZeroElim(int elen, double[] e, int flen, double[] f, double[] h)
+        private unsafe int FastExpansionSumZeroElim(int elen, double* e, int flen, double* f, double* h)
         {
             double Q;
             double Qnew;
@@ -548,7 +527,7 @@ namespace TriangleNet
         /// maintains the strongly nonoverlapping and nonadjacent properties as well. (That is,
         /// if e has one of these properties, so will h.)
         /// </remarks>
-        private int ScaleExpansionZeroElim(int elen, double[] e, double b, double[] h)
+        private unsafe int ScaleExpansionZeroElim(int elen, double* e, double b, double* h)
         {
             double Q, sum;
             double hh;
@@ -598,7 +577,7 @@ namespace TriangleNet
         /// <param name="elen"></param>
         /// <param name="e"></param>
         /// <returns></returns>
-        private double Estimate(int elen, double[] e)
+        private unsafe double Estimate(int elen, double* e)
         {
             double Q;
             int eindex;
@@ -629,7 +608,7 @@ namespace TriangleNet
         /// the returned value has the correct sign.  Hence, this function is usually quite fast,
         /// but will run more slowly when the input points are collinear or nearly so.
         /// </remarks>
-        private double CounterClockwiseAdapt(Point pa, Point pb, Point pc, double detsum)
+        private unsafe double CounterClockwiseAdapt(Point pa, Point pb, Point pc, double detsum)
         {
             double acx, acy, bcx, bcy;
             double acxtail, acytail, bcxtail, bcytail;
@@ -638,8 +617,8 @@ namespace TriangleNet
             double det, errbound;
             // Edited to work around index out of range exceptions (changed array length from 4 to 5).
             // See unsafe indexing in FastExpansionSumZeroElim.
-            double[] B = new double[5], u = new double[5];
-            double[] C1 = new double[8], C2 = new double[12], D = new double[16];
+            double* B = stackalloc double[5], u = stackalloc double[5];
+            double* C1 = stackalloc double[8], C2 = stackalloc double[12], D = stackalloc double[16];
             double B3;
             int C1length, C2length, Dlength;
 
@@ -734,51 +713,82 @@ namespace TriangleNet
         /// the returned value has the correct sign. Hence, this function is usually quite fast,
         /// but will run more slowly when the input points are cocircular or nearly so.
         /// </remarks>
-        private double InCircleAdapt(Point pa, Point pb, Point pc, Point pd, double permanent)
+        private unsafe double InCircleAdapt(Point pa, Point pb, Point pc, Point pd, double permanent)
         {
+            double* fin1 = stackalloc double[1152];
+            double* fin2 = stackalloc double[1152];
+            double* abdet = stackalloc double[64];
+
+            double* axbc = stackalloc double[8];
+            double* axxbc = stackalloc double[16];
+            double* aybc = stackalloc double[8];
+            double* ayybc = stackalloc double[16];
+            double* adet = stackalloc double[32];
+
+            double* bxca = stackalloc double[8];
+            double* bxxca = stackalloc double[16];
+            double* byca = stackalloc double[8];
+            double* byyca = stackalloc double[16];
+            double* bdet = stackalloc double[32];
+
+            double* cxab = stackalloc double[8];
+            double* cxxab = stackalloc double[16];
+            double* cyab = stackalloc double[8];
+            double* cyyab = stackalloc double[16];
+            double* cdet = stackalloc double[32];
+
+            double* temp8 = stackalloc double[8];
+            double* temp16a = stackalloc double[16];
+            double* temp16b = stackalloc double[16];
+            double* temp16c = stackalloc double[16];
+
+            double* temp32a = stackalloc double[32];
+            double* temp32b = stackalloc double[32];
+            double* temp48 = stackalloc double[48];
+            double* temp64 = stackalloc double[64];
             double adx, bdx, cdx, ady, bdy, cdy;
             double det, errbound;
 
             double bdxcdy1, cdxbdy1, cdxady1, adxcdy1, adxbdy1, bdxady1;
             double bdxcdy0, cdxbdy0, cdxady0, adxcdy0, adxbdy0, bdxady0;
-            double[] bc = new double[4], ca = new double[4], ab = new double[4];
+            double* bc = stackalloc double[4], ca = stackalloc double[4], ab = stackalloc double[4];
             double bc3, ca3, ab3;
             int axbclen, axxbclen, aybclen, ayybclen, alen;
             int bxcalen, bxxcalen, bycalen, byycalen, blen;
             int cxablen, cxxablen, cyablen, cyyablen, clen;
             int ablen;
-            double[] finnow, finother, finswap;
+            double* finnow, finother, finswap;
             int finlength;
 
             double adxtail, bdxtail, cdxtail, adytail, bdytail, cdytail;
             double adxadx1, adyady1, bdxbdx1, bdybdy1, cdxcdx1, cdycdy1;
             double adxadx0, adyady0, bdxbdx0, bdybdy0, cdxcdx0, cdycdy0;
-            double[] aa = new double[4], bb = new double[4], cc = new double[4];
+            double* aa = stackalloc double[4], bb = stackalloc double[4], cc = stackalloc double[4];
             double aa3, bb3, cc3;
             double ti1, tj1;
             double ti0, tj0;
             // Edited to work around index out of range exceptions (changed array length from 4 to 5).
             // See unsafe indexing in FastExpansionSumZeroElim.
-            double[] u = new double[5], v = new double[5];
+            double* u = stackalloc double[5], v = stackalloc double[5];
             double u3, v3;
             int temp8len, temp16alen, temp16blen, temp16clen;
             int temp32alen, temp32blen, temp48len, temp64len;
-            double[] axtbb = new double[8], axtcc = new double[8], aytbb = new double[8], aytcc = new double[8];
+            double* axtbb = stackalloc double[8], axtcc = stackalloc double[8], aytbb = stackalloc double[8], aytcc = stackalloc double[8];
             int axtbblen, axtcclen, aytbblen, aytcclen;
-            double[] bxtaa = new double[8], bxtcc = new double[8], bytaa = new double[8], bytcc = new double[8];
+            double* bxtaa = stackalloc double[8], bxtcc = stackalloc double[8], bytaa = stackalloc double[8], bytcc = stackalloc double[8];
             int bxtaalen, bxtcclen, bytaalen, bytcclen;
-            double[] cxtaa = new double[8], cxtbb = new double[8], cytaa = new double[8], cytbb = new double[8];
+            double* cxtaa = stackalloc double[8], cxtbb = stackalloc double[8], cytaa = stackalloc double[8], cytbb = stackalloc double[8];
             int cxtaalen, cxtbblen, cytaalen, cytbblen;
-            double[] axtbc = new double[8], aytbc = new double[8], bxtca = new double[8], bytca = new double[8], cxtab = new double[8], cytab = new double[8];
+            double* axtbc = stackalloc double[8], aytbc = stackalloc double[8], bxtca = stackalloc double[8], bytca = stackalloc double[8], cxtab = stackalloc double[8], cytab = stackalloc double[8];
             int axtbclen = 0, aytbclen = 0, bxtcalen = 0, bytcalen = 0, cxtablen = 0, cytablen = 0;
-            double[] axtbct = new double[16], aytbct = new double[16], bxtcat = new double[16], bytcat = new double[16], cxtabt = new double[16], cytabt = new double[16];
+            double* axtbct = stackalloc double[16], aytbct = stackalloc double[16], bxtcat = stackalloc double[16], bytcat = stackalloc double[16], cxtabt = stackalloc double[16], cytabt = stackalloc double[16];
             int axtbctlen, aytbctlen, bxtcatlen, bytcatlen, cxtabtlen, cytabtlen;
-            double[] axtbctt = new double[8], aytbctt = new double[8], bxtcatt = new double[8];
-            double[] bytcatt = new double[8], cxtabtt = new double[8], cytabtt = new double[8];
+            double* axtbctt = stackalloc double[8], aytbctt = stackalloc double[8], bxtcatt = stackalloc double[8];
+            double* bytcatt = stackalloc double[8], cxtabtt = stackalloc double[8], cytabtt = stackalloc double[8];
             int axtbcttlen, aytbcttlen, bxtcattlen, bytcattlen, cxtabttlen, cytabttlen;
-            double[] abt = new double[8], bct = new double[8], cat = new double[8];
+            double* abt = stackalloc double[8], bct = stackalloc double[8], cat = stackalloc double[8];
             int abtlen, bctlen, catlen;
-            double[] abtt = new double[4], bctt = new double[4], catt = new double[4];
+            double* abtt = stackalloc double[4], bctt = stackalloc double[4], catt = stackalloc double[4];
             int abttlen, bcttlen, cattlen;
             double abtt3, bctt3, catt3;
             double negate;
@@ -791,13 +801,6 @@ namespace TriangleNet
             double err1, err2, err3;
             double _i, _j;
             double _0;
-
-            adx = (double)(pa.x - pd.x);
-            bdx = (double)(pb.x - pd.x);
-            cdx = (double)(pc.x - pd.x);
-            ady = (double)(pa.y - pd.y);
-            bdy = (double)(pb.y - pd.y);
-            cdy = (double)(pc.y - pd.y);
 
             adx = (double)(pa.x - pd.x);
             bdx = (double)(pb.x - pd.x);
@@ -858,13 +861,13 @@ namespace TriangleNet
                 return det;
             }
 
-            errbound = iccerrboundC * permanent + resulterrbound * ((det) >= 0.0 ? (det) : -(det));
-            det += ((adx * adx + ady * ady) * ((bdx * cdytail + cdy * bdxtail) - (bdy * cdxtail + cdx * bdytail))
-                    + 2.0 * (adx * adxtail + ady * adytail) * (bdx * cdy - bdy * cdx))
-                 + ((bdx * bdx + bdy * bdy) * ((cdx * adytail + ady * cdxtail) - (cdy * adxtail + adx * cdytail))
-                    + 2.0 * (bdx * bdxtail + bdy * bdytail) * (cdx * ady - cdy * adx))
-                 + ((cdx * cdx + cdy * cdy) * ((adx * bdytail + bdy * adxtail) - (ady * bdxtail + bdx * adytail))
-                    + 2.0 * (cdx * cdxtail + cdy * cdytail) * (adx * bdy - ady * bdx));
+            errbound = (iccerrboundC * permanent) + (resulterrbound * (det >= 0.0 ? det : -det));
+            det += (((adx * adx) + (ady * ady)) * ((bdx * cdytail) + (cdy * bdxtail) - ((bdy * cdxtail) + (cdx * bdytail))))
+                    + (2.0 * ((adx * adxtail) + (ady * adytail)) * ((bdx * cdy) - (bdy * cdx)))
+                 + ((((bdx * bdx) + (bdy * bdy)) * ((cdx * adytail) + (ady * cdxtail) - ((cdy * adxtail) + (adx * cdytail))))
+                    + (2.0 * ((bdx * bdxtail) + (bdy * bdytail)) * ((cdx * ady) - (cdy * adx))))
+                 + ((((cdx * cdx) + (cdy * cdy)) * ((adx * bdytail) + (bdy * adxtail) - ((ady * bdxtail) + (bdx * adytail))))
+                    + (2.0 * ((cdx * cdxtail) + (cdy * cdytail)) * ((adx * bdy) - (ady * bdx))));
             if ((det >= errbound) || (-det >= errbound))
             {
                 return det;
@@ -1064,7 +1067,6 @@ namespace TriangleNet
                     finlength = FastExpansionSumZeroElim(finlength, finnow, temp48len, temp48, finother);
                     finswap = finnow; finnow = finother; finother = finswap;
 
-
                     temp32alen = ScaleExpansionZeroElim(aytbctlen, aytbct, adytail, temp32a);
                     aytbcttlen = ScaleExpansionZeroElim(bcttlen, bctt, adytail, aytbctt);
                     temp16alen = ScaleExpansionZeroElim(aytbcttlen, aytbctt, 2.0 * ady, temp16a);
@@ -1229,7 +1231,6 @@ namespace TriangleNet
                     finlength = FastExpansionSumZeroElim(finlength, finnow, temp48len, temp48, finother);
                     finswap = finnow; finnow = finother; finother = finswap;
 
-
                     temp32alen = ScaleExpansionZeroElim(cytabtlen, cytabt, cdytail, temp32a);
                     cytabttlen = ScaleExpansionZeroElim(abttlen, abtt, cdytail, cytabtt);
                     temp16alen = ScaleExpansionZeroElim(cytabttlen, cytabtt, 2.0 * cdy, temp16a);
@@ -1243,60 +1244,6 @@ namespace TriangleNet
 
             return finnow[finlength - 1];
         }
-
-        #region Workspace
-
-        // InCircleAdapt workspace:
-        double[] fin1, fin2, abdet;
-
-        double[] axbc, axxbc, aybc, ayybc, adet;
-        double[] bxca, bxxca, byca, byyca, bdet;
-        double[] cxab, cxxab, cyab, cyyab, cdet;
-
-        double[] temp8, temp16a, temp16b, temp16c;
-        double[] temp32a, temp32b, temp48, temp64;
-
-        private void AllocateWorkspace()
-        {
-            fin1 = new double[1152];
-            fin2 = new double[1152];
-            abdet = new double[64];
-
-            axbc = new double[8];
-            axxbc = new double[16];
-            aybc = new double[8];
-            ayybc = new double[16];
-            adet = new double[32];
-
-            bxca = new double[8];
-            bxxca = new double[16];
-            byca = new double[8];
-            byyca = new double[16];
-            bdet = new double[32];
-
-            cxab = new double[8];
-            cxxab = new double[16];
-            cyab = new double[8];
-            cyyab = new double[16];
-            cdet = new double[32];
-
-            temp8 = new double[8];
-            temp16a = new double[16];
-            temp16b = new double[16];
-            temp16c = new double[16];
-
-            temp32a = new double[32];
-            temp32b = new double[32];
-            temp48 = new double[48];
-            temp64 = new double[64];
-        }
-
-        private void ClearWorkspace()
-        {
-        }
-
-        #endregion
-
         #endregion
     }
 }
